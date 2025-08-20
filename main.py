@@ -200,7 +200,7 @@ scripts_data = [
 def server_pinger():
     while True:
         try:
-            requests.get("https://all-in-one-vadrifts.onrender.com/health", timeout=10)
+            requests.get("https://vadriftz.onrender.com/health", timeout=10)
             logger.info("Server pinged successfully")
         except Exception as e:
             logger.error(f"Ping failed: {e}")
