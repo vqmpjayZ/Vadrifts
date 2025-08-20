@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="pageTitle">Script Details - Vadrifts</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #0a0a0a;
+      color: #e8e8e8;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    .bg-lights {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: -2;
+      pointer-events: none;
+    }
+
+    .light {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.4;
+      animation-duration: 12s;
+      animation-iteration-count: infinite;
+      animation-timing-function: ease-in-out;
+    }
+
+    .light-1 {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, #ff4757 0%, transparent 70%);
+      top: -250px;
+      left: -250px;
+      animation-name: float1;
+    }
+
+    .light-2 {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, #00d2ff 0%, transparent 70%);
+      top: -200px;
+      right: -200px;
+      animation-name: float2;
+      animation-delay: -3s;
+    }
+
+    .light-3 {
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, #ff6b9d 0%, transparent 70%);
+      bottom: -225px;
+      left: -225px;
+      animation-name: float3;
+      animation-delay: -6s;
+    }
+
+    .light-4 {
+      width: 350px;
+      height: 350px;
+      background: radial-gradient(circle, #7209b7 0%, transparent 70%);
+      bottom: -175px;
+      right: -175px;
+      animation-name: float4;
+      animation-delay: -9s;
+    }
+
+    @keyframes float1 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(150px, -100px) scale(1.2); }
+      66% { transform: translate(-100px, 150px) scale(0.8); }
+    }
+
+    @keyframes float2 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(-120px, 100px) scale(1.3); }
+      66% { transform: translate(180px, -120px) scale(0.7); }
+    }
+
+    @keyframes float3 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(100px, -150px) scale(0.9); }
+      66% { transform: translate(-150px, -100px) scale(1.1); }
+    }
+
+    @keyframes float4 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(-100px, -120px) scale(1.4); }
+      66% { transform: translate(120px, 150px) scale(0.6); }
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 60px 60px;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(30px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 15px 20px;
+    }
+
+    .nav-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 24px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ff4757, #00d2ff, #ff6b9d, #7209b7);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-decoration: none;
+    }
+
+    .nav-logo-img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+    }
+
+    .nav-link {
+      color: #ccc;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      padding: 8px 16px;
+      border-radius: 8px;
+    }
+
+    .nav-link:hover {
+      color: #ff4757;
+      background: rgba(255, 71, 87, 0.1);
+    }
+
+    .back-btn {
+      background: rgba(255, 71, 87, 0.2);
+      color: #ff4757;
+      border: 1px solid #ff4757;
+      padding: 8px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 71, 87, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 100px 20px 40px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .script-header {
+      text-align: center;
+      margin-bottom: 40px;
+      animation: slideDown 1s ease-out;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .script-thumbnail {
+      width: 200px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 15px;
+      margin: 0 auto 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .script-game {
+      font-size: 14px;
+      color: #ff4757;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+
+    .script-title {
+      font-size: 36px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ff4757, #00d2ff, #ff6b9d, #7209b7);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 15px;
+    }
+
+    .script-description {
+      font-size: 18px;
+      color: #aaa;
+      line-height: 1.6;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .script-content {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 30px;
+      margin-bottom: 40px;
+      animation: slideUp 1s ease-out 0.3s both;
+      align-items: start;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .features-section, .script-section {
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(30px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 30px;
+      position: relative;
+      height: fit-content;
+    }
+
+    .features-section::before, .script-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 20px;
+      padding: 1px;
+      background: linear-gradient(45deg, 
+        rgba(255, 71, 87, 0.3) 0%, 
+        rgba(0, 210, 255, 0.3) 25%, 
+        transparent 50%, 
+        rgba(255, 107, 157, 0.3) 75%, 
+        rgba(114, 9, 183, 0.3) 100%);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask-composite: exclude;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .section-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #ff4757, #00d2ff);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .features-list {
+      list-style: none;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: #ccc;
+    }
+
+    .feature-item:last-child {
+      border-bottom: none;
+    }
+
+    .feature-icon {
+      color: #ff4757;
+      font-weight: bold;
+    }
+
+    .script-code {
+      background: rgba(5, 5, 5, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 13px;
+      line-height: 1.4;
+      color: #e8e8e8;
+      white-space: pre-wrap;
+      overflow-x: auto;
+      margin-bottom: 20px;
+      max-height: 300px;
+      overflow-y: auto;
+      word-break: break-all;
+      min-height: 80px;
+    }
+
+    .script-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 20px;
+      z-index: 50;
+      position: relative;
+    }
+
+    .action-btn {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      text-align: center;
+      font-size: 14px;
+      position: relative;
+      z-index: 51;
+      width: 100%;
+      display: block;
+    }
+
+    .copy-btn {
+      background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+      color: white;
+      box-shadow: 0 8px 25px rgba(46, 204, 113, 0.3);
+    }
+
+    .copy-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(46, 204, 113, 0.4);
+    }
+
+    .key-btn {
+      background: linear-gradient(135deg, #ff4757 0%, #ff6b9d 100%);
+      color: white;
+      box-shadow: 0 8px 25px rgba(255, 71, 87, 0.3);
+    }
+
+    .key-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(255, 71, 87, 0.4);
+    }
+
+    .game-link-btn {
+      background: linear-gradient(135deg, #00d2ff 0%, #7209b7 100%);
+      color: white;
+      box-shadow: 0 8px 25px rgba(0, 210, 255, 0.3);
+    }
+
+    .game-link-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(0, 210, 255, 0.4);
+    }
+
+    .status-message {
+      position: fixed;
+      top: 100px;
+      right: 20px;
+      padding: 15px 20px;
+      border-radius: 10px;
+      font-weight: 600;
+      z-index: 200;
+      transform: translateX(400px);
+      transition: all 0.3s ease;
+    }
+
+    .status-message.show {
+      transform: translateX(0);
+    }
+
+    .status-message.success {
+      background: rgba(46, 204, 113, 0.9);
+      color: white;
+      border-left: 4px solid #27ae60;
+    }
+
+    .status-message.error {
+      background: rgba(231, 76, 60, 0.9);
+      color: white;
+      border-left: 4px solid #c0392b;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 60px 20px;
+      color: #666;
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      border-top: 4px solid #ff4757;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .error-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #666;
+    }
+
+    .error-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+
+    @media (max-width: 768px) {
+      .nav-content {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .nav-links {
+        gap: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .script-title {
+        font-size: 28px;
+      }
+
+      .script-content {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+
+      .script-actions {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .action-btn {
+        width: 100%;
+        max-width: 300px;
+      }
+
+      .status-message {
+        right: 10px;
+        left: 10px;
+        transform: translateY(-100px);
+      }
+
+      .status-message.show {
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-lights">
+    <div class="light light-1"></div>
+    <div class="light light-2"></div>
+    <div class="light light-3"></div>
+    <div class="light light-4"></div>
+  </div>
+
+  <nav class="navbar">
+    <div class="nav-content">
+      <a href="/" class="nav-logo">
+        <img src="https://media.discordapp.net/attachments/1261422711243280478/1407435676231663728/vadrifts_v_with_glow_cropped.png?ex=68a6181e&is=68a4c69e&hm=a934572b1b64ac554dc63d534ed5765c0d8995fbfa092e04acc323141b5f8bcc&=&format=webp&quality=lossless" alt="Vadrifts" class="nav-logo-img">
+        Vadrifts
+      </a>
+      <div class="nav-links">
+        <a href="/" class="back-btn">← Back to Scripts</a>
+        <a href="/converter" class="nav-link">Image Converter</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div id="loadingState" class="loading">
+      <div class="loading-spinner"></div>
+      <p>Loading script details...</p>
+    </div>
+
+    <div id="errorState" class="error-state" style="display: none;">
+      <div class="error-icon">⚠️</div>
+      <h3>Script not found</h3>
+      <p>The script you're looking for doesn't exist or has been removed.</p>
+      <br>
+      <a href="/" class="back-btn">← Back to Scripts</a>
+    </div>
+
+    <div id="scriptContent" style="display: none;">
+      <div class="script-header">
+        <img id="scriptThumbnail" class="script-thumbnail" alt="Script Thumbnail">
+        <div id="scriptGame" class="script-game"></div>
+        <h1 id="scriptTitle" class="script-title"></h1>
+        <p id="scriptDescription" class="script-description"></p>
+      </div>
+
+      <div class="script-content">
+        <div class="features-section">
+          <h2 class="section-title">✨ Features</h2>
+          <ul id="featuresList" class="features-list"></ul>
+        </div>
+
+        <div class="script-section">
+          <h2 class="section-title">📜 Script Code</h2>
+          <div id="scriptCode" class="script-code"></div>
+          
+          <div class="script-actions">
+            <button class="action-btn copy-btn" onclick="copyScript()">
+              📋 Copy Script
+            </button>
+            <a id="keyLink" class="action-btn key-btn" href="#" style="cursor: pointer;">
+              🔑 Get Key
+            </a>
+            <button class="action-btn game-link-btn" onclick="copyGameLink()">
+              🎮 Copy Game Link
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="statusMessage" class="status-message"></div>
+
+  <script>
+    let currentScript = null;
+    let currentScriptId = null;
+
+    function getScriptIdFromURL() {
+      const pathParts = window.location.pathname.split('/');
+      const scriptId = pathParts[pathParts.length - 1];
+      console.log('Script ID from URL:', scriptId);
+      return scriptId;
+    }
+
+    async function loadScript() {
+      const scriptId = getScriptIdFromURL();
+      currentScriptId = scriptId;
+      
+      try {
+        const response = await fetch(`/api/scripts/${scriptId}`);
+        
+        if (!response.ok) {
+          throw new Error('Script not found');
+        }
+        
+        currentScript = await response.json();
+        console.log('Loaded script:', currentScript);
+        displayScript(currentScript);
+        
+      } catch (error) {
+        console.error('Failed to load script:', error);
+        showError();
+      }
+    }
+
+    function displayScript(script) {
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('scriptContent').style.display = 'block';
+  
+    document.getElementById('pageTitle').textContent = `${script.title} - Vadrifts`;
+    document.getElementById('scriptThumbnail').src = script.thumbnail;
+    document.getElementById('scriptThumbnail').alt = script.title;
+    document.getElementById('scriptGame').textContent = script.game;
+    document.getElementById('scriptTitle').textContent = script.title;
+    document.getElementById('scriptDescription').textContent = script.description;
+    document.getElementById('scriptCode').textContent = script.script;
+  
+    const keyButton = document.getElementById('keyLink');
+  
+    if (script.key_type === 'no-key') {
+        keyButton.style.display = 'none';
+    } else if (script.key_type === 'discord') {
+        keyButton.style.display = 'block';
+        keyButton.onclick = (e) => {
+        e.preventDefault();
+        window.open(script.key_link, '_blank');
+        };
+    } else {
+        keyButton.style.display = 'block';
+        keyButton.onclick = (e) => {
+        e.preventDefault();
+        goToKeySystem();
+        };
+    }
+  
+    const featuresList = document.getElementById('featuresList');
+    featuresList.innerHTML = script.features.map(feature => `
+        <li class="feature-item">
+        <span class="feature-icon">✓</span>
+        <span>${feature}</span>
+     </li>
+    `).join('');
+    }
+
+    function goToKeySystem() {
+      console.log('goToKeySystem called with scriptId:', currentScriptId);
+      console.log('currentScript:', currentScript);
+      
+      if (!currentScriptId) {
+        console.error('No script ID available');
+        return;
+      }
+      
+      if (currentScript && currentScript.key_type === 'discord') {
+        window.open(currentScript.key_link, '_blank');
+      } else {
+        const keySystemUrl = `/key-system?script=${currentScriptId}`;
+        console.log('Redirecting to:', keySystemUrl);
+        window.location.href = keySystemUrl;
+      }
+    }
+
+    function showError() {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('errorState').style.display = 'block';
+    }
+
+    function copyScript() {
+      if (!currentScript) return;
+      
+      navigator.clipboard.writeText(currentScript.script).then(() => {
+        showStatus('Script copied to clipboard!', 'success');
+      }).catch(err => {
+        console.error('Failed to copy script:', err);
+        showStatus('Failed to copy script', 'error');
+      });
+    }
+
+    function copyGameLink() {
+      if (!currentScript) return;
+      
+      const gameLink = currentScript.game_link || 'https://www.roblox.com/games';
+      navigator.clipboard.writeText(gameLink).then(() => {
+        showStatus('Game link copied to clipboard!', 'success');
+      }).catch(err => {
+        console.error('Failed to copy game link:', err);
+        showStatus('Failed to copy game link', 'error');
+      });
+    }
+
+    function showStatus(message, type) {
+      const statusEl = document.getElementById('statusMessage');
+      statusEl.textContent = message;
+      statusEl.className = `status-message ${type}`;
+      statusEl.classList.add('show');
+      
+      setTimeout(() => {
+        statusEl.classList.remove('show');
+      }, 3000);
+    }
+
+    document.addEventListener('DOMContentLoaded', loadScript);
+  </script>
+</body>
+</html>
