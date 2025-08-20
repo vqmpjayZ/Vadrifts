@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Key Verification</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #0a0a0a;
+      color: #e8e8e8;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .bg-lights {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .light {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.6;
+      animation-duration: 8s;
+      animation-iteration-count: infinite;
+      animation-timing-function: ease-in-out;
+    }
+
+    .light-1 {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, #ff4757 0%, transparent 70%);
+      top: -200px;
+      left: -200px;
+      animation-name: float1;
+    }
+
+    .light-2 {
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, #00d2ff 0%, transparent 70%);
+      top: -150px;
+      right: -150px;
+      animation-name: float2;
+      animation-delay: -2s;
+    }
+
+    .light-3 {
+      width: 350px;
+      height: 350px;
+      background: radial-gradient(circle, #ff6b9d 0%, transparent 70%);
+      bottom: -175px;
+      left: -175px;
+      animation-name: float3;
+      animation-delay: -4s;
+    }
+
+    .light-4 {
+      width: 250px;
+      height: 250px;
+      background: radial-gradient(circle, #7209b7 0%, transparent 70%);
+      bottom: -125px;
+      right: -125px;
+      animation-name: float4;
+      animation-delay: -6s;
+    }
+
+    @keyframes float1 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(100px, -50px) scale(1.1); }
+      66% { transform: translate(-50px, 100px) scale(0.9); }
+    }
+
+    @keyframes float2 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(-80px, 60px) scale(1.2); }
+      66% { transform: translate(120px, -80px) scale(0.8); }
+    }
+
+    @keyframes float3 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(60px, -100px) scale(0.9); }
+      66% { transform: translate(-100px, -60px) scale(1.1); }
+    }
+
+    @keyframes float4 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(-60px, -80px) scale(1.3); }
+      66% { transform: translate(80px, 100px) scale(0.7); }
+    }
+
+    body::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 50px 50px;
+      z-index: 2;
+    }
+
+    .container {
+      position: relative;
+      z-index: 10;
+      perspective: 1000px;
+    }
+
+    .box {
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 
+        0 25px 50px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        0 0 100px rgba(255, 71, 87, 0.1);
+      text-align: center;
+      width: 420px;
+      max-width: 90vw;
+      transform: translateZ(0);
+      animation: slideUp 0.8s ease-out;
+      position: relative;
+    }
+
+    .box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 16px;
+      padding: 1px;
+      background: linear-gradient(45deg, 
+        rgba(255, 71, 87, 0.3) 0%, 
+        rgba(0, 210, 255, 0.3) 25%, 
+        transparent 50%, 
+        rgba(255, 107, 157, 0.3) 75%, 
+        rgba(114, 9, 183, 0.3) 100%);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask-composite: exclude;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      animation: borderGlow 3s ease-in-out infinite;
+    }
+
+    @keyframes borderGlow {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px) rotateX(10deg);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) rotateX(0deg);
+      }
+    }
+
+    .logo {
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 25px;
+      background: linear-gradient(135deg, #ff4757 0%, #ff6b9d 50%, #7209b7 100%);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: white;
+      position: relative;
+      animation: logoGlow 2s ease-in-out infinite;
+      box-shadow: 0 10px 30px rgba(255, 71, 87, 0.3);
+    }
+
+    @keyframes logoGlow {
+      0%, 100% { 
+        transform: scale(1);
+        box-shadow: 0 10px 30px rgba(255, 71, 87, 0.3);
+      }
+      50% { 
+        transform: scale(1.05);
+        box-shadow: 0 15px 40px rgba(255, 71, 87, 0.5);
+      }
+    }
+
+    h2 {
+      font-size: 32px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ff4757, #00d2ff, #ff6b9d);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+      letter-spacing: -0.5px;
+      text-shadow: 0 0 30px rgba(255, 71, 87, 0.3);
+    }
+
+    .subtitle {
+      color: #888;
+      font-size: 14px;
+      margin-bottom: 35px;
+      line-height: 1.5;
+      opacity: 0.9;
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 30px;
+    }
+
+    input {
+      width: 100%;
+      padding: 18px 24px;
+      font-size: 16px;
+      background: rgba(20, 20, 20, 0.8);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      color: #e8e8e8;
+      outline: none;
+      transition: all 0.3s ease;
+      font-family: 'Consolas', 'Monaco', monospace;
+      position: relative;
+    }
+
+    input:focus {
+      border-color: #ff4757;
+      background: rgba(25, 25, 25, 0.9);
+      box-shadow: 
+        0 0 0 4px rgba(255, 71, 87, 0.1),
+        0 0 20px rgba(255, 71, 87, 0.2);
+      transform: translateY(-2px);
+    }
+
+    input::placeholder {
+      color: #555;
+    }
+
+    .verify-btn {
+      width: 100%;
+      padding: 18px;
+      background: linear-gradient(135deg, #ff4757 0%, #ff6b9d 50%, #7209b7 100%);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 0 8px 25px rgba(255, 71, 87, 0.3);
+    }
+
+    .verify-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .verify-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(255, 71, 87, 0.5);
+    }
+
+    .verify-btn:hover::before {
+      left: 100%;
+    }
+
+    .verify-btn:active {
+      transform: translateY(-1px);
+    }
+
+    .verify-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .status {
+      margin-top: 25px;
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      min-height: 20px;
+      backdrop-filter: blur(10px);
+    }
+
+    .status.loading {
+      background: rgba(255, 193, 7, 0.15);
+      color: #ffc107;
+      border-left: 4px solid #ffc107;
+      box-shadow: 0 0 20px rgba(255, 193, 7, 0.2);
+    }
+
+    .status.error {
+      background: rgba(255, 71, 87, 0.15);
+      color: #ff4757;
+      border-left: 4px solid #ff4757;
+      box-shadow: 0 0 20px rgba(255, 71, 87, 0.2);
+    }
+
+    .status.success {
+      background: rgba(46, 204, 113, 0.15);
+      color: #2ecc71;
+      border-left: 4px solid #2ecc71;
+      box-shadow: 0 0 20px rgba(46, 204, 113, 0.2);
+    }
+
+    .hwid-indicator {
+      position: absolute;
+      top: 50%;
+      right: 20px;
+      transform: translateY(-50%);
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #ff4757;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(255, 71, 87, 0.5);
+    }
+
+    .hwid-indicator.valid {
+      background: #2ecc71;
+      box-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top: 2px solid #ffc107;
+      animation: spin 1s linear infinite;
+      margin-right: 10px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 3;
+    }
+
+    .particle {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 50%;
+      animation: particleFloat 6s infinite linear;
+    }
+
+    @keyframes particleFloat {
+      0% {
+        transform: translateY(100vh) translateX(0);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-10px) translateX(100px);
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .box {
+        padding: 30px 25px;
+        width: 380px;
+      }
+      
+      h2 {
+        font-size: 26px;
+      }
+
+      .logo {
+        width: 60px;
+        height: 60px;
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-lights">
+    <div class="light light-1"></div>
+    <div class="light light-2"></div>
+    <div class="light light-3"></div>
+    <div class="light light-4"></div>
+  </div>
+
+  <div class="particles" id="particles"></div>
+
+  <div class="container">
+    <div class="box">
+      <div class="logo">🔐</div>
+      <h2>Verify HWID</h2>
+      <p class="subtitle">For us to generate you the correct key you must give us your HWID, which you can get from the script.<br>Verify below to generate your access key.</p>
+      
+      <div class="input-group">
+        <input id="hwidInput" type="text" placeholder="Hardware ID will appear here..." />
+        <div class="hwid-indicator" id="hwidIndicator"></div>
+      </div>
+      
+      <button class="verify-btn" onclick="getKey()" id="verifyBtn">
+        Generate Access Key
+      </button>
+      
+      <div class="status" id="status"></div>
+    </div>
+  </div>
+
+  <script>
+    let isValidHwid = false;
+    const allowedReferrers = ['work.ink', 'www.work.ink', 'lootdest.org'];
+
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      for (let i = 0; i < 50; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 6 + 's';
+        particle.style.animationDuration = (3 + Math.random() * 3) + 's';
+        particlesContainer.appendChild(particle);
+      }
+    }
+
+    function checkAccess() {
+      const referrer = document.referrer;
+      const hasValidReferrer = allowedReferrers.some(domain => 
+        referrer.includes(domain)
+      );
+
+      const isDirectAccess = !referrer;
+      
+      if (!hasValidReferrer) {
+        showAccessDenied();
+        return false;
+      }
+      return true;
+    }
+
+    function showAccessDenied() {
+      document.querySelector('.box').innerHTML = `
+        <div class="logo">🚫</div>
+        <h2 style="background: linear-gradient(135deg, #ff4757, #dc3545); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Access Denied</h2>
+        <p class="subtitle">Direct access to this page is not permitted.<br>Please access through the authorized portal.</p>
+        <div class="status error" style="margin-top: 30px;">
+          Unauthorized access attempt detected
+        </div>
+      `;
+    }
+
+    function updateHwidIndicator() {
+      const hwid = document.getElementById("hwidInput").value;
+      const indicator = document.getElementById("hwidIndicator");
+      
+      if (hwid && hwid.length >= 6) {
+        indicator.classList.add("valid");
+        isValidHwid = true;
+      } else {
+        indicator.classList.remove("valid");
+        isValidHwid = false;
+      }
+    }
+
+    function setStatus(message, type = '') {
+      const statusEl = document.getElementById("status");
+      statusEl.className = `status ${type}`;
+      statusEl.innerHTML = message;
+    }
+
+    async function getKey() {
+      const hwid = document.getElementById("hwidInput").value;
+      const btn = document.getElementById("verifyBtn");
+      
+      if (!hwid || hwid.length < 25) {
+        setStatus("Please enter your HWID.", "error");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<div class="loading-spinner"></div>Generating Key...';
+      setStatus('<div class="loading-spinner"></div>Generating your access key...', "loading");
+
+      try {
+        const res = await fetch(`/create?hwid=${encodeURIComponent(hwid)}`);
+        const link = await res.text();
+        
+        if (res.ok) {
+          setStatus("Access key generated successfully! Redirecting...", "success");
+          setTimeout(() => {
+            window.location.href = link;
+          }, 1500);
+        } else {
+          setStatus(`Failed to generate key: ${link}`, "error");
+          btn.disabled = false;
+          btn.innerHTML = 'Generate Access Key';
+        }
+      } catch (err) {
+        setStatus("Network error. Please check your connection and try again.", "error");
+        btn.disabled = false;
+        btn.innerHTML = 'Generate Access Key';
+      }
+    }
+
+    document.getElementById("hwidInput").addEventListener("input", updateHwidIndicator);
+    document.getElementById("hwidInput").addEventListener("keypress", (e) => {
+      if (e.key === "Enter" && isValidHwid) {
+        getKey();
+      }
+    });
+
+    if (checkAccess()) {
+      createParticles();
+    }
+  </script>
+</body>
+</html>
