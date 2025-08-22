@@ -125,7 +125,7 @@ scripts_data = [
         "id": 1,
         "title": "Vadrifts.byp",
         "game": "Universal",
-        "thumbnail": "https://media.discordapp.net/attachments/1269732925360963778/1407420132355080203/VADRIFTS_CHAT_BYPASSER_IMAGE_BANNER.jpg?ex=68a609a4&is=68a4b824&hm=9606daf495870a2601c27de5f84a215ce74b515b89e8fa661fa143f3be6480f3&=",
+        "thumbnail": "https://i.imgur.com/jI8qDiR.jpeg",
         "description": "Best and undetected Roblox Chat Bypasser. Bypasses the Roblox Chat Filters allowing you to Swear on roblox!",
         "features": [
             "Chat Bypass",
