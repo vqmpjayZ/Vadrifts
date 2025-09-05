@@ -216,14 +216,14 @@ def home():
         meta_tags = '''
     <meta property="og:title" content="Vadrifts - Roblox Scripts & Tools">
     <meta property="og:description" content="Vadrift's all-in-one website! Check out everything made by Vadrifts such as Discord server, Image converter, Roblox Scripts and More!!">
-    <meta property="og:image" content="https://i.imgur.com/jWIvrEm.png">
+    <meta property="og:image" content="https://i.imgur.com/PIHDQJf.png">
     <meta property="og:url" content="https://vadrifts.onrender.com/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Vadrifts">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Vadrifts - Roblox Scripts & Tools">
     <meta name="twitter:description" content="Vadrift's all-in-one website! Check out everything made by Vadrifts such as Discord server, Image converter, Roblox Scripts and More!!">
-    <meta name="twitter:image" content="https://i.imgur.com/jWIvrEm.png">
+    <meta name="twitter:image" content="https://i.imgur.com/PIHDQJf.png">
     <meta name="theme-color" content="#7289DA">'''
         
         return inject_meta_tags(html_content, meta_tags)
