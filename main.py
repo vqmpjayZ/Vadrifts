@@ -193,86 +193,10 @@ scripts_data = [
     },
 ]
 
-HOME_PAGE_TEMPLATE = '''<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vadrifts - Roblox Scripts & Tools</title>
-    
-    <meta property="og:title" content="Vadrifts - Roblox Scripts & Tools">
-    <meta property="og:description" content="Vadrift's all-in-one website! Check out everything made by Vadrifts such as Discord server, Image converter, Roblox Scripts and More!!">
-    <meta property="og:image" content="https://vadrifts.onrender.com/static/vadrifts-logo.png">
-    <meta property="og:url" content="https://vadrifts.onrender.com/">
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="Vadrifts">
-    
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Vadrifts - Roblox Scripts & Tools">
-    <meta name="twitter:description" content="Vadrift's all-in-one website! Check out everything made by Vadrifts such as Discord server, Image converter, Roblox Scripts and More!!">
-    <meta name="twitter:image" content="https://i.imgur.com/jWIvrEm.png">
-    
-    <meta name="description" content="Vadrift's all-in-one website! Check out everything made by Vadrifts such as Discord server, Image converter, Roblox Scripts and More!!">
-    <meta name="theme-color" content="#7289DA">
-</head>
-<body>
-    <script>
-        if (window.location.pathname === '/') {
-            window.location.href = '/templates/index.html';
-        }
-    </script>
-</body>
-</html>'''
-
-SCRIPT_PAGE_TEMPLATE = '''<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ script.title }} - Vadrifts</title>
-    
-    <meta property="og:title" content="{{ script.title }} - Vadrifts">
-    <meta property="og:description" content="{{ script.description }}">
-    <meta property="og:image" content="{{ script.thumbnail }}">
-    <meta property="og:url" content="https://vadrifts.onrender.com/script/{{ script.id }}">
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="Vadrifts">
-    
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{{ script.title }} - Vadrifts">
-    <meta name="twitter:description" content="{{ script.description }}">
-    <meta name="twitter:image" content="{{ script.thumbnail }}">
-    
-    <meta name="description" content="{{ script.description }}">
-    <meta name="theme-color" content="#7289DA">
-    
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "SoftwareApplication",
-        "name": "{{ script.title }}",
-        "description": "{{ script.description }}",
-        "image": "{{ script.thumbnail }}",
-        "applicationCategory": "Game",
-        "operatingSystem": "Cross-platform",
-        "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "USD"
-        },
-        "creator": {
-            "@type": "Organization",
-            "name": "Vadrifts"
-        }
-    }
-    </script>
-</head>
-<body>
-    <script>
-        window.location.href = '/templates/script-detail.html?id={{ script.id }}';
-    </script>
-</body>
-</html>'''
+def inject_meta_tags(html_content, meta_tags):
+    if '<head>' in html_content:
+        return html_content.replace('<head>', f'<head>\n{meta_tags}')
+    return html_content
 
 def server_pinger():
     while True:
@@ -286,9 +210,25 @@ def server_pinger():
 @app.route('/')
 def home():
     try:
-        return render_template_string(HOME_PAGE_TEMPLATE)
-    except Exception as e:
-        logger.error(f"Error rendering home template: {e}")
+        with open('templates/index.html', 'r', encoding='utf-8') as f:
+            html_content = f.read()
+        
+        meta_tags = '''
+    <meta property="og:title" content="Vadrifts - Roblox Scripts & Tools">
+    <meta property="og:description" content="Vadrift's all-in-one website! Check out everything made by Vadrifts such as Discord server, Image converter, Roblox Scripts and More!!">
+    <meta property="og:image" content="https://i.imgur.com/jWIvrEm.png">
+    <meta property="og:url" content="https://vadrifts.onrender.com/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Vadrifts">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Vadrifts - Roblox Scripts & Tools">
+    <meta name="twitter:description" content="Vadrift's all-in-one website! Check out everything made by Vadrifts such as Discord server, Image converter, Roblox Scripts and More!!">
+    <meta name="twitter:image" content="https://i.imgur.com/jWIvrEm.png">
+    <meta name="theme-color" content="#7289DA">'''
+        
+        return inject_meta_tags(html_content, meta_tags)
+    except FileNotFoundError:
+        logger.error("index.html template not found")
         return jsonify({
             "message": "Vadrifts - Your ultimate Roblox scripting platform",
             "status": "deployed",
@@ -340,21 +280,32 @@ def get_script_detail(script_id):
 
 @app.route('/script/<int:script_id>')
 def script_detail(script_id):
-    processed_scripts = process_script_data(scripts_data.copy())
-    script = next((s for s in processed_scripts if s['id'] == script_id), None)
+    script = next((s for s in scripts_data if s['id'] == script_id), None)
     
     if not script:
         return jsonify({"error": "Script not found"}), 404
     
     try:
-        return render_template_string(SCRIPT_PAGE_TEMPLATE, script=script)
-    except Exception as e:
-        logger.error(f"Error rendering script template: {e}")
-        try:
-            return send_file('templates/script-detail.html')
-        except FileNotFoundError:
-            logger.error("script-detail.html template not found")
-            return jsonify({"error": "Script detail page not found"}), 404
+        with open('templates/script-detail.html', 'r', encoding='utf-8') as f:
+            html_content = f.read()
+        
+        meta_tags = f'''
+    <meta property="og:title" content="{script['title']} - Vadrifts">
+    <meta property="og:description" content="{script['description']}">
+    <meta property="og:image" content="{script['thumbnail']}">
+    <meta property="og:url" content="https://vadrifts.onrender.com/script/{script['id']}">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Vadrifts">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{script['title']} - Vadrifts">
+    <meta name="twitter:description" content="{script['description']}">
+    <meta name="twitter:image" content="{script['thumbnail']}">
+    <meta name="theme-color" content="#7289DA">'''
+        
+        return inject_meta_tags(html_content, meta_tags)
+    except FileNotFoundError:
+        logger.error("script-detail.html template not found")
+        return jsonify({"error": "Script detail page not found"}), 404
 
 @app.route('/converter')
 def converter():
