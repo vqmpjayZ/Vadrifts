@@ -164,10 +164,6 @@ scripts_data = [
         "script": '''loadstring(game:HttpGet("https://raw.githubusercontent.com/vqmpjayZ/Vadrifts-Hub/refs/heads/main/Games/Starving-Artists/source.lua"))()''',
         "key_type": "discord",
         "key_link": "https://discord.com/invite/WDbJ5wE2cR"
-       # "key_type": "ad-websites",
-       # "key_system": {
-       #     "work_ink": "https://workink.net/20yd/vadriftscb",
-       #     "lootlabs": "https://lootdest.org/s?vadriftscb"
     },
     {
         "id": 263761432,
@@ -197,96 +193,86 @@ scripts_data = [
     },
 ]
 
-def generate_embed_html(title, description, image_url=None, url=None):
-    embed_template = """
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        
-        <title>{{ title }}</title>
-        <meta name="description" content="{{ description }}">
-        
-        <meta property="og:title" content="{{ title }}">
-        <meta property="og:description" content="{{ description }}">
-        <meta property="og:type" content="website">
-        {% if url %}<meta property="og:url" content="{{ url }}">{% endif %}
-        {% if image_url %}<meta property="og:image" content="{{ image_url }}">{% endif %}
-        <meta property="og:site_name" content="Vadrifts">
-        
-        <meta name="twitter:card" content="summary_large_image">
-        <meta name="twitter:title" content="{{ title }}">
-        <meta name="twitter:description" content="{{ description }}">
-        {% if image_url %}<meta name="twitter:image" content="{{ image_url }}">{% endif %}
-        
-        <meta name="theme-color" content="#7289da">
-        
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                margin: 0;
-                padding: 20px;
-                min-height: 100vh;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-            }
-            .container {
-                background: rgba(255, 255, 255, 0.1);
-                backdrop-filter: blur(10px);
-                border-radius: 15px;
-                padding: 40px;
-                text-align: center;
-                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-                border: 1px solid rgba(255, 255, 255, 0.18);
-                max-width: 600px;
-            }
-            h1 {
-                font-size: 2.5em;
-                margin-bottom: 20px;
-                text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-            }
-            p {
-                font-size: 1.2em;
-                line-height: 1.6;
-                margin-bottom: 30px;
-            }
-            .btn {
-                background: linear-gradient(45deg, #667eea, #764ba2);
-                color: white;
-                padding: 15px 30px;
-                border: none;
-                border-radius: 25px;
-                font-size: 1.1em;
-                cursor: pointer;
-                text-decoration: none;
-                display: inline-block;
-                transition: transform 0.3s ease;
-                box-shadow: 0 4px 15px 0 rgba(31, 38, 135, 0.4);
-            }
-            .btn:hover {
-                transform: translateY(-2px);
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <h1>{{ title }}</h1>
-            <p>{{ description }}</p>
-            <a href="/" class="btn">Go to Homepage</a>
-        </div>
-    </body>
-    </html>
-    """
-    return render_template_string(embed_template, 
-                                title=title, 
-                                description=description, 
-                                image_url=image_url, 
-                                url=url)
+HOME_PAGE_TEMPLATE = '''<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vadrifts - Roblox Scripts & Tools</title>
+    
+    <meta property="og:title" content="Vadrifts - Roblox Scripts & Tools">
+    <meta property="og:description" content="Vadrift's all-in-one website! Check out everything made by Vadrifts such as Discord server, Image converter, Roblox Scripts and More!!">
+    <meta property="og:image" content="https://vadrifts.onrender.com/static/vadrifts-logo.png">
+    <meta property="og:url" content="https://vadrifts.onrender.com/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Vadrifts">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Vadrifts - Roblox Scripts & Tools">
+    <meta name="twitter:description" content="Vadrift's all-in-one website! Check out everything made by Vadrifts such as Discord server, Image converter, Roblox Scripts and More!!">
+    <meta name="twitter:image" content="https://i.imgur.com/jWIvrEm.png">
+    
+    <meta name="description" content="Vadrift's all-in-one website! Check out everything made by Vadrifts such as Discord server, Image converter, Roblox Scripts and More!!">
+    <meta name="theme-color" content="#7289DA">
+</head>
+<body>
+    <script>
+        if (window.location.pathname === '/') {
+            window.location.href = '/templates/index.html';
+        }
+    </script>
+</body>
+</html>'''
+
+SCRIPT_PAGE_TEMPLATE = '''<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ script.title }} - Vadrifts</title>
+    
+    <meta property="og:title" content="{{ script.title }} - Vadrifts">
+    <meta property="og:description" content="{{ script.description }}">
+    <meta property="og:image" content="{{ script.thumbnail }}">
+    <meta property="og:url" content="https://vadrifts.onrender.com/script/{{ script.id }}">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Vadrifts">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ script.title }} - Vadrifts">
+    <meta name="twitter:description" content="{{ script.description }}">
+    <meta name="twitter:image" content="{{ script.thumbnail }}">
+    
+    <meta name="description" content="{{ script.description }}">
+    <meta name="theme-color" content="#7289DA">
+    
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "{{ script.title }}",
+        "description": "{{ script.description }}",
+        "image": "{{ script.thumbnail }}",
+        "applicationCategory": "Game",
+        "operatingSystem": "Cross-platform",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "creator": {
+            "@type": "Organization",
+            "name": "Vadrifts"
+        }
+    }
+    </script>
+</head>
+<body>
+    <script>
+        window.location.href = '/templates/script-detail.html';
+    </script>
+</body>
+</html>'''
 
 def server_pinger():
     while True:
@@ -300,15 +286,19 @@ def server_pinger():
 @app.route('/')
 def home():
     try:
-        return send_file('templates/index.html')
-    except FileNotFoundError:
-        logger.error("index.html template not found")
-        return generate_embed_html(
-            title="Vadrifts - Premium Roblox Scripts",
-            description="Your ultimate Roblox scripting platform. Free scripts, chat bypass, image converters and more!",
-            image_url="https://i.imgur.com/jI8qDiR.jpeg",
-            url=request.url
-        )
+        return render_template_string(HOME_PAGE_TEMPLATE)
+    except Exception as e:
+        logger.error(f"Error rendering home template: {e}")
+        return jsonify({
+            "message": "Vadrifts - Your ultimate Roblox scripting platform",
+            "status": "deployed",
+            "endpoints": {
+                "scripts": "GET /api/scripts - Get all scripts",
+                "script_detail": "GET /api/scripts/<id> - Get script details", 
+                "converter": "GET /converter - Image converter tool",
+                "convert_image": "GET /convert-image?url=<url>&crop=<true|false> - Convert image to pixels"
+            }
+        }), 200
 
 @app.route('/discord')
 def discord_invite():
@@ -350,26 +340,21 @@ def get_script_detail(script_id):
 
 @app.route('/script/<int:script_id>')
 def script_detail(script_id):
+    processed_scripts = process_script_data(scripts_data.copy())
+    script = next((s for s in processed_scripts if s['id'] == script_id), None)
+    
+    if not script:
+        return jsonify({"error": "Script not found"}), 404
+    
     try:
-        return send_file('templates/script-detail.html')
-    except FileNotFoundError:
-        logger.error("script-detail.html template not found")
-        
-        script = next((s for s in scripts_data if s['id'] == script_id), None)
-        if script:
-            return generate_embed_html(
-                title=f"{script['title']} - Vadrifts",
-                description=f"{script['description']} | Game: {script['game']}",
-                image_url=script.get('thumbnail'),
-                url=request.url
-            )
-        else:
-            return generate_embed_html(
-                title="Script Not Found - Vadrifts",
-                description="The requested script could not be found.",
-                image_url="https://i.imgur.com/jI8qDiR.jpeg",
-                url=request.url
-            )
+        return render_template_string(SCRIPT_PAGE_TEMPLATE, script=script)
+    except Exception as e:
+        logger.error(f"Error rendering script template: {e}")
+        try:
+            return send_file('templates/script-detail.html')
+        except FileNotFoundError:
+            logger.error("script-detail.html template not found")
+            return jsonify({"error": "Script detail page not found"}), 404
 
 @app.route('/converter')
 def converter():
@@ -377,12 +362,10 @@ def converter():
         return send_file('templates/converter.html')
     except FileNotFoundError:
         logger.error("converter.html template not found")
-        return generate_embed_html(
-            title="Image Converter - Vadrifts",
-            description="Convert any image to Roblox pixel format. Perfect for Starving Artists and other games!",
-            image_url="https://i.imgur.com/jI8qDiR.jpeg",
-            url=request.url
-        )
+        return jsonify({
+            "error": "Converter page not found",
+            "message": "Create templates/converter.html file"
+        }), 404
 
 @app.route('/convert-image', methods=['GET'])
 def convert_image():
@@ -469,12 +452,7 @@ def key_system():
         return send_file('templates/key-system.html')
     except FileNotFoundError:
         logger.error("key-system.html template not found")
-        return generate_embed_html(
-            title="Key System - Vadrifts",
-            description="Get your free key to access premium Vadrifts scripts. Quick and easy verification!",
-            image_url="https://i.imgur.com/jI8qDiR.jpeg",
-            url=request.url
-        )
+        return jsonify({"error": "Key system page not found"}), 404
 
 @app.route('/create')
 def create_key():
@@ -489,22 +467,11 @@ def create_key():
 def get_key(slug):
     hwid = active_slugs.get(slug)
     if not hwid:
-        return generate_embed_html(
-            title="Invalid Key Link - Vadrifts",
-            description="This key link is invalid or has expired. Please generate a new one.",
-            image_url="https://i.imgur.com/jI8qDiR.jpeg",
-            url=request.url
-        )
+        return "Invalid or expired key link", 404
     
     del active_slugs[slug]
     key = generate_key(hwid)
-    
-    return generate_embed_html(
-        title="Your Key - Vadrifts",
-        description=f"Your generated key: {key}",
-        image_url="https://i.imgur.com/jI8qDiR.jpeg",
-        url=request.url
-    )
+    return key
 
 @app.route('/verify')
 def verify():
@@ -512,12 +479,7 @@ def verify():
         return send_file('templates/verify.html')
     except FileNotFoundError:
         logger.error("verify.html template not found")
-        return generate_embed_html(
-            title="Verification - Vadrifts",
-            description="Verify your account to access all Vadrifts features and premium scripts.",
-            image_url="https://i.imgur.com/jI8qDiR.jpeg",
-            url=request.url
-        )
+        return jsonify({"error": "Verify page not found"}), 404
 
 def run_bot():
     try:
