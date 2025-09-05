@@ -269,7 +269,7 @@ SCRIPT_PAGE_TEMPLATE = '''<!DOCTYPE html>
 </head>
 <body>
     <script>
-        window.location.href = '/templates/script-detail.html';
+        window.location.href = '/templates/script-detail.html?id={{ script.id }}';
     </script>
 </body>
 </html>'''
