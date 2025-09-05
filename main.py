@@ -197,6 +197,97 @@ scripts_data = [
     },
 ]
 
+def generate_embed_html(title, description, image_url=None, url=None):
+    embed_template = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <title>{{ title }}</title>
+        <meta name="description" content="{{ description }}">
+        
+        <meta property="og:title" content="{{ title }}">
+        <meta property="og:description" content="{{ description }}">
+        <meta property="og:type" content="website">
+        {% if url %}<meta property="og:url" content="{{ url }}">{% endif %}
+        {% if image_url %}<meta property="og:image" content="{{ image_url }}">{% endif %}
+        <meta property="og:site_name" content="Vadrifts">
+        
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="{{ title }}">
+        <meta name="twitter:description" content="{{ description }}">
+        {% if image_url %}<meta name="twitter:image" content="{{ image_url }}">{% endif %}
+        
+        <meta name="theme-color" content="#7289da">
+        
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                margin: 0;
+                padding: 20px;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+            .container {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border-radius: 15px;
+                padding: 40px;
+                text-align: center;
+                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+                border: 1px solid rgba(255, 255, 255, 0.18);
+                max-width: 600px;
+            }
+            h1 {
+                font-size: 2.5em;
+                margin-bottom: 20px;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            }
+            p {
+                font-size: 1.2em;
+                line-height: 1.6;
+                margin-bottom: 30px;
+            }
+            .btn {
+                background: linear-gradient(45deg, #667eea, #764ba2);
+                color: white;
+                padding: 15px 30px;
+                border: none;
+                border-radius: 25px;
+                font-size: 1.1em;
+                cursor: pointer;
+                text-decoration: none;
+                display: inline-block;
+                transition: transform 0.3s ease;
+                box-shadow: 0 4px 15px 0 rgba(31, 38, 135, 0.4);
+            }
+            .btn:hover {
+                transform: translateY(-2px);
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>{{ title }}</h1>
+            <p>{{ description }}</p>
+            <a href="/" class="btn">Go to Homepage</a>
+        </div>
+    </body>
+    </html>
+    """
+    return render_template_string(embed_template, 
+                                title=title, 
+                                description=description, 
+                                image_url=image_url, 
+                                url=url)
+
 def server_pinger():
     while True:
         try:
@@ -212,16 +303,12 @@ def home():
         return send_file('templates/index.html')
     except FileNotFoundError:
         logger.error("index.html template not found")
-        return jsonify({
-            "message": "Vadrifts - Your ultimate Roblox scripting platform",
-            "status": "deployed",
-            "endpoints": {
-                "scripts": "GET /api/scripts - Get all scripts",
-                "script_detail": "GET /api/scripts/<id> - Get script details", 
-                "converter": "GET /converter - Image converter tool",
-                "convert_image": "GET /convert-image?url=<url>&crop=<true|false> - Convert image to pixels"
-            }
-        }), 200
+        return generate_embed_html(
+            title="Vadrifts - Premium Roblox Scripts",
+            description="Your ultimate Roblox scripting platform. Free scripts, chat bypass, image converters and more!",
+            image_url="https://i.imgur.com/jI8qDiR.jpeg",
+            url=request.url
+        )
 
 @app.route('/discord')
 def discord_invite():
@@ -267,7 +354,22 @@ def script_detail(script_id):
         return send_file('templates/script-detail.html')
     except FileNotFoundError:
         logger.error("script-detail.html template not found")
-        return jsonify({"error": "Script detail page not found"}), 404
+        
+        script = next((s for s in scripts_data if s['id'] == script_id), None)
+        if script:
+            return generate_embed_html(
+                title=f"{script['title']} - Vadrifts",
+                description=f"{script['description']} | Game: {script['game']}",
+                image_url=script.get('thumbnail'),
+                url=request.url
+            )
+        else:
+            return generate_embed_html(
+                title="Script Not Found - Vadrifts",
+                description="The requested script could not be found.",
+                image_url="https://i.imgur.com/jI8qDiR.jpeg",
+                url=request.url
+            )
 
 @app.route('/converter')
 def converter():
@@ -275,10 +377,12 @@ def converter():
         return send_file('templates/converter.html')
     except FileNotFoundError:
         logger.error("converter.html template not found")
-        return jsonify({
-            "error": "Converter page not found",
-            "message": "Create templates/converter.html file"
-        }), 404
+        return generate_embed_html(
+            title="Image Converter - Vadrifts",
+            description="Convert any image to Roblox pixel format. Perfect for Starving Artists and other games!",
+            image_url="https://i.imgur.com/jI8qDiR.jpeg",
+            url=request.url
+        )
 
 @app.route('/convert-image', methods=['GET'])
 def convert_image():
@@ -365,7 +469,12 @@ def key_system():
         return send_file('templates/key-system.html')
     except FileNotFoundError:
         logger.error("key-system.html template not found")
-        return jsonify({"error": "Key system page not found"}), 404
+        return generate_embed_html(
+            title="Key System - Vadrifts",
+            description="Get your free key to access premium Vadrifts scripts. Quick and easy verification!",
+            image_url="https://i.imgur.com/jI8qDiR.jpeg",
+            url=request.url
+        )
 
 @app.route('/create')
 def create_key():
@@ -380,11 +489,22 @@ def create_key():
 def get_key(slug):
     hwid = active_slugs.get(slug)
     if not hwid:
-        return "Invalid or expired key link", 404
+        return generate_embed_html(
+            title="Invalid Key Link - Vadrifts",
+            description="This key link is invalid or has expired. Please generate a new one.",
+            image_url="https://i.imgur.com/jI8qDiR.jpeg",
+            url=request.url
+        )
     
     del active_slugs[slug]
     key = generate_key(hwid)
-    return key
+    
+    return generate_embed_html(
+        title="Your Key - Vadrifts",
+        description=f"Your generated key: {key}",
+        image_url="https://i.imgur.com/jI8qDiR.jpeg",
+        url=request.url
+    )
 
 @app.route('/verify')
 def verify():
@@ -392,7 +512,12 @@ def verify():
         return send_file('templates/verify.html')
     except FileNotFoundError:
         logger.error("verify.html template not found")
-        return jsonify({"error": "Verify page not found"}), 404
+        return generate_embed_html(
+            title="Verification - Vadrifts",
+            description="Verify your account to access all Vadrifts features and premium scripts.",
+            image_url="https://i.imgur.com/jI8qDiR.jpeg",
+            url=request.url
+        )
 
 def run_bot():
     try:
