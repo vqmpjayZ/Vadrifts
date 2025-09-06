@@ -12,6 +12,7 @@ from discord.ext import commands, tasks
 from collections import defaultdict
 import hashlib
 from datetime import datetime, timedelta
+import json
 
 logging.basicConfig(
     level=logging.INFO,
@@ -38,28 +39,64 @@ game_data_cache = {}
 
 active_slugs = {}
 
-bypass_data = {
-    "words": {"asshole", "ass", "anal", "breasts", "blowjob", "boobs", "beaner", "bitches", "bitch", "bullshit", "butthole", "bootyhole", "booty", "bbc", "cocaine", "creampie", "cumming", "cum", "clit", "coochies", "cuckold", "cuck", "cunny", "cock", "cunt", "dickhead", "dick", "discord", "doggystyle", "dumbass", "dildo", "damn", "E-Rape", "E-Sex", "fatass", "fucked", "fucker", "fuck", "faggot", "fag", "fap", "femboy", "fanny", "hitler", "hentai", "horny", "hoes", "hoe", "kys", "kkk", "lmfao", "lmao", "motherfucker", "masturbate", "molest", "milf", "meth", "nigger", "nigga", "negro", "nipples", "nazi", "nudes", "onlyfans", "orgasm", "pedophile", "penis", "pussies", "pussy", "pornhub", "porn", "piss", "queer", "retarded", "retard", "rapist", "rape", "schlong", "stripper", "slave", "slut", "shit","stfu", "sexy", "sex", "titties", "tits", "tranny", "thot", "virgin", "vagina", "whore", "weed", "ASSHOLE", "ASS", "ANAL", "BULLSHIT", "BASTARD", "BONER", "BITCHES", "BITCH", "BOOBS", "BOOTY", "CUNT", "COCK", "CUCKOLD", "CUCK", "CUM", "DUMBAS", "DICKHEAD", "DAMN", "FAGGOT", "FAG", "FATASS", "FEMBOY", "FUCKER", "FUCKED", "FUCK", "HENTAI", "HOE", "KYS", "KKK", "LMFAO", "LMAO", "MOTHERFUCKER", "METH", "PORNHUB", "PISS", "STFU", "SLIT", "SHIT", "VIRGIN", "VAGINA", "WHORE", "WEED"},
-    
-    "sentences": {"anal sex pls", "anal sex", "ass sex pls", "ass sex", "Boom cockshot!", "boner alert!", "butt sex", "big cock", "boobs or ass?", "big ass thighs", "big black cock", "big ass", "Be my wife!", "Can I see those cute boobs of yours?", "cock sucker", "Cum on me please!", "cum please", "cut yourself", "child porn",  "Cock incoming!", "Cock in bedroom", "cock or boobs?", "damn you got a long schlong daddy", "dirty hoe","fuck yourself", "fuck you", "fuck off", "free porn", "fatass hoe", "fat ass", "go end your life", "hail hitler", "hardcore sex", "holy fuck", "i eat pussy", "i love minors", "i love you", "i love cocks", "i love boobs", "i love titties", "i'm gonna make you pregnant mommy", "i'm sexy, and you know it", "i'm horny so moan", "i'm mad horny", "i'm gonna bang you hard", "i'm so hard rn", "i'm so wet daddy", "i'm so wet", "i'm craving titties", "i would like to see some titties", "i wanna kms", "i wanna smash you", "i want to drink your breasts", "I banged your girl so hard", "i dont give a shit", "i love sex", "I'll make you pregnant", "Imagine getting no bitches", "kill yourself", "keep moaning", "lets do doggystyle", "lets have sex", "let me squish those titties", "lgbtq+ is related to autistm", "lil nigga", "Mind if you let me squish those titties", "my condom fell off!", "Mr breast is so cool", "my cock is dirty", "make me pregnant", "Naked Boys", "Naked Girls", "nice tits", "oral sex", "pussy licker", "rape me", "spank me daddy", "sex slave", "Sweet cock dude", "suck my cock", "Sweet cock you got up there", "shit on", "shut the fuck up", "shut yo goofy ass up", "shut yo broke ass up", "suck my cock retard", "son of a bitch", "small penis", "Theres cum everywhere!", "that bbc dont play", "ur gf was craving my raging schlong", "ur moms booty is delicous", "why is this nigger not getting whipped?", "wanna have sex?", "wsg bbg you lookin sexy", "what the fuck", "you like to rape and suck black oiled up men", "you fucking retard", "yo my shaft is hard, mind jerking it?", "you're such a whore", "you're a pedophile", "you pathetic slut", "you're a pussy", "you're so sexy", "BE MY WIFE!", "BIG BOOTY LATINAS", "BIG BOOTY ASIANS", "BIG BOOTY FEMBOYS", "BIG BOOTY", "BIG BOOBS", "CAN I PISS INSIDE YOUR BUTTHOLE?", "CAN I PISS ON YOUR?", "COCK IN BEDROOM", "CUM ON ME", "CUM ON MY FACE", "DO YOU HAVE TITS?", "EAT PUSSY BITCH", "FATASS HOE", "FAT ASS", "FREE HENTAI", "FUCK YOU", "HELP! THERES A COCK IN MY ASS!", "HELP! THERES A HOE CHASING ME!", "I AM ABOUT TO CUM", "I EAT PUSSY", "I PREFER PUSSY", "I HAVE A MASSIVE COCK", "I HAD AWESOME SEX WITH UR MOM!!!!", "ILL MAKE YOU PREGNANT", "LET ME SQUISH THOSE TITTIES", "LETS HAVE SEX", "LETS FUCK", "MY CONDOM FELL OFF!", "NAKED GIRLS", "NAKED BOYS", "oh my god, not this DUMBASS", "STRAIGHT POWER MOTHERFUCKERS", "SUCK MY COCK", "SHUT THE FUCK UP", "SHUT UP FAGGOT", "SHUT UP CUNT", "SHUT UP HOE", "SHAKE THAT ASS", "SON OF A BITCH", "YOU ARE SO ASS AT THIS GAME"},
-    
-    "roleplay": {"*moans*", "*screams*", "*cries*", "*dies*", "*kisses you*", "*hugs you*", "*slaps you*", "*punches you*", "*shoots you*", "*stabs you*", "*murders you*", "*rapes you*", "*fucks you*", "*makes love to you*", "*gets naked*", "*takes off clothes*", "*shows boobs*", "*shows ass*", "*shows penis*", "*shows vagina*", "*masturbates*", "*has sex*", "*gives blowjob*", "*gets pregnant*", "*gives birth*", "*commits suicide*", "*hangs self*", "*cuts wrists*", "*overdoses*", "*drinks bleach*", "*jumps off building*", "*gets run over*"},
-    
-    "nsfw_websites": {"pornhub.com", "xvideos.com", "xhamster.com", "redtube.com", "youporn.com", "tube8.com", "spankbang.com", "xnxx.com", "sex.com", "porn.com", "brazzers.com", "bangbros.com", "realitykings.com", "mofos.com", "teamskeet.com", "naughtyamerica.com", "digitalplayground.com", "evilangel.com", "kink.com", "chaturbate.com", "cam4.com", "myfreecams.com", "livejasmin.com", "onlyfans.com", "manyvids.com", "clips4sale.com", "iwantclips.com", "adultfriendfinder.com", "ashley madison", "seeking.com"},
-    
-    "not_legit": {"i have robux generator", "free robux here", "get free robux", "robux hack", "unlimited robux", "robux generator 2024", "robux giveaway", "free limiteds", "account seller", "selling accounts", "buying accounts", "scam link", "fake link", "virus link", "ip grabber", "cookie logger", "account stealer", "roblox hack", "exploit download", "free executor", "synapse crack", "krnl free", "jjsploit", "oxygen u", "scriptware crack", "free scripts", "op scripts", "admin scripts", "fe scripts", "trolling scripts"}
+bypass_test_data = {
+    "words": {
+        "success_rate": "unknown",
+        "last_tested": None,
+        "testing": False,
+        "first_tester": None
+    },
+    "sentences": {
+        "success_rate": "unknown", 
+        "last_tested": None,
+        "testing": False,
+        "first_tester": None
+    },
+    "roleplay": {
+        "success_rate": "unknown",
+        "last_tested": None,
+        "testing": False,
+        "first_tester": None
+    },
+    "nsfw_websites": {
+        "success_rate": "unknown",
+        "last_tested": None,
+        "testing": False,
+        "first_tester": None
+    },
+    "not_legit": {
+        "success_rate": "unknown",
+        "last_tested": None,
+        "testing": False,
+        "first_tester": None
+    }
 }
 
-bypass_results = {
-    "words": {"last_updated": None, "success_rate": None, "status": "unknown", "is_testing": False},
-    "sentences": {"last_updated": None, "success_rate": None, "status": "unknown", "is_testing": False},
-    "roleplay": {"last_updated": None, "success_rate": None, "status": "unknown", "is_testing": False},
-    "nsfw_websites": {"last_updated": None, "success_rate": None, "status": "unknown", "is_testing": False},
-    "not_legit": {"last_updated": None, "success_rate": None, "status": "unknown", "is_testing": False}
-}
+def reset_bypass_data():
+    global bypass_test_data
+    for category in bypass_test_data:
+        bypass_test_data[category] = {
+            "success_rate": "unknown",
+            "last_tested": None,
+            "testing": False,
+            "first_tester": None
+        }
+    logger.info("Bypass test data reset")
 
-testing_queue = []
-testing_lock = threading.Lock()
+def check_and_reset_if_needed():
+    for category, data in bypass_test_data.items():
+        if data["last_tested"]:
+            last_test_time = datetime.fromisoformat(data["last_tested"])
+            if datetime.now() - last_test_time > timedelta(hours=24):
+                data["success_rate"] = "unknown"
+                data["last_tested"] = None
+                data["testing"] = False
+                data["first_tester"] = None
+
+def daily_reset_task():
+    while True:
+        check_and_reset_if_needed()
+        time.sleep(3600)
 
 def generate_key(hwid):
     period = int(time.time() // (60 * 60 * 48))
@@ -81,42 +118,9 @@ def create_slug(hwid):
     
     return slug
 
-def is_data_expired(last_updated):
-    if not last_updated:
-        return True
-    return datetime.now() - last_updated > timedelta(hours=24)
-
-def reset_daily_data():
-    current_time = datetime.now()
-    for category in bypass_results:
-        if is_data_expired(bypass_results[category]["last_updated"]):
-            bypass_results[category] = {
-                "last_updated": None,
-                "success_rate": None,
-                "status": "unknown",
-                "is_testing": False
-            }
-
-def add_to_testing_queue(category, user_id):
-    with testing_lock:
-        if category not in [item[0] for item in testing_queue] and not bypass_results[category]["is_testing"]:
-            testing_queue.append((category, user_id))
-            return True
-    return False
-
-async def process_testing_queue():
-    while True:
-        with testing_lock:
-            if testing_queue and not any(bypass_results[cat]["is_testing"] for cat in bypass_results):
-                category, user_id = testing_queue.pop(0)
-                bypass_results[category]["is_testing"] = True
-                bypass_results[category]["status"] = f"testing_by_{user_id}"
-        await asyncio.sleep(1)
-
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user}")
-    bot.loop.create_task(process_testing_queue())
 
 async def send_good_boy_after_delay(user_id, channel):
     await asyncio.sleep(DELAY_SECONDS)
@@ -454,95 +458,6 @@ def convert_image():
         logger.error(f"Unexpected error: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/bypass-status')
-def get_bypass_status():
-    reset_daily_data()
-    
-    response_data = {}
-    for category, data in bypass_results.items():
-        response_data[category] = {
-            "success_rate": data["success_rate"],
-            "status": data["status"],
-            "last_updated": data["last_updated"].isoformat() if data["last_updated"] else None,
-            "is_testing": data["is_testing"]
-        }
-    
-    return jsonify(response_data)
-
-@app.route('/api/bypass-data/<category>')
-def get_bypass_data(category):
-    if category not in bypass_data:
-        return jsonify({"error": "Invalid category"}), 400
-    
-    return jsonify({
-        "category": category,
-        "data": list(bypass_data[category]),
-        "total_count": len(bypass_data[category])
-    })
-
-@app.route('/api/request-testing', methods=['POST'])
-def request_testing():
-    data = request.get_json()
-    if not data or 'category' not in data or 'user_id' not in data:
-        return jsonify({"error": "Missing category or user_id"}), 400
-    
-    category = data['category']
-    user_id = data['user_id']
-    
-    if category not in bypass_data:
-        return jsonify({"error": "Invalid category"}), 400
-    
-    reset_daily_data()
-    
-    if is_data_expired(bypass_results[category]["last_updated"]):
-        if add_to_testing_queue(category, user_id):
-            return jsonify({
-                "status": "queued",
-                "message": "You're the first today! Testing will begin shortly.",
-                "position": len(testing_queue)
-            })
-        else:
-            return jsonify({
-                "status": "already_queued",
-                "message": "Testing for this category is already in progress or queued."
-            })
-    else:
-        return jsonify({
-            "status": "recent_data",
-            "message": "Recent data available",
-            "success_rate": bypass_results[category]["success_rate"]
-        })
-
-@app.route('/api/submit-results', methods=['POST'])
-def submit_results():
-    data = request.get_json()
-    if not data or 'category' not in data or 'success_rate' not in data or 'user_id' not in data:
-        return jsonify({"error": "Missing required fields"}), 400
-    
-    category = data['category']
-    success_rate = data['success_rate']
-    user_id = data['user_id']
-    
-    if category not in bypass_results:
-        return jsonify({"error": "Invalid category"}), 400
-    
-    if not bypass_results[category]["is_testing"]:
-        return jsonify({"error": "No active testing session for this category"}), 400
-    
-    bypass_results[category] = {
-        "last_updated": datetime.now(),
-        "success_rate": success_rate,
-        "status": "completed",
-        "is_testing": False
-    }
-    
-    logger.info(f"Results submitted for {category}: {success_rate}% success rate by user {user_id}")
-    
-    return jsonify({
-        "status": "success",
-        "message": "Results submitted successfully"
-    })
-
 @app.route('/key-system')
 def key_system():
     try:
@@ -578,6 +493,200 @@ def verify():
         logger.error("verify.html template not found")
         return jsonify({"error": "Verify page not found"}), 404
 
+@app.route('/api/bypass-status')
+def get_bypass_status():
+    check_and_reset_if_needed()
+    return jsonify(bypass_test_data)
+
+@app.route('/api/bypass-status/<category>', methods=['GET'])
+def get_category_status(category):
+    if category not in bypass_test_data:
+        return jsonify({"error": "Invalid category"}), 404
+    
+    check_and_reset_if_needed()
+    return jsonify({category: bypass_test_data[category]})
+
+@app.route('/api/bypass-status/<category>/start', methods=['POST'])
+def start_bypass_test(category):
+    if category not in bypass_test_data:
+        return jsonify({"error": "Invalid category"}), 404
+    
+    check_and_reset_if_needed()
+    
+    data = bypass_test_data[category]
+    player_id = request.json.get('player_id', 'Unknown')
+    
+    if data["testing"]:
+        return jsonify({"error": "Already testing", "status": "testing"}), 409
+    
+    if data["success_rate"] != "unknown":
+        return jsonify({"error": "Already tested today", "status": "completed", "success_rate": data["success_rate"]}), 200
+    
+    data["testing"] = True
+    data["first_tester"] = player_id
+    
+    return jsonify({
+        "status": "started",
+        "message": "You're the first today!",
+        "first_tester": True
+    })
+
+@app.route('/api/bypass-status/<category>/complete', methods=['POST'])
+def complete_bypass_test(category):
+    if category not in bypass_test_data:
+        return jsonify({"error": "Invalid category"}), 404
+    
+    data = bypass_test_data[category]
+    success_rate = request.json.get('success_rate')
+    
+    if not isinstance(success_rate, (int, float)) or success_rate < 0 or success_rate > 100:
+        return jsonify({"error": "Invalid success rate"}), 400
+    
+    data["success_rate"] = f"{int(success_rate)}%"
+    data["last_tested"] = datetime.now().isoformat()
+    data["testing"] = False
+    
+    return jsonify({
+        "status": "completed",
+        "success_rate": data["success_rate"]
+    })
+
+@app.route('/api/bypass-status/webpage')
+def bypass_status_webpage():
+    check_and_reset_if_needed()
+    
+    html = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Bypass Status - Vadrifts</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #1a1a1a;
+                color: #ffffff;
+                margin: 0;
+                padding: 20px;
+            }
+            .container {
+                max-width: 800px;
+                margin: 0 auto;
+            }
+            h1 {
+                text-align: center;
+                color: #7289DA;
+            }
+            .status-grid {
+                display: grid;
+                gap: 20px;
+                margin-top: 30px;
+            }
+            .status-item {
+                background-color: #2a2a2a;
+                padding: 20px;
+                border-radius: 10px;
+                border: 2px solid #3a3a3a;
+            }
+            .category-name {
+                font-size: 20px;
+                font-weight: bold;
+                color: #7289DA;
+                margin-bottom: 10px;
+            }
+            .success-rate {
+                font-size: 24px;
+                font-weight: bold;
+            }
+            .success-rate.high {
+                color: #00FF00;
+            }
+            .success-rate.medium {
+                color: #FFFF00;
+            }
+            .success-rate.low {
+                color: #FF0000;
+            }
+            .success-rate.unknown {
+                color: #888888;
+            }
+            .testing {
+                color: #00BFFF;
+                animation: pulse 1.5s infinite;
+            }
+            @keyframes pulse {
+                0% { opacity: 1; }
+                50% { opacity: 0.5; }
+                100% { opacity: 1; }
+            }
+            .last-tested {
+                font-size: 12px;
+                color: #888888;
+                margin-top: 5px;
+            }
+        </style>
+        <meta http-equiv="refresh" content="30">
+    </head>
+    <body>
+        <div class="container">
+            <h1>Bypass Status Dashboard</h1>
+            <div class="status-grid">
+    """
+    
+    category_names = {
+        "words": "Words",
+        "sentences": "Sentences",
+        "roleplay": "Roleplay",
+        "nsfw_websites": "NSFW Websites",
+        "not_legit": "Not Legit"
+    }
+    
+    for category, display_name in category_names.items():
+        data = bypass_test_data[category]
+        success_rate = data["success_rate"]
+        
+        if data["testing"]:
+            rate_class = "testing"
+            rate_text = "Testing..."
+        elif success_rate == "unknown":
+            rate_class = "unknown"
+            rate_text = "Unknown"
+        else:
+            rate_value = int(success_rate.rstrip('%'))
+            rate_text = success_rate + " success rate"
+            if rate_value >= 70:
+                rate_class = "high"
+            elif rate_value >= 40:
+                rate_class = "medium"
+            else:
+                rate_class = "low"
+        
+        last_tested_text = ""
+        if data["last_tested"]:
+            last_tested_time = datetime.fromisoformat(data["last_tested"])
+            time_ago = datetime.now() - last_tested_time
+            hours_ago = int(time_ago.total_seconds() / 3600)
+            if hours_ago < 1:
+                last_tested_text = f"<div class='last-tested'>Tested less than an hour ago</div>"
+            else:
+                last_tested_text = f"<div class='last-tested'>Tested {hours_ago} hours ago</div>"
+        
+        html += f"""
+                <div class="status-item">
+                    <div class="category-name">{display_name}</div>
+                    <div class="success-rate {rate_class}">{rate_text}</div>
+                    {last_tested_text}
+                </div>
+        """
+    
+    html += """
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    
+    return html
+
 def run_bot():
     try:
         loop = asyncio.new_event_loop()
@@ -595,6 +704,10 @@ if __name__ == '__main__':
     ping_thread = threading.Thread(target=server_pinger, daemon=True)
     ping_thread.start()
     logger.info("Server pinger started")
+    
+    reset_thread = threading.Thread(target=daily_reset_task, daemon=True)
+    reset_thread.start()
+    logger.info("Daily reset task started")
     
     bot_thread = threading.Thread(target=run_bot, daemon=True)
     bot_thread.start()
