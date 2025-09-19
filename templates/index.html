@@ -455,26 +455,27 @@
       transition: all 0.3s ease;
       cursor: pointer;
       position: relative;
-      overflow: visible;
+      overflow: hidden;
     }
 
     .script-card::before {
       content: '';
       position: absolute;
-      top: -3px;
-      left: -3px;
-      right: -3px;
-      bottom: -3px;
-      border-radius: 23px;
+      inset: -2px;
+      padding: 2px;
       background: linear-gradient(45deg, 
-        rgba(114, 9, 183, 0.8) 0%, 
-        rgba(255, 107, 157, 0.8) 25%, 
-        rgba(196, 120, 212, 0.6) 50%, 
-        rgba(255, 159, 67, 0.8) 75%, 
-        rgba(114, 9, 183, 0.8) 100%);
+        #7209b7 0%, 
+        #ff6b9d 25%, 
+        #c478d4 50%, 
+        #ff9f43 75%, 
+        #7209b7 100%);
+      border-radius: 22px;
       opacity: 0;
       transition: opacity 0.3s ease;
-      z-index: -1;
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask-composite: xor;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
     }
 
     .script-card:hover {
