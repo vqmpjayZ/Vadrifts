@@ -74,7 +74,7 @@
     .light-4 {
       width: 350px;
       height: 350px;
-      background: radial-gradient(circle, #e91e63 0%, transparent 70%);
+      background: radial-gradient(circle, #9c88ff 0%, transparent 70%);
       bottom: 15%;
       right: 12%;
       animation-name: float4;
@@ -84,7 +84,7 @@
     .light-5 {
       width: 280px;
       height: 280px;
-      background: radial-gradient(circle, #ff4081 0%, transparent 70%);
+      background: radial-gradient(circle, #c478d4 0%, transparent 70%);
       top: 45%;
       left: 45%;
       animation-name: float5;
@@ -94,7 +94,7 @@
     .light-6 {
       width: 200px;
       height: 200px;
-      background: radial-gradient(circle, #f06292 0%, transparent 70%);
+      background: radial-gradient(circle, #b855d1 0%, transparent 70%);
       top: 60%;
       right: 30%;
       animation-name: float6;
@@ -104,7 +104,7 @@
     .light-7 {
       width: 380px;
       height: 380px;
-      background: radial-gradient(circle, #ff6b35 0%, transparent 70%);
+      background: radial-gradient(circle, #ff9f43 0%, transparent 70%);
       bottom: 8%;
       right: 5%;
       animation-name: float7;
@@ -191,7 +191,7 @@
 
     .navbar {
       position: fixed;
-      top: 10px;
+      top: 5px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 100;
@@ -206,10 +206,18 @@
       transition: all 0.3s ease;
     }
 
+    .navbar.scrolled {
+      top: 0px;
+    }
+
+    .navbar.scrolled:hover {
+      top: 5px;
+    }
+
     .navbar:hover {
       background: rgba(0, 0, 0, 0.6);
       border-color: rgba(255, 255, 255, 0.1);
-      transform: translateX(-50%) translateY(8px);
+      transform: translateX(-50%) translateY(-2px);
     }
 
     @keyframes slideInDown {
@@ -236,7 +244,7 @@
       gap: 10px;
       font-size: 24px;
       font-weight: 700;
-      background: linear-gradient(90deg, #ffffff 0%, #ffffff 40%, #7209b7 100%);
+      background: linear-gradient(90deg, #ffffff 0%, #7209b7 70%, #c478d4 100%);
       background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -897,6 +905,21 @@
 
     createParticles();
     loadScripts();
+
+    // Navbar scroll behavior
+    let lastScrollTop = 0;
+    window.addEventListener('scroll', function() {
+      let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const navbar = document.querySelector('.navbar');
+      
+      if (scrollTop > 100) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+      
+      lastScrollTop = scrollTop;
+    });
   </script>
 </body>
 </html>
