@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vadrifts</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+    
     * {
       margin: 0;
       padding: 0;
@@ -12,9 +14,9 @@
     }
 
     body {
-      background: #0a0a0a;
-      color: #e8e8e8;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #000000;
+      color: #ffffff;
+      font-family: 'Inter', sans-serif;
       min-height: 100vh;
       overflow-x: hidden;
       position: relative;
@@ -33,28 +35,28 @@
     .light {
       position: absolute;
       border-radius: 50%;
-      filter: blur(120px);
-      opacity: 0.4;
-      animation-duration: 12s;
+      filter: blur(150px);
+      opacity: 0.6;
+      animation-duration: 15s;
       animation-iteration-count: infinite;
       animation-timing-function: ease-in-out;
     }
 
     .light-1 {
-      width: 500px;
-      height: 500px;
-      background: radial-gradient(circle, #ff4757 0%, transparent 70%);
-      top: -250px;
-      left: -250px;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, #2d1b69 0%, transparent 70%);
+      top: 10%;
+      left: 5%;
       animation-name: float1;
     }
 
     .light-2 {
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, #00d2ff 0%, transparent 70%);
-      top: -200px;
-      right: -200px;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, #7209b7 0%, transparent 70%);
+      top: 15%;
+      right: 8%;
       animation-name: float2;
       animation-delay: -3s;
     }
@@ -62,9 +64,9 @@
     .light-3 {
       width: 450px;
       height: 450px;
-      background: radial-gradient(circle, #ff6b9d 0%, transparent 70%);
-      bottom: -225px;
-      left: -225px;
+      background: radial-gradient(circle, #4c1d95 0%, transparent 70%);
+      bottom: 20%;
+      left: 10%;
       animation-name: float3;
       animation-delay: -6s;
     }
@@ -72,151 +74,120 @@
     .light-4 {
       width: 350px;
       height: 350px;
-      background: radial-gradient(circle, #7209b7 0%, transparent 70%);
-      bottom: -175px;
-      right: -175px;
+      background: radial-gradient(circle, #581c87 0%, transparent 70%);
+      bottom: 15%;
+      right: 12%;
       animation-name: float4;
       animation-delay: -9s;
     }
 
     .light-5 {
-      width: 300px;
-      height: 300px;
-      background: radial-gradient(circle, #ff9ff3 0%, transparent 70%);
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+      width: 280px;
+      height: 280px;
+      background: radial-gradient(circle, #9c88ff 0%, transparent 70%);
+      top: 45%;
+      left: 45%;
       animation-name: float5;
       animation-delay: -12s;
     }
 
+    .light-6 {
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, #6b21a8 0%, transparent 70%);
+      top: 60%;
+      right: 30%;
+      animation-name: float6;
+      animation-delay: -5s;
+    }
+
     @keyframes float1 {
       0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(150px, -100px) scale(1.2); }
-      66% { transform: translate(-100px, 150px) scale(0.8); }
+      33% { transform: translate(120px, -80px) scale(1.1); }
+      66% { transform: translate(-80px, 120px) scale(0.9); }
     }
 
     @keyframes float2 {
       0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(-120px, 100px) scale(1.3); }
-      66% { transform: translate(180px, -120px) scale(0.7); }
+      33% { transform: translate(-100px, 90px) scale(1.2); }
+      66% { transform: translate(150px, -100px) scale(0.8); }
     }
 
     @keyframes float3 {
       0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(100px, -150px) scale(0.9); }
-      66% { transform: translate(-150px, -100px) scale(1.1); }
+      33% { transform: translate(90px, -120px) scale(0.95); }
+      66% { transform: translate(-120px, -90px) scale(1.05); }
     }
 
     @keyframes float4 {
       0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(-100px, -120px) scale(1.4); }
-      66% { transform: translate(120px, 150px) scale(0.6); }
+      33% { transform: translate(-90px, -100px) scale(1.3); }
+      66% { transform: translate(100px, 130px) scale(0.7); }
     }
 
     @keyframes float5 {
-      0%, 100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
-      50% { transform: translate(-50%, -50%) scale(1.2) rotate(180deg); }
+      0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+      50% { transform: translate(-30px, -50px) scale(1.1) rotate(180deg); }
     }
 
-    body::after {
-      content: '';
+    @keyframes float6 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(60px, -80px) scale(1.4); }
+    }
+
+    .particles {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-      background-size: 60px 60px;
       z-index: 2;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: #7209b7;
+      border-radius: 50%;
+      opacity: 0.7;
+      animation: floatUp 15s linear infinite;
+      box-shadow: 0 0 6px #7209b7;
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(100vh) translateX(0);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.7;
+      }
+      90% {
+        opacity: 0.7;
+      }
+      100% {
+        transform: translateY(-100px) translateX(30px);
+        opacity: 0;
+      }
     }
 
     .navbar {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
+      top: 20px;
+      left: 20px;
+      right: 20px;
       z-index: 100;
-      background: rgba(10, 10, 10, 0.95);
-      backdrop-filter: blur(30px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 15px 20px;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 12px 20px;
+      animation: slideInDown 0.8s ease-out;
     }
 
-    .nav-content {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .nav-logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 24px;
-      font-weight: 700;
-      background: linear-gradient(135deg, #ff4757, #00d2ff, #ff6b9d, #7209b7);
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-decoration: none;
-    }
-
-    .nav-logo-img {
-      width: 28px;
-      height: 28px;
-      object-fit: contain;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 30px;
-      align-items: center;
-    }
-
-    .nav-link {
-      color: #ccc;
-      text-decoration: none;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      padding: 8px 16px;
-      border-radius: 8px;
-      position: relative;
-    }
-
-    .nav-link:hover {
-      color: #ff4757;
-      background: rgba(255, 71, 87, 0.1);
-    }
-
-    .discord-btn {
-      background: linear-gradient(135deg, #5865f2 0%, #7289da 100%);
-      color: white !important;
-      padding: 10px 20px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: 600;
-      transition: all 0.3s ease;
-    }
-
-    .discord-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(88, 101, 242, 0.3);
-    }
-
-    .header {
-      position: relative;
-      z-index: 10;
-      text-align: center;
-      padding: 140px 20px 60px;
-      animation: slideDown 1s ease-out;
-    }
-
-    @keyframes slideDown {
+    @keyframes slideInDown {
       from {
         opacity: 0;
         transform: translateY(-50px);
@@ -227,77 +198,78 @@
       }
     }
 
-    .logo {
-      width: 120px;
-      height: 120px;
-      margin: 0 auto 30px;
-      background: linear-gradient(135deg, #ff4757 0%, #ff6b9d 50%, #7209b7 100%);
-      border-radius: 30px;
+    .nav-content {
       display: flex;
       align-items: center;
-      justify-content: center;
-      position: relative;
-      animation: logoFloat 3s ease-in-out infinite;
-      box-shadow: 
-        0 20px 40px rgba(255, 71, 87, 0.3),
-        0 0 100px rgba(255, 71, 87, 0.2);
-      overflow: hidden;
+      justify-content: space-between;
     }
 
-    .logo-img {
-      width: 80px;
-      height: 80px;
-      object-fit: contain;
-      filter: brightness(1.2);
-    }
-
-    @keyframes logoFloat {
-      0%, 100% { 
-        transform: translateY(0) scale(1);
-        box-shadow: 0 20px 40px rgba(255, 71, 87, 0.3), 0 0 100px rgba(255, 71, 87, 0.2);
-      }
-      50% { 
-        transform: translateY(-10px) scale(1.05);
-        box-shadow: 0 30px 60px rgba(255, 71, 87, 0.4), 0 0 120px rgba(255, 71, 87, 0.3);
-      }
-    }
-
-    h1 {
-      font-size: 48px;
-      font-weight: 800;
-      background: linear-gradient(135deg, #ff4757, #00d2ff, #ff6b9d, #7209b7);
+    .nav-logo {
+      font-size: 18px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ffffff, #7209b7, #ff6b9d, #ff9f43);
+      background-size: 300% 300%;
       background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin-bottom: 15px;
-      letter-spacing: -1px;
+      text-decoration: none;
+      animation: gradientShift 6s ease-in-out infinite;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    .tagline {
-      font-size: 20px;
-      color: #aaa;
-      margin-bottom: 20px;
-      opacity: 0.9;
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
     }
 
-    .description {
-      font-size: 16px;
-      color: #888;
-      max-width: 600px;
-      margin: 0 auto;
-      line-height: 1.6;
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      align-items: center;
     }
 
-    .search-section {
+    .nav-link {
+      color: #ccc;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      padding: 6px 12px;
+      border-radius: 8px;
+    }
+
+    .nav-link:hover {
+      color: #7209b7;
+      background: rgba(114, 9, 183, 0.1);
+    }
+
+    .discord-btn {
+      background: linear-gradient(135deg, #5865f2 0%, #7289da 100%);
+      color: white !important;
+      padding: 8px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .discord-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(88, 101, 242, 0.4);
+    }
+
+    .header {
       position: relative;
       z-index: 10;
-      padding: 0 20px 40px;
-      display: flex;
-      justify-content: center;
-      animation: slideUp 1s ease-out 0.3s both;
+      text-align: center;
+      padding: 120px 20px 60px;
+      animation: fadeInUp 1.2s ease-out;
     }
 
-    @keyframes slideUp {
+    @keyframes fadeInUp {
       from {
         opacity: 0;
         transform: translateY(50px);
@@ -306,6 +278,58 @@
         opacity: 1;
         transform: translateY(0);
       }
+    }
+
+    h1 {
+      font-size: 72px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #ffffff, #7209b7, #ff6b9d, #ff9f43);
+      background-size: 400% 400%;
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 30px;
+      letter-spacing: -2px;
+      animation: gradientFlow 8s ease-in-out infinite;
+      text-shadow: 0 0 40px rgba(114, 9, 183, 0.5);
+      filter: drop-shadow(0 0 20px rgba(114, 9, 183, 0.3));
+    }
+
+    @keyframes gradientFlow {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .tagline {
+      font-size: 24px;
+      color: #ffffff;
+      margin-bottom: 20px;
+      font-weight: 500;
+      animation: fadeInUp 1.2s ease-out 0.3s both;
+    }
+
+    .description {
+      font-size: 18px;
+      color: #ffffff;
+      max-width: 700px;
+      margin: 0 auto;
+      line-height: 1.7;
+      font-weight: 400;
+      animation: fadeInUp 1.2s ease-out 0.6s both;
+    }
+
+    .description .highlight {
+      color: #7209b7;
+      font-weight: 600;
+    }
+
+    .search-section {
+      position: relative;
+      z-index: 10;
+      padding: 0 20px 40px;
+      display: flex;
+      justify-content: center;
+      animation: fadeInUp 1.2s ease-out 0.9s both;
     }
 
     .search-box {
@@ -318,26 +342,27 @@
       width: 100%;
       padding: 18px 60px 18px 24px;
       font-size: 16px;
-      background: rgba(10, 10, 10, 0.95);
-      backdrop-filter: blur(30px);
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(20px);
       border: 2px solid rgba(255, 255, 255, 0.1);
       border-radius: 15px;
-      color: #e8e8e8;
+      color: #ffffff;
       outline: none;
       transition: all 0.3s ease;
+      font-family: 'Inter', sans-serif;
     }
 
     .search-input:focus {
-      border-color: #ff4757;
-      background: rgba(15, 15, 15, 0.95);
+      border-color: #7209b7;
+      background: rgba(0, 0, 0, 0.8);
       box-shadow: 
-        0 0 0 4px rgba(255, 71, 87, 0.1),
-        0 0 30px rgba(255, 71, 87, 0.2);
+        0 0 0 4px rgba(114, 9, 183, 0.2),
+        0 0 30px rgba(114, 9, 183, 0.3);
       transform: translateY(-2px);
     }
 
     .search-input::placeholder {
-      color: #666;
+      color: #888;
     }
 
     .search-icon {
@@ -345,7 +370,7 @@
       right: 20px;
       top: 50%;
       transform: translateY(-50%);
-      color: #666;
+      color: #888;
       font-size: 18px;
     }
 
@@ -355,6 +380,7 @@
       padding: 40px 20px;
       max-width: 1200px;
       margin: 0 auto;
+      animation: fadeInUp 1.2s ease-out 1.2s both;
     }
 
     .scripts-grid {
@@ -365,8 +391,8 @@
     }
 
     .script-card {
-      background: rgba(10, 10, 10, 0.95);
-      backdrop-filter: blur(30px);
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 20px;
       padding: 25px;
@@ -386,11 +412,11 @@
       border-radius: 20px;
       padding: 1px;
       background: linear-gradient(45deg, 
-        rgba(255, 71, 87, 0.3) 0%, 
-        rgba(0, 210, 255, 0.3) 25%, 
+        rgba(114, 9, 183, 0.4) 0%, 
+        rgba(255, 107, 157, 0.4) 25%, 
         transparent 50%, 
-        rgba(255, 107, 157, 0.3) 75%, 
-        rgba(114, 9, 183, 0.3) 100%);
+        rgba(255, 159, 67, 0.4) 75%, 
+        rgba(114, 9, 183, 0.4) 100%);
       mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
       mask-composite: exclude;
       -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -401,7 +427,7 @@
 
     .script-card:hover {
       transform: translateY(-8px);
-      box-shadow: 0 20px 60px rgba(255, 71, 87, 0.2);
+      box-shadow: 0 20px 60px rgba(114, 9, 183, 0.3);
     }
 
     .script-card:hover::before {
@@ -414,12 +440,12 @@
       border-radius: 12px;
       object-fit: cover;
       margin-bottom: 15px;
-      background: linear-gradient(135deg, #ff4757 0%, #ff6b9d 50%, #7209b7 100%);
+      background: linear-gradient(135deg, #7209b7 0%, #ff6b9d 50%, #ff9f43 100%);
     }
 
     .script-game {
       font-size: 12px;
-      color: #ff4757;
+      color: #7209b7;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 1px;
@@ -429,14 +455,14 @@
     .script-title {
       font-size: 20px;
       font-weight: 700;
-      color: #e8e8e8;
+      color: #ffffff;
       margin-bottom: 10px;
       line-height: 1.2;
     }
 
     .script-description {
       font-size: 14px;
-      color: #aaa;
+      color: #ccc;
       line-height: 1.4;
       margin-bottom: 15px;
     }
@@ -449,12 +475,13 @@
     }
 
     .feature-tag {
-      background: rgba(255, 71, 87, 0.2);
-      color: #ff4757;
+      background: rgba(114, 9, 183, 0.3);
+      color: #ff6b9d;
       padding: 4px 10px;
       border-radius: 20px;
       font-size: 11px;
       font-weight: 500;
+      border: 1px solid rgba(114, 9, 183, 0.5);
     }
 
     .script-actions {
@@ -465,7 +492,7 @@
 
     .view-btn {
       flex: 1;
-      background: linear-gradient(135deg, #ff4757 0%, #ff6b9d 100%);
+      background: linear-gradient(135deg, #7209b7 0%, #ff6b9d 100%);
       color: white;
       padding: 12px;
       border: none;
@@ -475,17 +502,19 @@
       transition: all 0.3s ease;
       text-decoration: none;
       text-align: center;
+      font-family: 'Inter', sans-serif;
     }
 
     .view-btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(255, 71, 87, 0.4);
+      box-shadow: 0 8px 25px rgba(114, 9, 183, 0.5);
     }
 
     .no-scripts {
       text-align: center;
       padding: 60px 20px;
-      color: #666;
+      color: #888;
+      grid-column: 1 / -1;
     }
 
     .no-scripts-icon {
@@ -497,7 +526,8 @@
     .loading {
       text-align: center;
       padding: 60px 20px;
-      color: #666;
+      color: #888;
+      grid-column: 1 / -1;
     }
 
     .loading-spinner {
@@ -506,7 +536,7 @@
       height: 40px;
       border: 4px solid rgba(255, 255, 255, 0.1);
       border-radius: 50%;
-      border-top: 4px solid #ff4757;
+      border-top: 4px solid #7209b7;
       animation: spin 1s linear infinite;
       margin-bottom: 20px;
     }
@@ -521,9 +551,10 @@
       z-index: 10;
       text-align: center;
       padding: 60px 20px;
-      color: #666;
+      color: #888;
       border-top: 1px solid rgba(255, 255, 255, 0.1);
       margin-top: 40px;
+      animation: fadeInUp 1.2s ease-out 1.5s both;
     }
 
     .footer-links {
@@ -535,39 +566,47 @@
     }
 
     .footer-link {
-      color: #888;
+      color: #aaa;
       text-decoration: none;
       transition: color 0.3s ease;
     }
 
     .footer-link:hover {
-      color: #ff4757;
+      color: #7209b7;
     }
 
     @media (max-width: 768px) {
+      .navbar {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        padding: 10px 15px;
+      }
+
       .nav-content {
-        flex-direction: column;
+        justify-content: space-between;
         gap: 15px;
       }
 
       .nav-links {
-        gap: 20px;
-        flex-wrap: wrap;
-        justify-content: center;
+        gap: 15px;
+      }
+
+      .nav-link, .discord-btn {
+        font-size: 12px;
+        padding: 6px 10px;
       }
 
       h1 {
-        font-size: 36px;
-      }
-      
-      .logo {
-        width: 100px;
-        height: 100px;
+        font-size: 48px;
       }
 
-      .logo-img {
-        width: 65px;
-        height: 65px;
+      .tagline {
+        font-size: 20px;
+      }
+
+      .description {
+        font-size: 16px;
       }
 
       .scripts-grid {
@@ -597,14 +636,13 @@
     <div class="light light-3"></div>
     <div class="light light-4"></div>
     <div class="light light-5"></div>
+    <div class="light light-6"></div>
   </div>
+
+  <div class="particles" id="particles"></div>
 
   <nav class="navbar">
     <div class="nav-content">
-      <a href="/" class="nav-logo">
-        <img src="https://i.imgur.com/ePueN25.png" alt="Vadrifts" class="nav-logo-img">
-        Vadrifts
-      </a>
       <div class="nav-links">
         <a href="/" class="nav-link">Scripts</a>
         <a href="/converter" class="nav-link">Image Converter</a>
@@ -612,18 +650,19 @@
           Discord
         </a>
       </div>
+      <a href="/" class="nav-logo">
+        <img src="https://i.imgur.com/ePueN25.png" alt="Vadrifts" style="width: 20px; height: 20px; object-fit: contain;">
+        Vadrifts
+      </a>
     </div>
   </nav>
 
   <div class="header">
-    <div class="logo">
-      <img src="https://i.imgur.com/ePueN25.png" alt="Vadrifts" class="logo-img">
-    </div>
     <h1>Vadrifts</h1>
     <p class="tagline">Roblox Scripts & Tools</p>
     <p class="description">
-      Discover powerful Roblox scripts, game-specific exploits, and useful tools. 
-      All scripts are regularly updated but may include key system protection.
+      Discover powerful <span class="highlight">Roblox scripts</span>, game-specific <span class="highlight">exploits</span>, and useful <span class="highlight">tools</span>. 
+      All scripts are regularly updated but may include <span class="highlight">key system protection</span>.
     </p>
   </div>
 
@@ -659,6 +698,20 @@
   <script>
     let allScripts = [];
     let searchTimeout = null;
+
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      const particleCount = 15;
+
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 8 + 's';
+        particle.style.animationDuration = (15 + Math.random() * 5) + 's';
+        particlesContainer.appendChild(particle);
+      }
+    }
 
     async function loadScripts() {
       try {
@@ -765,6 +818,7 @@
       }
     });
 
+    createParticles();
     loadScripts();
   </script>
 </body>
