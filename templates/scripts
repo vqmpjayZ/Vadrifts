@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vadrifts Scripts</title>
+  <link rel="icon" href="https://i.imgur.com/ePueN25.png" type="image/png">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000000;
+      color: #ffffff;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    .bg-lights {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .light {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(150px);
+      opacity: 0.6;
+      animation-duration: 15s;
+      animation-iteration-count: infinite;
+      animation-timing-function: ease-in-out;
+    }
+
+    .light-1 {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, #4a148c 0%, transparent 70%);
+      top: 2%;
+      left: 2%;
+      animation-name: float1;
+    }
+
+    .light-2 {
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, #7209b7 0%, transparent 70%);
+      top: 15%;
+      right: 8%;
+      animation-name: float2;
+      animation-delay: -3s;
+    }
+
+    .light-3 {
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, #9c27b0 0%, transparent 70%);
+      bottom: 20%;
+      left: 10%;
+      animation-name: float3;
+      animation-delay: -6s;
+    }
+
+    .light-4 {
+      width: 350px;
+      height: 350px;
+      background: radial-gradient(circle, #9c88ff 0%, transparent 70%);
+      bottom: 15%;
+      right: 12%;
+      animation-name: float4;
+      animation-delay: -9s;
+    }
+
+    .light-5 {
+      width: 280px;
+      height: 280px;
+      background: radial-gradient(circle, #c478d4 0%, transparent 70%);
+      top: 45%;
+      left: 45%;
+      animation-name: float5;
+      animation-delay: -12s;
+    }
+
+    .light-6 {
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, #b855d1 0%, transparent 70%);
+      top: 60%;
+      right: 30%;
+      animation-name: float6;
+      animation-delay: -5s;
+    }
+
+    .light-7 {
+      width: 380px;
+      height: 380px;
+      background: radial-gradient(circle, #ff9f43 0%, transparent 70%);
+      bottom: 8%;
+      right: 5%;
+      animation-name: float7;
+      animation-delay: -7s;
+    }
+
+    @keyframes float1 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(120px, -80px) scale(1.1); }
+      66% { transform: translate(-80px, 120px) scale(0.9); }
+    }
+
+    @keyframes float2 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(-100px, 90px) scale(1.2); }
+      66% { transform: translate(150px, -100px) scale(0.8); }
+    }
+
+    @keyframes float3 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(90px, -120px) scale(0.95); }
+      66% { transform: translate(-120px, -90px) scale(1.05); }
+    }
+
+    @keyframes float4 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(-90px, -100px) scale(1.3); }
+      66% { transform: translate(100px, 130px) scale(0.7); }
+    }
+
+    @keyframes float5 {
+      0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+      50% { transform: translate(-30px, -50px) scale(1.1) rotate(180deg); }
+    }
+
+    @keyframes float6 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(60px, -80px) scale(1.4); }
+    }
+
+    @keyframes float7 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(-60px, -70px) scale(1.1); }
+      66% { transform: translate(40px, 60px) scale(0.9); }
+    }
+
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: #7209b7;
+      border-radius: 50%;
+      opacity: 0.7;
+      animation: floatUp 15s linear infinite;
+      box-shadow: 0 0 6px #7209b7;
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(100vh) translateX(0);
+        opacity: 0.7;
+      }
+      100% {
+        transform: translateY(-100px) translateX(30px);
+        opacity: 0;
+      }
+    }
+
+    .navbar {
+      position: fixed;
+      top: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      border-radius: 20px;
+      padding: 24px 32px;
+      animation: slideInDown 0.8s ease-out;
+      max-width: 1000px;
+      width: 90%;
+      transition: all 0.3s ease;
+    }
+
+    .navbar.scrolled {
+      top: 0px;
+    }
+
+    .navbar.scrolled:hover {
+      top: 5px;
+    }
+
+    .navbar:hover {
+      background: rgba(0, 0, 0, 0.6);
+      border-color: rgba(255, 255, 255, 0.1);
+      transform: translateX(-50%) translateY(-2px);
+    }
+
+    @keyframes slideInDown {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+
+    .nav-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 100%;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 24px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #ffffff 0%, #ffffff 40%, #7209b7 80%, #c478d4 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-decoration: none;
+    }
+
+    .nav-logo-img {
+      width: 28px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+
+    @keyframes simpleGradient {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+      height: 100%;
+    }
+
+    .nav-link {
+      color: #ccc;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      padding: 8px 12px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      height: 100%;
+    }
+
+    .nav-link:hover {
+      color: #ffffff;
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+    }
+
+    .nav-link.active {
+      color: #ffffff;
+      background: rgba(114, 9, 183, 0.2);
+      border: 1px solid rgba(114, 9, 183, 0.3);
+    }
+
+    .header {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 120px 20px 60px;
+      animation: fadeInUp 1.2s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h1 {
+      font-size: 72px;
+      font-weight: 900;
+      background: linear-gradient(90deg, 
+        #ffffff 0%, 
+        #ffffff 25%,
+        #7209b7 50%, 
+        #ff9f43 75%,
+        #ff9f43 100%
+      );
+      background-size: 130% 100%;
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 30px;
+      letter-spacing: -2px;
+      animation: orangePulse 7s ease-in-out infinite;
+      text-shadow: 0 0 40px rgba(114, 9, 183, 0.5);
+      filter: drop-shadow(0 0 20px rgba(114, 9, 183, 0.3));
+    }
+
+    @keyframes orangePulse {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 50% 50%; }
+    }
+
+    .tagline {
+      font-size: 24px;
+      color: #ffffff;
+      margin-bottom: 20px;
+      font-weight: 500;
+      animation: fadeInUp 1.2s ease-out 0.3s both;
+    }
+
+    .description {
+      font-size: 18px;
+      color: #ffffff;
+      max-width: 700px;
+      margin: 0 auto;
+      line-height: 1.7;
+      font-weight: 400;
+      animation: fadeInUp 1.2s ease-out 0.6s both;
+    }
+
+    .description .highlight {
+      color: #7209b7;
+      font-weight: 600;
+    }
+
+    .search-section {
+      position: relative;
+      z-index: 10;
+      padding: 0 20px 40px;
+      display: flex;
+      justify-content: center;
+      animation: fadeInUp 1.2s ease-out 0.9s both;
+    }
+
+    .search-box {
+      position: relative;
+      max-width: 600px;
+      width: 100%;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 18px 60px 18px 24px;
+      font-size: 16px;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(20px);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      color: #ffffff;
+      outline: none;
+      transition: all 0.3s ease;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .search-input:focus {
+      border-color: #7209b7;
+      background: rgba(0, 0, 0, 0.8);
+      box-shadow: 
+        0 0 0 4px rgba(114, 9, 183, 0.2),
+        0 0 30px rgba(114, 9, 183, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .search-input::placeholder {
+      color: #888;
+    }
+
+    .search-icon {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      background-image: url('https://i.imgur.com/YJ1SXqR.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      opacity: 0.6;
+    }
+
+    .scripts-section {
+      position: relative;
+      z-index: 10;
+      padding: 40px 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+      animation: fadeInUp 1.2s ease-out 1.2s both;
+    }
+
+    .scripts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 25px;
+      margin-bottom: 50px;
+    }
+
+    .script-card {
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 25px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .script-card::before {
+      content: '';
+      position: absolute;
+      top: -20%;
+      right: -20%;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, #9c88ff 0%, transparent 70%);
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0;
+      transition: all 0.4s ease;
+      z-index: -1;
+    }
+
+    .script-card:hover::before {
+      opacity: 0.8;
+    }
+
+    .script-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 60px rgba(114, 9, 183, 0.3);
+    }
+
+    .script-card:hover::before {
+      opacity: 1;
+    }
+
+    .script-thumbnail {
+      width: 100%;
+      height: 150px;
+      border-radius: 12px;
+      object-fit: cover;
+      margin-bottom: 15px;
+      background: linear-gradient(135deg, #7209b7 0%, #ff6b9d 50%, #ff9f43 100%);
+    }
+
+    .script-game {
+      font-size: 12px;
+      color: #7209b7;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .script-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 10px;
+      line-height: 1.2;
+    }
+
+    .script-description {
+      font-size: 14px;
+      color: #ccc;
+      line-height: 1.4;
+      margin-bottom: 15px;
+    }
+
+    .script-features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 15px;
+    }
+
+    .feature-tag {
+      background: rgba(114, 9, 183, 0.3);
+      color: #ff6b9d;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 500;
+      border: 1px solid rgba(114, 9, 183, 0.5);
+    }
+
+    .script-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: auto;
+    }
+
+    .view-btn {
+      flex: 1;
+      background: linear-gradient(135deg, #7209b7 0%, #ff6b9d 100%);
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      text-align: center;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .view-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(114, 9, 183, 0.5);
+    }
+
+    .no-scripts {
+      text-align: center;
+      padding: 60px 20px;
+      color: #888;
+      grid-column: 1 / -1;
+    }
+
+    .no-scripts-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 60px 20px;
+      color: #888;
+      grid-column: 1 / -1;
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      border-top: 4px solid #7209b7;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .footer {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 60px 20px;
+      color: #888;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      margin-top: 40px;
+      animation: fadeInUp 1.2s ease-out 1.5s both;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .footer-link {
+      color: #aaa;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .footer-link:hover {
+      color: #7209b7;
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        padding: 16px 18px;
+        width: calc(100% - 20px);
+      }
+
+      .nav-content {
+        justify-content: space-between;
+        gap: 15px;
+      }
+
+      .nav-links {
+        gap: 15px;
+      }
+
+      .nav-link {
+        font-size: 12px;
+        padding: 6px 10px;
+      }
+
+      .nav-logo {
+        font-size: 20px;
+        gap: 8px;
+      }
+
+      .nav-logo-img {
+        width: 24px;
+        height: 24px;
+      }
+
+      h1 {
+        font-size: 48px;
+      }
+
+      .tagline {
+        font-size: 20px;
+      }
+
+      .description {
+        font-size: 16px;
+      }
+
+      .scripts-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .script-card {
+        padding: 20px;
+      }
+
+      .script-actions {
+        flex-direction: column;
+      }
+
+      .footer-links {
+        flex-direction: column;
+        gap: 15px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .nav-links {
+        gap: 10px;
+      }
+
+      .nav-link {
+        font-size: 11px;
+        padding: 5px 8px;
+      }
+
+      .navbar {
+        padding: 10px 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-lights">
+    <div class="light light-1"></div>
+    <div class="light light-2"></div>
+    <div class="light light-3"></div>
+    <div class="light light-4"></div>
+    <div class="light light-5"></div>
+    <div class="light light-6"></div>
+    <div class="light light-7"></div>
+  </div>
+
+  <div class="particles" id="particles"></div>
+
+  <nav class="navbar">
+    <div class="nav-content">
+      <a href="/" class="nav-logo">
+        <img src="https://i.imgur.com/ePueN25.png" alt="Vadrifts Logo" class="nav-logo-img">
+        Vadrifts
+      </a>
+      <div class="nav-links">
+        <a href="/scripts" class="nav-link active">Explore</a>
+        <a href="/converter" class="nav-link">Image Converter</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="header">
+    <h1>Vadrifts Scripts</h1>
+    <p class="tagline">Script Collection</p>
+    <p class="description">
+      Check out our <span class="highlight">collection</span> of all <span class="highlight">Vadrifts Scripts</span> we've released! 
+      Discover powerful tools and <span class="highlight">exploits</span> for your favorite games.
+    </p>
+  </div>
+
+  <div class="search-section">
+    <div class="search-box">
+      <input 
+        type="text" 
+        class="search-input" 
+        placeholder="Search for scripts, games, or features..."
+        id="searchInput"
+      >
+      <div class="search-icon"></div>
+    </div>
+  </div>
+
+  <div class="scripts-section">
+    <div class="scripts-grid" id="scriptsGrid">
+      <div class="loading">
+        <div class="loading-spinner"></div>
+        <p>Loading scripts...</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-links">
+      <a href="/converter" class="footer-link">Image Converter</a>
+      <a href="https://discord.com/invite/WDbJ5wE2cR" class="footer-link">Discord Server</a>
+    </div>
+    <p>&copy; 2025 Vadrifts - Roblox Scripts & Tools</p>
+  </div>
+
+  <script>
+    let allScripts = [];
+    let searchTimeout = null;
+
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      const particleCount = 15;
+
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = -Math.random() * 15 + 's';
+        particle.style.animationDuration = (15 + Math.random() * 5) + 's';
+        particlesContainer.appendChild(particle);
+      }
+    }
+
+    async function loadScripts() {
+      try {
+        const response = await fetch('/api/scripts');
+        allScripts = await response.json();
+        displayScripts(allScripts);
+      } catch (error) {
+        console.error('Failed to load scripts:', error);
+        displayError();
+      }
+    }
+
+    function displayScripts(scripts) {
+      const grid = document.getElementById('scriptsGrid');
+      
+      if (scripts.length === 0) {
+        grid.innerHTML = `
+          <div class="no-scripts">
+            <div class="no-scripts-icon">📜</div>
+            <h3>No scripts found</h3>
+            <p>Try adjusting your search terms or check back later for new scripts.</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = scripts.map(script => `
+        <div class="script-card" onclick="viewScript(${script.id})">
+          <img 
+            src="${script.thumbnail}" 
+            alt="${script.title}"
+            class="script-thumbnail"
+            onerror="this.style.display='none'"
+          >
+          <div class="script-game">${script.game}</div>
+          <h3 class="script-title">${script.title}</h3>
+          <p class="script-description">${script.description}</p>
+          
+          <div class="script-features">
+            ${script.features.slice(0, 3).map(feature => 
+              `<span class="feature-tag">${feature}</span>`
+            ).join('')}
+            ${script.features.length > 3 ? `<span class="feature-tag">+${script.features.length - 3} more</span>` : ''}
+          </div>
+          
+          <div class="script-actions">
+            <button class="view-btn" onclick="event.stopPropagation(); viewScript(${script.id})">
+              View Script
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function displayError() {
+      const grid = document.getElementById('scriptsGrid');
+      grid.innerHTML = `
+        <div class="no-scripts">
+          <div class="no-scripts-icon">⚠️</div>
+          <h3>Failed to load scripts</h3>
+          <p>Please refresh the page or try again later.</p>
+        </div>
+      `;
+    }
+
+    function searchScripts(query) {
+      if (!query.trim()) {
+        displayScripts(allScripts);
+        return;
+      }
+
+      const filtered = allScripts.filter(script => 
+        script.title.toLowerCase().includes(query.toLowerCase()) ||
+        script.game.toLowerCase().includes(query.toLowerCase()) ||
+        script.description.toLowerCase().includes(query.toLowerCase()) ||
+        script.features.some(feature => feature.toLowerCase().includes(query.toLowerCase()))
+      );
+
+      displayScripts(filtered);
+    }
+
+    function viewScript(scriptId) {
+      window.location.href = `/script/${scriptId}`;
+    }
+
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      const query = e.target.value;
+      
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+      
+      searchTimeout = setTimeout(() => {
+        searchScripts(query);
+      }, 300);
+    });
+
+    document.getElementById('searchInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        if (searchTimeout) {
+          clearTimeout(searchTimeout);
+        }
+        searchScripts(e.target.value);
+      }
+    });
+
+    createParticles();
+    loadScripts();
+
+    // Navbar scroll behavior
+    let lastScrollTop = 0;
+    window.addEventListener('scroll', function() {
+      let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const navbar = document.querySelector('.navbar');
+      
+      if (scrollTop > 100) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+      
+      lastScrollTop = scrollTop;
+    });
+  </script>
+</body>
+</html>
