@@ -455,38 +455,25 @@
       transition: all 0.3s ease;
       cursor: pointer;
       position: relative;
-      overflow: hidden;
+      overflow: visible;
     }
 
     .script-card::before {
       content: '';
       position: absolute;
-      top: -2px;
-      left: -2px;
-      right: -2px;
-      bottom: -2px;
-      border-radius: 22px;
+      top: -3px;
+      left: -3px;
+      right: -3px;
+      bottom: -3px;
+      border-radius: 23px;
       background: linear-gradient(45deg, 
-        rgba(114, 9, 183, 0.6) 0%, 
-        rgba(255, 107, 157, 0.6) 25%, 
-        transparent 50%, 
-        rgba(255, 159, 67, 0.6) 75%, 
-        rgba(114, 9, 183, 0.6) 100%);
+        rgba(114, 9, 183, 0.8) 0%, 
+        rgba(255, 107, 157, 0.8) 25%, 
+        rgba(196, 120, 212, 0.6) 50%, 
+        rgba(255, 159, 67, 0.8) 75%, 
+        rgba(114, 9, 183, 0.8) 100%);
       opacity: 0;
       transition: opacity 0.3s ease;
-      z-index: -2;
-    }
-
-    .script-card::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(20px);
-      border-radius: 20px;
       z-index: -1;
     }
 
@@ -506,8 +493,6 @@
       object-fit: cover;
       margin-bottom: 15px;
       background: linear-gradient(135deg, #7209b7 0%, #ff6b9d 50%, #ff9f43 100%);
-      position: relative;
-      z-index: 1;
     }
 
     .script-game {
@@ -517,8 +502,6 @@
       text-transform: uppercase;
       letter-spacing: 1px;
       margin-bottom: 8px;
-      position: relative;
-      z-index: 1;
     }
 
     .script-title {
@@ -527,8 +510,6 @@
       color: #ffffff;
       margin-bottom: 10px;
       line-height: 1.2;
-      position: relative;
-      z-index: 1;
     }
 
     .script-description {
@@ -536,8 +517,6 @@
       color: #ccc;
       line-height: 1.4;
       margin-bottom: 15px;
-      position: relative;
-      z-index: 1;
     }
 
     .script-features {
@@ -545,8 +524,6 @@
       flex-wrap: wrap;
       gap: 6px;
       margin-bottom: 15px;
-      position: relative;
-      z-index: 1;
     }
 
     .feature-tag {
@@ -563,8 +540,6 @@
       display: flex;
       gap: 10px;
       margin-top: auto;
-      position: relative;
-      z-index: 1;
     }
 
     .view-btn {
