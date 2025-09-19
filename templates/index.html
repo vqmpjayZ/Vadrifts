@@ -12,31 +12,113 @@
     }
 
     body {
-      background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+      background: #0a0a0a;
       color: #e8e8e8;
-      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       min-height: 100vh;
       overflow-x: hidden;
       position: relative;
     }
 
-    /* Background effects */
-    body::before {
-      content: '';
+    .bg-lights {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: 
-        radial-gradient(circle at 20% 30%, rgba(124, 58, 237, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 80% 70%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 40% 80%, rgba(147, 51, 234, 0.08) 0%, transparent 50%);
+      overflow: hidden;
       z-index: 1;
-      pointer-events: none;
     }
 
-    /* Subtle grid overlay */
+    .light {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.4;
+      animation-duration: 12s;
+      animation-iteration-count: infinite;
+      animation-timing-function: ease-in-out;
+    }
+
+    .light-1 {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, #ff4757 0%, transparent 70%);
+      top: -250px;
+      left: -250px;
+      animation-name: float1;
+    }
+
+    .light-2 {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, #00d2ff 0%, transparent 70%);
+      top: -200px;
+      right: -200px;
+      animation-name: float2;
+      animation-delay: -3s;
+    }
+
+    .light-3 {
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, #ff6b9d 0%, transparent 70%);
+      bottom: -225px;
+      left: -225px;
+      animation-name: float3;
+      animation-delay: -6s;
+    }
+
+    .light-4 {
+      width: 350px;
+      height: 350px;
+      background: radial-gradient(circle, #7209b7 0%, transparent 70%);
+      bottom: -175px;
+      right: -175px;
+      animation-name: float4;
+      animation-delay: -9s;
+    }
+
+    .light-5 {
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, #ff9ff3 0%, transparent 70%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation-name: float5;
+      animation-delay: -12s;
+    }
+
+    @keyframes float1 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(150px, -100px) scale(1.2); }
+      66% { transform: translate(-100px, 150px) scale(0.8); }
+    }
+
+    @keyframes float2 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(-120px, 100px) scale(1.3); }
+      66% { transform: translate(180px, -120px) scale(0.7); }
+    }
+
+    @keyframes float3 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(100px, -150px) scale(0.9); }
+      66% { transform: translate(-150px, -100px) scale(1.1); }
+    }
+
+    @keyframes float4 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(-100px, -120px) scale(1.4); }
+      66% { transform: translate(120px, 150px) scale(0.6); }
+    }
+
+    @keyframes float5 {
+      0%, 100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+      50% { transform: translate(-50%, -50%) scale(1.2) rotate(180deg); }
+    }
+
     body::after {
       content: '';
       position: fixed;
@@ -47,9 +129,8 @@
       background-image: 
         linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-      background-size: 50px 50px;
+      background-size: 60px 60px;
       z-index: 2;
-      pointer-events: none;
     }
 
     .navbar {
@@ -58,10 +139,10 @@
       left: 0;
       right: 0;
       z-index: 100;
-      background: rgba(10, 10, 15, 0.9);
-      backdrop-filter: blur(20px);
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(30px);
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 16px 24px;
+      padding: 15px 20px;
     }
 
     .nav-content {
@@ -77,8 +158,11 @@
       align-items: center;
       gap: 12px;
       font-size: 24px;
-      font-weight: 600;
-      color: #ffffff;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ff4757, #00d2ff, #ff6b9d, #7209b7);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
       text-decoration: none;
     }
 
@@ -90,207 +174,138 @@
 
     .nav-links {
       display: flex;
-      gap: 32px;
+      gap: 30px;
       align-items: center;
     }
 
     .nav-link {
-      color: #a1a1aa;
+      color: #ccc;
       text-decoration: none;
       font-weight: 500;
-      font-size: 15px;
-      transition: all 0.2s ease;
-      padding: 8px 0;
+      transition: all 0.3s ease;
+      padding: 8px 16px;
+      border-radius: 8px;
       position: relative;
     }
 
     .nav-link:hover {
-      color: #ffffff;
+      color: #ff4757;
+      background: rgba(255, 71, 87, 0.1);
     }
 
-    .auth-buttons {
-      display: flex;
-      gap: 12px;
-    }
-
-    .login-btn {
-      color: #a1a1aa;
-      text-decoration: none;
-      font-weight: 500;
-      padding: 8px 16px;
-      border-radius: 8px;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .login-btn:hover {
-      color: #ffffff;
-      background: rgba(255, 255, 255, 0.05);
-    }
-
-    .register-btn {
-      background: linear-gradient(135deg, #7c3aed 0%, #3b82f6 100%);
-      color: white;
+    .discord-btn {
+      background: linear-gradient(135deg, #5865f2 0%, #7289da 100%);
+      color: white !important;
       padding: 10px 20px;
       border-radius: 8px;
       text-decoration: none;
       font-weight: 600;
-      font-size: 14px;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      transition: all 0.3s ease;
     }
 
-    .register-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 25px rgba(124, 58, 237, 0.25);
+    .discord-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(88, 101, 242, 0.3);
     }
 
     .header {
       position: relative;
       z-index: 10;
       text-align: center;
-      padding: 140px 24px 80px;
-      max-width: 1200px;
-      margin: 0 auto;
+      padding: 140px 20px 60px;
+      animation: slideDown 1s ease-out;
     }
 
-    .header-badge {
-      display: inline-flex;
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .logo {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 30px;
+      background: linear-gradient(135deg, #ff4757 0%, #ff6b9d 50%, #7209b7 100%);
+      border-radius: 30px;
+      display: flex;
       align-items: center;
-      gap: 8px;
-      background: rgba(124, 58, 237, 0.1);
-      border: 1px solid rgba(124, 58, 237, 0.3);
-      color: #a78bfa;
-      padding: 8px 16px;
-      border-radius: 25px;
-      font-size: 14px;
-      font-weight: 500;
-      margin-bottom: 32px;
+      justify-content: center;
+      position: relative;
+      animation: logoFloat 3s ease-in-out infinite;
+      box-shadow: 
+        0 20px 40px rgba(255, 71, 87, 0.3),
+        0 0 100px rgba(255, 71, 87, 0.2);
+      overflow: hidden;
     }
 
-    .badge-icon {
-      width: 16px;
-      height: 16px;
-      background: linear-gradient(135deg, #7c3aed, #3b82f6);
-      border-radius: 50%;
+    .logo-img {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+      filter: brightness(1.2);
+    }
+
+    @keyframes logoFloat {
+      0%, 100% { 
+        transform: translateY(0) scale(1);
+        box-shadow: 0 20px 40px rgba(255, 71, 87, 0.3), 0 0 100px rgba(255, 71, 87, 0.2);
+      }
+      50% { 
+        transform: translateY(-10px) scale(1.05);
+        box-shadow: 0 30px 60px rgba(255, 71, 87, 0.4), 0 0 120px rgba(255, 71, 87, 0.3);
+      }
     }
 
     h1 {
-      font-size: clamp(48px, 8vw, 80px);
-      font-weight: 700;
-      color: #ffffff;
-      margin-bottom: 24px;
-      letter-spacing: -2px;
-      line-height: 1.1;
-    }
-
-    .version-text {
-      background: linear-gradient(135deg, #7c3aed, #3b82f6);
+      font-size: 48px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ff4757, #00d2ff, #ff6b9d, #7209b7);
       background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      margin-bottom: 15px;
+      letter-spacing: -1px;
     }
 
     .tagline {
       font-size: 20px;
-      color: #a1a1aa;
-      margin-bottom: 48px;
-      max-width: 800px;
-      margin-left: auto;
-      margin-right: auto;
+      color: #aaa;
+      margin-bottom: 20px;
+      opacity: 0.9;
+    }
+
+    .description {
+      font-size: 16px;
+      color: #888;
+      max-width: 600px;
+      margin: 0 auto;
       line-height: 1.6;
-    }
-
-    .highlight {
-      color: #a78bfa;
-      font-weight: 600;
-    }
-
-    .stats-section {
-      display: flex;
-      justify-content: center;
-      gap: 48px;
-      margin-bottom: 48px;
-      flex-wrap: wrap;
-    }
-
-    .stat-item {
-      text-align: center;
-    }
-
-    .stat-number {
-      font-size: 36px;
-      font-weight: 700;
-      color: #ffffff;
-      margin-bottom: 8px;
-    }
-
-    .stat-label {
-      font-size: 14px;
-      color: #6b7280;
-      font-weight: 500;
-    }
-
-    .cta-buttons {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      margin-bottom: 80px;
-      flex-wrap: wrap;
-    }
-
-    .primary-btn {
-      background: linear-gradient(135deg, #7c3aed 0%, #3b82f6 100%);
-      color: white;
-      padding: 16px 32px;
-      border: none;
-      border-radius: 12px;
-      font-weight: 600;
-      font-size: 16px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .primary-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 40px rgba(124, 58, 237, 0.3);
-    }
-
-    .secondary-btn {
-      background: rgba(255, 255, 255, 0.1);
-      color: #ffffff;
-      padding: 16px 32px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 12px;
-      font-weight: 600;
-      font-size: 16px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .secondary-btn:hover {
-      background: rgba(255, 255, 255, 0.15);
-      transform: translateY(-1px);
     }
 
     .search-section {
       position: relative;
       z-index: 10;
-      padding: 0 24px 60px;
+      padding: 0 20px 40px;
       display: flex;
       justify-content: center;
+      animation: slideUp 1s ease-out 0.3s both;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .search-box {
@@ -301,42 +316,43 @@
 
     .search-input {
       width: 100%;
-      padding: 20px 60px 20px 24px;
+      padding: 18px 60px 18px 24px;
       font-size: 16px;
-      background: rgba(15, 15, 25, 0.8);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
-      color: #ffffff;
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(30px);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      color: #e8e8e8;
       outline: none;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
     }
 
     .search-input:focus {
-      border-color: #7c3aed;
-      background: rgba(15, 15, 25, 0.9);
+      border-color: #ff4757;
+      background: rgba(15, 15, 15, 0.95);
       box-shadow: 
-        0 0 0 3px rgba(124, 58, 237, 0.1),
-        0 8px 32px rgba(124, 58, 237, 0.15);
+        0 0 0 4px rgba(255, 71, 87, 0.1),
+        0 0 30px rgba(255, 71, 87, 0.2);
+      transform: translateY(-2px);
     }
 
     .search-input::placeholder {
-      color: #6b7280;
+      color: #666;
     }
 
     .search-icon {
       position: absolute;
-      right: 24px;
+      right: 20px;
       top: 50%;
       transform: translateY(-50%);
-      color: #6b7280;
+      color: #666;
       font-size: 18px;
     }
 
     .scripts-section {
       position: relative;
       z-index: 10;
-      padding: 40px 24px;
+      padding: 40px 20px;
       max-width: 1200px;
       margin: 0 auto;
     }
@@ -344,16 +360,16 @@
     .scripts-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-      gap: 24px;
-      margin-bottom: 60px;
+      gap: 25px;
+      margin-bottom: 50px;
     }
 
     .script-card {
-      background: rgba(15, 15, 25, 0.6);
-      backdrop-filter: blur(20px);
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(30px);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 20px;
-      padding: 24px;
+      padding: 25px;
       transition: all 0.3s ease;
       cursor: pointer;
       position: relative;
@@ -367,16 +383,25 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(59, 130, 246, 0.1));
-      opacity: 0;
-      transition: opacity 0.3s ease;
       border-radius: 20px;
+      padding: 1px;
+      background: linear-gradient(45deg, 
+        rgba(255, 71, 87, 0.3) 0%, 
+        rgba(0, 210, 255, 0.3) 25%, 
+        transparent 50%, 
+        rgba(255, 107, 157, 0.3) 75%, 
+        rgba(114, 9, 183, 0.3) 100%);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask-composite: exclude;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      opacity: 0;
+      transition: all 0.3s ease;
     }
 
     .script-card:hover {
       transform: translateY(-8px);
-      border-color: rgba(124, 58, 237, 0.3);
-      box-shadow: 0 20px 60px rgba(124, 58, 237, 0.15);
+      box-shadow: 0 20px 60px rgba(255, 71, 87, 0.2);
     }
 
     .script-card:hover::before {
@@ -385,112 +410,105 @@
 
     .script-thumbnail {
       width: 100%;
-      height: 160px;
-      border-radius: 16px;
+      height: 150px;
+      border-radius: 12px;
       object-fit: cover;
-      margin-bottom: 20px;
-      background: linear-gradient(135deg, #7c3aed 0%, #3b82f6 100%);
+      margin-bottom: 15px;
+      background: linear-gradient(135deg, #ff4757 0%, #ff6b9d 50%, #7209b7 100%);
     }
 
     .script-game {
       font-size: 12px;
-      color: #a78bfa;
+      color: #ff4757;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 1px;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
 
     .script-title {
       font-size: 20px;
-      font-weight: 600;
-      color: #ffffff;
-      margin-bottom: 12px;
-      line-height: 1.3;
-      position: relative;
-      z-index: 1;
+      font-weight: 700;
+      color: #e8e8e8;
+      margin-bottom: 10px;
+      line-height: 1.2;
     }
 
     .script-description {
       font-size: 14px;
-      color: #a1a1aa;
-      line-height: 1.5;
-      margin-bottom: 20px;
-      position: relative;
-      z-index: 1;
+      color: #aaa;
+      line-height: 1.4;
+      margin-bottom: 15px;
     }
 
     .script-features {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 20px;
+      gap: 6px;
+      margin-bottom: 15px;
     }
 
     .feature-tag {
-      background: rgba(124, 58, 237, 0.2);
-      color: #a78bfa;
-      padding: 6px 12px;
+      background: rgba(255, 71, 87, 0.2);
+      color: #ff4757;
+      padding: 4px 10px;
       border-radius: 20px;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 500;
-      border: 1px solid rgba(124, 58, 237, 0.3);
     }
 
     .script-actions {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       margin-top: auto;
-      position: relative;
-      z-index: 1;
     }
 
     .view-btn {
       flex: 1;
-      background: linear-gradient(135deg, #7c3aed 0%, #3b82f6 100%);
+      background: linear-gradient(135deg, #ff4757 0%, #ff6b9d 100%);
       color: white;
-      padding: 12px 24px;
+      padding: 12px;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
       text-decoration: none;
       text-align: center;
     }
 
     .view-btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
+      box-shadow: 0 8px 25px rgba(255, 71, 87, 0.4);
     }
 
     .no-scripts {
       text-align: center;
-      padding: 80px 24px;
-      color: #6b7280;
+      padding: 60px 20px;
+      color: #666;
     }
 
     .no-scripts-icon {
       font-size: 64px;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       opacity: 0.5;
     }
 
     .loading {
       text-align: center;
-      padding: 80px 24px;
-      color: #6b7280;
+      padding: 60px 20px;
+      color: #666;
     }
 
     .loading-spinner {
       display: inline-block;
       width: 40px;
       height: 40px;
-      border: 3px solid rgba(255, 255, 255, 0.1);
+      border: 4px solid rgba(255, 255, 255, 0.1);
       border-radius: 50%;
-      border-top: 3px solid #7c3aed;
+      border-top: 4px solid #ff4757;
       animation: spin 1s linear infinite;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
     @keyframes spin {
@@ -502,58 +520,54 @@
       position: relative;
       z-index: 10;
       text-align: center;
-      padding: 60px 24px;
-      color: #6b7280;
+      padding: 60px 20px;
+      color: #666;
       border-top: 1px solid rgba(255, 255, 255, 0.1);
-      margin-top: 60px;
+      margin-top: 40px;
     }
 
     .footer-links {
       display: flex;
       justify-content: center;
-      gap: 32px;
-      margin-bottom: 24px;
+      gap: 30px;
+      margin-bottom: 20px;
       flex-wrap: wrap;
     }
 
     .footer-link {
-      color: #a1a1aa;
+      color: #888;
       text-decoration: none;
-      font-weight: 500;
-      transition: color 0.2s ease;
+      transition: color 0.3s ease;
     }
 
     .footer-link:hover {
-      color: #ffffff;
+      color: #ff4757;
     }
 
     @media (max-width: 768px) {
       .nav-content {
         flex-direction: column;
-        gap: 20px;
+        gap: 15px;
       }
 
       .nav-links {
-        gap: 24px;
+        gap: 20px;
         flex-wrap: wrap;
         justify-content: center;
       }
 
-      .auth-buttons {
-        order: -1;
+      h1 {
+        font-size: 36px;
+      }
+      
+      .logo {
+        width: 100px;
+        height: 100px;
       }
 
-      .header {
-        padding: 120px 20px 60px;
-      }
-
-      .stats-section {
-        gap: 32px;
-      }
-
-      .cta-buttons {
-        flex-direction: column;
-        align-items: center;
+      .logo-img {
+        width: 65px;
+        height: 65px;
       }
 
       .scripts-grid {
@@ -565,14 +579,26 @@
         padding: 20px;
       }
 
+      .script-actions {
+        flex-direction: column;
+      }
+
       .footer-links {
         flex-direction: column;
-        gap: 16px;
+        gap: 15px;
       }
     }
   </style>
 </head>
 <body>
+  <div class="bg-lights">
+    <div class="light light-1"></div>
+    <div class="light light-2"></div>
+    <div class="light light-3"></div>
+    <div class="light light-4"></div>
+    <div class="light light-5"></div>
+  </div>
+
   <nav class="navbar">
     <div class="nav-content">
       <a href="/" class="nav-logo">
@@ -580,61 +606,28 @@
         Vadrifts
       </a>
       <div class="nav-links">
-        <a href="#scripts" class="nav-link">Scripts</a>
-        <a href="/converter" class="nav-link">Features</a>
-        <a href="#" class="nav-link">Benefits</a>
-        <a href="#" class="nav-link">FAQ</a>
-      </div>
-      <div class="auth-buttons">
-        <a href="#" class="login-btn">
-          👤 Log in
-        </a>
-        <a href="https://discord.com/invite/WDbJ5wE2cR" class="register-btn" target="_blank">
-          🔗 Register
+        <a href="/" class="nav-link">Scripts</a>
+        <a href="/converter" class="nav-link">Image Converter</a>
+        <a href="https://discord.com/invite/WDbJ5wE2cR" class="discord-btn" target="_blank">
+          Discord
         </a>
       </div>
     </div>
   </nav>
 
   <div class="header">
-    <div class="header-badge">
-      <div class="badge-icon"></div>
-      Your next script executor
+    <div class="logo">
+      <img src="https://i.imgur.com/ePueN25.png" alt="Vadrifts" class="logo-img">
     </div>
-    
-    <h1>Vadrifts <span class="version-text">V2</span></h1>
-    
-    <p class="tagline">
-      Faster, more reliable, and still the most powerful Roblox<br>
-      script executor with <span class="highlight">100% UNC & sUNC</span> support.
+    <h1>Vadrifts</h1>
+    <p class="tagline">Roblox Scripts & Tools</p>
+    <p class="description">
+      Discover powerful Roblox scripts, game-specific exploits, and useful tools. 
+      All scripts are regularly updated but may include key system protection.
     </p>
-
-    <div class="stats-section">
-      <div class="stat-item">
-        <div class="stat-number">24,388</div>
-        <div class="stat-label">Total Users</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-number">300+</div>
-        <div class="stat-label">Custom Scripts</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-number">100%</div>
-        <div class="stat-label">Script Compatibility</div>
-      </div>
-    </div>
-
-    <div class="cta-buttons">
-      <a href="#scripts" class="primary-btn">
-        Get Started ↗
-      </a>
-      <a href="https://discord.com/invite/WDbJ5wE2cR" class="secondary-btn" target="_blank">
-        🎮 Join Discord
-      </a>
-    </div>
   </div>
 
-  <div class="search-section" id="scripts">
+  <div class="search-section">
     <div class="search-box">
       <input 
         type="text" 
@@ -659,8 +652,6 @@
     <div class="footer-links">
       <a href="/converter" class="footer-link">Image Converter</a>
       <a href="https://discord.com/invite/WDbJ5wE2cR" class="footer-link">Discord Server</a>
-      <a href="#" class="footer-link">Documentation</a>
-      <a href="#" class="footer-link">Support</a>
     </div>
     <p>&copy; 2025 Vadrifts - Roblox Scripts & Tools</p>
   </div>
@@ -772,16 +763,6 @@
         }
         searchScripts(e.target.value);
       }
-    });
-
-    // Smooth scrolling for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        document.querySelector(this.getAttribute('href')).scrollIntoView({
-          behavior: 'smooth'
-        });
-      });
     });
 
     loadScripts();
