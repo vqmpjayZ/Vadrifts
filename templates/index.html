@@ -456,24 +456,20 @@
     .script-card::before {
       content: '';
       position: absolute;
-      top: -50%;
-      right: -50%;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle at center, 
-        rgba(114, 9, 183, 0.5) 0%, 
-        rgba(156, 39, 176, 0.3) 40%,
-        rgba(196, 120, 212, 0.2) 60%,
-        transparent 80%);
+      top: -20%;
+      right: -20%;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, #9c88ff 0%, transparent 70%);
+      border-radius: 50%;
+      filter: blur(80px);
       opacity: 0;
       transition: all 0.4s ease;
-      transform: rotate(-45deg);
       z-index: -1;
     }
 
     .script-card:hover::before {
-      opacity: 1;
-      transform: rotate(-45deg) scale(1.2);
+      opacity: 0.8;
     }
 
     .script-card:hover {
@@ -790,7 +786,7 @@
         const particle = document.createElement('div');
         particle.className = 'particle';
         particle.style.left = Math.random() * 100 + '%';
-        particle.style.animationDelay = Math.random() * 15 + 's';
+        particle.style.animationDelay = -Math.random() * 15 + 's'; // Negative delay starts mid-cycle
         particle.style.animationDuration = (15 + Math.random() * 5) + 's';
         particlesContainer.appendChild(particle);
       }
