@@ -271,7 +271,7 @@ def server_pinger():
 @app.route('/')
 def home():
     try:
-        with open('templates/index.html', 'r', encoding='utf-8') as f:
+        with open('templates/home.html', 'r', encoding='utf-8') as f:
             html_content = f.read()
         
         meta_tags = '''
@@ -289,7 +289,7 @@ def home():
         
         return inject_meta_tags(html_content, meta_tags)
     except FileNotFoundError:
-        logger.error("index.html template not found")
+        logger.error("home.html template not found")
         return jsonify({
             "message": "Vadrifts - Your ultimate Roblox scripting platform",
             "status": "deployed",
@@ -300,6 +300,33 @@ def home():
                 "convert_image": "GET /convert-image?url=<url>&crop=<true|false> - Convert image to pixels"
             }
         }), 200
+
+@app.route('/scripts')
+def scripts_page():
+    try:
+        with open('templates/scripts.html', 'r', encoding='utf-8') as f:
+            html_content = f.read()
+        
+        meta_tags = '''
+    <meta property="og:title" content="Vadrifts Scripts - Collection">
+    <meta property="og:description" content="Check out our collection of all Vadrifts Scripts we've released! Discover powerful tools and exploits for your favorite games.">
+    <meta property="og:image" content="https://i.imgur.com/PIHDQJf.png">
+    <meta property="og:url" content="https://vadrifts.onrender.com/scripts">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Vadrifts">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Vadrifts Scripts - Collection">
+    <meta name="twitter:description" content="Check out our collection of all Vadrifts Scripts we've released! Discover powerful tools and exploits for your favorite games.">
+    <meta name="twitter:image" content="https://i.imgur.com/PIHDQJf.png">
+    <meta name="theme-color" content="#7289DA">'''
+        
+        return inject_meta_tags(html_content, meta_tags)
+    except FileNotFoundError:
+        logger.error("scripts.html template not found")
+        return jsonify({
+            "error": "Scripts page not found",
+            "message": "Create templates/scripts.html file"
+        }), 404
 
 @app.route('/discord')
 def discord_invite():
