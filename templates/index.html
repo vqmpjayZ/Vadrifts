@@ -43,11 +43,11 @@
     }
 
     .light-1 {
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, #2d1b69 0%, transparent 70%);
-      top: 10%;
-      left: 5%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, #4a148c 0%, transparent 70%);
+      top: 2%;
+      left: 2%;
       animation-name: float1;
     }
 
@@ -64,7 +64,7 @@
     .light-3 {
       width: 450px;
       height: 450px;
-      background: radial-gradient(circle, #4c1d95 0%, transparent 70%);
+      background: radial-gradient(circle, #9c27b0 0%, transparent 70%);
       bottom: 20%;
       left: 10%;
       animation-name: float3;
@@ -74,7 +74,7 @@
     .light-4 {
       width: 350px;
       height: 350px;
-      background: radial-gradient(circle, #581c87 0%, transparent 70%);
+      background: radial-gradient(circle, #e91e63 0%, transparent 70%);
       bottom: 15%;
       right: 12%;
       animation-name: float4;
@@ -84,7 +84,7 @@
     .light-5 {
       width: 280px;
       height: 280px;
-      background: radial-gradient(circle, #9c88ff 0%, transparent 70%);
+      background: radial-gradient(circle, #ff4081 0%, transparent 70%);
       top: 45%;
       left: 45%;
       animation-name: float5;
@@ -94,11 +94,21 @@
     .light-6 {
       width: 200px;
       height: 200px;
-      background: radial-gradient(circle, #6b21a8 0%, transparent 70%);
+      background: radial-gradient(circle, #f06292 0%, transparent 70%);
       top: 60%;
       right: 30%;
       animation-name: float6;
       animation-delay: -5s;
+    }
+
+    .light-7 {
+      width: 380px;
+      height: 380px;
+      background: radial-gradient(circle, #ff6b35 0%, transparent 70%);
+      bottom: 8%;
+      right: 5%;
+      animation-name: float7;
+      animation-delay: -7s;
     }
 
     @keyframes float1 {
@@ -133,6 +143,12 @@
     @keyframes float6 {
       0%, 100% { transform: translate(0, 0) scale(1); }
       50% { transform: translate(60px, -80px) scale(1.4); }
+    }
+
+    @keyframes float7 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(-60px, -70px) scale(1.1); }
+      66% { transform: translate(40px, 60px) scale(0.9); }
     }
 
     .particles {
@@ -175,26 +191,35 @@
 
     .navbar {
       position: fixed;
-      top: 20px;
-      left: 20px;
-      right: 20px;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
       z-index: 100;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.1);
       backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 15px;
-      padding: 12px 20px;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      border-radius: 20px;
+      padding: 24px 32px;
       animation: slideInDown 0.8s ease-out;
+      max-width: 1000px;
+      width: 90%;
+      transition: all 0.3s ease;
+    }
+
+    .navbar:hover {
+      background: rgba(0, 0, 0, 0.6);
+      border-color: rgba(255, 255, 255, 0.1);
+      transform: translateX(-50%) translateY(8px);
     }
 
     @keyframes slideInDown {
       from {
         opacity: 0;
-        transform: translateY(-50px);
+        transform: translateX(-50%) translateY(-50px);
       }
       to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateX(-50%) translateY(0);
       }
     }
 
@@ -202,32 +227,38 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      height: 100%;
     }
 
     .nav-logo {
-      font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 24px;
       font-weight: 700;
-      background: linear-gradient(135deg, #ffffff, #7209b7, #ff6b9d, #ff9f43);
-      background-size: 300% 300%;
+      background: linear-gradient(90deg, #ffffff 0%, #ffffff 40%, #7209b7 100%);
       background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       text-decoration: none;
-      animation: gradientShift 6s ease-in-out infinite;
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
 
-    @keyframes gradientShift {
+    .nav-logo-img {
+      width: 28px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+
+    @keyframes simpleGradient {
       0%, 100% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
     }
 
     .nav-links {
       display: flex;
-      gap: 20px;
+      gap: 30px;
       align-items: center;
+      height: 100%;
     }
 
     .nav-link {
@@ -236,29 +267,35 @@
       font-weight: 500;
       font-size: 14px;
       transition: all 0.3s ease;
-      padding: 6px 12px;
+      padding: 8px 12px;
       border-radius: 8px;
+      display: flex;
+      align-items: center;
+      height: 100%;
     }
 
     .nav-link:hover {
-      color: #7209b7;
-      background: rgba(114, 9, 183, 0.1);
+      color: #ffffff;
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
     }
 
     .discord-btn {
-      background: linear-gradient(135deg, #5865f2 0%, #7289da 100%);
-      color: white !important;
-      padding: 8px 16px;
+      background: transparent;
+      color: #ccc !important;
+      padding: 8px 12px;
       border-radius: 8px;
       text-decoration: none;
-      font-weight: 600;
+      font-weight: 500;
       font-size: 14px;
       transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      height: 100%;
     }
 
     .discord-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(88, 101, 242, 0.4);
+      color: #ffffff !important;
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
     }
 
     .header {
@@ -283,19 +320,30 @@
     h1 {
       font-size: 72px;
       font-weight: 900;
-      background: linear-gradient(135deg, #ffffff, #7209b7, #ff6b9d, #ff9f43);
-      background-size: 400% 400%;
+      background: linear-gradient(90deg, 
+        #ffffff 0%, 
+        #ffffff 25%,
+        #7209b7 50%, 
+        #ff9f43 75%,
+        #ff9f43 100%
+      );
+      background-size: 130% 100%;
       background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       margin-bottom: 30px;
       letter-spacing: -2px;
-      animation: gradientFlow 8s ease-in-out infinite;
+      animation: orangePulse 7s ease-in-out infinite;
       text-shadow: 0 0 40px rgba(114, 9, 183, 0.5);
       filter: drop-shadow(0 0 20px rgba(114, 9, 183, 0.3));
     }
 
-    @keyframes gradientFlow {
+    @keyframes orangePulse {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 50% 50%; }
+    }
+
+    @keyframes smoothGradient {
       0%, 100% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
     }
@@ -400,29 +448,26 @@
       cursor: pointer;
       position: relative;
       overflow: hidden;
+      isolation: isolate;
     }
 
     .script-card::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      top: -1px;
+      left: -1px;
+      right: -1px;
+      bottom: -1px;
       border-radius: 20px;
-      padding: 1px;
       background: linear-gradient(45deg, 
         rgba(114, 9, 183, 0.4) 0%, 
         rgba(255, 107, 157, 0.4) 25%, 
         transparent 50%, 
         rgba(255, 159, 67, 0.4) 75%, 
         rgba(114, 9, 183, 0.4) 100%);
-      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      mask-composite: exclude;
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
       opacity: 0;
-      transition: all 0.3s ease;
+      transition: opacity 0.3s ease;
+      z-index: -1;
     }
 
     .script-card:hover {
@@ -580,7 +625,8 @@
         top: 10px;
         right: 10px;
         left: 10px;
-        padding: 10px 15px;
+        padding: 16px 18px;
+        width: calc(100% - 20px);
       }
 
       .nav-content {
@@ -592,9 +638,24 @@
         gap: 15px;
       }
 
-      .nav-link, .discord-btn {
+      .nav-link {
         font-size: 12px;
         padding: 6px 10px;
+      }
+
+      .discord-btn {
+        font-size: 12px;
+        padding: 6px 10px;
+      }
+
+      .nav-logo {
+        font-size: 20px;
+        gap: 8px;
+      }
+
+      .nav-logo-img {
+        width: 24px;
+        height: 24px;
       }
 
       h1 {
@@ -627,6 +688,21 @@
         gap: 15px;
       }
     }
+
+    @media (max-width: 480px) {
+      .nav-links {
+        gap: 10px;
+      }
+
+      .nav-link, .discord-btn {
+        font-size: 11px;
+        padding: 5px 8px;
+      }
+
+      .navbar {
+        padding: 10px 15px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -637,12 +713,17 @@
     <div class="light light-4"></div>
     <div class="light light-5"></div>
     <div class="light light-6"></div>
+    <div class="light light-7"></div>
   </div>
 
   <div class="particles" id="particles"></div>
 
   <nav class="navbar">
     <div class="nav-content">
+      <a href="/" class="nav-logo">
+        <img src="https://i.imgur.com/ePueN25.png" alt="Vadrifts Logo" class="nav-logo-img">
+        Vadrifts
+      </a>
       <div class="nav-links">
         <a href="/" class="nav-link">Scripts</a>
         <a href="/converter" class="nav-link">Image Converter</a>
@@ -650,15 +731,11 @@
           Discord
         </a>
       </div>
-      <a href="/" class="nav-logo">
-        <img src="https://i.imgur.com/ePueN25.png" alt="Vadrifts" style="width: 20px; height: 20px; object-fit: contain;">
-        Vadrifts
-      </a>
     </div>
   </nav>
 
   <div class="header">
-    <h1>Vadrifts</h1>
+    <h1>Vadrifts Reimagined</h1>
     <p class="tagline">Roblox Scripts & Tools</p>
     <p class="description">
       Discover powerful <span class="highlight">Roblox scripts</span>, game-specific <span class="highlight">exploits</span>, and useful <span class="highlight">tools</span>. 
@@ -707,7 +784,7 @@
         const particle = document.createElement('div');
         particle.className = 'particle';
         particle.style.left = Math.random() * 100 + '%';
-        particle.style.animationDelay = Math.random() * 8 + 's';
+        particle.style.animationDelay = Math.random() * 15 + 's';
         particle.style.animationDuration = (15 + Math.random() * 5) + 's';
         particlesContainer.appendChild(particle);
       }
