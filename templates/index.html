@@ -15,108 +15,8 @@
       background: #0a0a0a;
       color: #e8e8e8;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      min-height: 100vh;
       overflow-x: hidden;
       position: relative;
-    }
-
-    .bg-lights {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      z-index: 1;
-    }
-
-    .light {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(120px);
-      opacity: 0.4;
-      animation-duration: 12s;
-      animation-iteration-count: infinite;
-      animation-timing-function: ease-in-out;
-    }
-
-    .light-1 {
-      width: 500px;
-      height: 500px;
-      background: radial-gradient(circle, #ff4757 0%, transparent 70%);
-      top: -250px;
-      left: -250px;
-      animation-name: float1;
-    }
-
-    .light-2 {
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, #00d2ff 0%, transparent 70%);
-      top: -200px;
-      right: -200px;
-      animation-name: float2;
-      animation-delay: -3s;
-    }
-
-    .light-3 {
-      width: 450px;
-      height: 450px;
-      background: radial-gradient(circle, #ff6b9d 0%, transparent 70%);
-      bottom: -225px;
-      left: -225px;
-      animation-name: float3;
-      animation-delay: -6s;
-    }
-
-    .light-4 {
-      width: 350px;
-      height: 350px;
-      background: radial-gradient(circle, #7209b7 0%, transparent 70%);
-      bottom: -175px;
-      right: -175px;
-      animation-name: float4;
-      animation-delay: -9s;
-    }
-
-    .light-5 {
-      width: 300px;
-      height: 300px;
-      background: radial-gradient(circle, #ff9ff3 0%, transparent 70%);
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      animation-name: float5;
-      animation-delay: -12s;
-    }
-
-    @keyframes float1 {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(150px, -100px) scale(1.2); }
-      66% { transform: translate(-100px, 150px) scale(0.8); }
-    }
-
-    @keyframes float2 {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(-120px, 100px) scale(1.3); }
-      66% { transform: translate(180px, -120px) scale(0.7); }
-    }
-
-    @keyframes float3 {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(100px, -150px) scale(0.9); }
-      66% { transform: translate(-150px, -100px) scale(1.1); }
-    }
-
-    @keyframes float4 {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(-100px, -120px) scale(1.4); }
-      66% { transform: translate(120px, 150px) scale(0.6); }
-    }
-
-    @keyframes float5 {
-      0%, 100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
-      50% { transform: translate(-50%, -50%) scale(1.2) rotate(180deg); }
     }
 
     body::after {
@@ -131,6 +31,7 @@
         linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
       background-size: 60px 60px;
       z-index: 2;
+      pointer-events: none;
     }
 
     .navbar {
@@ -201,6 +102,9 @@
       text-decoration: none;
       font-weight: 600;
       transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .discord-btn:hover {
@@ -208,34 +112,22 @@
       box-shadow: 0 10px 30px rgba(88, 101, 242, 0.3);
     }
 
-    .hero-section {
-      position: relative;
-      z-index: 10;
-      text-align: center;
-      padding: 140px 20px 80px;
-      min-height: 100vh;
+    .main-section {
+      height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      animation: slideDown 1s ease-out;
-    }
-
-    @keyframes slideDown {
-      from {
-        opacity: 0;
-        transform: translateY(-50px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      align-items: center;
+      text-align: center;
+      padding: 0 20px;
+      position: relative;
+      z-index: 10;
     }
 
     .logo {
       width: 120px;
       height: 120px;
       margin: 0 auto 30px;
-      background: linear-gradient(135deg, #ff4757 0%, #ff6b9d 50%, #7209b7 100%);
       border-radius: 30px;
       display: flex;
       align-items: center;
@@ -287,305 +179,269 @@
       line-height: 1.6;
     }
 
-    .cta-buttons {
+    .main-actions {
       display: flex;
       gap: 20px;
-      justify-content: center;
       flex-wrap: wrap;
+      justify-content: center;
     }
 
-    .cta-btn {
-      padding: 15px 30px;
-      border-radius: 12px;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 16px;
-      transition: all 0.3s ease;
-      cursor: pointer;
-      border: none;
-    }
-
-    .cta-primary {
+    .primary-btn {
       background: linear-gradient(135deg, #ff4757 0%, #ff6b9d 100%);
       color: white;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      font-size: 16px;
     }
 
-    .cta-secondary {
-      background: rgba(255, 255, 255, 0.1);
+    .primary-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(255, 71, 87, 0.4);
+    }
+
+    .secondary-btn {
+      background: transparent;
       color: #e8e8e8;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 15px 30px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      font-size: 16px;
     }
 
-    .cta-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 15px 40px rgba(255, 71, 87, 0.3);
+    .secondary-btn:hover {
+      border-color: #ff4757;
+      background: rgba(255, 71, 87, 0.1);
+      transform: translateY(-2px);
     }
 
-    .scroll-hint {
+    .scroll-indicator {
       position: absolute;
       bottom: 30px;
       left: 50%;
       transform: translateX(-50%);
       color: #666;
-      font-size: 14px;
       animation: bounce 2s infinite;
     }
 
     @keyframes bounce {
-      0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
-      40% { transform: translateX(-50%) translateY(-10px); }
-      60% { transform: translateX(-50%) translateY(-5px); }
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateX(-50%) translateY(0);
+      }
+      40% {
+        transform: translateX(-50%) translateY(-10px);
+      }
+      60% {
+        transform: translateX(-50%) translateY(-5px);
+      }
     }
 
-    .scripts-showcase {
-      position: relative;
-      height: 100vh;
-      overflow: hidden;
-      z-index: 10;
-    }
-
-    .showcase-container {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-    }
-
-    .script-slides {
-      display: flex;
-      width: calc(100% * var(--slides-count, 3));
-      height: 100%;
-      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .script-slide {
-      width: 100vw;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
-
-    .slide-content {
-      display: flex;
-      max-width: 1200px;
-      width: 100%;
-      align-items: center;
-      gap: 80px;
-      padding: 0 40px;
-    }
-
-    .slide-info {
-      flex: 1;
-      max-width: 500px;
-    }
-
-    .slide-game {
-      font-size: 14px;
-      color: #ff4757;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      margin-bottom: 15px;
-    }
-
-    .slide-title {
-      font-size: 42px;
-      font-weight: 800;
-      color: #e8e8e8;
-      margin-bottom: 20px;
-      line-height: 1.2;
-    }
-
-    .slide-description {
-      font-size: 18px;
-      color: #aaa;
-      line-height: 1.6;
-      margin-bottom: 30px;
-    }
-
-    .slide-features {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 10px;
-      margin-bottom: 40px;
-    }
-
-    .slide-feature {
-      background: rgba(255, 71, 87, 0.1);
-      color: #ff4757;
-      padding: 8px 15px;
-      border-radius: 25px;
-      font-size: 13px;
-      font-weight: 500;
-      text-align: center;
-    }
-
-    .slide-actions {
-      display: flex;
-      gap: 15px;
-    }
-
-    .slide-btn {
-      padding: 15px 30px;
-      border-radius: 10px;
-      text-decoration: none;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      cursor: pointer;
-      border: none;
-      font-size: 16px;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #ff4757 0%, #ff6b9d 100%);
-      color: white;
-    }
-
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.1);
-      color: #e8e8e8;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .slide-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(255, 71, 87, 0.3);
-    }
-
-    .slide-visual {
-      flex: 1;
-      max-width: 500px;
-      height: 400px;
-      position: relative;
-    }
-
-    .slide-thumbnail {
-      width: 100%;
-      height: 100%;
-      border-radius: 20px;
-      object-fit: cover;
-      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
-    }
-
-    .progress-indicator {
-      position: absolute;
-      bottom: 40px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 10px;
-      z-index: 20;
-    }
-
-    .progress-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.3);
-      transition: all 0.3s ease;
-      cursor: pointer;
-    }
-
-    .progress-dot.active {
-      background: #ff4757;
-      transform: scale(1.2);
-    }
-
-    .showcase-nav {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      z-index: 20;
-      background: rgba(0, 0, 0, 0.5);
-      border: none;
-      color: white;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-size: 20px;
-    }
-
-    .nav-prev {
-      left: 30px;
-    }
-
-    .nav-next {
-      right: 30px;
-    }
-
-    .showcase-nav:hover {
-      background: rgba(255, 71, 87, 0.8);
-      transform: translateY(-50%) scale(1.1);
-    }
-
-    .more-section {
+    .scripts-preview {
+      min-height: 100vh;
+      padding: 80px 0;
       position: relative;
       z-index: 10;
-      padding: 80px 20px;
+      background: linear-gradient(135deg, rgba(255, 71, 87, 0.05) 0%, rgba(0, 210, 255, 0.05) 100%);
+    }
+
+    .section-title {
       text-align: center;
-      background: rgba(5, 5, 5, 0.8);
-    }
-
-    .more-content {
-      max-width: 800px;
-      margin: 0 auto;
-    }
-
-    .more-title {
       font-size: 36px;
       font-weight: 700;
       margin-bottom: 20px;
-      background: linear-gradient(135deg, #ff4757, #00d2ff, #ff6b9d);
+      background: linear-gradient(135deg, #ff4757, #00d2ff, #ff6b9d, #7209b7);
       background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
-    .more-description {
-      font-size: 18px;
+    .section-subtitle {
+      text-align: center;
       color: #aaa;
-      margin-bottom: 40px;
-      line-height: 1.6;
+      font-size: 18px;
+      margin-bottom: 60px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
-    .more-features {
+    .scripts-slider {
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 40px;
+    }
+
+    .scripts-track {
+      display: flex;
+      gap: 30px;
+      padding: 20px;
+      animation: slide 30s linear infinite;
+    }
+
+    @keyframes slide {
+      0% {
+        transform: translateX(0);
+      }
+      100% {
+        transform: translateX(calc(-100% + 100vw));
+      }
+    }
+
+    .scripts-track:hover {
+      animation-play-state: paused;
+    }
+
+    .script-preview {
+      min-width: 320px;
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(30px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 25px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .script-preview::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 20px;
+      padding: 1px;
+      background: linear-gradient(45deg, 
+        rgba(255, 71, 87, 0.3) 0%, 
+        rgba(0, 210, 255, 0.3) 25%, 
+        transparent 50%, 
+        rgba(255, 107, 157, 0.3) 75%, 
+        rgba(114, 9, 183, 0.3) 100%);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask-composite: exclude;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    .script-preview:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 60px rgba(255, 71, 87, 0.2);
+    }
+
+    .script-preview:hover::before {
+      opacity: 1;
+    }
+
+    .script-thumbnail {
+      width: 100%;
+      height: 120px;
+      border-radius: 12px;
+      object-fit: cover;
+      margin-bottom: 15px;
+      background: linear-gradient(135deg, #ff4757 0%, #ff6b9d 50%, #7209b7 100%);
+    }
+
+    .script-game {
+      font-size: 11px;
+      color: #ff4757;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .script-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #e8e8e8;
+      margin-bottom: 10px;
+      line-height: 1.2;
+    }
+
+    .script-short-desc {
+      font-size: 14px;
+      color: #aaa;
+      line-height: 1.4;
+      margin-bottom: 15px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .script-key-type {
+      display: inline-block;
+      background: rgba(255, 71, 87, 0.2);
+      color: #ff4757;
+      padding: 4px 10px;
+      border-radius: 15px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 15px;
+    }
+
+    .view-all-section {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .features-section {
+      padding: 80px 20px;
+      text-align: center;
+      position: relative;
+      z-index: 10;
+    }
+
+    .features-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 30px;
-      margin-bottom: 50px;
+      max-width: 1000px;
+      margin: 0 auto 60px;
     }
 
     .feature-card {
       background: rgba(10, 10, 10, 0.8);
-      padding: 30px;
-      border-radius: 15px;
+      backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 30px 20px;
       transition: all 0.3s ease;
     }
 
     .feature-card:hover {
       transform: translateY(-5px);
       border-color: rgba(255, 71, 87, 0.3);
+      box-shadow: 0 10px 30px rgba(255, 71, 87, 0.1);
     }
 
     .feature-icon {
-      font-size: 40px;
-      margin-bottom: 15px;
+      font-size: 48px;
+      margin-bottom: 20px;
     }
 
     .feature-title {
       font-size: 20px;
       font-weight: 600;
-      margin-bottom: 10px;
+      color: #e8e8e8;
+      margin-bottom: 15px;
     }
 
-    .feature-text {
-      color: #888;
+    .feature-desc {
+      color: #aaa;
       line-height: 1.5;
     }
 
@@ -628,14 +484,10 @@
         justify-content: center;
       }
 
-      .hero-section {
-        padding: 120px 20px 60px;
-      }
-
       h1 {
         font-size: 36px;
       }
-
+      
       .logo {
         width: 100px;
         height: 100px;
@@ -646,43 +498,25 @@
         height: 65px;
       }
 
-      .slide-content {
+      .main-actions {
         flex-direction: column;
-        gap: 40px;
-        padding: 0 20px;
-        text-align: center;
+        align-items: center;
       }
 
-      .slide-title {
-        font-size: 32px;
+      .primary-btn, .secondary-btn {
+        width: 250px;
       }
 
-      .slide-features {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      .section-title {
+        font-size: 28px;
       }
 
-      .slide-visual {
-        max-width: 100%;
-        height: 300px;
+      .script-preview {
+        min-width: 280px;
       }
 
-      .showcase-nav {
-        width: 40px;
-        height: 40px;
-        font-size: 16px;
-      }
-
-      .nav-prev {
-        left: 15px;
-      }
-
-      .nav-next {
-        right: 15px;
-      }
-
-      .more-features {
+      .features-grid {
         grid-template-columns: 1fr;
-        gap: 20px;
       }
 
       .footer-links {
@@ -693,14 +527,6 @@
   </style>
 </head>
 <body>
-  <div class="bg-lights">
-    <div class="light light-1"></div>
-    <div class="light light-2"></div>
-    <div class="light light-3"></div>
-    <div class="light light-4"></div>
-    <div class="light light-5"></div>
-  </div>
-
   <nav class="navbar">
     <div class="nav-content">
       <a href="/" class="nav-logo">
@@ -711,365 +537,168 @@
         <a href="/scripts" class="nav-link">All Scripts</a>
         <a href="/converter" class="nav-link">Image Converter</a>
         <a href="https://discord.com/invite/WDbJ5wE2cR" class="discord-btn" target="_blank">
+          <span>🎮</span>
           Discord
         </a>
       </div>
     </div>
   </nav>
 
-  <div class="hero-section">
+  <div class="main-section">
     <div class="logo">
       <img src="https://i.imgur.com/ePueN25.png" alt="Vadrifts" class="logo-img">
     </div>
     <h1>Vadrifts</h1>
-    <p class="tagline">Premium Roblox Scripts & Tools</p>
+    <p class="tagline">Roblox Scripts & Tools</p>
     <p class="description">
-      Discover powerful, undetected Roblox scripts with advanced features. 
-      From universal chat bypasses to game-specific exploits - we've got everything you need.
+      Your ultimate destination for powerful Roblox scripts, game-specific exploits, and useful tools. 
+      All scripts are regularly updated and feature-packed.
     </p>
-    <div class="cta-buttons">
-      <button class="cta-btn cta-primary" onclick="scrollToShowcase()">Explore Scripts</button>
-      <a href="/scripts" class="cta-btn cta-secondary">View All Scripts</a>
+    
+    <div class="main-actions">
+      <a href="/scripts" class="primary-btn">Browse All Scripts</a>
+      <a href="/converter" class="secondary-btn">Image Converter</a>
     </div>
-    <div class="scroll-hint">↓ Scroll down to explore</div>
-  </div>
 
-  <div class="scripts-showcase" id="scriptsShowcase">
-    <div class="showcase-container">
-      <div class="script-slides" id="scriptSlides">
-        <div class="script-slide">
-          <div class="slide-content">
-            <div class="slide-info">
-              <div class="slide-game">Universal</div>
-              <h2 class="slide-title">Vadrifts.byp</h2>
-              <p class="slide-description">The most advanced Roblox Chat Bypasser available. Completely undetected with 700+ premade bypasses and intelligent tag detection.</p>
-              <div class="slide-features">
-                <span class="slide-feature">Chat Bypass</span>
-                <span class="slide-feature">Mobile Friendly</span>
-                <span class="slide-feature">700+ Bypasses</span>
-                <span class="slide-feature">Anti Chat Ban</span>
-                <span class="slide-feature">Sus Animations</span>
-                <span class="slide-feature">Anti Admin</span>
-              </div>
-              <div class="slide-actions">
-                <a href="/script/1" class="slide-btn btn-primary">Get Script</a>
-                <button class="slide-btn btn-secondary" onclick="copyScript('loadstring(game:HttpGet(&quot;https://raw.githubusercontent.com/vqmpjayZ/Bypass/main/vadrifts.lua&quot;))()')">Copy Code</button>
-              </div>
-            </div>
-            <div class="slide-visual">
-              <img src="https://i.imgur.com/jI8qDiR.jpeg" alt="Vadrifts Bypass" class="slide-thumbnail">
-            </div>
-          </div>
-        </div>
-
-        <div class="script-slide">
-          <div class="slide-content">
-            <div class="slide-info">
-              <div class="slide-game">Starving Artists</div>
-              <h2 class="slide-title">Advanced Art Generator</h2>
-              <p class="slide-description">Revolutionary Starving Artists script with AI-powered image generation, auto booth claiming, and advanced server hopping capabilities.</p>
-              <div class="slide-features">
-                <span class="slide-feature">Image Generator</span>
-                <span class="slide-feature">Auto Booth Claim</span>
-                <span class="slide-feature">Server Hopper</span>
-                <span class="slide-feature">Webhook Notify</span>
-                <span class="slide-feature">Auto Beg</span>
-                <span class="slide-feature">Anti-AFK</span>
-              </div>
-              <div class="slide-actions">
-                <a href="/script/8916037983" class="slide-btn btn-primary">Get Script</a>
-                <button class="slide-btn btn-secondary" onclick="copyScript('loadstring(game:HttpGet(&quot;https://raw.githubusercontent.com/vqmpjayZ/Vadrifts-Hub/refs/heads/main/Games/Starving-Artists/source.lua&quot;))()')">Copy Code</button>
-              </div>
-            </div>
-            <div class="slide-visual">
-              <img src="https://tr.rbxcdn.com/180DAY-808f20386cb8582fcd0075aae67cd039/768/432/Image/Webp/noFilter" alt="Starving Artists Script" class="slide-thumbnail">
-            </div>
-          </div>
-        </div>
-
-        <div class="script-slide">
-          <div class="slide-content">
-            <div class="slide-info">
-              <div class="slide-game">Horrific Housing</div>
-              <h2 class="slide-title">Ultimate Housing Hack</h2>
-              <p class="slide-description">Complete Horrific Housing domination with infinite tokens, unlock all items, godmode, and advanced ESP features. Completely keyless!</p>
-              <div class="slide-features">
-                <span class="slide-feature">Keyless</span>
-                <span class="slide-feature">Infinite Tokens</span>
-                <span class="slide-feature">Unlock All Items</span>
-                <span class="slide-feature">Godmode</span>
-                <span class="slide-feature">ESP & Reach</span>
-                <span class="slide-feature">Teleportation</span>
-              </div>
-              <div class="slide-actions">
-                <a href="/script/263761432" class="slide-btn btn-primary">Get Script</a>
-                <button class="slide-btn btn-secondary" onclick="copyScript('loadstring(game:HttpGet(&quot;https://raw.githubusercontent.com/vqmpjayZ/More-Scripts/refs/heads/main/Vadrifts-Horrific-Housing.lua&quot;))()')">Copy Code</button>
-              </div>
-            </div>
-            <div class="slide-visual">
-              <img src="https://tr.rbxcdn.com/180DAY-8598e6c1626e3ccf16eb8b3acbd618fe/768/432/Image/Webp/noFilter" alt="Horrific Housing Script" class="slide-thumbnail">
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <button class="showcase-nav nav-prev" onclick="previousSlide()">‹</button>
-      <button class="showcase-nav nav-next" onclick="nextSlide()">›</button>
-
-      <div class="progress-indicator">
-        <div class="progress-dot active" onclick="goToSlide(0)"></div>
-        <div class="progress-dot" onclick="goToSlide(1)"></div>
-        <div class="progress-dot" onclick="goToSlide(2)"></div>
-      </div>
+    <div class="scroll-indicator">
+      <div style="font-size: 24px;">↓</div>
+      <div style="font-size: 12px; margin-top: 5px;">Scroll to explore</div>
     </div>
   </div>
 
-  <div class="more-section">
-    <div class="more-content">
-      <h2 class="more-title">More Than Just Scripts</h2>
-      <p class="more-description">Vadrifts offers a complete ecosystem of tools and services for the Roblox community. Discover what makes us different.</p>
-      
-      <div class="more-features">
-        <div class="feature-card">
-          <div class="feature-icon">🔧</div>
-          <h3 class="feature-title">Image Converter</h3>
-          <p class="feature-text">Convert any image to pixel art for Starving Artists with our advanced conversion tool.</p>
+  <div class="scripts-preview">
+    <h2 class="section-title">Featured Scripts</h2>
+    <p class="section-subtitle">Check out our most popular and powerful Roblox scripts</p>
+    
+    <div class="scripts-slider">
+      <div class="scripts-track" id="scriptsTrack">
+        <div class="script-preview" onclick="viewScript(1)">
+          <img 
+            src="https://i.imgur.com/jI8qDiR.jpeg" 
+            alt="Vadrifts.byp"
+            class="script-thumbnail"
+          >
+          <div class="script-game">Universal</div>
+          <div class="script-key-type">Discord Key</div>
+          <h3 class="script-title">Vadrifts.byp</h3>
+          <p class="script-short-desc">Best and undetected Roblox Chat Bypasser. Bypass chat filters and swear freely!</p>
         </div>
-        <div class="feature-card">
-          <div class="feature-icon">💬</div>
-          <h3 class="feature-title">Discord Community</h3>
-          <p class="feature-text">Join thousands of users in our active Discord server for support and updates.</p>
+
+        <div class="script-preview" onclick="viewScript(8916037983)">
+          <img 
+            src="https://tr.rbxcdn.com/180DAY-808f20386cb8582fcd0075aae67cd039/768/432/Image/Webp/noFilter" 
+            alt="Starving Artists Script"
+            class="script-thumbnail"
+          >
+          <div class="script-game">Starving Artists</div>
+          <div class="script-key-type">Discord Key</div>
+          <h3 class="script-title">Starving Artists Script</h3>
+          <p class="script-short-desc">Generate custom images with URL input, auto booth claiming, and server hopping.</p>
         </div>
-        <div class="feature-card">
-          <div class="feature-icon">🚀</div>
-          <h3 class="feature-title">Regular Updates</h3>
-          <p class="feature-text">Our scripts are constantly updated to stay undetected and add new features.</p>
+
+        <div class="script-preview" onclick="viewScript(263761432)">
+          <img 
+            src="https://tr.rbxcdn.com/180DAY-8598e6c1626e3ccf16eb8b3acbd618fe/768/432/Image/Webp/noFilter" 
+            alt="Horrific Housing Script"
+            class="script-thumbnail"
+          >
+          <div class="script-game">Horrific Housing</div>
+          <div class="script-key-type">Keyless</div>
+          <h3 class="script-title">Horrific Housing Script</h3>
+          <p class="script-short-desc">Complete keyless script with infinite tokens, item unlocks, and godmode features.</p>
+        </div>
+
+        <div class="script-preview" onclick="viewScript(1)">
+          <img 
+            src="https://i.imgur.com/jI8qDiR.jpeg" 
+            alt="Vadrifts.byp"
+            class="script-thumbnail"
+          >
+          <div class="script-game">Universal</div>
+          <div class="script-key-type">Discord Key</div>
+          <h3 class="script-title">Vadrifts.byp</h3>
+          <p class="script-short-desc">Best and undetected Roblox Chat Bypasser. Bypass chat filters and swear freely!</p>
+        </div>
+
+        <div class="script-preview" onclick="viewScript(8916037983)">
+          <img 
+            src="https://tr.rbxcdn.com/180DAY-808f20386cb8582fcd0075aae67cd039/768/432/Image/Webp/noFilter" 
+            alt="Starving Artists Script"
+            class="script-thumbnail"
+          >
+          <div class="script-game">Starving Artists</div>
+          <div class="script-key-type">Discord Key</div>
+          <h3 class="script-title">Starving Artists Script</h3>
+          <p class="script-short-desc">Generate custom images with URL input, auto booth claiming, and server hopping.</p>
         </div>
       </div>
-      
-      <a href="/scripts" class="cta-btn cta-primary">View All Scripts</a>
+    </div>
+
+    <div class="view-all-section">
+      <a href="/scripts" class="primary-btn">View All Scripts</a>
+    </div>
+  </div>
+
+  <div class="features-section">
+    <h2 class="section-title">Why Choose Vadrifts?</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🚀</div>
+        <div class="feature-title">Regularly Updated</div>
+        <div class="feature-desc">Our scripts are constantly maintained and updated to work with the latest Roblox updates.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <div class="feature-title">Secure & Safe</div>
+        <div class="feature-desc">All scripts are tested for safety and won't harm your account or computer.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📱</div>
+        <div class="feature-title">Mobile Friendly</div>
+        <div class="feature-desc">Most of our scripts work perfectly on mobile executors and devices.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎮</div>
+        <div class="feature-title">Game Specific</div>
+        <div class="feature-desc">Specialized scripts tailored for specific games with unique features and exploits.</div>
+      </div>
     </div>
   </div>
 
   <div class="footer">
     <div class="footer-links">
-      <a href="/scripts" class="footer-link">All Scripts</a>
       <a href="/converter" class="footer-link">Image Converter</a>
       <a href="https://discord.com/invite/WDbJ5wE2cR" class="footer-link">Discord Server</a>
+      <a href="/scripts" class="footer-link">All Scripts</a>
     </div>
-    <p>&copy; 2025 Vadrifts - Premium Roblox Scripts & Tools</p>
+    <p>&copy; 2025 Vadrifts - Roblox Scripts & Tools</p>
   </div>
 
   <script>
-    let currentSlide = 0;
-    const totalSlides = 3;
-    let isScrolling = false;
-    let showcaseActive = false;
+    function viewScript(scriptId) {
+      window.location.href = `/script/${scriptId}`;
+    }
 
-    document.documentElement.style.setProperty('--slides-count', totalSlides);
-
-    function updateSlide() {
-      const slides = document.getElementById('scriptSlides');
-      const dots = document.querySelectorAll('.progress-dot');
+    document.addEventListener('DOMContentLoaded', function() {
+      const track = document.getElementById('scriptsTrack');
       
-      slides.style.transform = `translateX(-${currentSlide * 100}vw)`;
-      
-      dots.forEach((dot, index) => {
-        dot.classList.toggle('active', index === currentSlide);
+      track.addEventListener('mouseenter', function() {
+        this.style.animationPlayState = 'paused';
       });
-    }
-
-    function nextSlide() {
-      currentSlide = (currentSlide + 1) % totalSlides;
-      updateSlide();
-    }
-
-    function previousSlide() {
-      currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
-      updateSlide();
-    }
-
-    function goToSlide(index) {
-      currentSlide = index;
-      updateSlide();
-    }
-
-    function scrollToShowcase() {
-      document.getElementById('scriptsShowcase').scrollIntoView({
-        behavior: 'smooth'
+      
+      track.addEventListener('mouseleave', function() {
+        this.style.animationPlayState = 'running';
       });
-    }
 
-    function copyScript(code) {
-      navigator.clipboard.writeText(code).then(() => {
-        const button = event.target;
-        const originalText = button.textContent;
-        button.textContent = 'Copied!';
-        button.style.background = 'linear-gradient(135deg, #00d2ff 0%, #0099cc 100%)';
-        
-        setTimeout(() => {
-          button.textContent = originalText;
-          button.style.background = '';
-        }, 2000);
-      }).catch(() => {
-        alert('Failed to copy code. Please copy manually.');
-      });
-    }
-
-    function handleScroll() {
-      if (isScrolling) return;
-      
-      const showcase = document.getElementById('scriptsShowcase');
-      const showcaseRect = showcase.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-      
-      if (showcaseRect.top <= 0 && showcaseRect.bottom >= windowHeight) {
-        if (!showcaseActive) {
-          showcaseActive = true;
-          document.body.style.overflow = 'hidden';
-        }
-        
-        return;
-      }
-      
-      if (showcaseActive) {
-        showcaseActive = false;
-        document.body.style.overflow = '';
-      }
-    }
-
-    function handleWheel(e) {
-      const showcase = document.getElementById('scriptsShowcase');
-      const showcaseRect = showcase.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-      
-      if (showcaseRect.top <= 0 && showcaseRect.bottom >= windowHeight) {
-        e.preventDefault();
-        
-        if (isScrolling) return;
-        isScrolling = true;
-        
-        if (e.deltaY > 0) {
-          if (currentSlide < totalSlides - 1) {
-            nextSlide();
-          } else {
-            document.body.style.overflow = '';
-            showcaseActive = false;
-            window.scrollTo({
-              top: showcase.offsetTop + showcase.offsetHeight,
-              behavior: 'smooth'
-            });
-          }
+      const scrollIndicator = document.querySelector('.scroll-indicator');
+      window.addEventListener('scroll', function() {
+        if (window.scrollY > 200) {
+          scrollIndicator.style.opacity = '0';
         } else {
-          if (currentSlide > 0) {
-            previousSlide();
-          } else {
-            document.body.style.overflow = '';
-            showcaseActive = false;
-            window.scrollTo({
-              top: showcase.offsetTop - windowHeight,
-              behavior: 'smooth'
-            });
-          }
+          scrollIndicator.style.opacity = '1';
         }
-        
-        setTimeout(() => {
-          isScrolling = false;
-        }, 600);
-      }
-    }
-
-    let touchStartY = 0;
-    let touchEndY = 0;
-
-    function handleTouchStart(e) {
-      touchStartY = e.touches[0].clientY;
-    }
-
-    function handleTouchMove(e) {
-      const showcase = document.getElementById('scriptsShowcase');
-      const showcaseRect = showcase.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-      
-      if (showcaseRect.top <= 0 && showcaseRect.bottom >= windowHeight) {
-        e.preventDefault();
-      }
-    }
-
-    function handleTouchEnd(e) {
-      if (isScrolling) return;
-      
-      const showcase = document.getElementById('scriptsShowcase');
-      const showcaseRect = showcase.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-      
-      if (showcaseRect.top <= 0 && showcaseRect.bottom >= windowHeight) {
-        touchEndY = e.changedTouches[0].clientY;
-        const touchDiff = touchStartY - touchEndY;
-        
-        if (Math.abs(touchDiff) > 50) {
-          isScrolling = true;
-          
-          if (touchDiff > 0) {
-            if (currentSlide < totalSlides - 1) {
-              nextSlide();
-            } else {
-              document.body.style.overflow = '';
-              showcaseActive = false;
-              window.scrollTo({
-                top: showcase.offsetTop + showcase.offsetHeight,
-                behavior: 'smooth'
-              });
-            }
-          } else {
-            if (currentSlide > 0) {
-              previousSlide();
-            } else {
-              document.body.style.overflow = '';
-              showcaseActive = false;
-              window.scrollTo({
-                top: showcase.offsetTop - windowHeight,
-                behavior: 'smooth'
-              });
-            }
-          }
-          
-          setTimeout(() => {
-            isScrolling = false;
-          }, 600);
-        }
-      }
-    }
-
-    window.addEventListener('scroll', handleScroll);
-    window.addEventListener('wheel', handleWheel, { passive: false });
-    window.addEventListener('touchstart', handleTouchStart, { passive: false });
-    window.addEventListener('touchmove', handleTouchMove, { passive: false });
-    window.addEventListener('touchend', handleTouchEnd, { passive: false });
-
-    setInterval(() => {
-      if (!showcaseActive && !isScrolling) {
-        nextSlide();
-      }
-    }, 5000);
-
-    window.addEventListener('keydown', (e) => {
-      if (showcaseActive) {
-        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-          e.preventDefault();
-          if (currentSlide < totalSlides - 1) {
-            nextSlide();
-          }
-        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-          e.preventDefault();
-          if (currentSlide > 0) {
-            previousSlide();
-          }
-        }
-      }
+      });
     });
-
-    updateSlide();
   </script>
 </body>
 </html>
