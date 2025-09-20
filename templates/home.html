@@ -186,7 +186,7 @@
 
     .navbar {
       position: fixed;
-      top: 5px;
+      top: 20px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 100;
@@ -202,11 +202,11 @@
     }
 
     .navbar.scrolled {
-      top: 0px;
+      top: 15px;
     }
 
     .navbar.scrolled:hover {
-      top: 5px;
+      top: 20px;
     }
 
     .navbar:hover {
@@ -244,12 +244,19 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .nav-logo:hover {
+      transform: translateY(-3px);
+      filter: drop-shadow(0 0 15px rgba(114, 9, 183, 0.6));
     }
 
     .nav-logo-img {
       width: 28px;
       height: 28px;
       flex-shrink: 0;
+      transition: none;
     }
 
     @keyframes simpleGradient {
@@ -282,31 +289,107 @@
       text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
     }
 
-    .discord-btn {
-      background: transparent;
-      color: #ccc !important;
-      padding: 8px 12px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 14px;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      height: 100%;
-    }
-
-    .discord-btn:hover {
-      color: #ffffff !important;
-      text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
-    }
-
     .header {
       position: relative;
       z-index: 10;
       text-align: center;
       padding: 120px 20px 60px;
       animation: fadeInUp 1.2s ease-out;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #2a2a2a;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 20px;
+      border: 1px solid #22c55e;
+      font-size: 14px;
+      font-weight: 600;
+      margin: 20px 0;
+      animation: fadeInUp 1.2s ease-out 0.9s both;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: #22c55e;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      align-items: center;
+      margin-top: 30px;
+      animation: fadeInUp 1.2s ease-out 1.2s both;
+      flex-wrap: wrap;
+    }
+
+    .get-started-btn {
+      background: #5865f2;
+      color: white;
+      padding: 16px 32px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Inter', sans-serif;
+      box-shadow: 0 0 20px rgba(88, 101, 242, 0.4);
+    }
+
+    .get-started-btn:hover {
+      background: #4752c4;
+      transform: translateY(-1px);
+      box-shadow: 0 0 30px rgba(88, 101, 242, 0.6);
+    }
+
+    .discord-btn {
+      background: #2a2a2a;
+      color: white;
+      padding: 16px 32px;
+      border: 1px solid #3a3a3a;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .discord-btn:hover {
+      background: #3a3a3a;
+      transform: translateY(-1px);
+    }
+
+    .discord-btn:hover .discord-icon {
+      animation: discordPop 0.3s ease;
+    }
+
+    .discord-icon {
+      width: 18px;
+      height: 18px;
+      transition: all 0.3s ease;
+    }
+
+    @keyframes discordPop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
     }
 
     @keyframes fadeInUp {
@@ -370,237 +453,86 @@
     }
 
     .description .highlight {
-      color: #7209b7;
+      color: #9c88ff;
       font-weight: 600;
     }
 
-    .search-section {
-      position: relative;
-      z-index: 10;
-      padding: 0 20px 40px;
+    .rating-stars {
       display: flex;
+      align-items: center;
       justify-content: center;
-      animation: fadeInUp 1.2s ease-out 0.9s both;
+      gap: 12px;
+      margin: 25px 0;
+      animation: fadeInUp 1.2s ease-out 0.7s both;
     }
 
-    .search-box {
-      position: relative;
-      max-width: 600px;
-      width: 100%;
+    .stars-display {
+      display: flex;
+      gap: 3px;
     }
 
-    .search-input {
-      width: 100%;
-      padding: 18px 60px 18px 24px;
-      font-size: 16px;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(20px);
-      border: 2px solid rgba(255, 255, 255, 0.1);
-      border-radius: 15px;
-      color: #ffffff;
-      outline: none;
-      transition: all 0.3s ease;
-      font-family: 'Inter', sans-serif;
-    }
-
-    .search-input:focus {
-      border-color: #7209b7;
-      background: rgba(0, 0, 0, 0.8);
-      box-shadow: 
-        0 0 0 4px rgba(114, 9, 183, 0.2),
-        0 0 30px rgba(114, 9, 183, 0.3);
-      transform: translateY(-2px);
-    }
-
-    .search-input::placeholder {
-      color: #888;
-    }
-
-    .search-icon {
-      position: absolute;
-      right: 20px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 18px;
-      height: 18px;
-      background-image: url('https://i.imgur.com/YJ1SXqR.png');
-      background-size: contain;
-      background-repeat: no-repeat;
-      opacity: 0.6;
-    }
-
-    .scripts-section {
-      position: relative;
-      z-index: 10;
-      padding: 40px 20px;
-      max-width: 1200px;
-      margin: 0 auto;
-      animation: fadeInUp 1.2s ease-out 1.2s both;
-    }
-
-    .scripts-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-      gap: 25px;
-      margin-bottom: 50px;
-    }
-
-    .script-card {
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 20px;
-      padding: 25px;
-      transition: all 0.3s ease;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .script-card::before {
-      content: '';
-      position: absolute;
-      top: -20%;
-      right: -20%;
-      width: 200px;
-      height: 200px;
-      background: radial-gradient(circle, #9c88ff 0%, transparent 70%);
-      border-radius: 50%;
-      filter: blur(80px);
-      opacity: 0;
-      transition: all 0.4s ease;
-      z-index: -1;
-    }
-
-    .script-card:hover::before {
-      opacity: 0.8;
-    }
-
-    .script-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 20px 60px rgba(114, 9, 183, 0.3);
-    }
-
-    .script-card:hover::before {
-      opacity: 1;
-    }
-
-    .script-thumbnail {
-      width: 100%;
-      height: 150px;
-      border-radius: 12px;
-      object-fit: cover;
-      margin-bottom: 15px;
-      background: linear-gradient(135deg, #7209b7 0%, #ff6b9d 50%, #ff9f43 100%);
-    }
-
-    .script-game {
-      font-size: 12px;
-      color: #7209b7;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 8px;
-    }
-
-    .script-title {
+    .star {
       font-size: 20px;
-      font-weight: 700;
-      color: #ffffff;
-      margin-bottom: 10px;
-      line-height: 1.2;
+      color: #333;
+      transition: all 0.3s ease;
     }
 
-    .script-description {
+    .star.filled {
+      color: #fbbf24;
+      text-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
+    }
+
+    .rating-text {
       font-size: 14px;
       color: #ccc;
-      line-height: 1.4;
-      margin-bottom: 15px;
-    }
-
-    .script-features {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 15px;
-    }
-
-    .feature-tag {
-      background: rgba(114, 9, 183, 0.3);
-      color: #ff6b9d;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 11px;
       font-weight: 500;
-      border: 1px solid rgba(114, 9, 183, 0.5);
+      letter-spacing: 0.5px;
     }
 
-    .script-actions {
+    .stats-section {
       display: flex;
-      gap: 10px;
-      margin-top: auto;
+      justify-content: center;
+      gap: 60px;
+      margin: 40px 0 30px;
+      animation: fadeInUp 1.2s ease-out 0.8s both;
     }
 
-    .view-btn {
-      flex: 1;
-      background: linear-gradient(135deg, #7209b7 0%, #ff6b9d 100%);
-      color: white;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-decoration: none;
+    .stat-item {
       text-align: center;
-      font-family: 'Inter', sans-serif;
     }
 
-    .view-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(114, 9, 183, 0.5);
+    .stat-number {
+      font-size: 28px;
+      font-weight: 800;
+      color: #9c88ff;
+      margin-bottom: 6px;
+      letter-spacing: -0.5px;
     }
 
-    .no-scripts {
-      text-align: center;
-      padding: 60px 20px;
-      color: #888;
-      grid-column: 1 / -1;
+    .stat-label {
+      font-size: 13px;
+      color: #ccc;
+      font-weight: 400;
     }
 
-    .no-scripts-icon {
-      font-size: 64px;
-      margin-bottom: 20px;
-      opacity: 0.5;
-    }
+    @media (max-width: 768px) {
+      .stats-section {
+        gap: 30px;
+        margin: 30px 20px;
+      }
 
-    .loading {
-      text-align: center;
-      padding: 60px 20px;
-      color: #888;
-      grid-column: 1 / -1;
-    }
+      .stat-number {
+        font-size: 20px;
+      }
 
-    .loading-spinner {
-      display: inline-block;
-      width: 40px;
-      height: 40px;
-      border: 4px solid rgba(255, 255, 255, 0.1);
-      border-radius: 50%;
-      border-top: 4px solid #7209b7;
-      animation: spin 1s linear infinite;
-      margin-bottom: 20px;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      .stat-label {
+        font-size: 11px;
+      }
     }
 
     .footer {
       position: relative;
       z-index: 10;
-      text-align: center;
       padding: 60px 20px;
       color: #888;
       border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -608,31 +540,84 @@
       animation: fadeInUp 1.2s ease-out 1.5s both;
     }
 
-    .footer-links {
+    .footer-content {
       display: flex;
-      justify-content: center;
-      gap: 30px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
-    .footer-link {
-      color: #aaa;
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
       text-decoration: none;
-      transition: color 0.3s ease;
+      transition: all 0.3s ease;
     }
 
-    .footer-link:hover {
-      color: #7209b7;
+    .footer-logo:hover {
+      transform: scale(1.02);
+      filter: drop-shadow(0 0 10px rgba(114, 9, 183, 0.4));
+    }
+
+    .footer-logo-img {
+      width: 24px;
+      height: 24px;
+      transition: none;
+    }
+
+    .footer-copyright {
+      color: #888;
+      font-size: 14px;
+    }
+
+    .footer-discord {
+      display: flex;
+      align-items: center;
+    }
+
+    .footer-discord-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      background: #2a2a2a;
+      border-radius: 8px;
+      text-decoration: none;
+    }
+
+    .footer-discord-link:hover {
+      background: #3a3a3a;
+      transform: translateY(-2px);
+    }
+
+    .footer-discord-icon {
+      width: 20px;
+      height: 20px;
     }
 
     @media (max-width: 768px) {
       .navbar {
-        top: 10px;
+        top: 25px;
         right: 10px;
         left: 10px;
         padding: 16px 18px;
         width: calc(100% - 20px);
+      }
+
+      .navbar.scrolled {
+        top: 20px;
+      }
+
+      .navbar.scrolled:hover {
+        top: 25px;
       }
 
       .nav-content {
@@ -640,16 +625,15 @@
         gap: 15px;
       }
 
+      .showcaser-card {
+        min-width: 150px;
+      }
+
       .nav-links {
         gap: 15px;
       }
 
       .nav-link {
-        font-size: 12px;
-        padding: 6px 10px;
-      }
-
-      .discord-btn {
         font-size: 12px;
         padding: 6px 10px;
       }
@@ -676,37 +660,447 @@
         font-size: 16px;
       }
 
-      .scripts-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-      }
-
-      .script-card {
-        padding: 20px;
-      }
-
-      .script-actions {
-        flex-direction: column;
-      }
-
       .footer-links {
         flex-direction: column;
         gap: 15px;
       }
+
+      .scripts-preview-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .why-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .showcasers-grid {
+        display: flex;
+        gap: 15px;
+        animation: slide 20s linear infinite;
+      }
+
+      @keyframes slide {
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(-33.33%);
+        }
+      }
+
+      .footer-content {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+      }
+
+      .footer-left {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+
+    .section {
+      position: relative;
+      z-index: 10;
+      padding: 80px 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section.dark {
+      background: #000000;
+      margin: 40px 0;
+      padding: 80px 0;
+      width: 100%;
+      max-width: none;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .section.dark::before {
+      content: '';
+      position: absolute;
+      top: -20%;
+      right: -10%;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, #1e1b4b 0%, transparent 70%);
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.6;
+    }
+
+    .section.dark::after {
+      content: '';
+      position: absolute;
+      bottom: -20%;
+      left: -10%;
+      width: 350px;
+      height: 350px;
+      background: radial-gradient(circle, #312e81 0%, transparent 70%);
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.5;
+    }
+
+    .section.dark .section-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+      padding: 0 20px;
+    }
+
+    .section-title {
+      font-size: 48px;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 20px;
+      color: #ffffff;
+    }
+
+    .section-title.white {
+      color: #ffffff;
+      background: none;
+      -webkit-text-fill-color: #ffffff;
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 42px;
+      letter-spacing: -1px;
+    }
+
+    .section.dark .section-subtitle {
+      font-size: 18px;
+      text-align: center;
+      color: #999;
+      margin-bottom: 60px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+    }
+
+    .section-subtitle {
+      font-size: 18px;
+      text-align: center;
+      color: #ccc;
+      margin-bottom: 60px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .why-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .why-card {
+      background: #111111;
+      border: 1px solid #222;
+      border-radius: 12px;
+      padding: 30px 25px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .why-card::before {
+      content: '';
+      position: absolute;
+      top: -30%;
+      right: -30%;
+      width: 80%;
+      height: 80%;
+      background: radial-gradient(circle, rgba(96, 165, 250, 0.08) 0%, transparent 70%);
+      border-radius: 50%;
+      opacity: 0.3;
+      transition: all 0.3s ease;
+      z-index: 0;
+    }
+
+    .why-card:hover::before {
+      opacity: 0.8;
+      width: 120%;
+      height: 120%;
+      top: -40%;
+      right: -40%;
+    }
+
+    .why-card:hover {
+      border-color: #333;
+      transform: translateY(-2px);
+    }
+
+    .why-card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .why-icon {
+      width: 48px;
+      height: 48px;
+      background: #2a2a2a;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+
+    .why-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 12px;
+    }
+
+    .why-description {
+      font-size: 14px;
+      color: #888;
+      line-height: 1.5;
+    }
+
+    .scripts-preview {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 20px;
+      padding: 40px;
+      margin-bottom: 40px;
+    }
+
+    .scripts-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 25px;
+      margin-bottom: 30px;
+    }
+
+    .preview-card {
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 20px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .preview-card:hover {
+      transform: translateY(-3px);
+      border-color: #7209b7;
+    }
+
+    .preview-thumbnail {
+      width: 100%;
+      height: 120px;
+      background: linear-gradient(135deg, #7209b7 0%, #ff6b9d 50%, #ff9f43 100%);
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+
+    .preview-game {
+      font-size: 12px;
+      color: #7209b7;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 5px;
+    }
+
+    .preview-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 8px;
+    }
+
+    .preview-description {
+      font-size: 14px;
+      color: #ccc;
+      line-height: 1.4;
+    }
+
+    .view-all-btn {
+      display: block;
+      margin: 0 auto;
+      background: linear-gradient(135deg, #7209b7 0%, #ff6b9d 100%);
+      color: white;
+      padding: 16px 32px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .view-all-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(114, 9, 183, 0.4);
+    }
+
+    .showcasers-container {
+      overflow: hidden;
+      width: 100%;
+      position: relative;
+      mask: linear-gradient(90deg, transparent 0%, white 10%, white 90%, transparent 100%);
+      -webkit-mask: linear-gradient(90deg, transparent 0%, white 10%, white 90%, transparent 100%);
+    }
+
+    .showcasers-grid {
+      display: flex;
+      gap: 20px;
+      animation: slide 24s linear infinite;
+      width: fit-content;
+    }
+
+    .showcasers-grid:hover {
+      animation-play-state: paused;
+    }
+
+    @keyframes slide {
+      0% {
+        transform: translateX(0);
+      }
+      100% {
+        transform: translateX(-33.33%);
+      }
+    }
+
+    .showcaser-card {
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 20px;
+      text-align: center;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      color: inherit;
+      position: relative;
+      overflow: hidden;
+      min-width: 200px;
+      flex-shrink: 0;
+    }
+
+    .showcaser-card::before {
+      content: '';
+      position: absolute;
+      top: -30%;
+      right: -30%;
+      width: 80%;
+      height: 80%;
+      background: radial-gradient(circle, rgba(96, 165, 250, 0.08) 0%, transparent 70%);
+      border-radius: 50%;
+      opacity: 0.3;
+      transition: all 0.3s ease;
+      z-index: 0;
+    }
+
+    .showcaser-card:hover::before {
+      opacity: 0.8;
+      width: 120%;
+      height: 120%;
+      top: -40%;
+      right: -40%;
+    }
+
+    .showcaser-card:hover {
+      border-color: #888;
+    }
+
+    .showcaser-card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .showcaser-avatar {
+      width: 60px;
+      height: 60px;
+      background: #ff0000;
+      border-radius: 50%;
+      margin: 0 auto 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 24px;
+      overflow: hidden;
+    }
+
+    .showcaser-avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    .showcaser-avatar-text {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+    }
+
+    .showcaser-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 15px;
+    }
+
+    .check-out-btn {
+      background: #2a2a2a;
+      color: white;
+      padding: 8px 16px;
+      border: 1px solid #3a3a3a;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .check-out-btn:hover {
+      background: #3a3a3a;
+      transform: translateY(-1px);
     }
 
     @media (max-width: 480px) {
+      .showcaser-card {
+        min-width: 150px;
+      }
       .nav-links {
         gap: 10px;
       }
 
-      .nav-link, .discord-btn {
+      .nav-link {
         font-size: 11px;
         padding: 5px 8px;
       }
 
       .navbar {
         padding: 10px 15px;
+        top: 30px;
+      }
+
+      .navbar.scrolled {
+        top: 25px;
+      }
+
+      .navbar.scrolled:hover {
+        top: 30px;
       }
     }
   </style>
@@ -731,57 +1125,317 @@
         Vadrifts
       </a>
       <div class="nav-links">
-        <a href="/" class="nav-link">Scripts</a>
+        <a href="/scripts" class="nav-link">Scripts</a>
         <a href="/converter" class="nav-link">Image Converter</a>
-        <a href="https://discord.com/invite/WDbJ5wE2cR" class="discord-btn" target="_blank">
-          Discord
-        </a>
       </div>
     </div>
   </nav>
 
   <div class="header">
+    <div class="status-badge">
+      <span class="status-dot"></span>
+      #1 Best Roblox Scripts
+    </div>
     <h1>Vadrifts Reimagined</h1>
-    <p class="tagline">Roblox Scripts & Tools</p>
     <p class="description">
-      Discover powerful <span class="highlight">Roblox scripts</span>, game-specific <span class="highlight">exploits</span>, and useful <span class="highlight">tools</span>. 
-      All scripts are regularly updated but may include <span class="highlight">key system protection</span>.
+      After the fall and rise again, <span class="highlight">Vadrifts returns</span> for the second time. 
+      From the ashes of <span class="highlight">Vastral</span> and <span class="highlight">Valorium</span>, we're back with 
+      <span class="highlight">better scripts</span>, stronger community, and the same legendary <span class="highlight">bypassing power</span> you remember.
     </p>
-  </div>
-
-  <div class="search-section">
-    <div class="search-box">
-      <input 
-        type="text" 
-        class="search-input" 
-        placeholder="Search for scripts, games, or features..."
-        id="searchInput"
-      >
-      <div class="search-icon"></div>
+    
+    <div class="rating-stars">
+      <div class="stars-display">
+        <span class="star filled">★</span>
+        <span class="star filled">★</span>
+        <span class="star filled">★</span>
+        <span class="star filled">★</span>
+        <span class="star filled">★</span>
+      </div>
+      <span class="rating-text">9.9/10 Community Rating</span>
+    </div>
+    
+    <div class="stats-section">
+      <div class="stat-item">
+        <div class="stat-number" data-target="5228">0</div>
+        <div class="stat-label">Total Users</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" data-target="3">0</div>
+        <div class="stat-label">Scripts</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" data-target="100">0</div>
+        <div class="stat-label">Executor Support</div>
+      </div>
+    </div>
+    
+    <div class="action-buttons">
+      <a href="#" class="get-started-btn">Get Started</a>
+      <a href="https://discord.com/invite/WDbJ5wE2cR" class="discord-btn" target="_blank">
+        <img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/discord-white-icon.png" alt="Discord" class="discord-icon">
+        Join Discord
+      </a>
     </div>
   </div>
 
-  <div class="scripts-section">
-    <div class="scripts-grid" id="scriptsGrid">
-      <div class="loading">
-        <div class="loading-spinner"></div>
-        <p>Loading scripts...</p>
+  <!-- What We Offer Section -->
+  <div class="section dark">
+    <div class="section-content">
+      <h2 class="section-title white">What We Offer</h2>
+      <p class="section-subtitle">There's a reason we're loved by so many.</p>
+      
+      <div class="why-grid">
+        <div class="why-card">
+          <div class="why-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"></polygon>
+            </svg>
+          </div>
+          <h3 class="why-title">Lightning Fast</h3>
+          <p class="why-description">Optimized performance means faster load times and smooth execution without lag or crashes.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"></path>
+            </svg>
+          </div>
+          <h3 class="why-title">Trusted Owner</h3>
+          <p class="why-description">Led by experienced developers with a proven track record in the Roblox scripting community.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <circle cx="12" cy="12" r="6"></circle>
+              <circle cx="12" cy="12" r="2"></circle>
+            </svg>
+          </div>
+          <h3 class="why-title">User-Friendly</h3>
+          <p class="why-description">Intuitive interfaces and easy-to-use features make our scripts accessible for everyone.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v5Z"></path>
+              <path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"></path>
+            </svg>
+          </div>
+          <h3 class="why-title">Active Support</h3>
+          <p class="why-description">24/7 community support and regular developer updates keep everything running smoothly.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="14" height="20" x="5" y="2" rx="2" ry="2"></rect>
+              <path d="M12 18h.01"></path>
+            </svg>
+          </div>
+          <h3 class="why-title">Mobile Friendly</h3>
+          <p class="why-description">All our scripts work perfectly on mobile devices and support all major executors.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 12l2 2 4-4"></path>
+              <path d="M21 12c.552 0 1-.448 1-1V8a2 2 0 0 0-2-2h-5L9.5 4.5A2 2 0 0 0 8.086 4H4a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-1c0-.552-.448-1-1-1z"></path>
+            </svg>
+          </div>
+          <h3 class="why-title">Works on All Executors</h3>
+          <p class="why-description">Compatible with every executor - even the worst ones like Solara and Xeno work perfectly with our scripts.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts Preview Section -->
+  <div class="section">
+    <h2 class="section-title">Scripts Preview</h2>
+    <p class="section-subtitle">Get a taste of our most popular and powerful scripts</p>
+    
+    <div class="scripts-preview">
+      <div class="scripts-preview-grid">
+        <div class="preview-card">
+          <div class="preview-thumbnail"></div>
+          <div class="preview-game">Universal</div>
+          <h3 class="preview-title">Vadrifts.byp</h3>
+          <p class="preview-description">Best chat bypasser with 700+ premade bypasses and anti-admin protection.</p>
+        </div>
+        <div class="preview-card">
+          <div class="preview-thumbnail"></div>
+          <div class="preview-game">Starving Artists</div>
+          <h3 class="preview-title">Image Generator</h3>
+          <p class="preview-description">Advanced image generator with booth claimer and server hopping features.</p>
+        </div>
+        <div class="preview-card">
+          <div class="preview-thumbnail"></div>
+          <div class="preview-game">Horrific Housing</div>
+          <h3 class="preview-title">Ultimate Hub</h3>
+          <p class="preview-description">Keyless script with infinite tokens, ESP, fly, godmode and much more.</p>
+        </div>
+      </div>
+      <a href="/scripts" class="view-all-btn">View All Scripts</a>
+    </div>
+  </div>
+
+  <!-- Showcasers Section -->
+  <div class="section">
+    <h2 class="section-title">Our Beloved Showcasers</h2>
+    <p class="section-subtitle">Showing love to the amazing content creators who showcase our scripts. Want to be featured? Submit a request on our Discord!</p>
+    
+    <div class="showcasers-container">
+      <div class="showcasers-grid" id="showcasers-slider">
+        <a href="https://youtube.com/@MastersMZ" class="showcaser-card" target="_blank" data-name="MastersMZ">
+          <div class="showcaser-avatar">
+            <div class="showcaser-avatar-text">MZ</div>
+          </div>
+          <h3 class="showcaser-name">@MastersMZ</h3>
+          <div class="check-out-btn">Check out!</div>
+        </a>
+        <a href="https://youtube.com/@1F0YT" class="showcaser-card" target="_blank" data-name="1F0YT">
+          <div class="showcaser-avatar">
+            <div class="showcaser-avatar-text">1F</div>
+          </div>
+          <h3 class="showcaser-name">@1F0YT</h3>
+          <div class="check-out-btn">Check out!</div>
+        </a>
+        <a href="https://youtube.com/@ReverseScripts" class="showcaser-card" target="_blank" data-name="ReverseScripts">
+          <div class="showcaser-avatar">
+            <div class="showcaser-avatar-text">RS</div>
+          </div>
+          <h3 class="showcaser-name">@ReverseScripts</h3>
+          <div class="check-out-btn">Check out!</div>
+        </a>
+        <a href="https://youtube.com/@Sr_LDS" class="showcaser-card" target="_blank" data-name="Sr_LDS">
+          <div class="showcaser-avatar">
+            <div class="showcaser-avatar-text">LD</div>
+          </div>
+          <h3 class="showcaser-name">@Sr_LDS</h3>
+          <div class="check-out-btn">Check out!</div>
+        </a>
+        <a href="https://youtube.com/@Ras-Scripts" class="showcaser-card" target="_blank" data-name="Ras-Scripts">
+          <div class="showcaser-avatar">
+            <div class="showcaser-avatar-text">RA</div>
+          </div>
+          <h3 class="showcaser-name">@Ras-Scripts</h3>
+          <div class="check-out-btn">Check out!</div>
+        </a>
+        <a href="https://youtube.com/@MinebloxCraft-z3s" class="showcaser-card" target="_blank" data-name="MinebloxCraft">
+          <div class="showcaser-avatar">
+            <div class="showcaser-avatar-text">MC</div>
+          </div>
+          <h3 class="showcaser-name">@MinebloxCraft</h3>
+          <div class="check-out-btn">Check out!</div>
+        </a>
+        <!-- First duplication -->
+        <a href="https://youtube.com/@MastersMZ" class="showcaser-card" target="_blank" data-name="MastersMZ">
+          <div class="showcaser-avatar">
+            <div class="showcaser-avatar-text">MZ</div>
+          </div>
+          <h3 class="showcaser-name">@MastersMZ</h3>
+          <div class="check-out-btn">Check out!</div>
+        </a>
+        <a href="https://youtube.com/@1F0YT" class="showcaser-card" target="_blank" data-name="1F0YT">
+          <div class="showcaser-avatar">
+            <div class="showcaser-avatar-text">1F</div>
+          </div>
+          <h3 class="showcaser-name">@1F0YT</h3>
+          <div class="check-out-btn">Check out!</div>
+        </a>
+        <a href="https://youtube.com/@ReverseScripts" class="showcaser-card" target="_blank" data-name="ReverseScripts">
+          <div class="showcaser-avatar">
+            <div class="showcaser-avatar-text">RS</div>
+          </div>
+          <h3 class="showcaser-name">@ReverseScripts</h3>
+          <div class="check-out-btn">Check out!</div>
+        </a>
+        <a href="https://youtube.com/@Sr_LDS" class="showcaser-card" target="_blank" data-name="Sr_LDS">
+          <div class="showcaser-avatar">
+            <div class="showcaser-avatar-text">LD</div>
+          </div>
+          <h3 class="showcaser-name">@Sr_LDS</h3>
+          <div class="check-out-btn">Check out!</div>
+        </a>
+        <a href="https://youtube.com/@Ras-Scripts" class="showcaser-card" target="_blank" data-name="Ras-Scripts">
+          <div class="showcaser-avatar">
+            <div class="showcaser-avatar-text">RA</div>
+          </div>
+          <h3 class="showcaser-name">@Ras-Scripts</h3>
+          <div class="check-out-btn">Check out!</div>
+        </a>
+        <a href="https://youtube.com/@MinebloxCraft-z3s" class="showcaser-card" target="_blank" data-name="MinebloxCraft">
+          <div class="showcaser-avatar">
+            <div class="showcaser-avatar-text">MC</div>
+          </div>
+          <h3 class="showcaser-name">@MinebloxCraft</h3>
+          <div class="check-out-btn">Check out!</div>
+        </a>
+        <!-- Second duplication -->
+        <a href="https://youtube.com/@MastersMZ" class="showcaser-card" target="_blank" data-name="MastersMZ">
+          <div class="showcaser-avatar">
+            <div class="showcaser-avatar-text">MZ</div>
+          </div>
+          <h3 class="showcaser-name">@MastersMZ</h3>
+          <div class="check-out-btn">Check out!</div>
+        </a>
+        <a href="https://youtube.com/@1F0YT" class="showcaser-card" target="_blank" data-name="1F0YT">
+          <div class="showcaser-avatar">
+            <div class="showcaser-avatar-text">1F</div>
+          </div>
+          <h3 class="showcaser-name">@1F0YT</h3>
+          <div class="check-out-btn">Check out!</div>
+        </a>
+        <a href="https://youtube.com/@ReverseScripts" class="showcaser-card" target="_blank" data-name="ReverseScripts">
+          <div class="showcaser-avatar">
+            <div class="showcaser-avatar-text">RS</div>
+          </div>
+          <h3 class="showcaser-name">@ReverseScripts</h3>
+          <div class="check-out-btn">Check out!</div>
+        </a>
+        <a href="https://youtube.com/@Sr_LDS" class="showcaser-card" target="_blank" data-name="Sr_LDS">
+          <div class="showcaser-avatar">
+            <div class="showcaser-avatar-text">LD</div>
+          </div>
+          <h3 class="showcaser-name">@Sr_LDS</h3>
+          <div class="check-out-btn">Check out!</div>
+        </a>
+        <a href="https://youtube.com/@Ras-Scripts" class="showcaser-card" target="_blank" data-name="Ras-Scripts">
+          <div class="showcaser-avatar">
+            <div class="showcaser-avatar-text">RA</div>
+          </div>
+          <h3 class="showcaser-name">@Ras-Scripts</h3>
+          <div class="check-out-btn">Check out!</div>
+        </a>
+        <a href="https://youtube.com/@MinebloxCraft-z3s" class="showcaser-card" target="_blank" data-name="MinebloxCraft">
+          <div class="showcaser-avatar">
+            <div class="showcaser-avatar-text">MC</div>
+          </div>
+          <h3 class="showcaser-name">@MinebloxCraft</h3>
+          <div class="check-out-btn">Check out!</div>
+        </a>
       </div>
     </div>
   </div>
 
   <div class="footer">
-    <div class="footer-links">
-      <a href="/converter" class="footer-link">Image Converter</a>
-      <a href="https://discord.com/invite/WDbJ5wE2cR" class="footer-link">Discord Server</a>
+    <div class="footer-content">
+      <div class="footer-left">
+        <a href="/" class="footer-logo">
+          <img src="https://i.imgur.com/ePueN25.png" alt="Vadrifts Logo" class="footer-logo-img">
+        </a>
+        <div class="footer-copyright">
+          &copy; 2025 Vadrifts. All Rights Reserved
+        </div>
+      </div>
+      <div class="footer-discord">
+        <a href="https://discord.com/invite/WDbJ5wE2cR" class="footer-discord-link" target="_blank">
+          <img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/discord-white-icon.png" alt="Discord" class="footer-discord-icon">
+        </a>
+      </div>
     </div>
-    <p>&copy; 2025 Vadrifts - Roblox Scripts & Tools</p>
   </div>
 
   <script>
-    let allScripts = [];
-    let searchTimeout = null;
-
     function createParticles() {
       const particlesContainer = document.getElementById('particles');
       const particleCount = 15;
@@ -796,113 +1450,42 @@
       }
     }
 
-    async function loadScripts() {
-      try {
-        const response = await fetch('/api/scripts');
-        allScripts = await response.json();
-        displayScripts(allScripts);
-      } catch (error) {
-        console.error('Failed to load scripts:', error);
-        displayError();
-      }
-    }
-
-    function displayScripts(scripts) {
-      const grid = document.getElementById('scriptsGrid');
+    function animateCounters() {
+      const counters = document.querySelectorAll('.stat-number');
       
-      if (scripts.length === 0) {
-        grid.innerHTML = `
-          <div class="no-scripts">
-            <div class="no-scripts-icon">📜</div>
-            <h3>No scripts found</h3>
-            <p>Try adjusting your search terms or check back later for new scripts.</p>
-          </div>
-        `;
-        return;
-      }
-
-      grid.innerHTML = scripts.map(script => `
-        <div class="script-card" onclick="viewScript(${script.id})">
-          <img 
-            src="${script.thumbnail}" 
-            alt="${script.title}"
-            class="script-thumbnail"
-            onerror="this.style.display='none'"
-          >
-          <div class="script-game">${script.game}</div>
-          <h3 class="script-title">${script.title}</h3>
-          <p class="script-description">${script.description}</p>
-          
-          <div class="script-features">
-            ${script.features.slice(0, 3).map(feature => 
-              `<span class="feature-tag">${feature}</span>`
-            ).join('')}
-            ${script.features.length > 3 ? `<span class="feature-tag">+${script.features.length - 3} more</span>` : ''}
-          </div>
-          
-          <div class="script-actions">
-            <button class="view-btn" onclick="event.stopPropagation(); viewScript(${script.id})">
-              View Script
-            </button>
-          </div>
-        </div>
-      `).join('');
+      counters.forEach(counter => {
+        const target = parseInt(counter.getAttribute('data-target'));
+        const increment = target / 100; // Adjust speed here
+        let current = 0;
+        
+        const timer = setInterval(() => {
+          current += increment;
+          if (current >= target) {
+            if (target === 5228) {
+              counter.textContent = '5,228+';
+            } else if (target === 3) {
+              counter.textContent = '3+';
+            } else if (target === 100) {
+              counter.textContent = '100%';
+            }
+            clearInterval(timer);
+          } else {
+            if (target === 5228) {
+              counter.textContent = Math.floor(current).toLocaleString() + '+';
+            } else if (target === 3) {
+              counter.textContent = Math.floor(current) + '+';
+            } else if (target === 100) {
+              counter.textContent = Math.floor(current) + '%';
+            }
+          }
+        }, 20);
+      });
     }
-
-    function displayError() {
-      const grid = document.getElementById('scriptsGrid');
-      grid.innerHTML = `
-        <div class="no-scripts">
-          <div class="no-scripts-icon">⚠️</div>
-          <h3>Failed to load scripts</h3>
-          <p>Please refresh the page or try again later.</p>
-        </div>
-      `;
-    }
-
-    function searchScripts(query) {
-      if (!query.trim()) {
-        displayScripts(allScripts);
-        return;
-      }
-
-      const filtered = allScripts.filter(script => 
-        script.title.toLowerCase().includes(query.toLowerCase()) ||
-        script.game.toLowerCase().includes(query.toLowerCase()) ||
-        script.description.toLowerCase().includes(query.toLowerCase()) ||
-        script.features.some(feature => feature.toLowerCase().includes(query.toLowerCase()))
-      );
-
-      displayScripts(filtered);
-    }
-
-    function viewScript(scriptId) {
-      window.location.href = `/script/${scriptId}`;
-    }
-
-    document.getElementById('searchInput').addEventListener('input', (e) => {
-      const query = e.target.value;
-      
-      if (searchTimeout) {
-        clearTimeout(searchTimeout);
-      }
-      
-      searchTimeout = setTimeout(() => {
-        searchScripts(query);
-      }, 300);
-    });
-
-    document.getElementById('searchInput').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        if (searchTimeout) {
-          clearTimeout(searchTimeout);
-        }
-        searchScripts(e.target.value);
-      }
-    });
 
     createParticles();
-    loadScripts();
+
+    // Start counter animation immediately when page loads
+    animateCounters();
 
     // Navbar scroll behavior
     let lastScrollTop = 0;
