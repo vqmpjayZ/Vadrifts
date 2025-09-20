@@ -14,6 +14,7 @@ from collections import defaultdict
 import hashlib
 from datetime import datetime, timedelta
 import json
+from urllib.parse import quote_plus
 
 logging.basicConfig(
     level=logging.INFO,
@@ -37,14 +38,10 @@ pending_tasks = {}
 
 thumbnail_cache = {}
 game_data_cache = {}
-
 active_slugs = {}
 
-youtuber_pfps = {
-    "MastersMZ": None,
-    "1F0YT": None, 
-    "ReverseScripts": None
-}
+channel_cache = {}
+CACHE_DURATION = 7200
 
 bypass_test_data = {
     "words": {
@@ -79,63 +76,170 @@ bypass_test_data = {
     }
 }
 
-def fetch_youtube_profile_picture(channel_url):
-    try:
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+class YouTubeChannelFinder:
+    def __init__(self):
+        self.session = requests.Session()
+        self.session.headers.update({
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        })
+    
+    def find_channel_by_username(self, username):
+        cache_key = username.lower().strip()
+        if cache_key in channel_cache:
+            cached = channel_cache[cache_key]
+            if time.time() - cached['timestamp'] < CACHE_DURATION:
+                return cached['data']
+        
+        logger.info(f"Finding channel for username: {username}")
+        
+        possible_urls = [
+            f"https://www.youtube.com/@{username}",
+            f"https://www.youtube.com/c/{username}",
+            f"https://www.youtube.com/user/{username}",
+            f"https://www.youtube.com/{username}"
+        ]
+        
+        for url in possible_urls:
+            try:
+                response = self.session.get(url, timeout=10, allow_redirects=True)
+                
+                if response.status_code == 200 and 'youtube.com' in response.url:
+                    channel_data = self.extract_channel_data(response.text, response.url, username)
+                    if channel_data:
+                        channel_cache[cache_key] = {
+                            'data': channel_data,
+                            'timestamp': time.time()
+                        }
+                        logger.info(f"Found channel for {username}: {channel_data['url']}")
+                        return channel_data
+                        
+            except Exception as e:
+                logger.debug(f"Failed to fetch {url}: {e}")
+                continue
+        
+        search_result = self.search_for_channel(username)
+        if search_result:
+            channel_cache[cache_key] = {
+                'data': search_result,
+                'timestamp': time.time()
+            }
+            return search_result
+        
+        logger.warning(f"Could not find channel for username: {username}")
+        return {
+            'name': username,
+            'handle': f'@{username}',
+            'url': f'https://www.youtube.com/@{username}',
+            'pfp_url': None,
+            'found': False
         }
-        
-        response = requests.get(channel_url, headers=headers, timeout=10)
-        response.raise_for_status()
-        
+    
+    def extract_channel_data(self, html_content, url, username):
+        try:
+            channel_name = self.extract_channel_name(html_content)
+            pfp_url = self.extract_profile_picture(html_content)
+            
+            handle = f'@{username}'
+            if '"canonicalChannelUrl":"https://www.youtube.com/@' in html_content:
+                handle_match = re.search(r'"canonicalChannelUrl":"https://www\.youtube\.com/@([^"]+)"', html_content)
+                if handle_match:
+                    handle = f'@{handle_match.group(1)}'
+            
+            return {
+                'name': channel_name or username,
+                'handle': handle,
+                'url': url,
+                'pfp_url': pfp_url,
+                'found': True
+            }
+        except Exception as e:
+            logger.error(f"Error extracting channel data: {e}")
+            return None
+    
+    def extract_channel_name(self, html_content):
         patterns = [
-            r'"avatar":{"thumbnails":\[{"url":"([^"]+)"',
-            r'<link itemprop="thumbnailUrl" href="([^"]+)"',
-            r'"width":176,"height":176}\],"url":"([^"]+)"',
-            r'<meta property="og:image" content="([^"]+)"'
+            r'"channelMetadataRenderer":{"title":"([^"]+)"',
+            r'<meta property="og:title" content="([^"]+)"',
+            r'"title":"([^"]+)","navigationEndpoint"',
+            r'<title>([^<]+)</title>'
         ]
         
         for pattern in patterns:
-            match = re.search(pattern, response.text)
+            match = re.search(pattern, html_content)
             if match:
+                name = match.group(1).strip()
+                if name and name != 'YouTube':
+                    return name
+        return None
+    
+    def extract_profile_picture(self, html_content):
+        patterns = [
+            r'"avatar":{"thumbnails":\[{"url":"([^"]+)"[^}]*"width":176',
+            r'"avatar":{"thumbnails":\[{"url":"([^"]+)"',
+            r'<link itemprop="thumbnailUrl" href="([^"]+)"',
+            r'<meta property="og:image" content="([^"]+)"',
+            r'"thumbnailUrl":\s*"([^"]+)"'
+        ]
+        
+        for pattern in patterns:
+            matches = re.finditer(pattern, html_content)
+            for match in matches:
                 img_url = match.group(1)
                 img_url = img_url.replace('\\u003d', '=').replace('\\', '')
-                return img_url
                 
-        logger.warning(f"Could not find profile picture for {channel_url}")
-        return None
+                if self.validate_image_url(img_url):
+                    return img_url
         
-    except Exception as e:
-        logger.error(f"Error fetching {channel_url}: {e}")
+        yt3_pattern = r'(https?://yt3\.ggpht\.com[^"]*)'
+        matches = re.findall(yt3_pattern, html_content)
+        for url in matches:
+            if self.validate_image_url(url):
+                return url
+        
         return None
-
-def fetch_all_youtube_pfps():
-    channels = {
-        "MastersMZ": "https://youtube.com/@MastersMZ",
-        "1F0YT": "https://youtube.com/@1F0YT", 
-        "ReverseScripts": "https://youtube.com/@ReverseScripts"
-    }
     
-    logger.info("Fetching YouTube profile pictures...")
+    def search_for_channel(self, username):
+        try:
+            search_url = f"https://www.youtube.com/results?search_query={quote_plus(username)}&sp=EgIQAg%253D%253D"
+            response = self.session.get(search_url, timeout=10)
+            
+            if response.status_code == 200:
+                channel_links = re.findall(r'"url":"(/channel/[^"]+)"', response.text)
+                handle_links = re.findall(r'"url":"(/@[^"]+)"', response.text)
+                
+                all_links = []
+                for link in channel_links + handle_links:
+                    if link.startswith('/'):
+                        all_links.append(f"https://www.youtube.com{link}")
+                
+                for link in all_links[:3]:
+                    try:
+                        channel_response = self.session.get(link, timeout=10)
+                        if channel_response.status_code == 200:
+                            channel_data = self.extract_channel_data(channel_response.text, link, username)
+                            if channel_data and channel_data.get('pfp_url'):
+                                return channel_data
+                    except:
+                        continue
+        except Exception as e:
+            logger.error(f"Search failed for {username}: {e}")
+        
+        return None
     
-    for name, url in channels.items():
-        pfp_url = fetch_youtube_profile_picture(url)
-        if pfp_url:
-            youtuber_pfps[name] = pfp_url
-            logger.info(f"Found PFP for {name}: {pfp_url}")
-        else:
-            logger.warning(f"Could not fetch PFP for {name}")
+    def validate_image_url(self, url):
+        try:
+            if not url or not url.startswith('http'):
+                return False
+            
+            response = self.session.head(url, timeout=5)
+            content_type = response.headers.get('content-type', '').lower()
+            
+            return (response.status_code == 200 and 
+                    ('image' in content_type or url.endswith(('.jpg', '.jpeg', '.png', '.webp'))))
+        except:
+            return False
 
-def reset_bypass_data():
-    global bypass_test_data
-    for category in bypass_test_data:
-        bypass_test_data[category] = {
-            "success_rate": "unknown",
-            "last_tested": None,
-            "testing": False,
-            "first_tester": None
-        }
-    logger.info("Bypass test data reset")
+youtube_finder = YouTubeChannelFinder()
 
 def check_and_reset_if_needed():
     for category, data in bypass_test_data.items():
@@ -321,6 +425,29 @@ def server_pinger():
         except Exception as e:
             logger.error(f"Ping failed: {e}")
         time.sleep(300)
+
+def cleanup_expired_cache():
+    current_time = time.time()
+    keys_to_remove = []
+    
+    for key, data in channel_cache.items():
+        if current_time - data['timestamp'] >= CACHE_DURATION:
+            keys_to_remove.append(key)
+    
+    for key in keys_to_remove:
+        del channel_cache[key]
+    
+    if keys_to_remove:
+        logger.info(f"Cleaned up {len(keys_to_remove)} expired cache items")
+
+def cache_cleanup_task():
+    while True:
+        try:
+            cleanup_expired_cache()
+            time.sleep(1800)
+        except Exception as e:
+            logger.error(f"Cache cleanup error: {e}")
+            time.sleep(1800)
 
 @app.route('/')
 def home():
@@ -574,9 +701,78 @@ def verify():
         logger.error("verify.html template not found")
         return jsonify({"error": "Verify page not found"}), 404
 
-@app.route('/api/youtube-pfps')
-def get_youtube_pfps():
-    return jsonify(youtuber_pfps)
+@app.route('/api/find-channels', methods=['POST'])
+def find_channels():
+    try:
+        data = request.get_json()
+        usernames = data.get('usernames', [])
+        
+        if not usernames:
+            return jsonify({'error': 'No usernames provided'}), 400
+        
+        channels = []
+        for username in usernames:
+            username = username.strip()
+            if username:
+                channel_data = youtube_finder.find_channel_by_username(username)
+                channels.append(channel_data)
+        
+        return jsonify({'channels': channels})
+    
+    except Exception as e:
+        logger.error(f"Error in find_channels: {e}")
+        return jsonify({'error': 'Internal server error'}), 500
+
+@app.route('/api/find-channel/<username>')
+def find_single_channel(username):
+    try:
+        channel_data = youtube_finder.find_channel_by_username(username)
+        return jsonify(channel_data)
+    except Exception as e:
+        logger.error(f"Error finding channel {username}: {e}")
+        return jsonify({'error': 'Internal server error'}), 500
+
+@app.route('/api/showcasers')
+def get_showcasers():
+    try:
+        with open('templates/home.html', 'r', encoding='utf-8') as f:
+            html_content = f.read()
+        
+        url_pattern = r'href="(https://youtube\.com/@[^"]+)"'
+        urls = re.findall(url_pattern, html_content)
+        
+        channels = []
+        for url in urls:
+            username = url.split('@')[-1]
+            channel_data = youtube_finder.find_channel_by_username(username)
+            channels.append(channel_data)
+        
+        return jsonify({'channels': channels})
+        
+    except FileNotFoundError:
+        logger.error("home.html not found")
+        return jsonify({'channels': []})
+    except Exception as e:
+        logger.error(f"Error parsing showcasers from HTML: {e}")
+        return jsonify({'channels': []})
+
+@app.route('/api/add-showcaser', methods=['POST'])
+def add_showcaser():
+    return jsonify({'message': 'Add showcasers directly to the HTML file'}), 200
+
+@app.route('/api/remove-showcaser', methods=['DELETE'])
+def remove_showcaser():
+    return jsonify({'message': 'Remove showcasers directly from the HTML file'}), 200
+
+@app.route('/api/cache/clear')
+def clear_channel_cache():
+    global channel_cache
+    cache_size = len(channel_cache)
+    channel_cache.clear()
+    return jsonify({
+        'message': f'Cache cleared successfully',
+        'items_removed': cache_size
+    })
 
 @app.route('/api/bypass-status')
 def get_bypass_status():
@@ -786,8 +982,6 @@ def run_flask():
     app.run(host='0.0.0.0', port=port, debug=False)
 
 if __name__ == '__main__':
-    fetch_all_youtube_pfps()
-    
     ping_thread = threading.Thread(target=server_pinger, daemon=True)
     ping_thread.start()
     logger.info("Server pinger started")
@@ -795,6 +989,10 @@ if __name__ == '__main__':
     reset_thread = threading.Thread(target=daily_reset_task, daemon=True)
     reset_thread.start()
     logger.info("Daily reset task started")
+    
+    cache_thread = threading.Thread(target=cache_cleanup_task, daemon=True)
+    cache_thread.start()
+    logger.info("Cache cleanup task started")
     
     bot_thread = threading.Thread(target=run_bot, daemon=True)
     bot_thread.start()
