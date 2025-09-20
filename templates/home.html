@@ -1593,99 +1593,398 @@
     </div>
   </div>
 
-<!-- Updated showcasers section in your HTML -->
+<!-- Automated Showcasers Section with Username Input -->
 <div class="section">
   <h2 class="section-title">Our Beloved Showcasers</h2>
   <p class="section-subtitle">Showing love to the amazing content creators who showcase our scripts. Want to be featured? Submit a request on our Discord!</p>
   
   <div class="showcasers-container">
-    <div class="showcasers-grid" id="showcasers-slider">
-      <a href="https://youtube.com/@MastersMZ" class="showcaser-card" target="_blank" data-name="MastersMZ">
-        <div class="showcaser-avatar" id="avatar-MastersMZ">
-          <img class="showcaser-pfp" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" alt="MastersMZ">
-          <div class="showcaser-avatar-text">MZ</div>
-        </div>
-        <h3 class="showcaser-name">@MastersMZ</h3>
-        <div class="check-out-btn">Check out!</div>
-      </a>
-      
-      <a href="https://youtube.com/@1F0YT" class="showcaser-card" target="_blank" data-name="1F0YT">
-        <div class="showcaser-avatar" id="avatar-1F0YT">
-          <img class="showcaser-pfp" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" alt="1F0YT">
-          <div class="showcaser-avatar-text">1F</div>
-        </div>
-        <h3 class="showcaser-name">@1F0YT</h3>
-        <div class="check-out-btn">Check out!</div>
-      </a>
-      
-      <a href="https://youtube.com/@ReverseScripts" class="showcaser-card" target="_blank" data-name="ReverseScripts">
-        <div class="showcaser-avatar" id="avatar-ReverseScripts">
-          <img class="showcaser-pfp" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" alt="ReverseScripts">
-          <div class="showcaser-avatar-text">RS</div>
-        </div>
-        <h3 class="showcaser-name">@ReverseScripts</h3>
-        <div class="check-out-btn">Check out!</div>
-      </a>
-      
-      <a href="https://youtube.com/@Sr_LDS" class="showcaser-card" target="_blank" data-name="Sr_LDS">
-        <div class="showcaser-avatar">
-          <div class="showcaser-avatar-text">LD</div>
-        </div>
-        <h3 class="showcaser-name">@Sr_LDS</h3>
-        <div class="check-out-btn">Check out!</div>
-      </a>
-      
-      <a href="https://youtube.com/@Ras-Scripts" class="showcaser-card" target="_blank" data-name="Ras-Scripts">
-        <div class="showcaser-avatar">
-          <div class="showcaser-avatar-text">RA</div>
-        </div>
-        <h3 class="showcaser-name">@Ras-Scripts</h3>
-        <div class="check-out-btn">Check out!</div>
-      </a>
-      
-      <a href="https://youtube.com/@MinebloxCraft-z3s" class="showcaser-card" target="_blank" data-name="MinebloxCraft">
-        <div class="showcaser-avatar">
-          <div class="showcaser-avatar-text">MC</div>
-        </div>
-        <h3 class="showcaser-name">@MinebloxCraft</h3>
-        <div class="check-out-btn">Check out!</div>
-      </a>
+    <div class="showcasers-track" id="showcasers-track">
+      <!-- Loading placeholder -->
+      <div class="loading-placeholder">
+        <div class="spinner"></div>
+        <p>Finding showcasers...</p>
+      </div>
     </div>
   </div>
 </div>
 
-<script>
-async function loadYouTubePFPs() {
-  try {
-    const response = await fetch('/api/youtube-pfps');
-    const pfps = await response.json();
+<style>
+.showcasers-container {
+  overflow: hidden;
+  width: 100%;
+  position: relative;
+  mask: linear-gradient(90deg, transparent 0%, white 10%, white 90%, transparent 100%);
+  -webkit-mask: linear-gradient(90deg, transparent 0%, white 10%, white 90%, transparent 100%);
+  padding: 20px 0;
+  min-height: 140px;
+}
 
-    Object.keys(pfps).forEach(name => {
-      if (pfps[name]) {
-        const avatar = document.getElementById(`avatar-${name}`);
-        if (avatar) {
-          const img = avatar.querySelector('.showcaser-pfp');
-          const text = avatar.querySelector('.showcaser-avatar-text');
-          
-          if (img && text) {
-            img.src = pfps[name];
-            img.onload = function() {
-              text.style.display = 'none';
-              img.style.display = 'block';
-            };
-            img.onerror = function() {
-              console.warn(`Failed to load PFP for ${name}`);
-            };
-          }
-        }
-      }
-    });
-  } catch (error) {
-    console.error('Error loading YouTube PFPs:', error);
+.showcasers-track {
+  display: flex;
+  gap: 20px;
+  width: max-content;
+  animation: seamlessScroll 25s linear infinite;
+}
+
+.showcasers-track:hover {
+  animation-play-state: paused;
+}
+
+.showcasers-track.loaded {
+  animation: seamlessScroll 25s linear infinite;
+}
+
+@keyframes seamlessScroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
   }
 }
 
-document.addEventListener('DOMContentLoaded', loadYouTubePFPs);
+.loading-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  width: 100%;
+  color: #888;
+  padding: 40px;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #333;
+  border-top: 2px solid #7209b7;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.showcaser-card {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  color: inherit;
+  position: relative;
+  overflow: hidden;
+  min-width: 200px;
+  flex-shrink: 0;
+  opacity: 0;
+  animation: fadeIn 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+.showcaser-card::before {
+  content: '';
+  position: absolute;
+  top: -30%;
+  right: -30%;
+  width: 80%;
+  height: 80%;
+  background: radial-gradient(circle, rgba(96, 165, 250, 0.08) 0%, transparent 70%);
+  border-radius: 50%;
+  opacity: 0.3;
+  transition: all 0.3s ease;
+  z-index: 0;
+}
+
+.showcaser-card:hover::before {
+  opacity: 0.8;
+  width: 120%;
+  height: 120%;
+  top: -40%;
+  right: -40%;
+}
+
+.showcaser-card:hover {
+  border-color: #888;
+  transform: translateY(-5px);
+}
+
+.showcaser-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.showcaser-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin: 0 auto 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 24px;
+  overflow: hidden;
+  position: relative;
+  background: linear-gradient(135deg, #7209b7, #ff9f43);
+}
+
+.showcaser-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.showcaser-avatar-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: inherit;
+  border-radius: 50%;
+}
+
+.showcaser-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 15px;
+}
+
+.check-out-btn {
+  background: #2a2a2a;
+  color: white;
+  padding: 8px 16px;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.check-out-btn:hover {
+  background: #3a3a3a;
+  transform: translateY(-1px);
+}
+
+.showcaser-card.not-found {
+  opacity: 0.6;
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.showcaser-card.not-found .showcaser-avatar {
+  background: linear-gradient(135deg, #555, #333);
+}
+
+@media (max-width: 768px) {
+  .showcaser-card {
+    min-width: 160px;
+    padding: 15px;
+  }
+  
+  .showcaser-avatar {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+  }
+  
+  .showcasers-track {
+    gap: 15px;
+  }
+  
+  .showcasers-container {
+    min-height: 120px;
+  }
+}
+
+@media (max-width: 480px) {
+  .showcaser-card {
+    min-width: 140px;
+    padding: 12px;
+  }
+  
+  .showcaser-avatar {
+    width: 45px;
+    height: 45px;
+    font-size: 18px;
+  }
+}
+</style>
+
+<script>
+class AutoShowcasersManager {
+  constructor() {
+    this.track = document.getElementById('showcasers-track');
+    this.usernames = [
+      'MastersMZ', '1F0YT', 'ReverseScripts', 
+      'Sr_LDS', 'Ras-Scripts', 'MinebloxCraft-z3s'
+    ];
+    this.channels = [];
+    this.init();
+  }
+
+  async init() {
+    try {
+      await this.findAllChannels();
+      this.createShowcasersLoop();
+    } catch (error) {
+      console.error('Failed to initialize showcasers:', error);
+      this.showError();
+    }
+  }
+
+  async findAllChannels() {
+    try {
+      const response = await fetch('/api/find-channels', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          usernames: this.usernames
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+      this.channels = data.channels || [];
+      
+      console.log(`Found ${this.channels.length} channels:`, this.channels);
+    } catch (error) {
+      console.error('Error finding channels:', error);
+      this.channels = this.createFallbackChannels();
+    }
+  }
+
+  createFallbackChannels() {
+    return this.usernames.map(username => ({
+      name: username,
+      handle: `@${username}`,
+      url: `https://www.youtube.com/@${username}`,
+      pfp_url: null,
+      found: false
+    }));
+  }
+
+  createShowcaserCard(channel, index) {
+    const initials = this.getInitials(channel.name);
+
+    const card = document.createElement('a');
+    card.href = channel.url;
+    card.target = '_blank';
+    card.className = `showcaser-card ${!channel.found ? 'not-found' : ''}`;
+    card.style.animationDelay = `${index * 0.1}s`;
+
+    const avatarImg = channel.pfp_url ? 
+      `<img src="${channel.pfp_url}" alt="${channel.name}" onerror="this.style.display='none';">` : '';
+
+    card.innerHTML = `
+      <div class="showcaser-avatar">
+        ${avatarImg}
+        <div class="showcaser-avatar-text" style="${channel.pfp_url ? 'display: none;' : ''}">${initials}</div>
+      </div>
+      <h3 class="showcaser-name">${channel.handle}</h3>
+      <div class="check-out-btn">Check out!</div>
+    `;
+
+    return card;
+  }
+
+  getInitials(name) {
+    if (!name) return '?';
+    const cleanName = name.replace(/[^a-zA-Z0-9]/g, '');
+    return cleanName.length >= 2 ? 
+      cleanName.substring(0, 2).toUpperCase() : 
+      cleanName.substring(0, 1).toUpperCase();
+  }
+
+  createShowcasersLoop() {
+    if (this.channels.length === 0) {
+      this.showError();
+      return;
+    }
+
+    this.track.innerHTML = '';
+
+    const fragment1 = document.createDocumentFragment();
+    const fragment2 = document.createDocumentFragment();
+
+    this.channels.forEach((channel, index) => {
+      const card1 = this.createShowcaserCard(channel, index);
+      const card2 = this.createShowcaserCard(channel, index + this.channels.length);
+      
+      fragment1.appendChild(card1);
+      fragment2.appendChild(card2);
+    });
+
+    this.track.appendChild(fragment1);
+    this.track.appendChild(fragment2);
+    this.track.classList.add('loaded');
+
+    console.log(`Created seamless loop with ${this.channels.length * 2} cards`);
+  }
+
+  showError() {
+    this.track.innerHTML = `
+      <div class="loading-placeholder">
+        <p style="color: #ff6b6b;">Failed to load showcasers. Please try refreshing the page.</p>
+      </div>
+    `;
+  }
+
+  async addNewShowcaser(username) {
+    try {
+      const response = await fetch(`/api/find-channel/${encodeURIComponent(username)}`);
+      const channelData = await response.json();
+      
+      if (channelData) {
+        this.channels.push(channelData);
+        this.createShowcasersLoop();
+        return channelData;
+      }
+    } catch (error) {
+      console.error(`Failed to add showcaser ${username}:`, error);
+      return null;
+    }
+  }
+}
+
+window.showcasersManager = new AutoShowcasersManager();
+
+window.addShowcaser = async function(username) {
+  if (window.showcasersManager) {
+    const result = await window.showcasersManager.addNewShowcaser(username);
+    if (result) {
+      console.log(`Added showcaser: ${username}`, result);
+      return result;
+    } else {
+      console.error(`Failed to add showcaser: ${username}`);
+      return null;
+    }
+  }
+};
 </script>
 
   <div class="footer">
