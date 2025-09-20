@@ -192,7 +192,7 @@
       z-index: 100;
       background: rgba(0, 0, 0, 0.1);
       backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 20px;
       padding: 24px 32px;
       animation: slideInDown 0.8s ease-out;
@@ -211,8 +211,8 @@
 
     .navbar:hover {
       background: rgba(0, 0, 0, 0.6);
-      border-color: rgba(255, 255, 255, 0.1);
-      transform: translateX(-50%) translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.4);
+      transform: translateX(-50%) translateY(0);
     }
 
     @keyframes slideInDown {
@@ -257,11 +257,6 @@
       height: 28px;
       flex-shrink: 0;
       transition: none;
-    }
-
-    @keyframes simpleGradient {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
     }
 
     .nav-links {
@@ -429,11 +424,6 @@
       50% { background-position: 50% 50%; }
     }
 
-    @keyframes smoothGradient {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-    }
-
     .tagline {
       font-size: 24px;
       color: #ffffff;
@@ -513,191 +503,6 @@
       font-size: 13px;
       color: #ccc;
       font-weight: 400;
-    }
-
-    @media (max-width: 768px) {
-      .stats-section {
-        gap: 30px;
-        margin: 30px 20px;
-      }
-
-      .stat-number {
-        font-size: 20px;
-      }
-
-      .stat-label {
-        font-size: 11px;
-      }
-    }
-
-    .footer {
-      position: relative;
-      z-index: 10;
-      padding: 60px 20px;
-      color: #888;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      margin-top: 40px;
-      animation: fadeInUp 1.2s ease-out 1.5s both;
-    }
-
-    .footer-content {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .footer-left {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
-    .footer-logo {
-      display: flex;
-      align-items: center;
-      text-decoration: none;
-      transition: all 0.3s ease;
-    }
-
-    .footer-logo:hover {
-      transform: scale(1.02);
-      filter: drop-shadow(0 0 10px rgba(114, 9, 183, 0.4));
-    }
-
-    .footer-logo-img {
-      width: 24px;
-      height: 24px;
-      transition: none;
-    }
-
-    .footer-copyright {
-      color: #888;
-      font-size: 14px;
-    }
-
-    .footer-discord {
-      display: flex;
-      align-items: center;
-    }
-
-    .footer-discord-link {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 40px;
-      height: 40px;
-      background: #2a2a2a;
-      border-radius: 8px;
-      text-decoration: none;
-    }
-
-    .footer-discord-link:hover {
-      background: #3a3a3a;
-      transform: translateY(-2px);
-    }
-
-    .footer-discord-icon {
-      width: 20px;
-      height: 20px;
-    }
-
-    @media (max-width: 768px) {
-      .navbar {
-        top: 25px;
-        right: 10px;
-        left: 10px;
-        padding: 16px 18px;
-        width: calc(100% - 20px);
-      }
-
-      .navbar.scrolled {
-        top: 20px;
-      }
-
-      .navbar.scrolled:hover {
-        top: 25px;
-      }
-
-      .nav-content {
-        justify-content: space-between;
-        gap: 15px;
-      }
-
-      .showcaser-card {
-        min-width: 150px;
-      }
-
-      .nav-links {
-        gap: 15px;
-      }
-
-      .nav-link {
-        font-size: 12px;
-        padding: 6px 10px;
-      }
-
-      .nav-logo {
-        font-size: 20px;
-        gap: 8px;
-      }
-
-      .nav-logo-img {
-        width: 24px;
-        height: 24px;
-      }
-
-      h1 {
-        font-size: 48px;
-      }
-
-      .tagline {
-        font-size: 20px;
-      }
-
-      .description {
-        font-size: 16px;
-      }
-
-      .footer-links {
-        flex-direction: column;
-        gap: 15px;
-      }
-
-      .scripts-preview-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .why-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .showcasers-grid {
-        display: flex;
-        gap: 15px;
-        animation: slide 20s linear infinite;
-      }
-
-      @keyframes slide {
-        0% {
-          transform: translateX(0);
-        }
-        100% {
-          transform: translateX(-33.33%);
-        }
-      }
-
-      .footer-content {
-        flex-direction: column;
-        gap: 20px;
-        text-align: center;
-      }
-
-      .footer-left {
-        flex-direction: column;
-        gap: 10px;
-      }
     }
 
     .section {
@@ -866,68 +671,362 @@
       line-height: 1.5;
     }
 
-    .scripts-preview {
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: 20px;
-      padding: 40px;
+    /* NEW SCRIPTS SECTION DESIGN */
+    .scripts-showcase {
+      position: relative;
+      overflow: hidden;
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(17, 17, 17, 0.8) 0%, rgba(17, 17, 17, 0.4) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 60px 40px;
       margin-bottom: 40px;
     }
 
-    .scripts-preview-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 25px;
-      margin-bottom: 30px;
+    .scripts-showcase::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(from 0deg, transparent, rgba(114, 9, 183, 0.1), transparent, rgba(255, 159, 67, 0.1), transparent);
+      animation: rotate 20s linear infinite;
+      z-index: -1;
     }
 
-    .preview-card {
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 15px;
-      padding: 20px;
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .featured-script {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      margin-bottom: 50px;
+      position: relative;
+    }
+
+    .featured-image {
+      flex: 1;
+      max-width: 400px;
+      height: 250px;
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
       transition: all 0.3s ease;
-      cursor: pointer;
     }
 
-    .preview-card:hover {
-      transform: translateY(-3px);
-      border-color: #7209b7;
+    .featured-image:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
     }
 
-    .preview-thumbnail {
+    .featured-image img {
       width: 100%;
-      height: 120px;
-      background: linear-gradient(135deg, #7209b7 0%, #ff6b9d 50%, #ff9f43 100%);
-      border-radius: 10px;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .featured-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, rgba(114, 9, 183, 0.8), rgba(255, 159, 67, 0.8));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .featured-image:hover .featured-overlay {
+      opacity: 1;
+    }
+
+    .play-icon {
+      width: 60px;
+      height: 60px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .featured-content {
+      flex: 1;
+    }
+
+    .featured-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #7209b7, #ff9f43);
+      color: white;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
       margin-bottom: 15px;
     }
 
-    .preview-game {
+    .featured-title {
+      font-size: 32px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 15px;
+      line-height: 1.2;
+    }
+
+    .featured-description {
+      font-size: 16px;
+      color: #ccc;
+      line-height: 1.6;
+      margin-bottom: 25px;
+    }
+
+    .featured-stats {
+      display: flex;
+      gap: 30px;
+      margin-bottom: 25px;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #7209b7;
+      display: block;
+    }
+
+    .stat-name {
+      font-size: 12px;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .featured-actions {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, #7209b7, #ff9f43);
+      color: white;
+      padding: 14px 28px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 10px 25px rgba(114, 9, 183, 0.3);
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 35px rgba(114, 9, 183, 0.4);
+    }
+
+    .secondary-btn {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      padding: 14px 28px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      backdrop-filter: blur(10px);
+    }
+
+    .secondary-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .scripts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+    }
+
+    .script-card {
+      background: rgba(17, 17, 17, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      position: relative;
+      group: hover;
+    }
+
+    .script-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(114, 9, 183, 0.5);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .script-thumbnail {
+      width: 100%;
+      height: 160px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .script-thumbnail img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .script-card:hover .script-thumbnail img {
+      transform: scale(1.1);
+    }
+
+    .script-status {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(34, 197, 94, 0.9);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      backdrop-filter: blur(10px);
+    }
+
+    .script-status.premium {
+      background: rgba(255, 159, 67, 0.9);
+    }
+
+    .script-info {
+      padding: 20px;
+    }
+
+    .script-game {
       font-size: 12px;
       color: #7209b7;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 1px;
-      margin-bottom: 5px;
-    }
-
-    .preview-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: #ffffff;
       margin-bottom: 8px;
     }
 
-    .preview-description {
+    .script-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 10px;
+      line-height: 1.3;
+    }
+
+    .script-description {
       font-size: 14px;
-      color: #ccc;
-      line-height: 1.4;
+      color: #aaa;
+      line-height: 1.5;
+      margin-bottom: 15px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .script-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 15px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .script-rating {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .script-stars {
+      display: flex;
+      gap: 2px;
+    }
+
+    .script-star {
+      font-size: 14px;
+      color: #333;
+    }
+
+    .script-star.filled {
+      color: #fbbf24;
+    }
+
+    .script-rating-text {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .script-btn {
+      background: rgba(114, 9, 183, 0.2);
+      color: #7209b7;
+      border: 1px solid rgba(114, 9, 183, 0.3);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .script-btn:hover {
+      background: rgba(114, 9, 183, 0.3);
+      color: #fff;
+      border-color: #7209b7;
+    }
+
+    .view-all-section {
+      text-align: center;
+      margin-top: 40px;
+      padding: 40px;
+      background: rgba(17, 17, 17, 0.3);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .view-all-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    .view-all-subtitle {
+      font-size: 16px;
+      color: #888;
+      margin-bottom: 25px;
     }
 
     .view-all-btn {
-      display: block;
-      margin: 0 auto;
       background: linear-gradient(135deg, #7209b7 0%, #ff6b9d 100%);
       color: white;
       padding: 16px 32px;
@@ -939,6 +1038,9 @@
       transition: all 0.3s ease;
       text-decoration: none;
       text-align: center;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .view-all-btn:hover {
@@ -1077,10 +1179,212 @@
       transform: translateY(-1px);
     }
 
+    .footer {
+      position: relative;
+      z-index: 10;
+      padding: 60px 20px;
+      color: #888;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      margin-top: 40px;
+      animation: fadeInUp 1.2s ease-out 1.5s both;
+    }
+
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .footer-logo:hover {
+      transform: scale(1.02);
+      filter: drop-shadow(0 0 10px rgba(114, 9, 183, 0.4));
+    }
+
+    .footer-logo-img {
+      width: 24px;
+      height: 24px;
+      transition: none;
+    }
+
+    .footer-copyright {
+      color: #888;
+      font-size: 14px;
+    }
+
+    .footer-discord {
+      display: flex;
+      align-items: center;
+    }
+
+    .footer-discord-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      background: #2a2a2a;
+      border-radius: 8px;
+      text-decoration: none;
+    }
+
+    .footer-discord-link:hover {
+      background: #3a3a3a;
+      transform: translateY(-2px);
+    }
+
+    .footer-discord-icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        top: 25px;
+        right: 10px;
+        left: 10px;
+        padding: 16px 18px;
+        width: calc(100% - 20px);
+      }
+
+      .navbar.scrolled {
+        top: 20px;
+      }
+
+      .navbar.scrolled:hover {
+        top: 25px;
+      }
+
+      .nav-content {
+        justify-content: space-between;
+        gap: 15px;
+      }
+
+      .nav-links {
+        gap: 15px;
+      }
+
+      .nav-link {
+        font-size: 12px;
+        padding: 6px 10px;
+      }
+
+      .nav-logo {
+        font-size: 20px;
+        gap: 8px;
+      }
+
+      .nav-logo-img {
+        width: 24px;
+        height: 24px;
+      }
+
+      h1 {
+        font-size: 48px;
+      }
+
+      .tagline {
+        font-size: 20px;
+      }
+
+      .description {
+        font-size: 16px;
+      }
+
+      .stats-section {
+        gap: 30px;
+        margin: 30px 20px;
+      }
+
+      .stat-number {
+        font-size: 20px;
+      }
+
+      .stat-label {
+        font-size: 11px;
+      }
+
+      .why-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .scripts-showcase {
+        padding: 40px 20px;
+      }
+
+      .featured-script {
+        flex-direction: column;
+        gap: 25px;
+      }
+
+      .featured-image {
+        max-width: 100%;
+        height: 200px;
+      }
+
+      .featured-title {
+        font-size: 24px;
+      }
+
+      .featured-stats {
+        gap: 20px;
+      }
+
+      .featured-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .scripts-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .showcasers-grid {
+        display: flex;
+        gap: 15px;
+        animation: slide 20s linear infinite;
+      }
+
+      @keyframes slide {
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(-33.33%);
+        }
+      }
+
+      .footer-content {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+      }
+
+      .footer-left {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+
     @media (max-width: 480px) {
       .showcaser-card {
         min-width: 150px;
       }
+
       .nav-links {
         gap: 10px;
       }
@@ -1248,33 +1552,117 @@
     </div>
   </div>
 
-  <!-- Scripts Preview Section -->
+  <!-- Scripts Showcase Section -->
   <div class="section">
-    <h2 class="section-title">Scripts Preview</h2>
-    <p class="section-subtitle">Get a taste of our most popular and powerful scripts</p>
+    <h2 class="section-title">Featured Scripts</h2>
+    <p class="section-subtitle">Discover our most powerful and popular scripts</p>
     
-    <div class="scripts-preview">
-      <div class="scripts-preview-grid">
-        <div class="preview-card">
-          <div class="preview-thumbnail" style="background-image: url('https://i.imgur.com/jI8qDiR.jpeg'); background-size: cover; background-position: center;"></div>
-          <div class="preview-game">Universal</div>
-          <h3 class="preview-title">Vadrifts.byp</h3>
-          <p class="preview-description">Best and undetected Roblox Chat Bypasser. Bypasses the Roblox Chat Filters allowing you to Swear on roblox!</p>
+    <div class="scripts-showcase">
+      <div class="featured-script">
+        <div class="featured-image">
+          <img src="https://i.imgur.com/jI8qDiR.jpeg" alt="Vadrifts.byp">
+          <div class="featured-overlay">
+            <div class="play-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                <polygon points="5,3 19,12 5,21"></polygon>
+              </svg>
+            </div>
+          </div>
         </div>
-        <div class="preview-card">
-          <div class="preview-thumbnail" style="background-image: url('https://tr.rbxcdn.com/180DAY-808f20386cb8582fcd0075aae67cd039/768/432/Image/Webp/noFilter'); background-size: cover; background-position: center;"></div>
-          <div class="preview-game">Starving Artists</div>
-          <h3 class="preview-title">Starving Artists Script</h3>
-          <p class="preview-description">A Free starving artists script by Vadrifts with a simple and easy Discord Key System. Generate images by getting an image url online!</p>
-        </div>
-        <div class="preview-card">
-          <div class="preview-thumbnail" style="background-image: url('https://tr.rbxcdn.com/180DAY-8598e6c1626e3ccf16eb8b3acbd618fe/768/432/Image/Webp/noFilter'); background-size: cover; background-position: center;"></div>
-          <div class="preview-game">Horrific Housing</div>
-          <h3 class="preview-title">Horrific Housing Script</h3>
-          <p class="preview-description">Best keyless Horrific Housing script with tons of features!</p>
+        <div class="featured-content">
+          <span class="featured-badge">Most Popular</span>
+          <h3 class="featured-title">Vadrifts.byp</h3>
+          <p class="featured-description">
+            The ultimate Roblox chat bypasser that's completely undetected. Advanced filtering technology with 700+ premade bypasses, anti-admin protection, and works on all executors including mobile devices.
+          </p>
+          <div class="featured-stats">
+            <div class="stat">
+              <span class="stat-value">2.8K+</span>
+              <span class="stat-name">Current Users</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">4.7</span>
+              <span class="stat-name">Rating</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">100%</span>
+              <span class="stat-name">Undetected</span>
+            </div>
+          </div>
+          <div class="featured-actions">
+            <a href="https://vadrifts.onrender.com/script/1" class="primary-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+              </svg>
+              Get Script
+            </a>
+            <a href="#" class="secondary-btn">Learn More</a>
+          </div>
         </div>
       </div>
-      <a href="/scripts" class="view-all-btn">View All Scripts</a>
+      
+      <div class="scripts-grid">
+        <div class="script-card">
+          <div class="script-thumbnail">
+            <img src="https://tr.rbxcdn.com/180DAY-808f20386cb8582fcd0075aae67cd039/768/432/Image/Webp/noFilter" alt="Starving Artists">
+            <div class="script-status">Free</div>
+          </div>
+          <div class="script-info">
+            <div class="script-game">Starving Artists</div>
+            <h4 class="script-name">Starving Artists Script</h4>
+            <p class="script-description">A free Starving Artists script with simple Discord key system. Generate images using URL input with reliable, undetected, and customizable image generation plus auto booth claiming.</p>
+            <div class="script-footer">
+              <div class="script-rating">
+                <div class="script-stars">
+                  <span class="script-star filled">★</span>
+                  <span class="script-star filled">★</span>
+                  <span class="script-star filled">★</span>
+                  <span class="script-star filled">★</span>
+                  <span class="script-star filled">★</span>
+                </div>
+                <span class="script-rating-text">5.0</span>
+              </div>
+              <a href="#" class="script-btn">Get Script</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="script-card">
+          <div class="script-thumbnail">
+            <img src="https://tr.rbxcdn.com/180DAY-8598e6c1626e3ccf16eb8b3acbd618fe/768/432/Image/Webp/noFilter" alt="Horrific Housing">
+            <div class="script-status">Keyless</div>
+          </div>
+          <div class="script-info">
+            <div class="script-game">Horrific Housing</div>
+            <h4 class="script-name">Horrific Housing Script</h4>
+            <p class="script-description">Best keyless Horrific Housing script with infinite tokens, unlock all items for free, ESP, reach, item grabber, weapon exploit, godmode, fly, teleportation and much more!</p>
+            <div class="script-footer">
+              <div class="script-rating">
+                <div class="script-stars">
+                  <span class="script-star filled">★</span>
+                  <span class="script-star filled">★</span>
+                  <span class="script-star filled">★</span>
+                  <span class="script-star filled">★</span>
+                  <span class="script-star filled">★</span>
+                </div>
+                <span class="script-rating-text">4.9</span>
+              </div>
+              <a href="#" class="script-btn">Get Script</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="view-all-section">
+        <h3 class="view-all-title">Ready for More?</h3>
+        <p class="view-all-subtitle">Explore our complete collection of premium scripts</p>
+        <a href="/scripts" class="view-all-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+          View All Scripts
+        </a>
+      </div>
     </div>
   </div>
 
@@ -1285,49 +1673,6 @@
     
     <div class="showcasers-container">
       <div class="showcasers-grid" id="showcasers-slider">
-        <a href="https://youtube.com/@MastersMZ" class="showcaser-card" target="_blank" data-name="MastersMZ">
-          <div class="showcaser-avatar">
-            <div class="showcaser-avatar-text">MZ</div>
-          </div>
-          <h3 class="showcaser-name">@MastersMZ</h3>
-          <div class="check-out-btn">Check out!</div>
-        </a>
-        <a href="https://youtube.com/@1F0YT" class="showcaser-card" target="_blank" data-name="1F0YT">
-          <div class="showcaser-avatar">
-            <div class="showcaser-avatar-text">1F</div>
-          </div>
-          <h3 class="showcaser-name">@1F0YT</h3>
-          <div class="check-out-btn">Check out!</div>
-        </a>
-        <a href="https://youtube.com/@ReverseScripts" class="showcaser-card" target="_blank" data-name="ReverseScripts">
-          <div class="showcaser-avatar">
-            <div class="showcaser-avatar-text">RS</div>
-          </div>
-          <h3 class="showcaser-name">@ReverseScripts</h3>
-          <div class="check-out-btn">Check out!</div>
-        </a>
-        <a href="https://youtube.com/@Sr_LDS" class="showcaser-card" target="_blank" data-name="Sr_LDS">
-          <div class="showcaser-avatar">
-            <div class="showcaser-avatar-text">LD</div>
-          </div>
-          <h3 class="showcaser-name">@Sr_LDS</h3>
-          <div class="check-out-btn">Check out!</div>
-        </a>
-        <a href="https://youtube.com/@Ras-Scripts" class="showcaser-card" target="_blank" data-name="Ras-Scripts">
-          <div class="showcaser-avatar">
-            <div class="showcaser-avatar-text">RA</div>
-          </div>
-          <h3 class="showcaser-name">@Ras-Scripts</h3>
-          <div class="check-out-btn">Check out!</div>
-        </a>
-        <a href="https://youtube.com/@MinebloxCraft-z3s" class="showcaser-card" target="_blank" data-name="MinebloxCraft">
-          <div class="showcaser-avatar">
-            <div class="showcaser-avatar-text">MC</div>
-          </div>
-          <h3 class="showcaser-name">@MinebloxCraft</h3>
-          <div class="check-out-btn">Check out!</div>
-        </a>
-        <!-- First duplication -->
         <a href="https://youtube.com/@MastersMZ" class="showcaser-card" target="_blank" data-name="MastersMZ">
           <div class="showcaser-avatar">
             <div class="showcaser-avatar-text">MZ</div>
@@ -1503,4 +1848,47 @@
     });
   </script>
 </body>
-</html>
+</html>LDS</h3>
+          <div class="check-out-btn">Check out!</div>
+        </a>
+        <a href="https://youtube.com/@Ras-Scripts" class="showcaser-card" target="_blank" data-name="Ras-Scripts">
+          <div class="showcaser-avatar">
+            <div class="showcaser-avatar-text">RA</div>
+          </div>
+          <h3 class="showcaser-name">@Ras-Scripts</h3>
+          <div class="check-out-btn">Check out!</div>
+        </a>
+        <a href="https://youtube.com/@MinebloxCraft-z3s" class="showcaser-card" target="_blank" data-name="MinebloxCraft">
+          <div class="showcaser-avatar">
+            <div class="showcaser-avatar-text">MC</div>
+          </div>
+          <h3 class="showcaser-name">@MinebloxCraft</h3>
+          <div class="check-out-btn">Check out!</div>
+        </a>
+        <!-- First duplication -->
+        <a href="https://youtube.com/@MastersMZ" class="showcaser-card" target="_blank" data-name="MastersMZ">
+          <div class="showcaser-avatar">
+            <div class="showcaser-avatar-text">MZ</div>
+          </div>
+          <h3 class="showcaser-name">@MastersMZ</h3>
+          <div class="check-out-btn">Check out!</div>
+        </a>
+        <a href="https://youtube.com/@1F0YT" class="showcaser-card" target="_blank" data-name="1F0YT">
+          <div class="showcaser-avatar">
+            <div class="showcaser-avatar-text">1F</div>
+          </div>
+          <h3 class="showcaser-name">@1F0YT</h3>
+          <div class="check-out-btn">Check out!</div>
+        </a>
+        <a href="https://youtube.com/@ReverseScripts" class="showcaser-card" target="_blank" data-name="ReverseScripts">
+          <div class="showcaser-avatar">
+            <div class="showcaser-avatar-text">RS</div>
+          </div>
+          <h3 class="showcaser-name">@ReverseScripts</h3>
+          <div class="check-out-btn">Check out!</div>
+        </a>
+        <a href="https://youtube.com/@Sr_LDS" class="showcaser-card" target="_blank" data-name="Sr_LDS">
+          <div class="showcaser-avatar">
+            <div class="showcaser-avatar-text">LD</div>
+          </div>
+          <h3 class="showcaser-name">@Sr_
