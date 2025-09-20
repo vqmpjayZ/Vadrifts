@@ -671,7 +671,6 @@
       line-height: 1.5;
     }
 
-    /* NEW SCRIPTS SECTION DESIGN */
     .scripts-showcase {
       position: relative;
       overflow: hidden;
@@ -730,43 +729,15 @@
       object-fit: cover;
     }
 
-    .featured-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(45deg, rgba(114, 9, 183, 0.8), rgba(255, 159, 67, 0.8));
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .featured-image:hover .featured-overlay {
-      opacity: 1;
-    }
-
-    .play-icon {
-      width: 60px;
-      height: 60px;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(10px);
-      border: 2px solid rgba(255, 255, 255, 0.3);
-    }
-
     .featured-content {
       flex: 1;
     }
 
     .featured-badge {
-      display: inline-block;
-      background: linear-gradient(135deg, #7209b7, #ff9f43);
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: linear-gradient(135deg, #ff4757, #ff6b9d);
       color: white;
       padding: 6px 16px;
       border-radius: 20px;
@@ -774,7 +745,8 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 1px;
-      margin-bottom: 15px;
+      z-index: 10;
+      backdrop-filter: blur(10px);
     }
 
     .featured-title {
@@ -844,25 +816,6 @@
       box-shadow: 0 15px 35px rgba(114, 9, 183, 0.4);
     }
 
-    .secondary-btn {
-      background: rgba(255, 255, 255, 0.1);
-      color: white;
-      padding: 14px 28px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 12px;
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-decoration: none;
-      backdrop-filter: blur(10px);
-    }
-
-    .secondary-btn:hover {
-      background: rgba(255, 255, 255, 0.2);
-      transform: translateY(-2px);
-    }
-
     .scripts-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -876,7 +829,6 @@
       overflow: hidden;
       transition: all 0.3s ease;
       position: relative;
-      group: hover;
     }
 
     .script-card:hover {
@@ -914,10 +866,6 @@
       font-size: 11px;
       font-weight: 600;
       backdrop-filter: blur(10px);
-    }
-
-    .script-status.premium {
-      background: rgba(255, 159, 67, 0.9);
     }
 
     .script-info {
@@ -1138,13 +1086,6 @@
       overflow: hidden;
     }
 
-    .showcaser-avatar-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 50%;
-    }
-
     .showcaser-avatar-text {
       display: flex;
       align-items: center;
@@ -1359,15 +1300,6 @@
         animation: slide 20s linear infinite;
       }
 
-      @keyframes slide {
-        0% {
-          transform: translateX(0);
-        }
-        100% {
-          transform: translateX(-33.33%);
-        }
-      }
-
       .footer-content {
         flex-direction: column;
         gap: 20px;
@@ -1474,7 +1406,7 @@
     </div>
     
     <div class="action-buttons">
-      <a href="#" class="get-started-btn">Get Started</a>
+      <a href="#scripts" class="get-started-btn">Get Started</a>
       <a href="https://discord.com/invite/WDbJ5wE2cR" class="discord-btn" target="_blank">
         <img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/discord-white-icon.png" alt="Discord" class="discord-icon">
         Join Discord
@@ -1482,7 +1414,6 @@
     </div>
   </div>
 
-  <!-- What We Offer Section -->
   <div class="section dark">
     <div class="section-content">
       <h2 class="section-title white">What We Offer</h2>
@@ -1552,8 +1483,7 @@
     </div>
   </div>
 
-  <!-- Scripts Showcase Section -->
-  <div class="section">
+  <div class="section" id="scripts">
     <h2 class="section-title">Featured Scripts</h2>
     <p class="section-subtitle">Discover our most powerful and popular scripts</p>
     
@@ -1561,16 +1491,14 @@
       <div class="featured-script">
         <div class="featured-image">
           <img src="https://i.imgur.com/jI8qDiR.jpeg" alt="Vadrifts.byp">
-          <div class="featured-overlay">
-            <div class="play-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-                <polygon points="5,3 19,12 5,21"></polygon>
-              </svg>
-            </div>
-          </div>
+          <span class="featured-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
+              <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+            </svg>
+            Hot
+          </span>
         </div>
         <div class="featured-content">
-          <span class="featured-badge">Most Popular</span>
           <h3 class="featured-title">Vadrifts.byp</h3>
           <p class="featured-description">
             The ultimate Roblox chat bypasser that's completely undetected. Advanced filtering technology with 700+ premade bypasses, anti-admin protection, and works on all executors including mobile devices.
@@ -1596,7 +1524,6 @@
               </svg>
               Get Script
             </a>
-            <a href="#" class="secondary-btn">Learn More</a>
           </div>
         </div>
       </div>
@@ -1622,7 +1549,7 @@
                 </div>
                 <span class="script-rating-text">5.0</span>
               </div>
-              <a href="#" class="script-btn">Get Script</a>
+              <a href="https://vadrifts.onrender.com/script/8916037983" class="script-btn">Get Script</a>
             </div>
           </div>
         </div>
@@ -1647,7 +1574,7 @@
                 </div>
                 <span class="script-rating-text">4.9</span>
               </div>
-              <a href="#" class="script-btn">Get Script</a>
+              <a href="https://vadrifts.onrender.com/script/263761432" class="script-btn">Get Script</a>
             </div>
           </div>
         </div>
@@ -1655,7 +1582,7 @@
 
       <div class="view-all-section">
         <h3 class="view-all-title">Ready for More?</h3>
-        <p class="view-all-subtitle">Explore our complete collection of premium scripts</p>
+        <p class="view-all-subtitle">Explore our complete collection of scripts</p>
         <a href="/scripts" class="view-all-btn">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
@@ -1666,101 +1593,100 @@
     </div>
   </div>
 
-  <!-- Showcasers Section -->
-  <div class="section">
-    <h2 class="section-title">Our Beloved Showcasers</h2>
-    <p class="section-subtitle">Showing love to the amazing content creators who showcase our scripts. Want to be featured? Submit a request on our Discord!</p>
-    
-    <div class="showcasers-container">
-      <div class="showcasers-grid" id="showcasers-slider">
-        <a href="https://youtube.com/@MastersMZ" class="showcaser-card" target="_blank" data-name="MastersMZ">
-          <div class="showcaser-avatar">
-            <div class="showcaser-avatar-text">MZ</div>
-          </div>
-          <h3 class="showcaser-name">@MastersMZ</h3>
-          <div class="check-out-btn">Check out!</div>
-        </a>
-        <a href="https://youtube.com/@1F0YT" class="showcaser-card" target="_blank" data-name="1F0YT">
-          <div class="showcaser-avatar">
-            <div class="showcaser-avatar-text">1F</div>
-          </div>
-          <h3 class="showcaser-name">@1F0YT</h3>
-          <div class="check-out-btn">Check out!</div>
-        </a>
-        <a href="https://youtube.com/@ReverseScripts" class="showcaser-card" target="_blank" data-name="ReverseScripts">
-          <div class="showcaser-avatar">
-            <div class="showcaser-avatar-text">RS</div>
-          </div>
-          <h3 class="showcaser-name">@ReverseScripts</h3>
-          <div class="check-out-btn">Check out!</div>
-        </a>
-        <a href="https://youtube.com/@Sr_LDS" class="showcaser-card" target="_blank" data-name="Sr_LDS">
-          <div class="showcaser-avatar">
-            <div class="showcaser-avatar-text">LD</div>
-          </div>
-          <h3 class="showcaser-name">@Sr_LDS</h3>
-          <div class="check-out-btn">Check out!</div>
-        </a>
-        <a href="https://youtube.com/@Ras-Scripts" class="showcaser-card" target="_blank" data-name="Ras-Scripts">
-          <div class="showcaser-avatar">
-            <div class="showcaser-avatar-text">RA</div>
-          </div>
-          <h3 class="showcaser-name">@Ras-Scripts</h3>
-          <div class="check-out-btn">Check out!</div>
-        </a>
-        <a href="https://youtube.com/@MinebloxCraft-z3s" class="showcaser-card" target="_blank" data-name="MinebloxCraft">
-          <div class="showcaser-avatar">
-            <div class="showcaser-avatar-text">MC</div>
-          </div>
-          <h3 class="showcaser-name">@MinebloxCraft</h3>
-          <div class="check-out-btn">Check out!</div>
-        </a>
-        <!-- Second duplication -->
-        <a href="https://youtube.com/@MastersMZ" class="showcaser-card" target="_blank" data-name="MastersMZ">
-          <div class="showcaser-avatar">
-            <div class="showcaser-avatar-text">MZ</div>
-          </div>
-          <h3 class="showcaser-name">@MastersMZ</h3>
-          <div class="check-out-btn">Check out!</div>
-        </a>
-        <a href="https://youtube.com/@1F0YT" class="showcaser-card" target="_blank" data-name="1F0YT">
-          <div class="showcaser-avatar">
-            <div class="showcaser-avatar-text">1F</div>
-          </div>
-          <h3 class="showcaser-name">@1F0YT</h3>
-          <div class="check-out-btn">Check out!</div>
-        </a>
-        <a href="https://youtube.com/@ReverseScripts" class="showcaser-card" target="_blank" data-name="ReverseScripts">
-          <div class="showcaser-avatar">
-            <div class="showcaser-avatar-text">RS</div>
-          </div>
-          <h3 class="showcaser-name">@ReverseScripts</h3>
-          <div class="check-out-btn">Check out!</div>
-        </a>
-        <a href="https://youtube.com/@Sr_LDS" class="showcaser-card" target="_blank" data-name="Sr_LDS">
-          <div class="showcaser-avatar">
-            <div class="showcaser-avatar-text">LD</div>
-          </div>
-          <h3 class="showcaser-name">@Sr_LDS</h3>
-          <div class="check-out-btn">Check out!</div>
-        </a>
-        <a href="https://youtube.com/@Ras-Scripts" class="showcaser-card" target="_blank" data-name="Ras-Scripts">
-          <div class="showcaser-avatar">
-            <div class="showcaser-avatar-text">RA</div>
-          </div>
-          <h3 class="showcaser-name">@Ras-Scripts</h3>
-          <div class="check-out-btn">Check out!</div>
-        </a>
-        <a href="https://youtube.com/@MinebloxCraft-z3s" class="showcaser-card" target="_blank" data-name="MinebloxCraft">
-          <div class="showcaser-avatar">
-            <div class="showcaser-avatar-text">MC</div>
-          </div>
-          <h3 class="showcaser-name">@MinebloxCraft</h3>
-          <div class="check-out-btn">Check out!</div>
-        </a>
-      </div>
+<!-- Updated showcasers section in your HTML -->
+<div class="section">
+  <h2 class="section-title">Our Beloved Showcasers</h2>
+  <p class="section-subtitle">Showing love to the amazing content creators who showcase our scripts. Want to be featured? Submit a request on our Discord!</p>
+  
+  <div class="showcasers-container">
+    <div class="showcasers-grid" id="showcasers-slider">
+      <a href="https://youtube.com/@MastersMZ" class="showcaser-card" target="_blank" data-name="MastersMZ">
+        <div class="showcaser-avatar" id="avatar-MastersMZ">
+          <img class="showcaser-pfp" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" alt="MastersMZ">
+          <div class="showcaser-avatar-text">MZ</div>
+        </div>
+        <h3 class="showcaser-name">@MastersMZ</h3>
+        <div class="check-out-btn">Check out!</div>
+      </a>
+      
+      <a href="https://youtube.com/@1F0YT" class="showcaser-card" target="_blank" data-name="1F0YT">
+        <div class="showcaser-avatar" id="avatar-1F0YT">
+          <img class="showcaser-pfp" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" alt="1F0YT">
+          <div class="showcaser-avatar-text">1F</div>
+        </div>
+        <h3 class="showcaser-name">@1F0YT</h3>
+        <div class="check-out-btn">Check out!</div>
+      </a>
+      
+      <a href="https://youtube.com/@ReverseScripts" class="showcaser-card" target="_blank" data-name="ReverseScripts">
+        <div class="showcaser-avatar" id="avatar-ReverseScripts">
+          <img class="showcaser-pfp" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" alt="ReverseScripts">
+          <div class="showcaser-avatar-text">RS</div>
+        </div>
+        <h3 class="showcaser-name">@ReverseScripts</h3>
+        <div class="check-out-btn">Check out!</div>
+      </a>
+      
+      <a href="https://youtube.com/@Sr_LDS" class="showcaser-card" target="_blank" data-name="Sr_LDS">
+        <div class="showcaser-avatar">
+          <div class="showcaser-avatar-text">LD</div>
+        </div>
+        <h3 class="showcaser-name">@Sr_LDS</h3>
+        <div class="check-out-btn">Check out!</div>
+      </a>
+      
+      <a href="https://youtube.com/@Ras-Scripts" class="showcaser-card" target="_blank" data-name="Ras-Scripts">
+        <div class="showcaser-avatar">
+          <div class="showcaser-avatar-text">RA</div>
+        </div>
+        <h3 class="showcaser-name">@Ras-Scripts</h3>
+        <div class="check-out-btn">Check out!</div>
+      </a>
+      
+      <a href="https://youtube.com/@MinebloxCraft-z3s" class="showcaser-card" target="_blank" data-name="MinebloxCraft">
+        <div class="showcaser-avatar">
+          <div class="showcaser-avatar-text">MC</div>
+        </div>
+        <h3 class="showcaser-name">@MinebloxCraft</h3>
+        <div class="check-out-btn">Check out!</div>
+      </a>
     </div>
   </div>
+</div>
+
+<script>
+async function loadYouTubePFPs() {
+  try {
+    const response = await fetch('/api/youtube-pfps');
+    const pfps = await response.json();
+
+    Object.keys(pfps).forEach(name => {
+      if (pfps[name]) {
+        const avatar = document.getElementById(`avatar-${name}`);
+        if (avatar) {
+          const img = avatar.querySelector('.showcaser-pfp');
+          const text = avatar.querySelector('.showcaser-avatar-text');
+          
+          if (img && text) {
+            img.src = pfps[name];
+            img.onload = function() {
+              text.style.display = 'none';
+              img.style.display = 'block';
+            };
+            img.onerror = function() {
+              console.warn(`Failed to load PFP for ${name}`);
+            };
+          }
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error loading YouTube PFPs:', error);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadYouTubePFPs);
+</script>
 
   <div class="footer">
     <div class="footer-content">
@@ -1789,7 +1715,7 @@
         const particle = document.createElement('div');
         particle.className = 'particle';
         particle.style.left = Math.random() * 100 + '%';
-        particle.style.animationDelay = -Math.random() * 15 + 's'; // Negative delay starts mid-cycle
+        particle.style.animationDelay = -Math.random() * 15 + 's';
         particle.style.animationDuration = (15 + Math.random() * 5) + 's';
         particlesContainer.appendChild(particle);
       }
@@ -1800,7 +1726,7 @@
       
       counters.forEach(counter => {
         const target = parseInt(counter.getAttribute('data-target'));
-        const increment = target / 100; // Adjust speed here
+        const increment = target / 100;
         let current = 0;
         
         const timer = setInterval(() => {
@@ -1827,12 +1753,19 @@
       });
     }
 
-    createParticles();
+    document.querySelector('.get-started-btn').addEventListener('click', function(e) {
+      e.preventDefault();
+      const targetElement = document.getElementById('scripts');
+      const targetPosition = targetElement.offsetTop - 100;
+      window.scrollTo({
+        top: targetPosition,
+        behavior: 'smooth'
+      });
+    });
 
-    // Start counter animation immediately when page loads
+    createParticles();
     animateCounters();
 
-    // Navbar scroll behavior
     let lastScrollTop = 0;
     window.addEventListener('scroll', function() {
       let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
@@ -1848,47 +1781,4 @@
     });
   </script>
 </body>
-</html>LDS</h3>
-          <div class="check-out-btn">Check out!</div>
-        </a>
-        <a href="https://youtube.com/@Ras-Scripts" class="showcaser-card" target="_blank" data-name="Ras-Scripts">
-          <div class="showcaser-avatar">
-            <div class="showcaser-avatar-text">RA</div>
-          </div>
-          <h3 class="showcaser-name">@Ras-Scripts</h3>
-          <div class="check-out-btn">Check out!</div>
-        </a>
-        <a href="https://youtube.com/@MinebloxCraft-z3s" class="showcaser-card" target="_blank" data-name="MinebloxCraft">
-          <div class="showcaser-avatar">
-            <div class="showcaser-avatar-text">MC</div>
-          </div>
-          <h3 class="showcaser-name">@MinebloxCraft</h3>
-          <div class="check-out-btn">Check out!</div>
-        </a>
-        <!-- First duplication -->
-        <a href="https://youtube.com/@MastersMZ" class="showcaser-card" target="_blank" data-name="MastersMZ">
-          <div class="showcaser-avatar">
-            <div class="showcaser-avatar-text">MZ</div>
-          </div>
-          <h3 class="showcaser-name">@MastersMZ</h3>
-          <div class="check-out-btn">Check out!</div>
-        </a>
-        <a href="https://youtube.com/@1F0YT" class="showcaser-card" target="_blank" data-name="1F0YT">
-          <div class="showcaser-avatar">
-            <div class="showcaser-avatar-text">1F</div>
-          </div>
-          <h3 class="showcaser-name">@1F0YT</h3>
-          <div class="check-out-btn">Check out!</div>
-        </a>
-        <a href="https://youtube.com/@ReverseScripts" class="showcaser-card" target="_blank" data-name="ReverseScripts">
-          <div class="showcaser-avatar">
-            <div class="showcaser-avatar-text">RS</div>
-          </div>
-          <h3 class="showcaser-name">@ReverseScripts</h3>
-          <div class="check-out-btn">Check out!</div>
-        </a>
-        <a href="https://youtube.com/@Sr_LDS" class="showcaser-card" target="_blank" data-name="Sr_LDS">
-          <div class="showcaser-avatar">
-            <div class="showcaser-avatar-text">LD</div>
-          </div>
-          <h3 class="showcaser-name">@Sr_
+</html>
