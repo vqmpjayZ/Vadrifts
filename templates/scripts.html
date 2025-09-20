@@ -186,7 +186,7 @@
 
     .navbar {
       position: fixed;
-      top: 5px;
+      top: 20px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 100;
@@ -202,11 +202,11 @@
     }
 
     .navbar.scrolled {
-      top: 0px;
+      top: 15px;
     }
 
     .navbar.scrolled:hover {
-      top: 5px;
+      top: 20px;
     }
 
     .navbar:hover {
@@ -244,17 +244,19 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .nav-logo:hover {
+      transform: translateY(-3px);
+      filter: drop-shadow(0 0 15px rgba(114, 9, 183, 0.6));
     }
 
     .nav-logo-img {
       width: 28px;
       height: 28px;
       flex-shrink: 0;
-    }
-
-    @keyframes simpleGradient {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
+      transition: none;
     }
 
     .nav-links {
@@ -352,7 +354,7 @@
     }
 
     .description .highlight {
-      color: #7209b7;
+      color: #9c88ff;
       font-weight: 600;
     }
 
@@ -582,7 +584,6 @@
     .footer {
       position: relative;
       z-index: 10;
-      text-align: center;
       padding: 60px 20px;
       color: #888;
       border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -590,31 +591,84 @@
       animation: fadeInUp 1.2s ease-out 1.5s both;
     }
 
-    .footer-links {
+    .footer-content {
       display: flex;
-      justify-content: center;
-      gap: 30px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
-    .footer-link {
-      color: #aaa;
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
       text-decoration: none;
-      transition: color 0.3s ease;
+      transition: all 0.3s ease;
     }
 
-    .footer-link:hover {
-      color: #7209b7;
+    .footer-logo:hover {
+      transform: scale(1.02);
+      filter: drop-shadow(0 0 10px rgba(114, 9, 183, 0.4));
+    }
+
+    .footer-logo-img {
+      width: 24px;
+      height: 24px;
+      transition: none;
+    }
+
+    .footer-copyright {
+      color: #888;
+      font-size: 14px;
+    }
+
+    .footer-discord {
+      display: flex;
+      align-items: center;
+    }
+
+    .footer-discord-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      background: #2a2a2a;
+      border-radius: 8px;
+      text-decoration: none;
+    }
+
+    .footer-discord-link:hover {
+      background: #3a3a3a;
+      transform: translateY(-2px);
+    }
+
+    .footer-discord-icon {
+      width: 20px;
+      height: 20px;
     }
 
     @media (max-width: 768px) {
       .navbar {
-        top: 10px;
+        top: 25px;
         right: 10px;
         left: 10px;
         padding: 16px 18px;
         width: calc(100% - 20px);
+      }
+
+      .navbar.scrolled {
+        top: 20px;
+      }
+
+      .navbar.scrolled:hover {
+        top: 25px;
       }
 
       .nav-content {
@@ -666,9 +720,15 @@
         flex-direction: column;
       }
 
-      .footer-links {
+      .footer-content {
         flex-direction: column;
-        gap: 15px;
+        gap: 20px;
+        text-align: center;
+      }
+
+      .footer-left {
+        flex-direction: column;
+        gap: 10px;
       }
     }
 
@@ -684,6 +744,15 @@
 
       .navbar {
         padding: 10px 15px;
+        top: 30px;
+      }
+
+      .navbar.scrolled {
+        top: 25px;
+      }
+
+      .navbar.scrolled:hover {
+        top: 30px;
       }
     }
   </style>
@@ -708,7 +777,7 @@
         Vadrifts
       </a>
       <div class="nav-links">
-        <a href="/scripts" class="nav-link active">Explore</a>
+        <a href="/scripts" class="nav-link active">Scripts</a>
         <a href="/converter" class="nav-link">Image Converter</a>
       </div>
     </div>
@@ -745,11 +814,21 @@
   </div>
 
   <div class="footer">
-    <div class="footer-links">
-      <a href="/converter" class="footer-link">Image Converter</a>
-      <a href="https://discord.com/invite/WDbJ5wE2cR" class="footer-link">Discord Server</a>
+    <div class="footer-content">
+      <div class="footer-left">
+        <a href="/" class="footer-logo">
+          <img src="https://i.imgur.com/ePueN25.png" alt="Vadrifts Logo" class="footer-logo-img">
+        </a>
+        <div class="footer-copyright">
+          &copy; 2025 Vadrifts. All Rights Reserved
+        </div>
+      </div>
+      <div class="footer-discord">
+        <a href="https://discord.com/invite/WDbJ5wE2cR" class="footer-discord-link" target="_blank">
+          <img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/discord-white-icon.png" alt="Discord" class="footer-discord-icon">
+        </a>
+      </div>
     </div>
-    <p>&copy; 2025 Vadrifts - Roblox Scripts & Tools</p>
   </div>
 
   <script>
@@ -797,12 +876,7 @@
 
       grid.innerHTML = scripts.map(script => `
         <div class="script-card" onclick="viewScript(${script.id})">
-          <img 
-            src="${script.thumbnail}" 
-            alt="${script.title}"
-            class="script-thumbnail"
-            onerror="this.style.display='none'"
-          >
+          <div class="script-thumbnail" style="background-image: url('${script.thumbnail}'); background-size: cover; background-position: center;"></div>
           <div class="script-game">${script.game}</div>
           <h3 class="script-title">${script.title}</h3>
           <p class="script-description">${script.description}</p>
