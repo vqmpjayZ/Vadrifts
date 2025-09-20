@@ -4,6 +4,7 @@ import time
 import threading
 import requests
 import asyncio
+import re
 from flask import Flask, request, jsonify, send_from_directory, send_file, render_template_string, redirect
 from PIL import Image
 from io import BytesIO
@@ -39,6 +40,12 @@ game_data_cache = {}
 
 active_slugs = {}
 
+youtuber_pfps = {
+    "MastersMZ": None,
+    "1F0YT": None, 
+    "ReverseScripts": None
+}
+
 bypass_test_data = {
     "words": {
         "success_rate": "unknown",
@@ -71,6 +78,53 @@ bypass_test_data = {
         "first_tester": None
     }
 }
+
+def fetch_youtube_profile_picture(channel_url):
+    try:
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        
+        response = requests.get(channel_url, headers=headers, timeout=10)
+        response.raise_for_status()
+        
+        patterns = [
+            r'"avatar":{"thumbnails":\[{"url":"([^"]+)"',
+            r'<link itemprop="thumbnailUrl" href="([^"]+)"',
+            r'"width":176,"height":176}\],"url":"([^"]+)"',
+            r'<meta property="og:image" content="([^"]+)"'
+        ]
+        
+        for pattern in patterns:
+            match = re.search(pattern, response.text)
+            if match:
+                img_url = match.group(1)
+                img_url = img_url.replace('\\u003d', '=').replace('\\', '')
+                return img_url
+                
+        logger.warning(f"Could not find profile picture for {channel_url}")
+        return None
+        
+    except Exception as e:
+        logger.error(f"Error fetching {channel_url}: {e}")
+        return None
+
+def fetch_all_youtube_pfps():
+    channels = {
+        "MastersMZ": "https://youtube.com/@MastersMZ",
+        "1F0YT": "https://youtube.com/@1F0YT", 
+        "ReverseScripts": "https://youtube.com/@ReverseScripts"
+    }
+    
+    logger.info("Fetching YouTube profile pictures...")
+    
+    for name, url in channels.items():
+        pfp_url = fetch_youtube_profile_picture(url)
+        if pfp_url:
+            youtuber_pfps[name] = pfp_url
+            logger.info(f"Found PFP for {name}: {pfp_url}")
+        else:
+            logger.warning(f"Could not fetch PFP for {name}")
 
 def reset_bypass_data():
     global bypass_test_data
@@ -520,6 +574,10 @@ def verify():
         logger.error("verify.html template not found")
         return jsonify({"error": "Verify page not found"}), 404
 
+@app.route('/api/youtube-pfps')
+def get_youtube_pfps():
+    return jsonify(youtuber_pfps)
+
 @app.route('/api/bypass-status')
 def get_bypass_status():
     check_and_reset_if_needed()
@@ -728,6 +786,8 @@ def run_flask():
     app.run(host='0.0.0.0', port=port, debug=False)
 
 if __name__ == '__main__':
+    fetch_all_youtube_pfps()
+    
     ping_thread = threading.Thread(target=server_pinger, daemon=True)
     ping_thread.start()
     logger.info("Server pinger started")
