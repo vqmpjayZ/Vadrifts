@@ -47,6 +47,12 @@ CACHE_DURATION = 7200
 plugins_data = []
 rate_limit_data = {}
 
+DATA_DIR = 'data'
+if not os.path.exists(DATA_DIR):
+    os.makedirs(DATA_DIR)
+
+PLUGINS_FILE = os.path.join(DATA_DIR, 'plugins_data.json')
+
 bypass_test_data = {
     "words": {
         "success_rate": "unknown",
@@ -172,10 +178,13 @@ class YouTubeChannelFinder:
     
     def extract_profile_picture(self, html_content):
         patterns = [
-            r'"channelMetadataRenderer":{"title":"([^"]+)"',
-            r'<meta property="og:title" content="([^"]+)"',
-            r'"title":"([^"]+)","navigationEndpoint"',
-            r'<title>([^<]+)</title>'
+            r'"avatar":{"thumbnails":```math
+{"url":"([^"]+)"[^}]*"width":176',
+            r'"avatar":{"thumbnails":```math
+{"url":"([^"]+)"',
+            r'<link itemprop="thumbnailUrl" href="([^"]+)"',
+            r'<meta property="og:image" content="([^"]+)"',
+            r'"thumbnailUrl":\s*"([^"]+)"'
         ]
         
         for pattern in patterns:
@@ -453,18 +462,19 @@ def cache_cleanup_task():
 
 def save_plugins_to_file():
     try:
-        with open('plugins_data.json', 'w') as f:
-            json.dump(plugins_data, f)
+        with open(PLUGINS_FILE, 'w') as f:
+            json.dump(plugins_data, f, indent=2)
     except Exception as e:
         logger.error(f"Error saving plugins: {e}")
 
 def load_plugins_from_file():
     global plugins_data
     try:
-        with open('plugins_data.json', 'r') as f:
-            plugins_data = json.load(f)
-    except FileNotFoundError:
-        plugins_data = []
+        if os.path.exists(PLUGINS_FILE):
+            with open(PLUGINS_FILE, 'r') as f:
+                plugins_data = json.load(f)
+        else:
+            plugins_data = []
     except Exception as e:
         logger.error(f"Error loading plugins: {e}")
         plugins_data = []
@@ -708,7 +718,7 @@ def convert_image():
 def get_plugins():
     sorted_plugins = sorted(plugins_data, key=lambda x: x.get('created_at', ''), reverse=True)
     return jsonify(sorted_plugins[:50])
-    
+
 @app.route('/api/plugins', methods=['POST'])
 def create_plugin():
     try:
@@ -730,7 +740,7 @@ def create_plugin():
         else:
             rate_limit_data[client_ip] = {'count': 0, 'last_create': now}
         
-        if not data.get('name') or not data.get('description') or not data.get('sections'):
+        if not data.get('name') or not data.get('sections'):
             return jsonify({"error": "Missing required fields"}), 400
         
         name = data['name'][:25]
@@ -744,10 +754,11 @@ def create_plugin():
             'id': str(uuid.uuid4()),
             'name': name,
             'author': author if author else 'Anonymous',
-            'description': data['description'][:200],
+            'description': data.get('description', '')[:200],
             'icon': data.get('icon', ''),
             'sections': data['sections'],
             'created_at': datetime.now().isoformat(),
+            'updated_at': datetime.now().isoformat(),
             'uses': 0
         }
         
@@ -763,7 +774,7 @@ def create_plugin():
     except Exception as e:
         logger.error(f"Error creating plugin: {e}")
         return jsonify({"error": "Failed to create plugin"}), 500
-        
+
 @app.route('/api/plugins/<plugin_id>', methods=['GET'])
 def get_plugin(plugin_id):
     plugin = next((p for p in plugins_data if p['id'] == plugin_id), None)
@@ -773,11 +784,40 @@ def get_plugin(plugin_id):
         return jsonify(plugin)
     return jsonify({"error": "Plugin not found"}), 404
 
+@app.route('/api/plugins/<plugin_id>', methods=['PUT'])
+def update_plugin(plugin_id):
+    try:
+        data = request.get_json()
+        
+        plugin = next((p for p in plugins_data if p['id'] == plugin_id), None)
+        if not plugin:
+            return jsonify({"error": "Plugin not found"}), 404
+        
+        name = data.get('name', plugin['name'])[:25]
+        author = data.get('author', 'Anonymous')[:20]
+        
+        if author != 'Anonymous' and author:
+            if not re.match(r'^[a-zA-Z0-9]+$', author):
+                return jsonify({"error": "Author name can only contain letters and numbers"}), 400
+        
+        plugin['name'] = name
+        plugin['author'] = author if author else 'Anonymous'
+        plugin['description'] = data.get('description', '')[:200]
+        plugin['icon'] = data.get('icon', '')
+        plugin['sections'] = data.get('sections', plugin['sections'])
+        plugin['updated_at'] = datetime.now().isoformat()
+        
+        save_plugins_to_file()
+        
+        return jsonify(plugin), 200
+        
+    except Exception as e:
+        logger.error(f"Error updating plugin: {e}")
+        return jsonify({"error": "Failed to update plugin"}), 500
+
 @app.route('/api/plugins/<plugin_id>', methods=['DELETE'])
 def delete_plugin(plugin_id):
     global plugins_data
-    
-    client_ip = request.remote_addr
     
     plugin = next((p for p in plugins_data if p['id'] == plugin_id), None)
     if not plugin:
@@ -787,7 +827,7 @@ def delete_plugin(plugin_id):
     save_plugins_to_file()
     
     return jsonify({"message": "Plugin deleted successfully"}), 200
-    
+
 @app.route('/plugin/<plugin_id>')
 def plugin_detail(plugin_id):
     plugin = next((p for p in plugins_data if p['id'] == plugin_id), None)
@@ -846,7 +886,7 @@ def plugin_detail(plugin_id):
         <a href="/plugins" class="back-btn">← Back to Plugins</a>
         <h1>{plugin['name']}</h1>
         <p>By {plugin['author']}</p>
-        <p>{plugin['description']}</p>
+        <p>{plugin.get('description', 'No description')}</p>
         <p>Used {plugin.get('uses', 0)} times</p>
         
         <div id="sections">
