@@ -15,6 +15,7 @@ import hashlib
 from datetime import datetime, timedelta
 import json
 from urllib.parse import quote_plus
+import uuid
 
 logging.basicConfig(
     level=logging.INFO,
@@ -42,6 +43,9 @@ active_slugs = {}
 
 channel_cache = {}
 CACHE_DURATION = 7200
+
+plugins_data = []
+rate_limit_data = {}
 
 bypass_test_data = {
     "words": {
@@ -168,11 +172,10 @@ class YouTubeChannelFinder:
     
     def extract_profile_picture(self, html_content):
         patterns = [
-            r'"avatar":{"thumbnails":\[{"url":"([^"]+)"[^}]*"width":176',
-            r'"avatar":{"thumbnails":\[{"url":"([^"]+)"',
-            r'<link itemprop="thumbnailUrl" href="([^"]+)"',
-            r'<meta property="og:image" content="([^"]+)"',
-            r'"thumbnailUrl":\s*"([^"]+)"'
+            r'"channelMetadataRenderer":{"title":"([^"]+)"',
+            r'<meta property="og:title" content="([^"]+)"',
+            r'"title":"([^"]+)","navigationEndpoint"',
+            r'<title>([^<]+)</title>'
         ]
         
         for pattern in patterns:
@@ -286,11 +289,9 @@ async def on_message(message):
     if message.author == bot.user:
         return
     
-    # Check for "meow" in any channel
     if "meow" in message.content.lower():
         await message.channel.send("meow")
     
-    # Original boost detection for specific channel
     if message.channel.id == TARGET_CHANNEL_ID:
         if "just boosted the server!" in message.content.lower():
             user_id = message.author.id
@@ -450,6 +451,24 @@ def cache_cleanup_task():
             logger.error(f"Cache cleanup error: {e}")
             time.sleep(1800)
 
+def save_plugins_to_file():
+    try:
+        with open('plugins_data.json', 'w') as f:
+            json.dump(plugins_data, f)
+    except Exception as e:
+        logger.error(f"Error saving plugins: {e}")
+
+def load_plugins_from_file():
+    global plugins_data
+    try:
+        with open('plugins_data.json', 'r') as f:
+            plugins_data = json.load(f)
+    except FileNotFoundError:
+        plugins_data = []
+    except Exception as e:
+        logger.error(f"Error loading plugins: {e}")
+        plugins_data = []
+
 @app.route('/')
 def home():
     try:
@@ -505,6 +524,28 @@ def scripts_page():
             "error": "Scripts page not found",
             "message": "Create templates/scripts.html file"
         }), 404
+
+@app.route('/plugins')
+def plugins_page():
+    try:
+        with open('templates/plugins.html', 'r', encoding='utf-8') as f:
+            html_content = f.read()
+        
+        meta_tags = '''
+    <meta property="og:title" content="Vadrifts Plugins - Community Bypasses">
+    <meta property="og:description" content="Create and share custom bypass plugins for Vadrifts.byp. Browse community-made plugins and contribute your own!">
+    <meta property="og:url" content="https://vadrifts.onrender.com/plugins">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Vadrifts">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Vadrifts Plugins - Community Bypasses">
+    <meta name="twitter:description" content="Create and share custom bypass plugins for Vadrifts.byp">
+    <meta name="theme-color" content="#9c88ff">'''
+        
+        return inject_meta_tags(html_content, meta_tags)
+    except FileNotFoundError:
+        logger.error("plugins.html template not found")
+        return jsonify({"error": "Plugins page not found"}), 404
 
 @app.route('/discord')
 def discord_invite():
@@ -662,6 +703,195 @@ def convert_image():
     except Exception as e:
         logger.error(f"Unexpected error: {str(e)}")
         return jsonify({'error': str(e)}), 500
+
+@app.route('/api/plugins', methods=['GET'])
+def get_plugins():
+    sorted_plugins = sorted(plugins_data, key=lambda x: x.get('created_at', ''), reverse=True)
+    return jsonify(sorted_plugins[:50])
+
+@app.route('/api/plugins', methods=['POST'])
+def create_plugin():
+    try:
+        data = request.get_json()
+        
+        client_ip = request.remote_addr
+        now = datetime.now()
+        
+        if client_ip in rate_limit_data:
+            user_data = rate_limit_data[client_ip]
+            time_diff = (now - user_data['last_create']).total_seconds()
+            
+            if time_diff < 300:
+                if user_data['count'] >= 2:
+                    time_left = int(300 - time_diff)
+                    return jsonify({"error": f"You're creating plugins too fast! Wait {time_left} seconds"}), 429
+            else:
+                rate_limit_data[client_ip] = {'count': 0, 'last_create': now}
+        else:
+            rate_limit_data[client_ip] = {'count': 0, 'last_create': now}
+        
+        if not data.get('name') or not data.get('description') or not data.get('sections'):
+            return jsonify({"error": "Missing required fields"}), 400
+        
+        name = data['name'][:25]
+        author = data.get('author', 'Anonymous')[:20]
+        
+        if author != 'Anonymous' and author:
+            if not re.match(r'^[a-zA-Z0-9]+$', author):
+                return jsonify({"error": "Author name can only contain letters and numbers"}), 400
+        
+        plugin = {
+            'id': str(uuid.uuid4()),
+            'name': name,
+            'author': author if author else 'Anonymous',
+            'description': data['description'][:200],
+            'icon': data.get('icon', ''),
+            'sections': data['sections'],
+            'created_at': datetime.now().isoformat(),
+            'uses': 0
+        }
+        
+        plugins_data.append(plugin)
+        
+        rate_limit_data[client_ip]['count'] += 1
+        rate_limit_data[client_ip]['last_create'] = now
+        
+        save_plugins_to_file()
+        
+        return jsonify(plugin), 201
+        
+    except Exception as e:
+        logger.error(f"Error creating plugin: {e}")
+        return jsonify({"error": "Failed to create plugin"}), 500
+
+@app.route('/api/plugins/<plugin_id>', methods=['GET'])
+def get_plugin(plugin_id):
+    plugin = next((p for p in plugins_data if p['id'] == plugin_id), None)
+    if plugin:
+        plugin['uses'] = plugin.get('uses', 0) + 1
+        save_plugins_to_file()
+        return jsonify(plugin)
+    return jsonify({"error": "Plugin not found"}), 404
+
+@app.route('/plugin/<plugin_id>')
+def plugin_detail(plugin_id):
+    plugin = next((p for p in plugins_data if p['id'] == plugin_id), None)
+    if not plugin:
+        return jsonify({"error": "Plugin not found"}), 404
+    
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>{plugin['name']} - Vadrifts Plugin</title>
+        <style>
+            body {{
+                background: #000;
+                color: #fff;
+                font-family: 'Inter', sans-serif;
+                padding: 40px;
+                max-width: 800px;
+                margin: 0 auto;
+            }}
+            h1 {{ color: #9c88ff; }}
+            .section {{ 
+                background: rgba(40, 40, 40, 0.8);
+                padding: 20px;
+                border-radius: 10px;
+                margin: 20px 0;
+            }}
+            .bypass {{ 
+                background: rgba(114, 9, 183, 0.2);
+                padding: 8px 12px;
+                border-radius: 6px;
+                margin: 5px;
+                display: inline-block;
+            }}
+            .back-btn {{
+                background: #9c88ff;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 8px;
+                text-decoration: none;
+                display: inline-block;
+                margin-bottom: 20px;
+            }}
+            .export-btn {{
+                background: #22c55e;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 8px;
+                border: none;
+                cursor: pointer;
+                margin-top: 20px;
+            }}
+        </style>
+    </head>
+    <body>
+        <a href="/plugins" class="back-btn">← Back to Plugins</a>
+        <h1>{plugin['name']}</h1>
+        <p>By {plugin['author']}</p>
+        <p>{plugin['description']}</p>
+        <p>Used {plugin.get('uses', 0)} times</p>
+        
+        <div id="sections">
+    """
+    
+    for section_name, bypasses in plugin['sections'].items():
+        html += f"""
+            <div class="section">
+                <h3>{section_name}</h3>
+                <div>
+        """
+        for bypass in bypasses:
+            html += f'<span class="bypass">{bypass}</span>'
+        html += """
+                </div>
+            </div>
+        """
+    
+    html += f"""
+        <button class="export-btn" onclick="exportPlugin()">Export for Roblox</button>
+        
+        <script>
+            function exportPlugin() {{
+                const pluginData = {json.dumps(plugin)};
+                const scriptCode = generateRobloxScript(pluginData);
+                navigator.clipboard.writeText(scriptCode);
+                alert('Plugin code copied to clipboard!');
+            }}
+            
+            function generateRobloxScript(plugin) {{
+                let script = '{{\\n';
+                script += '  id = "' + plugin.id + '",\\n';
+                script += '  name = "' + plugin.name + '",\\n';
+                script += '  author = "' + plugin.author + '",\\n';
+                
+                if (plugin.icon) {{
+                    script += '  icon = "' + plugin.icon + '",\\n';
+                }}
+                
+                script += '  sections = {{\\n';
+                
+                for (const [section, bypasses] of Object.entries(plugin.sections)) {{
+                    script += '    ["' + section + '"] = {{\\n';
+                    bypasses.forEach(bypass => {{
+                        script += '      "' + bypass + '",\\n';
+                    }});
+                    script += '    }},\\n';
+                }}
+                
+                script += '  }}\\n';
+                script += '}}';
+                
+                return script;
+            }}
+        </script>
+    </body>
+    </html>
+    """
+    
+    return html
 
 @app.route('/key-system')
 def key_system():
@@ -978,6 +1208,8 @@ def run_flask():
     app.run(host='0.0.0.0', port=port, debug=False)
 
 if __name__ == '__main__':
+    load_plugins_from_file()
+    
     ping_thread = threading.Thread(target=server_pinger, daemon=True)
     ping_thread.start()
     logger.info("Server pinger started")
