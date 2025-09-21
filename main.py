@@ -67,12 +67,6 @@ bypass_test_data = {
         "last_tested": None,
         "testing": False,
         "first_tester": None
-    },
-    "not_legit": {
-        "success_rate": "unknown",
-        "last_tested": None,
-        "testing": False,
-        "first_tester": None
     }
 }
 
@@ -156,88 +150,71 @@ class YouTubeChannelFinder:
             logger.error(f"Error extracting channel data: {e}")
             return None
     
-    def extract_channel_name(self, html_content):
-        patterns = [
-            r'"channelMetadataRenderer":{"title":"([^"]+)"',
-            r'<meta property="og:title" content="([^"]+)"',
-            r'"title":"([^"]+)","navigationEndpoint"',
-            r'<title>([^<]+)</title>'
-        ]
-        
-        for pattern in patterns:
-            match = re.search(pattern, html_content)
-            if match:
-                name = match.group(1).strip()
-                if name and name != 'YouTube':
-                    return name
-        return None
+def extract_profile_picture(self, html_content):
+    patterns = [
+        '"avatar".*?"thumbnails".*?"url":"([^"]+)".*?"width":176',
+        '"avatar".*?"thumbnails".*?"url":"([^"]+)"',
+        '<link itemprop="thumbnailUrl" href="([^"]+)"',
+        '<meta property="og:image" content="([^"]+)"',
+        '"thumbnailUrl":\\s*"([^"]+)"'
+    ]
     
-    def extract_profile_picture(self, html_content):
-        patterns = [
-            r'"avatar":{"thumbnails":\[{"url":"([^"]+)"[^}]*"width":176',
-            r'"avatar":{"thumbnails":\[{"url":"([^"]+)"',
-            r'<link itemprop="thumbnailUrl" href="([^"]+)"',
-            r'<meta property="og:image" content="([^"]+)"',
-            r'"thumbnailUrl":\s*"([^"]+)"'
-        ]
-        
-        for pattern in patterns:
-            matches = re.finditer(pattern, html_content)
-            for match in matches:
-                img_url = match.group(1)
-                img_url = img_url.replace('\\u003d', '=').replace('\\', '')
-                
-                if self.validate_image_url(img_url):
-                    return img_url
-        
-        yt3_pattern = r'(https?://yt3\.ggpht\.com[^"]*)'
-        matches = re.findall(yt3_pattern, html_content)
-        for url in matches:
-            if self.validate_image_url(url):
-                return url
-        
-        return None
+    for pattern in patterns:
+        matches = re.finditer(pattern, html_content)
+        for match in matches:
+            img_url = match.group(1)
+            img_url = img_url.replace('\\u003d', '=').replace('\\', '')
+            
+            if self.validate_image_url(img_url):
+                return img_url
     
-    def search_for_channel(self, username):
-        try:
-            search_url = f"https://www.youtube.com/results?search_query={quote_plus(username)}&sp=EgIQAg%253D%253D"
-            response = self.session.get(search_url, timeout=10)
-            
-            if response.status_code == 200:
-                channel_links = re.findall(r'"url":"(/channel/[^"]+)"', response.text)
-                handle_links = re.findall(r'"url":"(/@[^"]+)"', response.text)
-                
-                all_links = []
-                for link in channel_links + handle_links:
-                    if link.startswith('/'):
-                        all_links.append(f"https://www.youtube.com{link}")
-                
-                for link in all_links[:3]:
-                    try:
-                        channel_response = self.session.get(link, timeout=10)
-                        if channel_response.status_code == 200:
-                            channel_data = self.extract_channel_data(channel_response.text, link, username)
-                            if channel_data and channel_data.get('pfp_url'):
-                                return channel_data
-                    except:
-                        continue
-        except Exception as e:
-            logger.error(f"Search failed for {username}: {e}")
-        
-        return None
+    yt3_pattern = '(https?://yt3\\.ggpht\\.com[^"]*)'
+    matches = re.findall(yt3_pattern, html_content)
+    for url in matches:
+        if self.validate_image_url(url):
+            return url
     
-    def validate_image_url(self, url):
-        try:
-            if not url or not url.startswith('http'):
-                return False
+    return None
+def search_for_channel(self, username):
+    try:
+        search_url = f"https://www.youtube.com/results?search_query={quote_plus(username)}&sp=EgIQAg%253D%253D"
+        response = self.session.get(search_url, timeout=10)
+        
+        if response.status_code == 200:
+            channel_links = re.findall(r'"url":"(/channel/[^"]+)"', response.text)
+            handle_links = re.findall(r'"url":"(/@[^"]+)"', response.text)
             
-            response = self.session.head(url, timeout=5)
-            content_type = response.headers.get('content-type', '').lower()
+            all_links = []
+            for link in channel_links + handle_links:
+                if link.startswith('/'):
+                    all_links.append(f"https://www.youtube.com{link}")
             
-            return (response.status_code == 200 and 
-                    ('image' in content_type or url.endswith(('.jpg', '.jpeg', '.png', '.webp'))))
-        except:
+            for link in all_links[:3]:
+                try:
+                    channel_response = self.session.get(link, timeout=10)
+                    if channel_response.status_code == 200:
+                        channel_data = self.extract_channel_data(channel_response.text, link, username)
+                        if channel_data and channel_data.get('pfp_url'):
+                            return channel_data
+                except:
+                    continue
+    except Exception as e:
+        logger.error(f"Search failed for {username}: {e}")
+    
+    return None
+
+def validate_image_url(self, url):
+    try:
+        if not url or not url.startswith('http'):
             return False
+        
+        response = self.session.head(url, timeout=5)
+        content_type = response.headers.get('content-type', '').lower()
+        
+        return (response.status_code == 200 and 
+                ('image' in content_type or url.endswith(('.jpg', '.jpeg', '.png', '.webp'))))
+    except:
+        return False
 
 youtube_finder = YouTubeChannelFinder()
 
@@ -291,6 +268,12 @@ async def send_good_boy_after_delay(user_id, channel):
 async def on_message(message):
     if message.author == bot.user:
         return
+    
+    # Check for "meow" in any channel
+    if "meow" in message.content.lower():
+        await message.channel.send("meow")
+    
+    # Original boost detection for specific channel
     if message.channel.id == TARGET_CHANNEL_ID:
         if "just boosted the server!" in message.content.lower():
             user_id = message.author.id
@@ -298,6 +281,7 @@ async def on_message(message):
             if user_id in pending_tasks:
                 pending_tasks[user_id].cancel()
             pending_tasks[user_id] = bot.loop.create_task(send_good_boy_after_delay(user_id, message.channel))
+    
     await bot.process_commands(message)
 
 def resize_with_crop(image, target_size=(32, 32)):
@@ -352,7 +336,7 @@ scripts_data = [
             "Works on ALL executors",
             "Automatic chat bypasser",
             "Tag Detection",
-            "700+ Premade bypasses",
+            "400+ Premade bypasses",
             "Anti Admin",
             "Anti Chat Ban",
             "Sus Animations",
@@ -917,8 +901,7 @@ def bypass_status_webpage():
         "words": "Words",
         "sentences": "Sentences",
         "roleplay": "Roleplay",
-        "nsfw_websites": "NSFW Websites",
-        "not_legit": "Not Legit"
+        "nsfw_websites": "NSFW Websites"
     }
     
     for category, display_name in category_names.items():
