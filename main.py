@@ -178,13 +178,10 @@ class YouTubeChannelFinder:
     
     def extract_profile_picture(self, html_content):
         patterns = [
-            r'"avatar":{"thumbnails":```math
-{"url":"([^"]+)"[^}]*"width":176',
-            r'"avatar":{"thumbnails":```math
-{"url":"([^"]+)"',
-            r'<link itemprop="thumbnailUrl" href="([^"]+)"',
-            r'<meta property="og:image" content="([^"]+)"',
-            r'"thumbnailUrl":\s*"([^"]+)"'
+            r'"channelMetadataRenderer":{"title":"([^"]+)"',
+            r'<meta property="og:title" content="([^"]+)"',
+            r'"title":"([^"]+)","navigationEndpoint"',
+            r'<title>([^<]+)</title>'
         ]
         
         for pattern in patterns:
