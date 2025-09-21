@@ -150,31 +150,32 @@ class YouTubeChannelFinder:
             logger.error(f"Error extracting channel data: {e}")
             return None
     
-def extract_profile_picture(self, html_content):
-    patterns = [
-        '"avatar".*?"thumbnails".*?"url":"([^"]+)".*?"width":176',
-        '"avatar".*?"thumbnails".*?"url":"([^"]+)"',
-        '<link itemprop="thumbnailUrl" href="([^"]+)"',
-        '<meta property="og:image" content="([^"]+)"',
-        '"thumbnailUrl":\\s*"([^"]+)"'
-    ]
+    def extract_profile_picture(self, html_content):
+        patterns = [
+            r'"avatar":{"thumbnails":\[{"url":"([^"]+)"[^}]*"width":176',
+            r'"avatar":{"thumbnails":\[{"url":"([^"]+)"',
+            r'<link itemprop="thumbnailUrl" href="([^"]+)"',
+            r'<meta property="og:image" content="([^"]+)"',
+            r'"thumbnailUrl":\s*"([^"]+)"'
+        ]
+        
+        for pattern in patterns:
+            matches = re.finditer(pattern, html_content)
+            for match in matches:
+                img_url = match.group(1)
+                img_url = img_url.replace('\\u003d', '=').replace('\\', '')
+                
+                if self.validate_image_url(img_url):
+                    return img_url
+        
+        yt3_pattern = r'(https?://yt3\.ggpht\.com[^"]*)'
+        matches = re.findall(yt3_pattern, html_content)
+        for url in matches:
+            if self.validate_image_url(url):
+                return url
+        
+        return None
     
-    for pattern in patterns:
-        matches = re.finditer(pattern, html_content)
-        for match in matches:
-            img_url = match.group(1)
-            img_url = img_url.replace('\\u003d', '=').replace('\\', '')
-            
-            if self.validate_image_url(img_url):
-                return img_url
-    
-    yt3_pattern = '(https?://yt3\\.ggpht\\.com[^"]*)'
-    matches = re.findall(yt3_pattern, html_content)
-    for url in matches:
-        if self.validate_image_url(url):
-            return url
-    
-    return None
 def search_for_channel(self, username):
     try:
         search_url = f"https://www.youtube.com/results?search_query={quote_plus(username)}&sp=EgIQAg%253D%253D"
