@@ -4,7 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title id="pageTitle">Script Details - Vadrifts</title>
+  <link rel="icon" href="https://i.imgur.com/ePueN25.png" type="image/png">
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+    
     * {
       margin: 0;
       padding: 0;
@@ -12,9 +15,9 @@
     }
 
     body {
-      background: #0a0a0a;
-      color: #e8e8e8;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #000000;
+      color: #ffffff;
+      font-family: 'Inter', sans-serif;
       min-height: 100vh;
       overflow-x: hidden;
       position: relative;
@@ -27,16 +30,15 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      z-index: -2;
-      pointer-events: none;
+      z-index: 1;
     }
 
     .light {
       position: absolute;
       border-radius: 50%;
-      filter: blur(120px);
-      opacity: 0.4;
-      animation-duration: 12s;
+      filter: blur(150px);
+      opacity: 0.6;
+      animation-duration: 15s;
       animation-iteration-count: infinite;
       animation-timing-function: ease-in-out;
     }
@@ -44,18 +46,18 @@
     .light-1 {
       width: 500px;
       height: 500px;
-      background: radial-gradient(circle, #ff4757 0%, transparent 70%);
-      top: -250px;
-      left: -250px;
+      background: radial-gradient(circle, #4a148c 0%, transparent 70%);
+      top: 2%;
+      left: 2%;
       animation-name: float1;
     }
 
     .light-2 {
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, #00d2ff 0%, transparent 70%);
-      top: -200px;
-      right: -200px;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, #7209b7 0%, transparent 70%);
+      top: 15%;
+      right: 8%;
       animation-name: float2;
       animation-delay: -3s;
     }
@@ -63,9 +65,9 @@
     .light-3 {
       width: 450px;
       height: 450px;
-      background: radial-gradient(circle, #ff6b9d 0%, transparent 70%);
-      bottom: -225px;
-      left: -225px;
+      background: radial-gradient(circle, #9c27b0 0%, transparent 70%);
+      bottom: 20%;
+      left: 10%;
       animation-name: float3;
       animation-delay: -6s;
     }
@@ -73,131 +75,230 @@
     .light-4 {
       width: 350px;
       height: 350px;
-      background: radial-gradient(circle, #7209b7 0%, transparent 70%);
-      bottom: -175px;
-      right: -175px;
+      background: radial-gradient(circle, #9c88ff 0%, transparent 70%);
+      bottom: 15%;
+      right: 12%;
       animation-name: float4;
       animation-delay: -9s;
     }
 
+    .light-5 {
+      width: 280px;
+      height: 280px;
+      background: radial-gradient(circle, #c478d4 0%, transparent 70%);
+      top: 45%;
+      left: 45%;
+      animation-name: float5;
+      animation-delay: -12s;
+    }
+
+    .light-6 {
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, #b855d1 0%, transparent 70%);
+      top: 60%;
+      right: 30%;
+      animation-name: float6;
+      animation-delay: -5s;
+    }
+
+    .light-7 {
+      width: 380px;
+      height: 380px;
+      background: radial-gradient(circle, #ff9f43 0%, transparent 70%);
+      bottom: 8%;
+      right: 5%;
+      animation-name: float7;
+      animation-delay: -7s;
+    }
+
     @keyframes float1 {
       0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(150px, -100px) scale(1.2); }
-      66% { transform: translate(-100px, 150px) scale(0.8); }
+      33% { transform: translate(120px, -80px) scale(1.1); }
+      66% { transform: translate(-80px, 120px) scale(0.9); }
     }
 
     @keyframes float2 {
       0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(-120px, 100px) scale(1.3); }
-      66% { transform: translate(180px, -120px) scale(0.7); }
+      33% { transform: translate(-100px, 90px) scale(1.2); }
+      66% { transform: translate(150px, -100px) scale(0.8); }
     }
 
     @keyframes float3 {
       0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(100px, -150px) scale(0.9); }
-      66% { transform: translate(-150px, -100px) scale(1.1); }
+      33% { transform: translate(90px, -120px) scale(0.95); }
+      66% { transform: translate(-120px, -90px) scale(1.05); }
     }
 
     @keyframes float4 {
       0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(-100px, -120px) scale(1.4); }
-      66% { transform: translate(120px, 150px) scale(0.6); }
+      33% { transform: translate(-90px, -100px) scale(1.3); }
+      66% { transform: translate(100px, 130px) scale(0.7); }
     }
 
-    body::after {
-      content: '';
+    @keyframes float5 {
+      0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+      50% { transform: translate(-30px, -50px) scale(1.1) rotate(180deg); }
+    }
+
+    @keyframes float6 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(60px, -80px) scale(1.4); }
+    }
+
+    @keyframes float7 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(-60px, -70px) scale(1.1); }
+      66% { transform: translate(40px, 60px) scale(0.9); }
+    }
+
+    .particles {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-      background-size: 60px 60px;
-      z-index: -1;
+      z-index: 2;
       pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: #7209b7;
+      border-radius: 50%;
+      opacity: 0.7;
+      animation: floatUp 15s linear infinite;
+      box-shadow: 0 0 6px #7209b7;
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(100vh) translateX(0);
+        opacity: 0.7;
+      }
+      100% {
+        transform: translateY(-100px) translateX(30px);
+        opacity: 0;
+      }
     }
 
     .navbar {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
       z-index: 100;
-      background: rgba(10, 10, 10, 0.95);
-      backdrop-filter: blur(30px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 15px 20px;
+      background: rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 24px 32px;
+      animation: slideInDown 0.8s ease-out;
+      max-width: 1000px;
+      width: 90%;
+      transition: all 0.3s ease;
+    }
+
+    .navbar.scrolled {
+      top: 15px;
+    }
+
+    .navbar.scrolled:hover {
+      top: 20px;
+    }
+
+    .navbar:hover {
+      background: rgba(0, 0, 0, 0.6);
+      border-color: rgba(255, 255, 255, 0.4);
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @keyframes slideInDown {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+
+    @keyframes slideInDownMobile {
+      from {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .nav-content {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      max-width: 1200px;
-      margin: 0 auto;
+      height: 100%;
     }
 
     .nav-logo {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       font-size: 24px;
       font-weight: 700;
-      background: linear-gradient(135deg, #ff4757, #00d2ff, #ff6b9d, #7209b7);
+      background: linear-gradient(90deg, #ffffff 0%, #ffffff 40%, #7209b7 80%, #c478d4 100%);
       background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .nav-logo:hover {
+      transform: translateY(-3px);
+      filter: drop-shadow(0 0 15px rgba(114, 9, 183, 0.6));
     }
 
     .nav-logo-img {
       width: 28px;
       height: 28px;
-      object-fit: contain;
+      flex-shrink: 0;
+      transition: none;
     }
 
     .nav-links {
       display: flex;
       gap: 30px;
       align-items: center;
+      height: 100%;
     }
 
     .nav-link {
       color: #ccc;
       text-decoration: none;
       font-weight: 500;
+      font-size: 14px;
       transition: all 0.3s ease;
-      padding: 8px 16px;
-      border-radius: 8px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      height: 100%;
+      position: relative;
     }
 
     .nav-link:hover {
-      color: #ff4757;
-      background: rgba(255, 71, 87, 0.1);
-    }
-
-    .back-btn {
-      background: rgba(255, 71, 87, 0.2);
-      color: #ff4757;
-      border: 1px solid #ff4757;
-      padding: 8px 16px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: 600;
-      transition: all 0.3s ease;
-    }
-
-    .back-btn:hover {
-      background: rgba(255, 71, 87, 0.3);
-      transform: translateY(-2px);
+      color: #ffffff;
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
     }
 
     .container {
       max-width: 1000px;
       margin: 0 auto;
-      padding: 100px 20px 40px;
+      padding: 120px 20px 40px;
       position: relative;
       z-index: 10;
     }
@@ -205,13 +306,13 @@
     .script-header {
       text-align: center;
       margin-bottom: 40px;
-      animation: slideDown 1s ease-out;
+      animation: fadeInUp 1.2s ease-out;
     }
 
-    @keyframes slideDown {
+    @keyframes fadeInUp {
       from {
         opacity: 0;
-        transform: translateY(-30px);
+        transform: translateY(50px);
       }
       to {
         opacity: 1;
@@ -226,11 +327,12 @@
       border-radius: 15px;
       margin: 0 auto 20px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      background: linear-gradient(135deg, #7209b7 0%, #ff6b9d 50%, #ff9f43 100%);
     }
 
     .script-game {
       font-size: 14px;
-      color: #ff4757;
+      color: #7209b7;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 1px;
@@ -238,18 +340,19 @@
     }
 
     .script-title {
-      font-size: 36px;
+      font-size: 48px;
       font-weight: 800;
-      background: linear-gradient(135deg, #ff4757, #00d2ff, #ff6b9d, #7209b7);
+      background: linear-gradient(90deg, #ffffff 0%, #9c88ff 100%);
       background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       margin-bottom: 15px;
+      letter-spacing: -1px;
     }
 
     .script-description {
       font-size: 18px;
-      color: #aaa;
+      color: #ccc;
       line-height: 1.6;
       max-width: 600px;
       margin: 0 auto;
@@ -260,24 +363,13 @@
       grid-template-columns: 1.5fr 1fr;
       gap: 30px;
       margin-bottom: 40px;
-      animation: slideUp 1s ease-out 0.3s both;
+      animation: fadeInUp 1.2s ease-out 0.6s both;
       align-items: start;
     }
 
-    @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
     .features-section, .script-section {
-      background: rgba(10, 10, 10, 0.95);
-      backdrop-filter: blur(30px);
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 20px;
       padding: 30px;
@@ -285,34 +377,11 @@
       height: fit-content;
     }
 
-    .features-section::before, .script-section::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      border-radius: 20px;
-      padding: 1px;
-      background: linear-gradient(45deg, 
-        rgba(255, 71, 87, 0.3) 0%, 
-        rgba(0, 210, 255, 0.3) 25%, 
-        transparent 50%, 
-        rgba(255, 107, 157, 0.3) 75%, 
-        rgba(114, 9, 183, 0.3) 100%);
-      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      mask-composite: exclude;
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      opacity: 0.6;
-      pointer-events: none;
-    }
-
     .section-title {
       font-size: 24px;
       font-weight: 700;
       margin-bottom: 20px;
-      background: linear-gradient(135deg, #ff4757, #00d2ff);
+      background: linear-gradient(90deg, #ffffff 0%, #9c88ff 100%);
       background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -336,27 +405,69 @@
     }
 
     .feature-icon {
-      color: #ff4757;
+      color: #7209b7;
       font-weight: bold;
     }
 
+    .script-code-wrapper {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
     .script-code {
-      background: rgba(5, 5, 5, 0.8);
+      background: rgba(0, 0, 0, 0.8);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 12px;
       padding: 20px;
       font-family: 'Consolas', 'Monaco', monospace;
       font-size: 13px;
-      line-height: 1.4;
+      line-height: 1.6;
       color: #e8e8e8;
       white-space: pre-wrap;
       overflow-x: auto;
-      margin-bottom: 20px;
       max-height: 300px;
       overflow-y: auto;
       word-break: break-all;
       min-height: 80px;
     }
+
+    .script-code-wrapper:hover .code-copy-btn {
+      opacity: 1;
+      transform: translate(0, 0);
+    }
+
+    .code-copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(114, 9, 183, 0.8);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      opacity: 0;
+      transform: translate(10px, -10px);
+      backdrop-filter: blur(10px);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .code-copy-btn:hover {
+      background: rgba(114, 9, 183, 1);
+      transform: translate(0, -2px);
+    }
+
+    /* Lua syntax highlighting */
+    .lua-keyword { color: #ff79c6; font-weight: 600; }
+    .lua-string { color: #f1fa8c; }
+    .lua-comment { color: #6272a4; font-style: italic; }
+    .lua-number { color: #bd93f9; }
+    .lua-function { color: #8be9fd; }
+    .lua-boolean { color: #ffb86c; }
+    .lua-builtin { color: #50fa7b; }
 
     .script-actions {
       display: flex;
@@ -368,7 +479,7 @@
     }
 
     .action-btn {
-      padding: 12px 20px;
+      padding: 14px 20px;
       border: none;
       border-radius: 12px;
       font-weight: 600;
@@ -381,39 +492,40 @@
       z-index: 51;
       width: 100%;
       display: block;
+      font-family: 'Inter', sans-serif;
     }
 
     .copy-btn {
       background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
       color: white;
-      box-shadow: 0 8px 25px rgba(46, 204, 113, 0.3);
+      box-shadow: 0 10px 25px rgba(46, 204, 113, 0.3);
     }
 
     .copy-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 35px rgba(46, 204, 113, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 15px 35px rgba(46, 204, 113, 0.4);
     }
 
     .key-btn {
-      background: linear-gradient(135deg, #ff4757 0%, #ff6b9d 100%);
+      background: linear-gradient(135deg, #7209b7 0%, #ff9f43 100%);
       color: white;
-      box-shadow: 0 8px 25px rgba(255, 71, 87, 0.3);
+      box-shadow: 0 10px 25px rgba(114, 9, 183, 0.3);
     }
 
     .key-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 35px rgba(255, 71, 87, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 15px 35px rgba(114, 9, 183, 0.4);
     }
 
     .game-link-btn {
-      background: linear-gradient(135deg, #00d2ff 0%, #7209b7 100%);
+      background: linear-gradient(135deg, #5865f2 0%, #4752c4 100%);
       color: white;
-      box-shadow: 0 8px 25px rgba(0, 210, 255, 0.3);
+      box-shadow: 0 10px 25px rgba(88, 101, 242, 0.3);
     }
 
     .game-link-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 35px rgba(0, 210, 255, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 15px 35px rgba(88, 101, 242, 0.4);
     }
 
     .status-message {
@@ -426,6 +538,7 @@
       z-index: 200;
       transform: translateX(400px);
       transition: all 0.3s ease;
+      font-family: 'Inter', sans-serif;
     }
 
     .status-message.show {
@@ -447,7 +560,7 @@
     .loading {
       text-align: center;
       padding: 60px 20px;
-      color: #666;
+      color: #888;
     }
 
     .loading-spinner {
@@ -456,7 +569,7 @@
       height: 40px;
       border: 4px solid rgba(255, 255, 255, 0.1);
       border-radius: 50%;
-      border-top: 4px solid #ff4757;
+      border-top: 4px solid #7209b7;
       animation: spin 1s linear infinite;
       margin-bottom: 20px;
     }
@@ -469,7 +582,7 @@
     .error-state {
       text-align: center;
       padding: 60px 20px;
-      color: #666;
+      color: #888;
     }
 
     .error-icon {
@@ -478,20 +591,75 @@
       opacity: 0.5;
     }
 
+    .back-btn {
+      background: rgba(114, 9, 183, 0.2);
+      color: #9c88ff;
+      border: 1px solid rgba(114, 9, 183, 0.3);
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: inline-block;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .back-btn:hover {
+      background: rgba(114, 9, 183, 0.3);
+      transform: translateY(-2px);
+    }
+
     @media (max-width: 768px) {
+      .navbar {
+        top: 25px;
+        left: 10px;
+        right: 10px;
+        width: auto;
+        transform: none;
+        padding: 16px 18px;
+        animation: slideInDownMobile 0.8s ease-out;
+      }
+
+      .navbar.scrolled {
+        top: 20px;
+      }
+
+      .navbar.scrolled:hover {
+        top: 20px;
+      }
+
+      .navbar:hover {
+        background: rgba(0, 0, 0, 0.6);
+        border-color: rgba(255, 255, 255, 0.4);
+        transform: none;
+      }
+
       .nav-content {
-        flex-direction: column;
+        justify-content: space-between;
         gap: 15px;
       }
 
       .nav-links {
-        gap: 20px;
-        flex-wrap: wrap;
-        justify-content: center;
+        gap: 15px;
+      }
+
+      .nav-link {
+        font-size: 12px;
+        padding: 6px 10px;
+      }
+
+      .nav-logo {
+        font-size: 20px;
+        gap: 8px;
+      }
+
+      .nav-logo-img {
+        width: 24px;
+        height: 24px;
       }
 
       .script-title {
-        font-size: 28px;
+        font-size: 32px;
       }
 
       .script-content {
@@ -519,6 +687,32 @@
         transform: translateY(0);
       }
     }
+
+    @media (max-width: 480px) {
+      .nav-links {
+        gap: 10px;
+      }
+
+      .nav-link {
+        font-size: 11px;
+        padding: 5px 8px;
+      }
+
+      .navbar {
+        left: 10px;
+        right: 10px;
+        padding: 10px 15px;
+        top: 30px;
+      }
+
+      .navbar.scrolled {
+        top: 25px;
+      }
+
+      .navbar.scrolled:hover {
+        top: 25px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -527,16 +721,21 @@
     <div class="light light-2"></div>
     <div class="light light-3"></div>
     <div class="light light-4"></div>
+    <div class="light light-5"></div>
+    <div class="light light-6"></div>
+    <div class="light light-7"></div>
   </div>
+
+  <div class="particles" id="particles"></div>
 
   <nav class="navbar">
     <div class="nav-content">
       <a href="/" class="nav-logo">
-        <img src="https://i.imgur.com/ePueN25.png" alt="Vadrifts" class="nav-logo-img">
+        <img src="https://i.imgur.com/ePueN25.png" alt="Vadrifts Logo" class="nav-logo-img">
         Vadrifts
       </a>
       <div class="nav-links">
-        <a href="/" class="back-btn">← Back to Scripts</a>
+        <a href="/scripts" class="nav-link">Scripts</a>
         <a href="/converter" class="nav-link">Image Converter</a>
       </div>
     </div>
@@ -553,7 +752,7 @@
       <h3>Script not found</h3>
       <p>The script you're looking for doesn't exist or has been removed.</p>
       <br>
-      <a href="/" class="back-btn">← Back to Scripts</a>
+      <a href="/scripts" class="back-btn">← Back to Scripts</a>
     </div>
 
     <div id="scriptContent" style="display: none;">
@@ -572,7 +771,10 @@
 
         <div class="script-section">
           <h2 class="section-title">📜 Script Code</h2>
-          <div id="scriptCode" class="script-code"></div>
+          <div class="script-code-wrapper">
+            <div id="scriptCode" class="script-code"></div>
+            <button class="code-copy-btn" onclick="copyScript()">Copy</button>
+          </div>
           
           <div class="script-actions">
             <button class="action-btn copy-btn" onclick="copyScript()">
@@ -595,6 +797,50 @@
   <script>
     let currentScript = null;
     let currentScriptId = null;
+
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      const particleCount = 15;
+
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = -Math.random() * 15 + 's';
+        particle.style.animationDuration = (15 + Math.random() * 5) + 's';
+        particlesContainer.appendChild(particle);
+      }
+    }
+
+    function highlightLua(code) {
+      if (!code) return '';
+      
+      // Keywords
+      const keywords = /\b(local|function|end|if|then|else|elseif|for|while|do|repeat|until|return|break|true|false|nil|and|or|not|in)\b/g;
+      const builtins = /\b(game|workspace|script|wait|print|warn|error|spawn|loadstring|getfenv|setfenv|require|pairs|ipairs|next|tostring|tonumber|type|pcall|xpcall|assert|Vector3|CFrame|Instance|Color3|UDim2|math|string|table|coroutine|os)\b/g;
+      const strings = /(["'])(?:(?=(\\?))\2.)*?\1/g;
+      const comments = /(--.*$)/gm;
+      const numbers = /\b(\d+\.?\d*)\b/g;
+      const functions = /\b(\w+)\s*(?=KATEX_INLINE_OPEN)/g;
+      const booleans = /\b(true|false)\b/g;
+      
+      // Apply highlighting
+      let highlighted = code
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+      
+      // Order matters - do strings and comments first
+      highlighted = highlighted.replace(strings, '<span class="lua-string">$&</span>');
+      highlighted = highlighted.replace(comments, '<span class="lua-comment">$&</span>');
+      highlighted = highlighted.replace(keywords, '<span class="lua-keyword">$&</span>');
+      highlighted = highlighted.replace(builtins, '<span class="lua-builtin">$&</span>');
+      highlighted = highlighted.replace(booleans, '<span class="lua-boolean">$&</span>');
+      highlighted = highlighted.replace(numbers, '<span class="lua-number">$&</span>');
+      highlighted = highlighted.replace(functions, '<span class="lua-function">$1</span>(');
+      
+      return highlighted;
+    }
 
     function getScriptIdFromURL() {
       const pathParts = window.location.pathname.split('/');
@@ -625,42 +871,44 @@
     }
 
     function displayScript(script) {
-    document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('scriptContent').style.display = 'block';
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('scriptContent').style.display = 'block';
   
-    document.getElementById('pageTitle').textContent = `${script.title} - Vadrifts`;
-    document.getElementById('scriptThumbnail').src = script.thumbnail;
-    document.getElementById('scriptThumbnail').alt = script.title;
-    document.getElementById('scriptGame').textContent = script.game;
-    document.getElementById('scriptTitle').textContent = script.title;
-    document.getElementById('scriptDescription').textContent = script.description;
-    document.getElementById('scriptCode').textContent = script.script;
+      document.getElementById('pageTitle').textContent = `${script.title} - Vadrifts`;
+      document.getElementById('scriptThumbnail').src = script.thumbnail;
+      document.getElementById('scriptThumbnail').alt = script.title;
+      document.getElementById('scriptGame').textContent = script.game;
+      document.getElementById('scriptTitle').textContent = script.title;
+      document.getElementById('scriptDescription').textContent = script.description;
+
+      const scriptCodeEl = document.getElementById('scriptCode');
+      scriptCodeEl.innerHTML = highlightLua(script.script);
   
-    const keyButton = document.getElementById('keyLink');
+      const keyButton = document.getElementById('keyLink');
   
-    if (script.key_type === 'no-key') {
+      if (script.key_type === 'no-key') {
         keyButton.style.display = 'none';
-    } else if (script.key_type === 'discord') {
+      } else if (script.key_type === 'discord') {
         keyButton.style.display = 'block';
         keyButton.onclick = (e) => {
-        e.preventDefault();
-        window.open(script.key_link, '_blank');
+          e.preventDefault();
+          window.open(script.key_link, '_blank');
         };
-    } else {
+      } else {
         keyButton.style.display = 'block';
         keyButton.onclick = (e) => {
-        e.preventDefault();
-        goToKeySystem();
+          e.preventDefault();
+          goToKeySystem();
         };
-    }
+      }
   
-    const featuresList = document.getElementById('featuresList');
-    featuresList.innerHTML = script.features.map(feature => `
+      const featuresList = document.getElementById('featuresList');
+      featuresList.innerHTML = script.features.map(feature => `
         <li class="feature-item">
-        <span class="feature-icon">✓</span>
-        <span>${feature}</span>
-     </li>
-    `).join('');
+          <span class="feature-icon">✓</span>
+          <span>${feature}</span>
+        </li>
+      `).join('');
     }
 
     function goToKeySystem() {
@@ -720,6 +968,21 @@
       }, 3000);
     }
 
+    let lastScrollTop = 0;
+    window.addEventListener('scroll', function() {
+      let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const navbar = document.querySelector('.navbar');
+      
+      if (scrollTop > 100) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+      
+      lastScrollTop = scrollTop;
+    });
+
+    createParticles();
     document.addEventListener('DOMContentLoaded', loadScript);
   </script>
 </body>
