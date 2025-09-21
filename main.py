@@ -269,12 +269,10 @@ async def send_good_boy_after_delay(user_id, channel):
 async def on_message(message):
     if message.author == bot.user:
         return
-    
-    # Check for "meow" in any channel
+
     if "meow" in message.content.lower():
         await message.channel.send("meow")
     
-    # Original boost detection for specific channel
     if message.channel.id == TARGET_CHANNEL_ID:
         if "just boosted the server!" in message.content.lower():
             user_id = message.author.id
@@ -443,15 +441,13 @@ def home():
         meta_tags = '''
     <meta property="og:title" content="Vadrifts - Roblox Scripts & Tools">
     <meta property="og:description" content="Vadrift's all-in-one website! Check out everything made by Vadrifts such as Discord server, Image converter, Roblox Scripts and More!!">
-    <meta property="og:image" content="https://i.imgur.com/PIHDQJf.png">
-    <meta property="og:url" content="https://vadrifts.onrender.com/">
+    <meta property="og:url" content="https://vadrifts.onrender.com">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Vadrifts">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Vadrifts - Roblox Scripts & Tools">
     <meta name="twitter:description" content="Vadrift's all-in-one website! Check out everything made by Vadrifts such as Discord server, Image converter, Roblox Scripts and More!!">
-    <meta name="twitter:image" content="https://i.imgur.com/PIHDQJf.png">
-    <meta name="theme-color" content="#7289DA">'''
+    <meta name="theme-color" content="#9c88ff">'''
         
         return inject_meta_tags(html_content, meta_tags)
     except FileNotFoundError:
@@ -476,15 +472,13 @@ def scripts_page():
         meta_tags = '''
     <meta property="og:title" content="Vadrifts Scripts - Collection">
     <meta property="og:description" content="Check out our collection of all Vadrifts Scripts we've released! Discover powerful tools and exploits for your favorite games.">
-    <meta property="og:image" content="https://i.imgur.com/PIHDQJf.png">
     <meta property="og:url" content="https://vadrifts.onrender.com/scripts">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Vadrifts">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Vadrifts Scripts - Collection">
     <meta name="twitter:description" content="Check out our collection of all Vadrifts Scripts we've released! Discover powerful tools and exploits for your favorite games.">
-    <meta name="twitter:image" content="https://i.imgur.com/PIHDQJf.png">
-    <meta name="theme-color" content="#7289DA">'''
+    <meta name="theme-color" content="#9c88ff">'''
         
         return inject_meta_tags(html_content, meta_tags)
     except FileNotFoundError:
