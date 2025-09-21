@@ -226,6 +226,18 @@
       }
     }
 
+    /* Mobile animation keyframe */
+    @keyframes slideInDownMobile {
+      from {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     .nav-content {
       display: flex;
       align-items: center;
@@ -1477,10 +1489,12 @@
     @media (max-width: 768px) {
       .navbar {
         top: 25px;
-        right: 10px;
         left: 10px;
+        right: 10px;
+        width: auto;
+        transform: none;
         padding: 16px 18px;
-        width: calc(100% - 20px);
+        animation: slideInDownMobile 0.8s ease-out;
       }
 
       .navbar.scrolled {
@@ -1488,7 +1502,13 @@
       }
 
       .navbar.scrolled:hover {
-        top: 25px;
+        top: 20px;
+      }
+
+      .navbar:hover {
+        background: rgba(0, 0, 0, 0.6);
+        border-color: rgba(255, 255, 255, 0.4);
+        transform: none;
       }
 
       .nav-content {
@@ -1670,6 +1690,8 @@
       }
 
       .navbar {
+        left: 10px;
+        right: 10px;
         padding: 10px 15px;
         top: 30px;
       }
@@ -1679,7 +1701,7 @@
       }
 
       .navbar.scrolled:hover {
-        top: 30px;
+        top: 25px;
       }
 
       .faq-question {
