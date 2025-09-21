@@ -150,6 +150,22 @@ class YouTubeChannelFinder:
             logger.error(f"Error extracting channel data: {e}")
             return None
     
+    def extract_channel_name(self, html_content):
+        patterns = [
+            r'"channelMetadataRenderer":{"title":"([^"]+)"',
+            r'<meta property="og:title" content="([^"]+)"',
+            r'"title":"([^"]+)","navigationEndpoint"',
+            r'<title>([^<]+)</title>'
+        ]
+        
+        for pattern in patterns:
+            match = re.search(pattern, html_content)
+            if match:
+                name = match.group(1).strip()
+                if name and name != 'YouTube':
+                    return name
+        return None
+    
     def extract_profile_picture(self, html_content):
         patterns = [
             r'"avatar":{"thumbnails":\[{"url":"([^"]+)"[^}]*"width":176',
@@ -176,46 +192,46 @@ class YouTubeChannelFinder:
         
         return None
     
-def search_for_channel(self, username):
-    try:
-        search_url = f"https://www.youtube.com/results?search_query={quote_plus(username)}&sp=EgIQAg%253D%253D"
-        response = self.session.get(search_url, timeout=10)
+    def search_for_channel(self, username):
+        try:
+            search_url = f"https://www.youtube.com/results?search_query={quote_plus(username)}&sp=EgIQAg%253D%253D"
+            response = self.session.get(search_url, timeout=10)
+            
+            if response.status_code == 200:
+                channel_links = re.findall(r'"url":"(/channel/[^"]+)"', response.text)
+                handle_links = re.findall(r'"url":"(/@[^"]+)"', response.text)
+                
+                all_links = []
+                for link in channel_links + handle_links:
+                    if link.startswith('/'):
+                        all_links.append(f"https://www.youtube.com{link}")
+                
+                for link in all_links[:3]:
+                    try:
+                        channel_response = self.session.get(link, timeout=10)
+                        if channel_response.status_code == 200:
+                            channel_data = self.extract_channel_data(channel_response.text, link, username)
+                            if channel_data and channel_data.get('pfp_url'):
+                                return channel_data
+                    except:
+                        continue
+        except Exception as e:
+            logger.error(f"Search failed for {username}: {e}")
         
-        if response.status_code == 200:
-            channel_links = re.findall(r'"url":"(/channel/[^"]+)"', response.text)
-            handle_links = re.findall(r'"url":"(/@[^"]+)"', response.text)
-            
-            all_links = []
-            for link in channel_links + handle_links:
-                if link.startswith('/'):
-                    all_links.append(f"https://www.youtube.com{link}")
-            
-            for link in all_links[:3]:
-                try:
-                    channel_response = self.session.get(link, timeout=10)
-                    if channel_response.status_code == 200:
-                        channel_data = self.extract_channel_data(channel_response.text, link, username)
-                        if channel_data and channel_data.get('pfp_url'):
-                            return channel_data
-                except:
-                    continue
-    except Exception as e:
-        logger.error(f"Search failed for {username}: {e}")
+        return None
     
-    return None
-
-def validate_image_url(self, url):
-    try:
-        if not url or not url.startswith('http'):
+    def validate_image_url(self, url):
+        try:
+            if not url or not url.startswith('http'):
+                return False
+            
+            response = self.session.head(url, timeout=5)
+            content_type = response.headers.get('content-type', '').lower()
+            
+            return (response.status_code == 200 and 
+                    ('image' in content_type or url.endswith(('.jpg', '.jpeg', '.png', '.webp'))))
+        except:
             return False
-        
-        response = self.session.head(url, timeout=5)
-        content_type = response.headers.get('content-type', '').lower()
-        
-        return (response.status_code == 200 and 
-                ('image' in content_type or url.endswith(('.jpg', '.jpeg', '.png', '.webp'))))
-    except:
-        return False
 
 youtube_finder = YouTubeChannelFinder()
 
@@ -269,10 +285,12 @@ async def send_good_boy_after_delay(user_id, channel):
 async def on_message(message):
     if message.author == bot.user:
         return
-
+    
+    # Check for "meow" in any channel
     if "meow" in message.content.lower():
         await message.channel.send("meow")
     
+    # Original boost detection for specific channel
     if message.channel.id == TARGET_CHANNEL_ID:
         if "just boosted the server!" in message.content.lower():
             user_id = message.author.id
@@ -372,7 +390,7 @@ scripts_data = [
         "title": "Horrific Housing Script",
         "game": "Horrific Housing",
         "thumbnail": "https://tr.rbxcdn.com/180DAY-8598e6c1626e3ccf16eb8b3acbd618fe/768/432/Image/Webp/noFilter",
-        "description": "Best keyless Horrific Housing script with tons of features!",
+                "description": "Best keyless Horrific Housing script with tons of features!",
         "features": [
             "Keyless",
             "Mobile Friendly", 
@@ -834,7 +852,7 @@ def bypass_status_webpage():
             }
             h1 {
                 text-align: center;
-                color: #7289DA;
+                color: #9c88ff;
             }
             .status-grid {
                 display: grid;
@@ -847,9 +865,10 @@ def bypass_status_webpage():
                 border-radius: 10px;
                 border: 2px solid #3a3a3a;
             }
+            .category-name {
                 font-size: 20px;
                 font-weight: bold;
-                color: #7289DA;
+                color: #9c88ff;
                 margin-bottom: 10px;
             }
             .success-rate {
