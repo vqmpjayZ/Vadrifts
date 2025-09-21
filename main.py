@@ -548,7 +548,7 @@ def script_detail(script_id):
     <meta name="twitter:title" content="{script['title']} - Vadrifts">
     <meta name="twitter:description" content="{script['description']}">
     <meta name="twitter:image" content="{script['thumbnail']}">
-    <meta name="theme-color" content="#7289DA">'''
+    <meta name="theme-color" content="#9c88ff">'''
         
         return inject_meta_tags(html_content, meta_tags)
     except FileNotFoundError:
@@ -847,7 +847,6 @@ def bypass_status_webpage():
                 border-radius: 10px;
                 border: 2px solid #3a3a3a;
             }
-            .category-name {
                 font-size: 20px;
                 font-weight: bold;
                 color: #7289DA;
