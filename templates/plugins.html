@@ -1303,7 +1303,7 @@
     Plugin created successfully!
   </div>
 
-  <script>
+ <script>
     let plugins = [];
     let sections = {};
     let sectionIdCounter = 0;
@@ -1341,17 +1341,70 @@
       });
     }
 
+    function getLucideIcon(iconName) {
+      const iconMap = {
+        'shield': lucide.Shield,
+        'swords': lucide.Swords,
+        'star': lucide.Star,
+        'heart': lucide.Heart,
+        'flame': lucide.Flame,
+        'zap': lucide.Zap,
+        'crown': lucide.Crown,
+        'gem': lucide.Gem,
+        'rocket': lucide.Rocket,
+        'sparkles': lucide.Sparkles,
+        'settings': lucide.Settings,
+        'code': lucide.Code,
+        'skull': lucide.Skull,
+        'bomb': lucide.Bomb,
+        'flag': lucide.Flag,
+        'target': lucide.Target,
+        'lock': lucide.Lock,
+        'unlock': lucide.Unlock,
+        'eye': lucide.Eye,
+        'eye-off': lucide.EyeOff,
+        'user': lucide.User,
+        'users': lucide.Users,
+        'gamepad-2': lucide.Gamepad2,
+        'trophy': lucide.Trophy,
+        'award': lucide.Award,
+        'terminal': lucide.Terminal,
+        'database': lucide.Database,
+        'server': lucide.Server,
+        'cpu': lucide.Cpu,
+        'wifi': lucide.Wifi,
+        'cloud': lucide.Cloud,
+        'download': lucide.Download,
+        'upload': lucide.Upload,
+        'package': lucide.Package,
+        'box': lucide.Box,
+        'layers': lucide.Layers,
+        'grid-3x3': lucide.Grid3x3
+      };
+      
+      return iconMap[iconName] || lucide.Box;
+    }
+
+    function createLucideIconElement(iconName) {
+      const IconClass = getLucideIcon(iconName);
+      if (IconClass) {
+        return lucide.createElement(IconClass);
+      }
+      return null;
+    }
+
     function updateIconPreview() {
       const select = document.getElementById('pluginIcon');
       const preview = document.getElementById('iconPreview');
       const iconName = select.value;
       
+      preview.innerHTML = '';
+      
       if (iconName) {
-        const icon = lucide.createElement(lucide[iconName] || lucide.Box);
-        preview.innerHTML = '';
-        preview.appendChild(icon);
-      } else {
-        preview.innerHTML = '';
+        const icon = createLucideIconElement(iconName);
+        if (icon) {
+          preview.appendChild(icon);
+        }
       }
     }
 
@@ -1440,8 +1493,8 @@
                 </button>
               </div>
             ` : ''}
-            <div class="plugin-icon">
-              ${plugin.icon ? createLucideIcon(plugin.icon) : '📦'}
+            <div class="plugin-icon" data-icon="${plugin.icon || ''}">
+              📦
             </div>
             <h3 class="plugin-title">${escapeHtml(plugin.name)}</h3>
             <div class="plugin-author">by ${escapeHtml(plugin.author || 'Anonymous')}</div>
@@ -1471,15 +1524,18 @@
           </div>
         `;
       }).join('');
-    }
 
-    function createLucideIcon(iconName) {
-      const iconElement = document.createElement('div');
-      const icon = lucide.createElement(lucide[iconName] || lucide.Box);
-      if (icon) {
-        return icon.outerHTML;
-      }
-      return '📦';
+      // Now render all the Lucide icons
+      document.querySelectorAll('.plugin-icon[data-icon]').forEach(container => {
+        const iconName = container.getAttribute('data-icon');
+        if (iconName) {
+          const icon = createLucideIconElement(iconName);
+          if (icon) {
+            container.innerHTML = '';
+            container.appendChild(icon);
+          }
+        }
+      });
     }
 
     function handleSearch(e) {
@@ -1774,7 +1830,7 @@
           <div class="detail-row">
             <span class="detail-label">Icon</span>
             <span class="detail-value" style="display: flex; align-items: center; gap: 8px;">
-              ${createLucideIcon(plugin.icon)} ${plugin.icon}
+              <span data-detail-icon="${plugin.icon}"></span> ${plugin.icon}
             </span>
           </div>
           ` : ''}
@@ -1807,6 +1863,16 @@
           <pre id="pluginCode">${generatePluginCode(plugin)}</pre>
         </div>
       `;
+      
+      // Render icon in detail view
+      const detailIcon = document.querySelector('[data-detail-icon]');
+      if (detailIcon) {
+        const iconName = detailIcon.getAttribute('data-detail-icon');
+        const icon = createLucideIconElement(iconName);
+        if (icon) {
+          detailIcon.appendChild(icon);
+        }
+      }
       
       document.getElementById('viewModal').classList.add('active');
     }
