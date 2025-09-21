@@ -708,7 +708,7 @@ def convert_image():
 def get_plugins():
     sorted_plugins = sorted(plugins_data, key=lambda x: x.get('created_at', ''), reverse=True)
     return jsonify(sorted_plugins[:50])
-
+    
 @app.route('/api/plugins', methods=['POST'])
 def create_plugin():
     try:
@@ -763,7 +763,7 @@ def create_plugin():
     except Exception as e:
         logger.error(f"Error creating plugin: {e}")
         return jsonify({"error": "Failed to create plugin"}), 500
-
+        
 @app.route('/api/plugins/<plugin_id>', methods=['GET'])
 def get_plugin(plugin_id):
     plugin = next((p for p in plugins_data if p['id'] == plugin_id), None)
@@ -773,6 +773,21 @@ def get_plugin(plugin_id):
         return jsonify(plugin)
     return jsonify({"error": "Plugin not found"}), 404
 
+@app.route('/api/plugins/<plugin_id>', methods=['DELETE'])
+def delete_plugin(plugin_id):
+    global plugins_data
+    
+    client_ip = request.remote_addr
+    
+    plugin = next((p for p in plugins_data if p['id'] == plugin_id), None)
+    if not plugin:
+        return jsonify({"error": "Plugin not found"}), 404
+    
+    plugins_data = [p for p in plugins_data if p['id'] != plugin_id]
+    save_plugins_to_file()
+    
+    return jsonify({"message": "Plugin deleted successfully"}), 200
+    
 @app.route('/plugin/<plugin_id>')
 def plugin_detail(plugin_id):
     plugin = next((p for p in plugins_data if p['id'] == plugin_id), None)
