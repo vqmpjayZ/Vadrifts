@@ -1344,13 +1344,10 @@
     let editingPlugin = null;
     let myPlugins = JSON.parse(localStorage.getItem('myPlugins') || '[]');
     
-    // Generate a unique session ID for this browser session
-    const sessionId = 'session_' + Math.random().toString(36).substring(2, 15);
-    
     function init() {
       createParticles();
-      loadPlugins();
       setupEventListeners();
+      loadPlugins();
     }
 
     function createParticles() {
@@ -1492,16 +1489,18 @@
         const response = await fetch('/api/plugins');
         if (response.ok) {
           plugins = await response.json();
-          displayPlugins(plugins);
           
-          // Save to localStorage as a backup
+          // Save to persistent storage for redeployment resilience
           localStorage.setItem('vadriftsPlugins', JSON.stringify(plugins));
+          
+          displayPlugins(plugins);
         } else {
-          throw new Error('Failed to fetch plugins from API');
+          throw new Error('Failed to load plugins from API');
         }
       } catch (error) {
         console.error('API Error:', error);
-        // Try to load from localStorage as fallback
+        
+        // Try loading from local storage if API fails
         const savedPlugins = localStorage.getItem('vadriftsPlugins');
         if (savedPlugins) {
           plugins = JSON.parse(savedPlugins);
@@ -1509,6 +1508,7 @@
           showToast('Using cached plugins due to server error', 'error');
         } else {
           showToast('Could not load plugins. Please try again later.', 'error');
+          displayPlugins([]);
         }
       }
     }
@@ -1597,15 +1597,6 @@
     }
 
     function openCreateModal() {
-      // Use session-specific rate limiting instead of global
-      const sessionPluginData = JSON.parse(localStorage.getItem(`pluginData_${sessionId}`) || '{"count": 0, "lastCreate": 0}');
-      const now = Date.now();
-      
-      // If it's been more than 5 minutes since last creation, reset the counter
-      if (now - sessionPluginData.lastCreate > 5 * 60 * 1000) {
-        sessionPluginData.count = 0;
-      }
-      
       resetForm();
       document.getElementById('modalTitle').textContent = 'Create New Plugin';
       document.getElementById('submitBtn').textContent = 'Create Plugin';
@@ -1779,11 +1770,10 @@
         });
         
         if (response.ok) {
-          // Update both server and client-side data
+          // Update client-side data
           myPlugins = myPlugins.filter(id => id !== pluginId);
           localStorage.setItem('myPlugins', JSON.stringify(myPlugins));
           
-          // Update the plugins list locally
           plugins = plugins.filter(p => p.id !== pluginId);
           localStorage.setItem('vadriftsPlugins', JSON.stringify(plugins));
           
@@ -1794,7 +1784,7 @@
         }
       } catch (error) {
         console.error('Error:', error);
-        showToast('Failed to delete plugin from server. Refreshing might be needed.', 'error');
+        showToast('Failed to delete plugin. Please try again.', 'error');
       }
     }
 
@@ -1824,23 +1814,6 @@
       });
       
       try {
-        // Check rate limit before proceeding (for new plugin creation only)
-        if (!isEditing) {
-          // Use session-specific rate limiting
-          const sessionPluginData = JSON.parse(localStorage.getItem(`pluginData_${sessionId}`) || '{"count": 0, "lastCreate": 0}');
-          const now = Date.now();
-          
-          // If creating too many plugins too quickly
-          if (sessionPluginData.count >= 8) {
-            throw new Error("You're creating plugins too quickly. Please try again later.");
-          }
-          
-          // Update session data
-          sessionPluginData.count++;
-          sessionPluginData.lastCreate = now;
-          localStorage.setItem(`pluginData_${sessionId}`, JSON.stringify(sessionPluginData));
-        }
-        
         const url = isEditing ? `/api/plugins/${isEditing}` : '/api/plugins';
         const method = isEditing ? 'PUT' : 'POST';
         
@@ -1852,13 +1825,17 @@
           body: JSON.stringify(pluginData)
         });
         
+        if (response.status === 429) {
+          throw new Error("Rate limit exceeded. Please try again in a few minutes.");
+        }
+        
         if (!response.ok) {
           throw new Error(`Server error: ${response.status}`);
         }
         
         const result = await response.json();
         
-        // Update local data
+        // Update client-side data
         if (isEditing) {
           pluginData.id = isEditing;
           plugins = plugins.map(p => p.id === isEditing ? pluginData : p);
@@ -1869,7 +1846,7 @@
           localStorage.setItem('myPlugins', JSON.stringify(myPlugins));
         }
         
-        // Update local storage backup
+        // Update localStorage for persistence
         localStorage.setItem('vadriftsPlugins', JSON.stringify(plugins));
         
         showToast(isEditing ? 'Plugin updated successfully!' : 'Plugin created successfully!');
