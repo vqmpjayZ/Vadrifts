@@ -37,17 +37,17 @@ class PluginsManager:
     def get_all_plugins(self):
         sorted_plugins = sorted(self.plugins_data, key=lambda x: x.get('created_at', ''), reverse=True)
         return jsonify(sorted_plugins[:50])
-
+    
     def get_plugin_data(self, plugin_id):
-    """Get raw plugin data for display"""
-    return next((p for p in self.plugins_data if p['id'] == plugin_id), None)
+        """Get raw plugin data for display"""
+        return next((p for p in self.plugins_data if p['id'] == plugin_id), None)
     
     def create_plugin(self, request):
         try:
             data = request.get_json()
             client_ip = request.remote_addr
             now = datetime.now()
-          
+
             if client_ip in self.rate_limit_data:
                 user_data = self.rate_limit_data[client_ip]
                 time_diff = (now - user_data['last_create']).total_seconds()
@@ -70,7 +70,7 @@ class PluginsManager:
             if author and author != 'Anonymous':
                 if not re.match(r'^[a-zA-Z0-9]+$', author):
                     return jsonify({"error": "Author name can only contain letters and numbers"}), 400
-            
+
             plugin = {
                 'id': str(uuid.uuid4()),
                 'name': name,
@@ -84,7 +84,7 @@ class PluginsManager:
             }
             
             self.plugins_data.append(plugin)
-            
+
             self.rate_limit_data[client_ip]['count'] += 1
             self.rate_limit_data[client_ip]['last_create'] = now
             
