@@ -37,6 +37,10 @@ class PluginsManager:
     def get_all_plugins(self):
         sorted_plugins = sorted(self.plugins_data, key=lambda x: x.get('created_at', ''), reverse=True)
         return jsonify(sorted_plugins[:50])
+
+    def get_plugin_data(self, plugin_id):
+    """Get raw plugin data for display"""
+    return next((p for p in self.plugins_data if p['id'] == plugin_id), None)
     
     def create_plugin(self, request):
         try:
