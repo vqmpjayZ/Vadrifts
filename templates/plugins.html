@@ -1344,10 +1344,6 @@
     let editingPlugin = null;
     let myPlugins = JSON.parse(localStorage.getItem('myPlugins') || '[]');
     
-    function generateRandomId() {
-      return 'plugin_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    }
-    
     function init() {
       createParticles();
       loadPlugins();
@@ -1488,14 +1484,27 @@
       }
     }
 
-    function loadPlugins() {
-      const savedPlugins = localStorage.getItem('vadriftsPlugins');
-      if (savedPlugins) {
-        plugins = JSON.parse(savedPlugins);
-        displayPlugins(plugins);
-      } else {
-        plugins = [];
-        displayPlugins(plugins);
+    async function loadPlugins() {
+      try {
+        const savedPlugins = localStorage.getItem('vadriftsPlugins');
+        if (savedPlugins) {
+          plugins = JSON.parse(savedPlugins);
+          displayPlugins(plugins);
+        }
+        
+        const response = await fetch('/api/plugins');
+        if (response.ok) {
+          plugins = await response.json();
+          localStorage.setItem('vadriftsPlugins', JSON.stringify(plugins));
+          displayPlugins(plugins);
+        }
+      } catch (error) {
+        console.error('Failed to load plugins:', error);
+        const savedPlugins = localStorage.getItem('vadriftsPlugins');
+        if (savedPlugins) {
+          plugins = JSON.parse(savedPlugins);
+          displayPlugins(plugins);
+        }
       }
     }
 
@@ -1768,20 +1777,33 @@
       document.getElementById('createModal').classList.add('active');
     }
 
-    function deletePlugin(pluginId) {
+    async function deletePlugin(pluginId) {
       if (!confirm('Are you sure you want to delete this plugin?')) return;
       
-      plugins = plugins.filter(p => p.id !== pluginId);
-      localStorage.setItem('vadriftsPlugins', JSON.stringify(plugins));
-      
-      myPlugins = myPlugins.filter(id => id !== pluginId);
-      localStorage.setItem('myPlugins', JSON.stringify(myPlugins));
-      
-      showToast('Plugin deleted successfully!');
-      displayPlugins(plugins);
+      try {
+        const response = await fetch(`/api/plugins/${pluginId}`, {
+          method: 'DELETE'
+        });
+        
+        if (response.ok) {
+          myPlugins = myPlugins.filter(id => id !== pluginId);
+          localStorage.setItem('myPlugins', JSON.stringify(myPlugins));
+          
+          plugins = plugins.filter(p => p.id !== pluginId);
+          localStorage.setItem('vadriftsPlugins', JSON.stringify(plugins));
+          
+          showToast('Plugin deleted successfully!');
+          displayPlugins(plugins);
+        } else {
+          showToast('Failed to delete plugin', 'error');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        showToast('Failed to delete plugin', 'error');
+      }
     }
 
-    function handleSubmit(e) {
+    async function handleSubmit(e) {
       e.preventDefault();
       
       if (!validateForm()) return;
@@ -1807,26 +1829,47 @@
       });
       
       try {
-        if (isEditing) {
-          pluginData.id = isEditing;
-          plugins = plugins.map(p => p.id === isEditing ? pluginData : p);
-        } else {
-          const newId = generateRandomId();
-          pluginData.id = newId;
-          plugins.push(pluginData);
-          myPlugins.push(newId);
-          localStorage.setItem('myPlugins', JSON.stringify(myPlugins));
+        const url = isEditing ? `/api/plugins/${isEditing}` : '/api/plugins';
+        const method = isEditing ? 'PUT' : 'POST';
+        
+        const response = await fetch(url, {
+          method: method,
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(pluginData)
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
           
-          const createCount = parseInt(localStorage.getItem('pluginCreateCount') || '0') + 1;
-          localStorage.setItem('pluginCreateCount', createCount.toString());
-          localStorage.setItem('lastPluginCreate', Date.now().toString());
+          if (isEditing) {
+            pluginData.id = isEditing;
+            plugins = plugins.map(p => p.id === isEditing ? pluginData : p);
+          } else {
+            pluginData.id = result.id;
+            plugins.push(pluginData);
+            myPlugins.push(result.id);
+            localStorage.setItem('myPlugins', JSON.stringify(myPlugins));
+            
+            const createCount = parseInt(localStorage.getItem('pluginCreateCount') || '0') + 1;
+            localStorage.setItem('pluginCreateCount', createCount.toString());
+            localStorage.setItem('lastPluginCreate', Date.now().toString());
+          }
+          
+          localStorage.setItem('vadriftsPlugins', JSON.stringify(plugins));
+          
+          showToast(isEditing ? 'Plugin updated successfully!' : 'Plugin created successfully!');
+          closeCreateModal();
+          displayPlugins(plugins);
+        } else {
+          const error = await response.json();
+          if (error.error && error.error.includes('rate limit')) {
+            showToast(error.error, 'error');
+          } else {
+            throw new Error('Failed to save plugin');
+          }
         }
-        
-        localStorage.setItem('vadriftsPlugins', JSON.stringify(plugins));
-        
-        showToast(isEditing ? 'Plugin updated successfully!' : 'Plugin created successfully!');
-        closeCreateModal();
-        displayPlugins(plugins);
       } catch (error) {
         console.error('Error:', error);
         showToast('Failed to save plugin. Please try again.', 'error');
@@ -1856,10 +1899,7 @@
     }
 
     function viewPlugin(pluginId) {
-      const plugin = plugins.find(p => p.id === pluginId);
-      if (!plugin) return;
-      
-      alert(`Plugin: ${plugin.name}\nAuthor: ${plugin.author || 'Anonymous'}\n\nThis is a placeholder for viewing the plugin details page.`);
+      window.location.href = `/plugin/${pluginId}`;
     }
 
     function hideAllErrors() {
