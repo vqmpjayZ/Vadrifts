@@ -1002,6 +1002,41 @@
       display: none;
     }
 
+    .backup-restore {
+      display: flex;
+      justify-content: space-between;
+      margin: 10px 20px 30px;
+      gap: 10px;
+    }
+
+    .backup-btn, .restore-btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(40, 40, 40, 0.5);
+      color: #ccc;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .backup-btn:hover, .restore-btn:hover {
+      background: rgba(114, 9, 183, 0.2);
+      color: #fff;
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    .countdown {
+      color: #ff4b4b;
+      font-weight: 600;
+    }
+
     @media (max-width: 768px) {
       h1 {
         font-size: 48px;
@@ -1017,6 +1052,10 @@
 
       .add-bypass-btn {
         width: 100%;
+      }
+
+      .backup-restore {
+        flex-direction: column;
       }
     }
   </style>
@@ -1060,6 +1099,18 @@
       </svg>
       Create New Plugin
     </button>
+  </div>
+
+  <div class="backup-restore">
+    <button class="backup-btn" onclick="backupPlugins()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+      Backup Plugins
+    </button>
+    <button class="restore-btn" onclick="document.getElementById('fileInput').click()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+      Restore Plugins
+    </button>
+    <input type="file" id="fileInput" accept=".json" onchange="restorePlugins(this)">
   </div>
 
   <div class="search-section">
@@ -1343,11 +1394,24 @@
     let sectionIdCounter = 0;
     let editingPlugin = null;
     let myPlugins = JSON.parse(localStorage.getItem('myPlugins') || '[]');
+    let timeoutEndTime = 0;
+    let countdownInterval;
     
     function init() {
       createParticles();
       setupEventListeners();
       loadPlugins();
+      
+      // Check for timeout from localStorage
+      const storedTimeout = localStorage.getItem('pluginTimeout');
+      if (storedTimeout) {
+        const endTime = parseInt(storedTimeout);
+        if (endTime > Date.now()) {
+          timeoutEndTime = endTime;
+        } else {
+          localStorage.removeItem('pluginTimeout');
+        }
+      }
     }
 
     function createParticles() {
@@ -1389,6 +1453,12 @@
       document.getElementById('iconSearch').addEventListener('input', function(e) {
         const query = e.target.value.toLowerCase();
         filterIcons(query);
+      });
+      
+      window.addEventListener('storage', function(e) {
+        if (e.key === 'vadriftsPlugins') {
+          loadPlugins();
+        }
       });
     }
 
@@ -1483,32 +1553,103 @@
         }, 3000);
       }
     }
+    
+    function backupPlugins() {
+      try {
+        const backupData = {
+          plugins: plugins,
+          myPlugins: myPlugins,
+          timestamp: Date.now()
+        };
+        
+        const blob = new Blob([JSON.stringify(backupData)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `vadrifts_plugins_backup_${new Date().toISOString().slice(0, 10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showToast('Plugins backed up successfully!');
+      } catch (error) {
+        console.error('Backup error:', error);
+        showToast('Failed to backup plugins', 'error');
+      }
+    }
+    
+    function restorePlugins(input) {
+      if (!input.files || !input.files[0]) return;
+      
+      const file = input.files[0];
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          
+          if (!data.plugins || !data.myPlugins) {
+            throw new Error('Invalid backup file format');
+          }
+          
+          plugins = data.plugins;
+          myPlugins = data.myPlugins;
+          
+          localStorage.setItem('vadriftsPlugins', JSON.stringify(plugins));
+          localStorage.setItem('myPlugins', JSON.stringify(myPlugins));
+          
+          displayPlugins(plugins);
+          showToast('Plugins restored successfully!');
+        } catch (error) {
+          console.error('Restore error:', error);
+          showToast('Failed to restore plugins: Invalid file format', 'error');
+        }
+      };
+      
+      reader.readAsText(file);
+      input.value = ''; // Reset input for future use
+    }
 
     async function loadPlugins() {
       try {
-        const response = await fetch('/api/plugins');
-        if (response.ok) {
-          plugins = await response.json();
-          
-          // Save to persistent storage for redeployment resilience
-          localStorage.setItem('vadriftsPlugins', JSON.stringify(plugins));
-          
-          displayPlugins(plugins);
-        } else {
-          throw new Error('Failed to load plugins from API');
-        }
-      } catch (error) {
-        console.error('API Error:', error);
-        
-        // Try loading from local storage if API fails
+        // Always load from localStorage first for immediate display
         const savedPlugins = localStorage.getItem('vadriftsPlugins');
         if (savedPlugins) {
           plugins = JSON.parse(savedPlugins);
           displayPlugins(plugins);
-          showToast('Using cached plugins due to server error', 'error');
-        } else {
-          showToast('Could not load plugins. Please try again later.', 'error');
-          displayPlugins([]);
+        }
+        
+        // Then try to get from the API
+        const response = await fetch('/api/plugins');
+        if (response.ok) {
+          const apiPlugins = await response.json();
+          
+          // Merge with locally stored plugins to ensure we don't lose any
+          if (plugins.length > 0) {
+            // Create map of existing API plugins by ID
+            const apiPluginMap = apiPlugins.reduce((map, plugin) => {
+              map[plugin.id] = plugin;
+              return map;
+            }, {});
+            
+            // Add any plugins that exist locally but not in API
+            plugins.forEach(localPlugin => {
+              if (!apiPluginMap[localPlugin.id]) {
+                apiPlugins.push(localPlugin);
+              }
+            });
+          }
+          
+          plugins = apiPlugins;
+          localStorage.setItem('vadriftsPlugins', JSON.stringify(plugins));
+          displayPlugins(plugins);
+        }
+      } catch (error) {
+        console.error('API Error:', error);
+        if (!plugins.length) {
+          showToast('Could not load plugins from server. Using cached data if available.', 'error');
         }
       }
     }
@@ -1597,6 +1738,37 @@
     }
 
     function openCreateModal() {
+      const now = Date.now();
+      
+      // Check if user is in timeout
+      if (timeoutEndTime > now) {
+        const remainingSeconds = Math.ceil((timeoutEndTime - now) / 1000);
+        showToast(`You're creating plugins too fast! Wait <span class="countdown">${remainingSeconds}</span> seconds`, 'error');
+        
+        if (countdownInterval) clearInterval(countdownInterval);
+        
+        countdownInterval = setInterval(() => {
+          const remaining = Math.ceil((timeoutEndTime - Date.now()) / 1000);
+          if (remaining <= 0) {
+            clearInterval(countdownInterval);
+            timeoutEndTime = 0;
+            localStorage.removeItem('pluginTimeout');
+            
+            const toast = document.getElementById('toast');
+            if (toast.classList.contains('show')) {
+              toast.classList.remove('show');
+            }
+          } else {
+            const countdownElement = document.querySelector('.countdown');
+            if (countdownElement) {
+              countdownElement.textContent = remaining;
+            }
+          }
+        }, 1000);
+        
+        return;
+      }
+      
       resetForm();
       document.getElementById('modalTitle').textContent = 'Create New Plugin';
       document.getElementById('submitBtn').textContent = 'Create Plugin';
@@ -1769,22 +1941,18 @@
           method: 'DELETE'
         });
         
-        if (response.ok) {
-          // Update client-side data
-          myPlugins = myPlugins.filter(id => id !== pluginId);
-          localStorage.setItem('myPlugins', JSON.stringify(myPlugins));
-          
-          plugins = plugins.filter(p => p.id !== pluginId);
-          localStorage.setItem('vadriftsPlugins', JSON.stringify(plugins));
-          
-          showToast('Plugin deleted successfully!');
-          displayPlugins(plugins);
-        } else {
-          throw new Error('Server error when deleting plugin');
-        }
+        // Update client-side data regardless of server response
+        myPlugins = myPlugins.filter(id => id !== pluginId);
+        localStorage.setItem('myPlugins', JSON.stringify(myPlugins));
+        
+        plugins = plugins.filter(p => p.id !== pluginId);
+        localStorage.setItem('vadriftsPlugins', JSON.stringify(plugins));
+        
+        showToast('Plugin deleted successfully!');
+        displayPlugins(plugins);
       } catch (error) {
         console.error('Error:', error);
-        showToast('Failed to delete plugin. Please try again.', 'error');
+        showToast('Plugin deleted locally. Server may need to sync.', 'error');
       }
     }
 
@@ -1826,7 +1994,11 @@
         });
         
         if (response.status === 429) {
-          throw new Error("Rate limit exceeded. Please try again in a few minutes.");
+          // Set timeout for 60 seconds
+          timeoutEndTime = Date.now() + 60000;
+          localStorage.setItem('pluginTimeout', timeoutEndTime.toString());
+          
+          throw new Error("Rate limit exceeded. You can try again in 60 seconds.");
         }
         
         if (!response.ok) {
@@ -1881,7 +2053,16 @@
     }
 
     function viewPlugin(pluginId) {
-      window.location.href = `/plugin/${pluginId}`;
+      const plugin = plugins.find(p => p.id === pluginId);
+      if (!plugin) return;
+      
+      // This is a temporary solution until you create a proper plugin details page
+      const sections = Object.entries(plugin.sections || {})
+        .map(([name, bypasses]) => 
+          `${name}: ${bypasses.join(', ')}`
+        ).join('\n\n');
+      
+      alert(`${plugin.name}\nby ${plugin.author || 'Anonymous'}\n\n${plugin.description || 'No description'}\n\n${sections}`);
     }
 
     function hideAllErrors() {
@@ -1892,15 +2073,17 @@
 
     function showToast(message, type = 'success') {
       const toast = document.getElementById('toast');
-      toast.textContent = message;
+      toast.innerHTML = message; // Allow HTML in toast messages
       toast.className = 'toast show';
       if (type === 'error') {
         toast.classList.add('error');
       }
       
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 3000);
+      if (!message.includes('countdown')) {
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 3000);
+      }
     }
 
     function escapeHtml(text) {
