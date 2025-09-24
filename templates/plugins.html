@@ -392,6 +392,52 @@
       box-shadow: 0 20px 60px rgba(114, 9, 183, 0.3);
     }
 
+    .plugin-actions {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: none;
+      gap: 8px;
+    }
+
+    .plugin-card:hover .plugin-actions {
+      display: flex;
+    }
+
+    .action-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      border: 1px solid;
+    }
+
+    .edit-btn {
+      background: rgba(114, 9, 183, 0.2);
+      border-color: rgba(114, 9, 183, 0.3);
+      color: #9c88ff;
+    }
+
+    .edit-btn:hover {
+      background: rgba(114, 9, 183, 0.3);
+      border-color: #9c88ff;
+    }
+
+    .delete-btn {
+      background: rgba(255, 75, 75, 0.2);
+      border-color: rgba(255, 75, 75, 0.3);
+      color: #ff4b4b;
+    }
+
+    .delete-btn:hover {
+      background: rgba(255, 75, 75, 0.3);
+      border-color: #ff4b4b;
+    }
+
     .plugin-icon {
       width: 40px;
       height: 40px;
@@ -402,6 +448,11 @@
       justify-content: center;
       margin-bottom: 15px;
       color: #9c88ff;
+    }
+
+    .plugin-icon svg {
+      width: 24px;
+      height: 24px;
     }
 
     .plugin-title {
@@ -452,6 +503,7 @@
       border: 1px solid rgba(114, 9, 183, 0.5);
     }
 
+    /* Modal Styles */
     .modal {
       display: none;
       position: fixed;
@@ -528,6 +580,38 @@
       margin-bottom: 10px;
     }
 
+    .required {
+      color: #ff4b4b;
+    }
+
+    .optional {
+      color: #666;
+      font-size: 12px;
+      font-weight: 400;
+      margin-left: 5px;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .char-counter {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 11px;
+      color: #666;
+    }
+
+    .char-counter.warning {
+      color: #ff9f43;
+    }
+
+    .char-counter.error {
+      color: #ff4b4b;
+    }
+
     input, textarea, select {
       width: 100%;
       background: rgba(40, 40, 40, 0.5);
@@ -538,6 +622,140 @@
       font-size: 14px;
       font-family: 'Inter', sans-serif;
       transition: all 0.3s ease;
+    }
+
+    input.has-counter {
+      padding-right: 45px;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: #7209b7;
+      background: rgba(40, 40, 40, 0.8);
+      box-shadow: 0 0 0 3px rgba(114, 9, 183, 0.1);
+    }
+
+    .section-builder {
+      background: rgba(20, 20, 20, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .section-name-input {
+      background: rgba(40, 40, 40, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: #9c88ff;
+      font-size: 16px;
+      font-weight: 600;
+      flex: 1;
+      margin-right: 10px;
+    }
+
+    .bypasses-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 15px;
+      min-height: 40px;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+    }
+
+    .bypass-chip {
+      background: rgba(114, 9, 183, 0.2);
+      border: 1px solid rgba(114, 9, 183, 0.3);
+      color: #b8a4ff;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: chipIn 0.3s ease;
+    }
+
+    @keyframes chipIn {
+      from {
+        transform: scale(0.8);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .bypass-remove {
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+      font-size: 16px;
+    }
+
+    .bypass-remove:hover {
+      opacity: 1;
+      color: #ff4b4b;
+    }
+
+    .bypass-input-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .bypass-input {
+      flex: 1;
+    }
+
+    .add-bypass-btn {
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .add-bypass-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
+    }
+
+    .add-section-btn {
+      width: 100%;
+      background: rgba(114, 9, 183, 0.1);
+      border: 2px dashed rgba(114, 9, 183, 0.3);
+      color: #9c88ff;
+      padding: 15px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .add-section-btn:hover {
+      background: rgba(114, 9, 183, 0.2);
+      border-color: #9c88ff;
     }
 
     .submit-btn {
@@ -557,6 +775,60 @@
     .submit-btn:hover:not(:disabled) {
       transform: translateY(-2px);
       box-shadow: 0 10px 30px rgba(114, 9, 183, 0.4);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .error-message {
+      background: rgba(255, 75, 75, 0.1);
+      border: 1px solid rgba(255, 75, 75, 0.3);
+      color: #ff4b4b;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-top: 8px;
+      display: none;
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    .toast {
+      position: fixed;
+      top: 100px;
+      right: 20px;
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+      color: white;
+      padding: 16px 24px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(34, 197, 94, 0.3);
+      display: none;
+      animation: slideInRight 0.5s ease;
+      z-index: 2000;
+    }
+
+    .toast.show {
+      display: block;
+    }
+
+    .toast.error {
+      background: linear-gradient(135deg, #ff4b4b 0%, #c62828 100%);
+      box-shadow: 0 10px 30px rgba(255, 75, 75, 0.3);
+    }
+
+    @keyframes slideInRight {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
     }
 
     .empty-state {
@@ -583,6 +855,22 @@
       color: #666;
     }
 
+    .remove-section-btn {
+      background: rgba(255, 75, 75, 0.2);
+      border: 1px solid rgba(255, 75, 75, 0.3);
+      color: #ff4b4b;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .remove-section-btn:hover {
+      background: rgba(255, 75, 75, 0.3);
+      border-color: #ff4b4b;
+    }
+
     @media (max-width: 768px) {
       h1 {
         font-size: 48px;
@@ -590,6 +878,14 @@
 
       .plugins-grid {
         grid-template-columns: 1fr;
+      }
+
+      .bypass-input-group {
+        flex-direction: column;
+      }
+
+      .add-bypass-btn {
+        width: 100%;
       }
     }
   </style>
@@ -651,8 +947,8 @@
     <div class="plugins-grid" id="pluginsGrid">
       <div class="empty-state">
         <div class="empty-icon">📦</div>
-        <div class="empty-title">No plugins yet</div>
-        <div class="empty-text">Be the first to create a plugin!</div>
+        <div class="empty-title">Loading plugins...</div>
+        <div class="empty-text">Please wait</div>
       </div>
     </div>
   </div>
@@ -666,25 +962,35 @@
       </div>
       <div class="modal-body">
         <form id="pluginForm">
+          <input type="hidden" id="editingPluginId" value="">
+          
           <div class="form-group">
-            <label>Plugin Name *</label>
-            <input type="text" id="pluginName" placeholder="My Awesome Plugin" maxlength="25" required>
+            <label>Plugin Name <span class="required">*</span></label>
+            <div class="input-wrapper">
+              <input type="text" id="pluginName" placeholder="My Awesome Plugin" maxlength="25" required class="has-counter">
+              <span class="char-counter" id="nameCounter">0/25</span>
+            </div>
+            <div class="error-message" id="nameError">Plugin name is required</div>
           </div>
 
           <div class="form-group">
-            <label>Author (optional)</label>
-            <input type="text" id="pluginAuthor" placeholder="Anonymous" maxlength="20">
+            <label>Author <span class="optional">(optional)</span></label>
+            <div class="input-wrapper">
+              <input type="text" id="pluginAuthor" placeholder="Anonymous" maxlength="20" class="has-counter">
+              <span class="char-counter" id="authorCounter">0/20</span>
+            </div>
+            <div class="error-message" id="authorError">Only letters and numbers allowed</div>
           </div>
 
           <div class="form-group">
-            <label>Description (optional)</label>
+            <label>Description <span class="optional">(optional)</span></label>
             <textarea id="pluginDescription" placeholder="Describe what your plugin does..." maxlength="200"></textarea>
           </div>
 
           <div class="form-group">
-            <label>Icon (optional)</label>
+            <label>Tab Icon <span class="optional">(optional)</span></label>
             <select id="pluginIcon">
-              <option value="">No Icon</option>
+              <option value="package">Package (Default)</option>
               <option value="shield">Shield</option>
               <option value="swords">Swords</option>
               <option value="star">Star</option>
@@ -693,18 +999,54 @@
               <option value="zap">Lightning</option>
               <option value="crown">Crown</option>
               <option value="gem">Diamond</option>
+              <option value="rocket">Rocket</option>
+              <option value="sparkles">Sparkles</option>
+              <option value="settings">Settings</option>
+              <option value="code">Code</option>
+              <option value="skull">Skull</option>
+              <option value="bomb">Bomb</option>
+              <option value="flag">Flag</option>
+              <option value="target">Target</option>
+              <option value="lock">Lock</option>
+              <option value="unlock">Unlock</option>
+              <option value="eye">Eye</option>
+              <option value="eye-off">Eye Off</option>
+              <option value="user">User</option>
+              <option value="users">Users</option>
+              <option value="gamepad-2">Gamepad</option>
+              <option value="trophy">Trophy</option>
             </select>
           </div>
 
-          <button type="submit" class="submit-btn">Create Plugin</button>
+          <div class="form-group">
+            <label>Sections & Bypasses <span class="required">*</span></label>
+            <div id="sectionsContainer"></div>
+            <button type="button" class="add-section-btn" onclick="addSection()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+              </svg>
+              Add Section
+            </button>
+            <div class="error-message" id="sectionsError">At least one section with bypasses is required</div>
+          </div>
+
+          <button type="submit" class="submit-btn" id="submitBtn">Create Plugin</button>
         </form>
       </div>
     </div>
   </div>
 
+  <div class="toast" id="toast">
+    Plugin created successfully!
+  </div>
+
   <script>
     let plugins = [];
     let sections = {};
+    let sectionIdCounter = 0;
+    let editingPlugin = null;
+    let myPlugins = JSON.parse(localStorage.getItem('myPlugins') || '[]');
+    const isOwner = window.location.search.includes('owner=true');
 
     function init() {
       createParticles();
@@ -729,6 +1071,44 @@
     function setupEventListeners() {
       document.getElementById('searchInput').addEventListener('input', handleSearch);
       document.getElementById('pluginForm').addEventListener('submit', handleSubmit);
+      document.getElementById('pluginName').addEventListener('input', updateCharCounter);
+      document.getElementById('pluginAuthor').addEventListener('input', (e) => {
+        validateAuthorName(e);
+        updateCharCounter(e);
+      });
+    }
+
+    function updateCharCounter(e) {
+      const input = e.target;
+      const counterId = input.id === 'pluginName' ? 'nameCounter' : 'authorCounter';
+      const counter = document.getElementById(counterId);
+      const current = input.value.length;
+      const max = input.maxLength;
+      
+      counter.textContent = `${current}/${max}`;
+      
+      if (current === max) {
+        counter.classList.add('error');
+      } else if (current > max * 0.8) {
+        counter.classList.add('warning');
+        counter.classList.remove('error');
+      } else {
+        counter.classList.remove('warning', 'error');
+      }
+    }
+
+    function validateAuthorName(e) {
+      const input = e.target;
+      const value = input.value;
+      const regex = /^[a-zA-Z0-9]*$/;
+      
+      if (!regex.test(value)) {
+        input.value = value.replace(/[^a-zA-Z0-9]/g, '');
+        document.getElementById('authorError').classList.add('show');
+        setTimeout(() => {
+          document.getElementById('authorError').classList.remove('show');
+        }, 3000);
+      }
     }
 
     async function loadPlugins() {
@@ -749,7 +1129,7 @@
           <div class="empty-state">
             <div class="empty-icon">📦</div>
             <div class="empty-title">No plugins found</div>
-            <div class="empty-text">Try adjusting your search or create the first plugin!</div>
+            <div class="empty-text">Be the first to create a plugin!</div>
           </div>
         `;
         return;
@@ -758,13 +1138,29 @@
       grid.innerHTML = pluginsToShow.map(plugin => {
         const sectionCount = Object.keys(plugin.sections || {}).length;
         const bypassCount = Object.values(plugin.sections || {}).reduce((acc, bypasses) => acc + bypasses.length, 0);
+        const canEdit = myPlugins.includes(plugin.id) || isOwner;
 
         return `
           <div class="plugin-card" onclick="viewPlugin('${plugin.id}')">
-            <div class="plugin-icon">📦</div>
+            ${canEdit ? `
+              <div class="plugin-actions">
+                <button class="action-btn edit-btn" onclick="event.stopPropagation(); editPlugin('${plugin.id}')">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                  </svg>
+                </button>
+                <button class="action-btn delete-btn" onclick="event.stopPropagation(); deletePlugin('${plugin.id}')">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                  </svg>
+                </button>
+              </div>
+            ` : ''}
+            <div class="plugin-icon" data-icon="${plugin.icon || 'package'}"></div>
             <h3 class="plugin-title">${escapeHtml(plugin.name)}</h3>
             <div class="plugin-author">by ${escapeHtml(plugin.author || 'Anonymous')}</div>
-            <p class="plugin-description">${escapeHtml(plugin.description || 'No description')}</p>
+            <p class="plugin-description">${escapeHtml(plugin.description || 'This plugin has no description.')}</p>
             
             <div class="plugin-stats">
               <span>${sectionCount} sections</span>
@@ -780,6 +1176,15 @@
           </div>
         `;
       }).join('');
+
+      document.querySelectorAll('[data-icon]').forEach(container => {
+        const iconName = container.getAttribute('data-icon');
+        const icon = lucide.createElement(lucide[iconName] || lucide.Package);
+        if (icon) {
+          container.innerHTML = '';
+          container.appendChild(icon);
+        }
+      });
     }
 
     function handleSearch(e) {
@@ -793,34 +1198,245 @@
       const filtered = plugins.filter(plugin => {
         return plugin.name.toLowerCase().includes(query) ||
                (plugin.author || '').toLowerCase().includes(query) ||
-               (plugin.description || '').toLowerCase().includes(query);
+               (plugin.description || '').toLowerCase().includes(query) ||
+               Object.keys(plugin.sections || {}).some(section => section.toLowerCase().includes(query)) ||
+               Object.values(plugin.sections || {}).flat().some(bypass => bypass.toLowerCase().includes(query));
       });
 
       displayPlugins(filtered);
     }
 
     function openCreateModal() {
+      const lastCreateTime = localStorage.getItem('lastPluginCreate');
+      const createCount = parseInt(localStorage.getItem('pluginCreateCount') || '0');
+      const now = Date.now();
+      
+      if (lastCreateTime) {
+        const timeDiff = now - parseInt(lastCreateTime);
+        const fiveMinutes = 5 * 60 * 1000;
+        
+        if (timeDiff < fiveMinutes && createCount >= 2) {
+          const timeLeft = Math.ceil((fiveMinutes - timeDiff) / 1000);
+          const minutes = Math.floor(timeLeft / 60);
+          const seconds = timeLeft % 60;
+          showToast(`You're creating plugins too fast! Wait ${minutes}:${seconds.toString().padStart(2, '0')}`, 'error');
+          return;
+        }
+        
+        if (timeDiff >= fiveMinutes) {
+          localStorage.setItem('pluginCreateCount', '0');
+        }
+      }
+      
+      resetForm();
+      document.getElementById('modalTitle').textContent = 'Create New Plugin';
+      document.getElementById('submitBtn').textContent = 'Create Plugin';
       document.getElementById('createModal').classList.add('active');
     }
 
     function closeCreateModal() {
       document.getElementById('createModal').classList.remove('active');
+      resetForm();
+    }
+
+    function resetForm() {
+      document.getElementById('pluginForm').reset();
+      document.getElementById('editingPluginId').value = '';
+      sections = {};
+      sectionIdCounter = 0;
+      document.getElementById('sectionsContainer').innerHTML = '';
+      document.getElementById('nameCounter').textContent = '0/25';
+      document.getElementById('authorCounter').textContent = '0/20';
+      hideAllErrors();
+    }
+
+    function addSection() {
+      const sectionId = `section_${sectionIdCounter++}`;
+      sections[sectionId] = {
+        name: `Section ${Object.keys(sections).length + 1}`,
+        bypasses: []
+      };
+      
+      renderSection(sectionId);
+    }
+
+    function renderSection(sectionId) {
+      const container = document.getElementById('sectionsContainer');
+      const sectionDiv = document.createElement('div');
+      sectionDiv.className = 'section-builder';
+      sectionDiv.id = sectionId;
+      
+      sectionDiv.innerHTML = `
+        <div class="section-header">
+          <input type="text" 
+                 class="section-name-input" 
+                 value="${sections[sectionId].name}" 
+                 placeholder="Section name"
+                 onchange="updateSectionName('${sectionId}', this.value)">
+          <button type="button" class="remove-section-btn" onclick="removeSection('${sectionId}')">
+            Remove Section
+          </button>
+        </div>
+        
+        <div class="bypasses-container" id="bypasses_${sectionId}">
+          ${sections[sectionId].bypasses.length === 0 ? '<span style="color: #666; font-size: 13px;">No bypasses yet</span>' : ''}
+        </div>
+        
+        <div class="bypass-input-group">
+          <input type="text" 
+                 class="bypass-input" 
+                 id="bypassInput_${sectionId}"
+                 placeholder="Enter bypass text..."
+                 onkeypress="if(event.key === 'Enter') { event.preventDefault(); addBypass('${sectionId}'); }">
+          <button type="button" class="add-bypass-btn" onclick="addBypass('${sectionId}')">
+            Add Bypass
+          </button>
+        </div>
+      `;
+      
+      container.appendChild(sectionDiv);
+      renderBypasses(sectionId);
+    }
+
+    function updateSectionName(sectionId, name) {
+      sections[sectionId].name = name || `Section ${sectionId}`;
+    }
+
+    function removeSection(sectionId) {
+      delete sections[sectionId];
+      document.getElementById(sectionId).remove();
+    }
+
+    function addBypass(sectionId) {
+      const input = document.getElementById(`bypassInput_${sectionId}`);
+      const bypassText = input.value.trim();
+      
+      if (!bypassText) {
+        return;
+      }
+      
+      const isDuplicate = sections[sectionId].bypasses.some(b => 
+        b.toLowerCase() === bypassText.toLowerCase()
+      );
+      
+      if (isDuplicate) {
+        showToast('This bypass already exists in this section', 'error');
+        return;
+      }
+      
+      sections[sectionId].bypasses.push(bypassText);
+      input.value = '';
+      renderBypasses(sectionId);
+    }
+
+    function renderBypasses(sectionId) {
+      const container = document.getElementById(`bypasses_${sectionId}`);
+      const bypasses = sections[sectionId].bypasses;
+      
+      if (bypasses.length === 0) {
+        container.innerHTML = '<span style="color: #666; font-size: 13px;">No bypasses yet</span>';
+        return;
+      }
+      
+      container.innerHTML = bypasses.map((bypass, index) => `
+        <div class="bypass-chip">
+          ${escapeHtml(bypass)}
+          <span class="bypass-remove" onclick="removeBypass('${sectionId}', ${index})">×</span>
+        </div>
+      `).join('');
+    }
+
+    function removeBypass(sectionId, bypassIndex) {
+      sections[sectionId].bypasses.splice(bypassIndex, 1);
+      renderBypasses(sectionId);
+    }
+
+    function editPlugin(pluginId) {
+      const plugin = plugins.find(p => p.id === pluginId);
+      if (!plugin) return;
+      
+      resetForm();
+      
+      document.getElementById('modalTitle').textContent = 'Edit Plugin';
+      document.getElementById('submitBtn').textContent = 'Save Changes';
+      document.getElementById('editingPluginId').value = pluginId;
+      
+      document.getElementById('pluginName').value = plugin.name;
+      document.getElementById('pluginAuthor').value = plugin.author || '';
+      document.getElementById('pluginDescription').value = plugin.description || '';
+      document.getElementById('pluginIcon').value = plugin.icon || 'package';
+      
+      sections = {};
+      sectionIdCounter = 0;
+      
+      Object.entries(plugin.sections || {}).forEach(([sectionName, bypasses]) => {
+        const sectionId = `section_${sectionIdCounter++}`;
+        sections[sectionId] = {
+          name: sectionName,
+          bypasses: [...bypasses]
+        };
+        renderSection(sectionId);
+      });
+      
+      updateCharCounter({target: document.getElementById('pluginName')});
+      updateCharCounter({target: document.getElementById('pluginAuthor')});
+      
+      document.getElementById('createModal').classList.add('active');
+    }
+
+    async function deletePlugin(pluginId) {
+      if (!confirm('Are you sure you want to delete this plugin?')) return;
+      
+      try {
+        const response = await fetch(`/api/plugins/${pluginId}`, {
+          method: 'DELETE'
+        });
+        
+        if (response.ok) {
+          myPlugins = myPlugins.filter(id => id !== pluginId);
+          localStorage.setItem('myPlugins', JSON.stringify(myPlugins));
+          showToast('Plugin deleted successfully!');
+          loadPlugins();
+        } else {
+          showToast('Failed to delete plugin', 'error');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        showToast('Failed to delete plugin', 'error');
+      }
     }
 
     async function handleSubmit(e) {
       e.preventDefault();
       
+      if (!validateForm()) return;
+      
+      const submitBtn = document.getElementById('submitBtn');
+      const isEditing = document.getElementById('editingPluginId').value;
+      
+      submitBtn.disabled = true;
+      submitBtn.textContent = isEditing ? 'Saving...' : 'Creating...';
+      
       const pluginData = {
         name: document.getElementById('pluginName').value.trim(),
         author: document.getElementById('pluginAuthor').value.trim() || 'Anonymous',
-        description: document.getElementById('pluginDescription').value.trim(),
-        icon: document.getElementById('pluginIcon').value,
-        sections: {"Test Section": ["test bypass"]} // Temporary for testing
+        description: document.getElementById('pluginDescription').value.trim() || 'This plugin has no description.',
+        icon: document.getElementById('pluginIcon').value || 'package',
+        sections: {}
       };
       
+      Object.values(sections).forEach(section => {
+        if (section.bypasses.length > 0) {
+          pluginData.sections[section.name] = section.bypasses;
+        }
+      });
+      
       try {
-        const response = await fetch('/api/plugins', {
-          method: 'POST',
+        const url = isEditing ? `/api/plugins/${isEditing}` : '/api/plugins';
+        const method = isEditing ? 'PUT' : 'POST';
+        
+        const response = await fetch(url, {
+          method: method,
           headers: {
             'Content-Type': 'application/json'
           },
@@ -828,16 +1444,77 @@
         });
         
         if (response.ok) {
+          const result = await response.json();
+          
+          if (!isEditing) {
+            myPlugins.push(result.id);
+            localStorage.setItem('myPlugins', JSON.stringify(myPlugins));
+            
+            const createCount = parseInt(localStorage.getItem('pluginCreateCount') || '0') + 1;
+            localStorage.setItem('pluginCreateCount', createCount.toString());
+            localStorage.setItem('lastPluginCreate', Date.now().toString());
+          }
+          
+          showToast(isEditing ? 'Plugin updated successfully!' : 'Plugin created successfully!');
           closeCreateModal();
           loadPlugins();
+        } else {
+          const error = await response.json();
+          if (error.error && error.error.includes('rate limit')) {
+            showToast(error.error, 'error');
+          } else {
+            throw new Error('Failed to save plugin');
+          }
         }
       } catch (error) {
         console.error('Error:', error);
+        showToast('Failed to save plugin. Please try again.', 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = isEditing ? 'Save Changes' : 'Create Plugin';
       }
     }
 
+    function validateForm() {
+      hideAllErrors();
+      let isValid = true;
+      
+      const name = document.getElementById('pluginName').value.trim();
+      if (!name) {
+        document.getElementById('nameError').classList.add('show');
+        isValid = false;
+      }
+      
+      const hasValidSections = Object.values(sections).some(s => s.bypasses.length > 0);
+      if (!hasValidSections) {
+        document.getElementById('sectionsError').classList.add('show');
+        isValid = false;
+      }
+      
+      return isValid;
+    }
+
     function viewPlugin(pluginId) {
-      console.log('View plugin:', pluginId);
+      window.location.href = `/plugin/${pluginId}`;
+    }
+
+    function hideAllErrors() {
+      document.querySelectorAll('.error-message').forEach(el => {
+        el.classList.remove('show');
+      });
+    }
+
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast show';
+      if (type === 'error') {
+        toast.classList.add('error');
+      }
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
     }
 
     function escapeHtml(text) {
