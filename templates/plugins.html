@@ -1037,6 +1037,20 @@
       font-weight: 600;
     }
 
+    .owner-mode {
+      position: fixed;
+      top: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #ff4b4b 0%, #c62828 100%);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(255, 75, 75, 0.4);
+    }
+
     @media (max-width: 768px) {
       h1 {
         font-size: 48px;
@@ -1082,6 +1096,10 @@
       </div>
     </div>
   </nav>
+
+  <div id="ownerModeIndicator" class="owner-mode" style="display: none;">
+    OWNER MODE ACTIVE
+  </div>
 
   <div class="header">
     <h1>Community Plugins</h1>
@@ -1396,13 +1414,14 @@
     let myPlugins = JSON.parse(localStorage.getItem('myPlugins') || '[]');
     let timeoutEndTime = 0;
     let countdownInterval;
+    let isOwnerMode = false;
     
     function init() {
       createParticles();
       setupEventListeners();
+      checkOwnerMode();
       loadPlugins();
       
-      // Check for timeout from localStorage
       const storedTimeout = localStorage.getItem('pluginTimeout');
       if (storedTimeout) {
         const endTime = parseInt(storedTimeout);
@@ -1411,6 +1430,13 @@
         } else {
           localStorage.removeItem('pluginTimeout');
         }
+      }
+    }
+
+    function checkOwnerMode() {
+      isOwnerMode = window.location.search.includes('owner=true');
+      if (isOwnerMode) {
+        document.getElementById('ownerModeIndicator').style.display = 'block';
       }
     }
 
@@ -1671,7 +1697,7 @@
       grid.innerHTML = pluginsToShow.map(plugin => {
         const sectionCount = Object.keys(plugin.sections || {}).length;
         const bypassCount = Object.values(plugin.sections || {}).reduce((acc, bypasses) => acc + bypasses.length, 0);
-        const canEdit = myPlugins.includes(plugin.id);
+        const canEdit = myPlugins.includes(plugin.id) || isOwnerMode;
 
         return `
           <div class="plugin-card" onclick="viewPlugin('${plugin.id}')">
@@ -1908,9 +1934,12 @@
       document.getElementById('submitBtn').textContent = 'Save Changes';
       document.getElementById('editingPluginId').value = pluginId;
       
-      document.getElementById('nameFormGroup').style.display = 'none';
-      document.getElementById('authorFormGroup').style.display = 'none';
-      document.getElementById('descriptionFormGroup').style.display = 'none';
+      // Only hide these fields for regular users, not for owner mode
+      if (!isOwnerMode) {
+        document.getElementById('nameFormGroup').style.display = 'none';
+        document.getElementById('authorFormGroup').style.display = 'none';
+        document.getElementById('descriptionFormGroup').style.display = 'none';
+      }
       
       document.getElementById('pluginName').value = plugin.name;
       document.getElementById('pluginAuthor').value = plugin.author || '';
@@ -1937,13 +1966,22 @@
       if (!confirm('Are you sure you want to delete this plugin?')) return;
       
       try {
+        // If in owner mode, show a more obvious confirmation
+        if (isOwnerMode && !myPlugins.includes(pluginId)) {
+          if (!confirm('WARNING: You are deleting someone else\'s plugin as an owner. This cannot be undone. Continue?')) {
+            return;
+          }
+        }
+        
         const response = await fetch(`/api/plugins/${pluginId}`, {
           method: 'DELETE'
         });
         
         // Update client-side data regardless of server response
-        myPlugins = myPlugins.filter(id => id !== pluginId);
-        localStorage.setItem('myPlugins', JSON.stringify(myPlugins));
+        if (myPlugins.includes(pluginId)) {
+          myPlugins = myPlugins.filter(id => id !== pluginId);
+          localStorage.setItem('myPlugins', JSON.stringify(myPlugins));
+        }
         
         plugins = plugins.filter(p => p.id !== pluginId);
         localStorage.setItem('vadriftsPlugins', JSON.stringify(plugins));
