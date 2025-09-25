@@ -1187,32 +1187,8 @@
 
           <div class="form-group">
             <label>Tab Icon <span class="optional">(optional)</span></label>
-            <select id="pluginIcon">
+            <select id="pluginIcon" style="display: none;">
               <option value="package">Package (Default)</option>
-              <option value="shield">Shield</option>
-              <option value="swords">Swords</option>
-              <option value="star">Star</option>
-              <option value="heart">Heart</option>
-              <option value="flame">Flame</option>
-              <option value="zap">Lightning</option>
-              <option value="crown">Crown</option>
-              <option value="gem">Diamond</option>
-              <option value="rocket">Rocket</option>
-              <option value="sparkles">Sparkles</option>
-              <option value="settings">Settings</option>
-              <option value="code">Code</option>
-              <option value="skull">Skull</option>
-              <option value="bomb">Bomb</option>
-              <option value="flag">Flag</option>
-              <option value="target">Target</option>
-              <option value="lock">Lock</option>
-              <option value="unlock">Unlock</option>
-              <option value="eye">Eye</option>
-              <option value="eye-off">Eye Off</option>
-              <option value="user">User</option>
-              <option value="users">Users</option>
-              <option value="gamepad-2">Gamepad</option>
-              <option value="trophy">Trophy</option>
             </select>
             <div class="custom-select-container" id="iconSelectContainer">
               <div class="select-header" id="selectHeader">
@@ -1228,18 +1204,8 @@
               </div>
               <div class="select-dropdown" id="selectDropdown">
                 <input type="text" class="select-search" id="iconSearch" placeholder="Search icons...">
-                  function populateIconOptions() {
-                    const iconOptions = document.getElementById('iconOptions');
-                    iconOptions.innerHTML = availableIcons.map(icon => `
-                <div class="select-option ${icon.name === 'package' ? 'selected' : ''}" 
-              data-value="${icon.name}" 
-              onclick="selectIcon('${icon.name}')">
-            <div class="option-icon">${icon.svg}</div>
-          <div class="option-label">${icon.label}</div>
-          </div>
-          `).join('');
-                    }
-                  </div>
+                <div class="select-options" id="iconOptions">
+                  <!-- Icons will be loaded dynamically -->
                 </div>
               </div>
             </div>
@@ -1282,8 +1248,8 @@
       createParticles();
       setupEventListeners();
       checkOwnerMode();
-      loadPlugins();
       loadIcons();
+      loadPlugins();
       
       const storedTimeout = localStorage.getItem('pluginTimeout');
       if (storedTimeout) {
@@ -1294,6 +1260,35 @@
           localStorage.removeItem('pluginTimeout');
         }
       }
+    }
+
+    async function loadIcons() {
+      try {
+        const response = await fetch('https://raw.githubusercontent.com/vqmpjayZ/Vadrifts/refs/heads/main/icons.json');
+        const data = await response.json();
+        availableIcons = data;
+        populateIconOptions();
+      } catch (error) {
+        console.error('Failed to load icons:', error);
+        availableIcons = [{ 
+          name: 'package', 
+          label: 'Package', 
+          svg: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"></path><path d="M16.5 9.4 7.55 4.24"></path><polyline points="3.29 7 12 12 20.71 7"></polyline><line x1="12" y1="22" x2="12" y2="12"></line><circle cx="18.5" cy="15.5" r="2.5"></circle><path d="M20.27 17.27 22 19"></path></svg>'
+        }];
+        populateIconOptions();
+      }
+    }
+
+    function populateIconOptions() {
+      const iconOptions = document.getElementById('iconOptions');
+      iconOptions.innerHTML = availableIcons.map(icon => `
+        <div class="select-option ${icon.name === 'package' ? 'selected' : ''}" 
+             data-value="${icon.name}" 
+             onclick="selectIcon('${icon.name}')">
+          <div class="option-icon">${icon.svg}</div>
+          <div class="option-label">${icon.label}</div>
+        </div>
+      `).join('');
     }
 
     function checkOwnerMode() {
@@ -1351,26 +1346,13 @@
       });
     }
 
-    async function loadIcons() {
-      try {
-        const response = await fetch('https://raw.githubusercontent.com/vqmpjayZ/Vadrifts/refs/heads/main/icons.json');
-        const data = await response.json();
-        availableIcons = data;
-        populateIconOptions();
-      } catch (error) {
-        console.error('Failed to load icons:', error);
-        availableIcons = [{ name: 'package', label: 'Package', svg: '<svg>...</svg>' }];
-        populateIconOptions();
-      }
-    }
-
     function filterIcons(query) {
       const options = document.querySelectorAll('.select-option');
       let visibleCount = 0;
       
       options.forEach(option => {
         const iconName = option.getAttribute('data-value');
-        const label = document.querySelector(`[data-value="${iconName}"] .option-label`).textContent.toLowerCase();
+        const label = option.querySelector('.option-label').textContent.toLowerCase();
         
         if (query === '' || label.includes(query) || iconName.includes(query)) {
           option.style.display = 'flex';
@@ -1406,14 +1388,17 @@
       selectedIconName.textContent = formatIconName(iconName);
       
       const selectedIcon = document.getElementById('selectedIcon');
-      selectedIcon.innerHTML = document.querySelector(`.select-option[data-value="${iconName}"] .option-icon`).innerHTML;
+      const icon = availableIcons.find(i => i.name === iconName);
+      if (icon) {
+        selectedIcon.innerHTML = icon.svg;
+      }
       
       document.getElementById('selectDropdown').classList.remove('show');
       
       document.querySelectorAll('.select-option').forEach(option => {
         option.classList.remove('selected');
       });
-      document.querySelector(`.select-option[data-value="${iconName}"]`).classList.add('selected');
+      document.querySelector(`[data-value="${iconName}"]`).classList.add('selected');
     }
 
     function formatIconName(iconName) {
@@ -1516,7 +1501,6 @@
 
     async function loadPlugins() {
       try {
-
         const savedPlugins = localStorage.getItem('vadriftsPlugins');
         if (savedPlugins) {
           plugins = JSON.parse(savedPlugins);
@@ -1804,7 +1788,6 @@
       document.getElementById('modalTitle').textContent = 'Edit Plugin';
       document.getElementById('submitBtn').textContent = 'Save Changes';
       document.getElementById('editingPluginId').value = pluginId;
-
       if (!isOwnerMode) {
         document.getElementById('nameFormGroup').style.display = 'none';
         document.getElementById('authorFormGroup').style.display = 'none';
