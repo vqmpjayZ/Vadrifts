@@ -7,12 +7,8 @@ logger = logging.getLogger(__name__)
 class BypassDashboard:
     def __init__(self):
         self.bypass_status = {
-            "words": {"testing": False, "success_rate": "unknown", "last_tested": None, "tester": None, "test_count": 0},
-            "sentences": {"testing": False, "success_rate": "unknown", "last_tested": None, "tester": None, "test_count": 0},
-            "roleplay": {"testing": False, "success_rate": "unknown", "last_tested": None, "tester": None, "test_count": 0},
-            "nsfw_websites": {"testing": False, "success_rate": "unknown", "last_tested": None, "tester": None, "test_count": 0},
-            "not_legit": {"testing": False, "success_rate": "unknown", "last_tested": None, "tester": None, "test_count": 0},
-            "Pre-made Bypasses": {"testing": False, "success_rate": "unknown", "last_tested": None, "tester": None, "test_count": 0}
+            "Pre-made Bypasses": {"testing": False, "success_rate": "unknown", "last_tested": None, "tester": None, "test_count": 0},
+            "websites": {"testing": False, "success_rate": "unknown", "last_tested": None, "tester": None, "test_count": 0}
         }
         self.test_history = []
 
