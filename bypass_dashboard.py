@@ -7,15 +7,14 @@ logger = logging.getLogger(__name__)
 class BypassDashboard:
     def __init__(self):
         self.bypass_status = {
-            "Pre-made Bypasses": {"testing": False, "success_rate": "unknown", "last_tested": None, "tester": None, "test_count": 0},
-            "websites": {"testing": False, "success_rate": "unknown", "last_tested": None, "tester": None, "test_count": 0}
+            "Pre-made Bypasses": {"testing": False, "success_rate": "unknown", "last_tested": None, "tester": None, "test_count": 0}
         }
         self.test_history = []
 
     def get_bypass_status(self, category):
         if category not in self.bypass_status:
             return jsonify({"error": "Category not found"}), 404
-        return jsonify({category: self.bypass_status[category]})
+        return jsonify(self.bypass_status[category])
 
     def start_bypass_test(self, category, data):
         if category not in self.bypass_status:
@@ -43,7 +42,7 @@ class BypassDashboard:
         self.bypass_status[category]['testing'] = True
         self.bypass_status[category]['tester'] = player_id
         
-        logger.info(f"Bypass test started for {category} by {player_id}")
+        logger.info(f"✅ Bypass test started for {category} by {player_id}")
         
         return jsonify({
             "success": True,
@@ -72,7 +71,7 @@ class BypassDashboard:
         if len(self.test_history) > 100:
             self.test_history = self.test_history[-100:]
         
-        logger.info(f"Bypass test completed for {category}: {success_rate}%")
+        logger.info(f"✅ Bypass test completed for {category}: {success_rate}% by {self.bypass_status[category]['tester']}")
         
         return jsonify({
             "success": True,
@@ -130,17 +129,21 @@ class BypassDashboard:
                 logger.error("dashboard.html template not found")
                 return jsonify({"error": "Dashboard page not found"}), 404
 
-        @app.route('/api/bypass-status/<category>', methods=['GET'])
+        @app.route('/api/bypass-status/<path:category>', methods=['GET'])
         def get_bypass_status_route(category):
             return self.get_bypass_status(category)
 
-        @app.route('/api/bypass-status/<category>/start', methods=['POST'])
+        @app.route('/api/bypass-status/<path:category>/start', methods=['POST'])
         def start_bypass_test_route(category):
-            return self.start_bypass_test(category, request.get_json())
+            data = request.get_json() or {}
+            logger.info(f"📥 Start test request for {category}: {data}")
+            return self.start_bypass_test(category, data)
 
-        @app.route('/api/bypass-status/<category>/complete', methods=['POST'])
+        @app.route('/api/bypass-status/<path:category>/complete', methods=['POST'])
         def complete_bypass_test_route(category):
-            return self.complete_bypass_test(category, request.get_json())
+            data = request.get_json() or {}
+            logger.info(f"📥 Complete test request for {category}: {data}")
+            return self.complete_bypass_test(category, data)
 
         @app.route('/api/bypass-status/all', methods=['GET'])
         def get_all_bypass_status_route():
