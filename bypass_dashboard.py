@@ -1,158 +1,164 @@
-from flask import jsonify, request
 from datetime import datetime, timedelta
-import logging
-
-logger = logging.getLogger(__name__)
+import time
+from flask import jsonify
 
 class BypassDashboard:
+    TESTING_TIMEOUT = 300
+    
     def __init__(self):
-        self.bypass_status = {
-            "Pre-made Bypasses": {"testing": False, "success_rate": "unknown", "last_tested": None, "tester": None, "test_count": 0}
-        }
-        self.test_history = []
-
+        self.statuses = {}
+    
+    def check_and_clear_stale_tests(self):
+        current_time = time.time()
+        
+        for category, status in self.statuses.items():
+            if status.get('testing') and status.get('started_at'):
+                elapsed = current_time - status['started_at']
+                if elapsed > self.TESTING_TIMEOUT:
+                    print(f"Clearing stale test for {category} (ran for {elapsed:.0f}s)")
+                    status['testing'] = False
+                    status['started_at'] = None
+                    status['tester'] = None
+    
     def get_bypass_status(self, category):
-        if category not in self.bypass_status:
-            return jsonify({"error": "Category not found"}), 404
-        return jsonify(self.bypass_status[category])
-
-    def start_bypass_test(self, category, data):
-        if category not in self.bypass_status:
-            return jsonify({"error": "Category not found"}), 404
+        self.check_and_clear_stale_tests()
         
-        player_id = data.get('player_id', 'Unknown')
+        if category not in self.statuses:
+            self.statuses[category] = {
+                'success_rate': 'unknown',
+                'last_tested': None,
+                'testing': False,
+                'tester': None,
+                'started_at': None,
+                'test_count': 0
+            }
         
-        if self.bypass_status[category]['testing']:
-            return jsonify({
-                "success": False, 
-                "message": "Already testing",
-                "first_tester": False
-            })
+        status = self.statuses[category].copy()
+        if 'started_at' in status:
+            del status['started_at']
         
-        last_tested = self.bypass_status[category].get('last_tested')
-        if last_tested:
-            last_tested_date = datetime.fromisoformat(last_tested)
-            if datetime.now() - last_tested_date < timedelta(hours=24):
-                return jsonify({
-                    "success": False,
-                    "message": "Already tested today",
-                    "first_tester": False
-                })
+        return status
+    
+    def start_bypass_test(self, category, player_id):
+        self.check_and_clear_stale_tests()
         
-        self.bypass_status[category]['testing'] = True
-        self.bypass_status[category]['tester'] = player_id
+        if category not in self.statuses:
+            self.statuses[category] = {
+                'success_rate': 'unknown',
+                'last_tested': None,
+                'testing': False,
+                'tester': None,
+                'started_at': None,
+                'test_count': 0
+            }
         
-        logger.info(f"✅ Bypass test started for {category} by {player_id}")
+        status = self.statuses[category]
         
-        return jsonify({
-            "success": True,
-            "message": "Test started",
-            "first_tester": True
-        })
-
-    def complete_bypass_test(self, category, data):
-        if category not in self.bypass_status:
-            return jsonify({"error": "Category not found"}), 404
+        if status['testing']:
+            return {'first_tester': False, 'reason': 'already_testing'}
         
-        success_rate = data.get('success_rate', 0)
+        if status['last_tested']:
+            last_test = datetime.fromisoformat(status['last_tested'])
+            if datetime.now() - last_test < timedelta(hours=24):
+                return {'first_tester': False, 'reason': 'already_tested_today'}
         
-        self.bypass_status[category]['testing'] = False
-        self.bypass_status[category]['success_rate'] = f"{success_rate}%"
-        self.bypass_status[category]['last_tested'] = datetime.now().isoformat()
-        self.bypass_status[category]['test_count'] += 1
+        status['testing'] = True
+        status['tester'] = player_id
+        status['started_at'] = time.time()
         
-        self.test_history.append({
-            "category": category,
-            "success_rate": success_rate,
-            "tester": self.bypass_status[category]['tester'],
-            "timestamp": datetime.now().isoformat()
-        })
+        return {'first_tester': True}
+    
+    def complete_bypass_test(self, category, success_rate):
+        if category not in self.statuses:
+            return {'success': False, 'error': 'Category not found'}
         
-        if len(self.test_history) > 100:
-            self.test_history = self.test_history[-100:]
+        status = self.statuses[category]
+        status['success_rate'] = f'{success_rate}%'
+        status['last_tested'] = datetime.now().isoformat()
+        status['testing'] = False
+        status['tester'] = None
+        status['started_at'] = None
+        status['test_count'] = status.get('test_count', 0) + 1
         
-        logger.info(f"✅ Bypass test completed for {category}: {success_rate}% by {self.bypass_status[category]['tester']}")
-        
-        return jsonify({
-            "success": True,
-            "message": "Test completed",
-            "success_rate": f"{success_rate}%"
-        })
-
-    def get_all_bypass_status(self):
-        return jsonify(self.bypass_status)
-
+        return {'success': True, 'success_rate': status['success_rate']}
+    
+    def cancel_bypass_test(self, category):
+        if category in self.statuses:
+            self.statuses[category]['testing'] = False
+            self.statuses[category]['tester'] = None
+            self.statuses[category]['started_at'] = None
+            return {'success': True}
+        return {'success': False, 'error': 'Category not found'}
+    
     def get_dashboard_stats(self):
-        total_categories = len(self.bypass_status)
-        tested_today = sum(1 for status in self.bypass_status.values() if status['success_rate'] != 'unknown')
-        currently_testing = sum(1 for status in self.bypass_status.values() if status['testing'])
+        self.check_and_clear_stale_tests()
         
-        rates = []
-        for status in self.bypass_status.values():
+        total_categories = len(self.statuses)
+        tested_today = 0
+        currently_testing = 0
+        total_success = 0
+        tested_count = 0
+        
+        for status in self.statuses.values():
+            if status['testing']:
+                currently_testing += 1
+            
+            if status['last_tested']:
+                last_test = datetime.fromisoformat(status['last_tested'])
+                if datetime.now() - last_test < timedelta(hours=24):
+                    tested_today += 1
+            
             if status['success_rate'] != 'unknown':
                 rate = int(status['success_rate'].replace('%', ''))
-                rates.append(rate)
+                total_success += rate
+                tested_count += 1
         
-        avg_success_rate = sum(rates) / len(rates) if rates else 0
+        avg_success_rate = int(total_success / tested_count) if tested_count > 0 else 0
         
-        return jsonify({
-            "total_categories": total_categories,
-            "tested_today": tested_today,
-            "currently_testing": currently_testing,
-            "average_success_rate": round(avg_success_rate, 1),
-            "categories": self.bypass_status
-        })
-
-    def get_test_history(self):
-        return jsonify({
-            "history": self.test_history[-20:],
-            "total_tests": len(self.test_history)
-        })
-
+        return {
+            'total_categories': total_categories,
+            'tested_today': tested_today,
+            'currently_testing': currently_testing,
+            'average_success_rate': avg_success_rate,
+            'categories': self.statuses
+        }
+    
     def register_routes(self, app):
-        @app.route('/dashboard')
-        def dashboard():
-            try:
-                with open('templates/dashboard.html', 'r', encoding='utf-8') as f:
-                    html_content = f.read()
-                
-                from utils import inject_meta_tags
-                meta_tags = '''
-    <meta property="og:title" content="Bypass Dashboard - Vadrifts">
-    <meta property="og:description" content="Real-time bypass testing statistics and status">
-    <meta property="og:url" content="https://vadrifts.onrender.com/dashboard">
-    <meta property="og:type" content="website">
-    <meta name="theme-color" content="#9c88ff">'''
-                
-                return inject_meta_tags(html_content, meta_tags)
-            except FileNotFoundError:
-                logger.error("dashboard.html template not found")
-                return jsonify({"error": "Dashboard page not found"}), 404
-
-        @app.route('/api/bypass-status/<path:category>', methods=['GET'])
-        def get_bypass_status_route(category):
-            return self.get_bypass_status(category)
-
-        @app.route('/api/bypass-status/<path:category>/start', methods=['POST'])
-        def start_bypass_test_route(category):
-            data = request.get_json() or {}
-            logger.info(f"📥 Start test request for {category}: {data}")
-            return self.start_bypass_test(category, data)
-
-        @app.route('/api/bypass-status/<path:category>/complete', methods=['POST'])
-        def complete_bypass_test_route(category):
-            data = request.get_json() or {}
-            logger.info(f"📥 Complete test request for {category}: {data}")
-            return self.complete_bypass_test(category, data)
-
-        @app.route('/api/bypass-status/all', methods=['GET'])
-        def get_all_bypass_status_route():
-            return self.get_all_bypass_status()
-
+        @app.route('/api/bypass-status/<category>', methods=['GET'])
+        def get_status(category):
+            status = self.get_bypass_status(category)
+            return jsonify(status)
+        
+        @app.route('/api/bypass-status/<category>/start', methods=['POST'])
+        def start_test(category):
+            from flask import request
+            data = request.get_json()
+            player_id = data.get('player_id')
+            result = self.start_bypass_test(category, player_id)
+            return jsonify(result)
+        
+        @app.route('/api/bypass-status/<category>/complete', methods=['POST'])
+        def complete_test(category):
+            from flask import request
+            data = request.get_json()
+            success_rate = data.get('success_rate')
+            result = self.complete_bypass_test(category, success_rate)
+            return jsonify(result)
+        
+        @app.route('/api/bypass-status/<category>/cancel', methods=['POST'])
+        def cancel_test(category):
+            result = self.cancel_bypass_test(category)
+            return jsonify(result)
+        
         @app.route('/api/dashboard/stats', methods=['GET'])
-        def get_dashboard_stats_route():
-            return self.get_dashboard_stats()
-
-        @app.route('/api/dashboard/history', methods=['GET'])
-        def get_test_history_route():
-            return self.get_test_history()
+        def dashboard_stats():
+            stats = self.get_dashboard_stats()
+            return jsonify(stats)
+        
+        @app.route('/dashboard')
+        def dashboard_page():
+            from flask import send_file
+            try:
+                return send_file('templates/dashboard.html')
+            except FileNotFoundError:
+                return jsonify({"error": "Dashboard page not found"}), 404
