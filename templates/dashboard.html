@@ -291,7 +291,13 @@
     </div>
 
     <script>
-        function getStatusBadge(status) {
+        const TESTING_TIMEOUT_MS = 300000;
+
+        function getStatusBadge(status, isStale) {
+            if (isStale) {
+                return '<span class="status-badge unknown">Timed Out</span>';
+            }
+            
             if (status.testing) {
                 return '<span class="status-badge testing">Testing</span>';
             }
@@ -323,9 +329,22 @@
             return date.toLocaleDateString();
         }
 
+        function checkTestingTimeout(status) {
+            if (!status.testing || !status.started_at) return false;
+            
+            const startTime = new Date(status.started_at * 1000);
+            const elapsed = Date.now() - startTime;
+            
+            return elapsed > TESTING_TIMEOUT_MS;
+        }
+
         function createCategoryCard(name, status) {
             const card = document.createElement('div');
-            card.className = 'category-card' + (status.testing ? ' testing' : '');
+            
+            const isStale = checkTestingTimeout(status);
+            const isActuallyTesting = status.testing && !isStale;
+            
+            card.className = 'category-card' + (isActuallyTesting ? ' testing' : '');
             
             const rate = status.success_rate !== 'unknown' ? parseInt(status.success_rate) : 0;
             let rateColor = '#888';
@@ -336,10 +355,10 @@
             card.innerHTML = `
                 <div class="category-header">
                     <div class="category-name">${name}</div>
-                    ${getStatusBadge(status)}
+                    ${getStatusBadge(status, isStale)}
                 </div>
                 <div class="success-rate" style="color: ${rateColor}">
-                    ${status.success_rate}
+                    ${isActuallyTesting ? 'Testing...' : status.success_rate}
                 </div>
                 <div class="progress-bar">
                     <div class="progress-fill" style="width: ${rate}%; background: ${rateColor};"></div>
