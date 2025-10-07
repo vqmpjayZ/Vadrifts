@@ -1608,11 +1608,22 @@
       }).join('');
     }
 
-    function getIconSvg(iconName) {
-      const iconElement = document.querySelector(`.select-option[data-value="${iconName}"] .option-icon`);
-      return iconElement ? iconElement.innerHTML : document.querySelector(`.select-option[data-value="package"] .option-icon`).innerHTML;
-    }
+function getIconSvg(iconName) {
+  if (icons && icons[iconName]) {
+    return icons[iconName];
+  }
 
+  const iconElement = document.querySelector(`.select-option[data-value="${iconName}"] .option-icon`);
+  if (iconElement) {
+    return iconElement.innerHTML;
+  }
+  
+  if (icons && icons.package) {
+    return icons.package;
+  }
+  
+  return '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>';
+}
     function handleSearch(e) {
       const query = e.target.value.toLowerCase();
       
