@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vadrifts Plugins</title>
   <link rel="icon" href="https://i.imgur.com/ePueN25.png" type="image/png">
+  
+  <!-- Load icons from your GitHub -->
+  <script src="https://raw.githubusercontent.com/vqmpjayZ/Vadrifts/refs/heads/main/icons.js"></script>
+  
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
     
@@ -592,390 +596,6 @@
       color: #ff4b4b;
     }
 
-    .optional {
-      color: #666;
-      font-size: 12px;
-      font-weight: 400;
-      margin-left: 5px;
-    }
-
-    .input-wrapper {
-      position: relative;
-    }
-
-    .char-counter {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 11px;
-      color: #666;
-    }
-
-    .char-counter.warning {
-      color: #ff9f43;
-    }
-
-    .char-counter.error {
-      color: #ff4b4b;
-    }
-
-    input, textarea, select {
-      width: 100%;
-      background: rgba(40, 40, 40, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-      padding: 14px 16px;
-      color: #ffffff;
-      font-size: 14px;
-      font-family: 'Inter', sans-serif;
-      transition: all 0.3s ease;
-    }
-
-    input.has-counter {
-      padding-right: 45px;
-    }
-
-    input:focus, textarea:focus, select:focus {
-      outline: none;
-      border-color: #7209b7;
-      background: rgba(40, 40, 40, 0.8);
-      box-shadow: 0 0 0 3px rgba(114, 9, 183, 0.1);
-    }
-
-    .section-builder {
-      background: rgba(20, 20, 20, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 15px;
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-    }
-
-    .section-name-input {
-      background: rgba(40, 40, 40, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-      padding: 8px 12px;
-      color: #9c88ff;
-      font-size: 16px;
-      font-weight: 600;
-      flex: 1;
-      margin-right: 10px;
-    }
-
-    .bypasses-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 15px;
-      min-height: 40px;
-      padding: 10px;
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: 10px;
-    }
-
-    .bypass-chip {
-      background: rgba(114, 9, 183, 0.2);
-      border: 1px solid rgba(114, 9, 183, 0.3);
-      color: #b8a4ff;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      animation: chipIn 0.3s ease;
-    }
-
-    @keyframes chipIn {
-      from {
-        transform: scale(0.8);
-        opacity: 0;
-      }
-      to {
-        transform: scale(1);
-        opacity: 1;
-      }
-    }
-
-    .bypass-remove {
-      cursor: pointer;
-      opacity: 0.7;
-      transition: opacity 0.2s;
-      font-size: 16px;
-    }
-
-    .bypass-remove:hover {
-      opacity: 1;
-      color: #ff4b4b;
-    }
-
-    .bypass-input-group {
-      display: flex;
-      gap: 10px;
-    }
-
-    .bypass-input {
-      flex: 1;
-    }
-
-    .add-bypass-btn {
-      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      white-space: nowrap;
-    }
-
-    .add-bypass-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
-    }
-
-    .add-section-btn {
-      width: 100%;
-      background: rgba(114, 9, 183, 0.1);
-      border: 2px dashed rgba(114, 9, 183, 0.3);
-      color: #9c88ff;
-      padding: 15px;
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .add-section-btn:hover {
-      background: rgba(114, 9, 183, 0.2);
-      border-color: #9c88ff;
-    }
-
-    .submit-btn {
-      width: 100%;
-      background: linear-gradient(135deg, #7209b7 0%, #9c88ff 100%);
-      color: white;
-      padding: 18px;
-      border: none;
-      border-radius: 12px;
-      font-weight: 700;
-      font-size: 16px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      margin-top: 20px;
-    }
-
-    .submit-btn:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(114, 9, 183, 0.4);
-    }
-
-    .submit-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .error-message {
-      background: rgba(255, 75, 75, 0.1);
-      border: 1px solid rgba(255, 75, 75, 0.3);
-      color: #ff4b4b;
-      padding: 10px 15px;
-      border-radius: 8px;
-      font-size: 13px;
-      margin-top: 8px;
-      display: none;
-    }
-
-    .error-message.show {
-      display: block;
-    }
-
-    .toast {
-      position: fixed;
-      top: 100px;
-      right: 20px;
-      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-      color: white;
-      padding: 16px 24px;
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(34, 197, 94, 0.3);
-      display: none;
-      animation: slideInRight 0.5s ease;
-      z-index: 2000;
-    }
-
-    .toast.show {
-      display: block;
-    }
-
-    .toast.error {
-      background: linear-gradient(135deg, #ff4b4b 0%, #c62828 100%);
-      box-shadow: 0 10px 30px rgba(255, 75, 75, 0.3);
-    }
-
-    @keyframes slideInRight {
-      from {
-        transform: translateX(100%);
-        opacity: 0;
-      }
-      to {
-        transform: translateX(0);
-        opacity: 1;
-      }
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 80px 20px;
-      grid-column: 1 / -1;
-    }
-
-    .empty-icon {
-      font-size: 64px;
-      margin-bottom: 20px;
-      opacity: 0.3;
-    }
-
-    .empty-title {
-      font-size: 24px;
-      font-weight: 600;
-      color: #888;
-      margin-bottom: 10px;
-    }
-
-    .empty-text {
-      font-size: 14px;
-      color: #666;
-    }
-
-    .remove-section-btn {
-      background: rgba(255, 75, 75, 0.2);
-      border: 1px solid rgba(255, 75, 75, 0.3);
-      color: #ff4b4b;
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 12px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .remove-section-btn:hover {
-      background: rgba(255, 75, 75, 0.3);
-      border-color: #ff4b4b;
-    }
-
-    .custom-select-container {
-      position: relative;
-      width: 100%;
-    }
-
-    .select-header {
-      background: rgba(40, 40, 40, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-      padding: 14px 16px;
-      color: #ffffff;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .select-header:hover {
-      background: rgba(40, 40, 40, 0.8);
-    }
-
-    .select-header-content {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .selected-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 24px;
-      height: 24px;
-    }
-
-    .select-dropdown {
-      position: absolute;
-      top: calc(100% + 5px);
-      left: 0;
-      width: 100%;
-      background: #151515;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-      max-height: 300px;
-      overflow-y: auto;
-      z-index: 10;
-      display: none;
-      padding: 10px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    }
-
-    .select-dropdown.show {
-      display: block;
-      animation: fadeIn 0.2s ease;
-    }
-
-    .select-search {
-      background: rgba(40, 40, 40, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-      padding: 10px;
-      color: #ffffff;
-      font-size: 14px;
-      width: 100%;
-      margin-bottom: 10px;
-    }
-
-    .select-options {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-      gap: 8px;
-    }
-
-    .select-option {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      padding: 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      text-align: center;
-    }
-
-    .select-option:hover {
-      background: rgba(114, 9, 183, 0.2);
-    }
-
-    .select-option.selected {
-      background: rgba(114, 9, 183, 0.3);
-      border: 1px solid rgba(114, 9, 183, 0.5);
-    }
-
     .option-icon {
       display: flex;
       align-items: center;
@@ -1187,39 +807,11 @@
 
           <div class="form-group">
             <label>Tab Icon <span class="optional">(optional)</span></label>
-            <select id="pluginIcon">
-              <option value="package">Package (Default)</option>
-              <option value="shield">Shield</option>
-              <option value="swords">Swords</option>
-              <option value="star">Star</option>
-              <option value="heart">Heart</option>
-              <option value="flame">Flame</option>
-              <option value="zap">Lightning</option>
-              <option value="crown">Crown</option>
-              <option value="gem">Diamond</option>
-              <option value="rocket">Rocket</option>
-              <option value="sparkles">Sparkles</option>
-              <option value="settings">Settings</option>
-              <option value="code">Code</option>
-              <option value="skull">Skull</option>
-              <option value="bomb">Bomb</option>
-              <option value="flag">Flag</option>
-              <option value="target">Target</option>
-              <option value="lock">Lock</option>
-              <option value="unlock">Unlock</option>
-              <option value="eye">Eye</option>
-              <option value="eye-off">Eye Off</option>
-              <option value="user">User</option>
-              <option value="users">Users</option>
-              <option value="gamepad-2">Gamepad</option>
-              <option value="trophy">Trophy</option>
-            </select>
+            <input type="hidden" id="pluginIcon" value="package">
             <div class="custom-select-container" id="iconSelectContainer">
               <div class="select-header" id="selectHeader">
                 <div class="select-header-content">
-                  <div class="selected-icon" id="selectedIcon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"></path><path d="M16.5 9.4 7.55 4.24"></path><polyline points="3.29 7 12 12 20.71 7"></polyline><line x1="12" y1="22" x2="12" y2="12"></line><circle cx="18.5" cy="15.5" r="2.5"></circle><path d="M20.27 17.27 22 19"></path></svg>
-                  </div>
+                  <div class="selected-icon" id="selectedIcon"></div>
                   <span id="selectedIconName">Package (Default)</span>
                 </div>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -1228,158 +820,7 @@
               </div>
               <div class="select-dropdown" id="selectDropdown">
                 <input type="text" class="select-search" id="iconSearch" placeholder="Search icons...">
-                <div class="select-options" id="iconOptions">
-                  <div class="select-option selected" data-value="package" onclick="selectIcon('package')">
-                    <div class="option-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"></path><path d="M16.5 9.4 7.55 4.24"></path><polyline points="3.29 7 12 12 20.71 7"></polyline><line x1="12" y1="22" x2="12" y2="12"></line><circle cx="18.5" cy="15.5" r="2.5"></circle><path d="M20.27 17.27 22 19"></path></svg>
-                    </div>
-                    <div class="option-label">Package</div>
-                  </div>
-                  <div class="select-option" data-value="shield" onclick="selectIcon('shield')">
-                    <div class="option-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path></svg>
-                    </div>
-                    <div class="option-label">Shield</div>
-                  </div>
-                  <div class="select-option" data-value="swords" onclick="selectIcon('swords')">
-                    <div class="option-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5 3 6V3h3l11.5 11.5"></path><path d="M13 19l6-6"></path><path d="M16 16l4 4"></path><path d="M19 21l2-2"></path><path d="M14.5 6.5 18 3h3v3l-3.5 3.5"></path><path d="M5 14l4 4"></path><path d="M7 17l-3 3"></path><path d="M3 19L1 21"></path></svg>
-                    </div>
-                    <div class="option-label">Swords</div>
-                  </div>
-                  <div class="select-option" data-value="star" onclick="selectIcon('star')">
-                    <div class="option-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                    </div>
-                    <div class="option-label">Star</div>
-                  </div>
-                  <div class="select-option" data-value="heart" onclick="selectIcon('heart')">
-                    <div class="option-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></svg>
-                    </div>
-                    <div class="option-label">Heart</div>
-                  </div>
-                  <div class="select-option" data-value="flame" onclick="selectIcon('flame')">
-                    <div class="option-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>
-                    </div>
-                    <div class="option-label">Flame</div>
-                  </div>
-                  <div class="select-option" data-value="zap" onclick="selectIcon('zap')">
-                    <div class="option-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                    </div>
-                    <div class="option-label">Lightning</div>
-                  </div>
-                  <div class="select-option" data-value="crown" onclick="selectIcon('crown')">
-                    <div class="option-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"></path></svg>
-                    </div>
-                    <div class="option-label">Crown</div>
-                  </div>
-                  <div class="select-option" data-value="gem" onclick="selectIcon('gem')">
-                    <div class="option-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l4 6-10 13L2 9Z"></path><path d="M11 3 8 9l4 13 4-13-3-6"></path><path d="M2 9h20"></path></svg>
-                    </div>
-                    <div class="option-label">Diamond</div>
-                  </div>
-                  <div class="select-option" data-value="rocket" onclick="selectIcon('rocket')">
-                    <div class="option-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path></svg>
-                    </div>
-                    <div class="option-label">Rocket</div>
-                  </div>
-                  <div class="select-option" data-value="sparkles" onclick="selectIcon('sparkles')">
-                    <div class="option-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.287 1.288L3 12l5.8 1.9a2 2 0 0 1 1.288 1.287L12 21l1.9-5.8a2 2 0 0 1 1.287-1.288L21 12l-5.8-1.9a2 2 0 0 1-1.288-1.287Z"></path></svg>
-                    </div>
-                    <div class="option-label">Sparkles</div>
-                  </div>
-                  <div class="select-option" data-value="settings" onclick="selectIcon('settings')">
-                    <div class="option-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                    </div>
-                    <div class="option-label">Settings</div>
-                  </div>
-                  <div class="select-option" data-value="code" onclick="selectIcon('code')">
-                    <div class="option-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                    </div>
-                    <div class="option-label">Code</div>
-                  </div>
-                  <div class="select-option" data-value="skull" onclick="selectIcon('skull')">
-                    <div class="option-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="1"></circle><circle cx="15" cy="12" r="1"></circle><path d="M8 20v2h8v-2"></path><path d="m12.5 17-.5-1-.5 1h1z"></path><path d="M16 20a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20"></path></svg>
-                    </div>
-                    <div class="option-label">Skull</div>
-                  </div>
-                  <div class="select-option" data-value="bomb" onclick="selectIcon('bomb')">
-                    <div class="option-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="13" r="9"></circle><path d="m19.5 9.5 1.8-1.8a2.4 2.4 0 0 0 0-3.4l-1.6-1.6a2.41 2.41 0 0 0-3.4 0l-1.8 1.8"></path><path d="m22 2-1.5 1.5"></path></svg>
-                    </div>
-                    <div class="option-label">Bomb</div>
-                  </div>
-                  <div class="select-option" data-value="flag" onclick="selectIcon('flag')">
-                    <div class="option-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
-                    </div>
-                    <div class="option-label">Flag</div>
-                  </div>
-                  <div class="select-option" data-value="target" onclick="selectIcon('target')">
-                    <div class="option-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
-                    </div>
-                    <div class="option-label">Target</div>
-                  </div>
-                  <div class="select-option" data-value="lock" onclick="selectIcon('lock')">
-                    <div class="option-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                    </div>
-                    <div class="option-label">Lock</div>
-                  </div>
-                  <div class="select-option" data-value="unlock" onclick="selectIcon('unlock')">
-                    <div class="option-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>
-                    </div>
-                    <div class="option-label">Unlock</div>
-                  </div>
-                  <div class="select-option" data-value="eye" onclick="selectIcon('eye')">
-                    <div class="option-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                    </div>
-                    <div class="option-label">Eye</div>
-                  </div>
-                  <div class="select-option" data-value="eye-off" onclick="selectIcon('eye-off')">
-                    <div class="option-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path><line x1="2" y1="2" x2="22" y2="22"></line></svg>
-                    </div>
-                    <div class="option-label">Eye Off</div>
-                  </div>
-                  <div class="select-option" data-value="user" onclick="selectIcon('user')">
-                    <div class="option-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                    </div>
-                    <div class="option-label">User</div>
-                  </div>
-                  <div class="select-option" data-value="users" onclick="selectIcon('users')">
-                    <div class="option-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                    </div>
-                    <div class="option-label">Users</div>
-                  </div>
-                  <div class="select-option" data-value="gamepad-2" onclick="selectIcon('gamepad-2')">
-                    <div class="option-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"></line><line x1="8" y1="10" x2="8" y2="14"></line><circle cx="15" cy="13" r="1"></circle><circle cx="18" cy="11" r="1"></circle><rect x="2" y="6" width="20" height="12" rx="2"></rect></svg>
-                    </div>
-                    <div class="option-label">Gamepad</div>
-                  </div>
-                  <div class="select-option" data-value="trophy" onclick="selectIcon('trophy')">
-                    <div class="option-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
-                    </div>
-                    <div class="option-label">Trophy</div>
-                  </div>
-                </div>
+                <div class="select-options" id="iconOptions"></div>
               </div>
             </div>
           </div>
@@ -1419,6 +860,7 @@
     function init() {
       createParticles();
       setupEventListeners();
+      initIconPicker();
       checkOwnerMode();
       loadPlugins();
       
@@ -1452,6 +894,26 @@
         particle.style.animationDuration = (15 + Math.random() * 5) + 's';
         particlesContainer.appendChild(particle);
       }
+    }
+
+    function initIconPicker() {
+      if (typeof ICONS === 'undefined' || typeof ICON_LABELS === 'undefined') {
+        console.error('Icons not loaded! Make sure icons.js is loaded first.');
+        return;
+      }
+
+      const iconOptions = document.getElementById('iconOptions');
+      iconOptions.innerHTML = Object.keys(ICONS).map((iconName, index) => `
+        <div class="select-option ${iconName === 'package' ? 'selected' : ''}" 
+             data-value="${iconName}" 
+             onclick="selectIcon('${iconName}')">
+          <div class="option-icon">${ICONS[iconName]}</div>
+          <div class="option-label">${ICON_LABELS[iconName]}</div>
+        </div>
+      `).join('');
+      
+      document.getElementById('selectedIcon').innerHTML = ICONS.package;
+      document.getElementById('selectedIconName').textContent = ICON_LABELS.package + ' (Default)';
     }
 
     function setupEventListeners() {
@@ -1494,7 +956,7 @@
       
       options.forEach(option => {
         const iconName = option.getAttribute('data-value');
-        const label = document.querySelector(`[data-value="${iconName}"] .option-label`).textContent.toLowerCase();
+        const label = ICON_LABELS[iconName].toLowerCase();
         
         if (query === '' || label.includes(query) || iconName.includes(query)) {
           option.style.display = 'flex';
@@ -1504,21 +966,18 @@
         }
       });
       
+      const container = document.getElementById('iconOptions');
+      let noResults = document.getElementById('noIconResults');
+      
       if (visibleCount === 0) {
-        const container = document.getElementById('iconOptions');
-        const noResults = document.getElementById('noIconResults');
-        
         if (!noResults) {
-          const message = document.createElement('div');
-          message.id = 'noIconResults';
-          message.style.textAlign = 'center';
-          message.style.padding = '15px';
-          message.style.color = '#888';
-          message.textContent = 'No icons found';
-          container.appendChild(message);
+          noResults = document.createElement('div');
+          noResults.id = 'noIconResults';
+          noResults.style.cssText = 'grid-column: 1/-1; text-align: center; padding: 15px; color: #888;';
+          noResults.textContent = 'No icons found';
+          container.appendChild(noResults);
         }
       } else {
-        const noResults = document.getElementById('noIconResults');
         if (noResults) noResults.remove();
       }
     }
@@ -1527,10 +986,10 @@
       document.getElementById('pluginIcon').value = iconName;
       
       const selectedIconName = document.getElementById('selectedIconName');
-      selectedIconName.textContent = formatIconName(iconName);
+      selectedIconName.textContent = ICON_LABELS[iconName];
       
       const selectedIcon = document.getElementById('selectedIcon');
-      selectedIcon.innerHTML = document.querySelector(`.select-option[data-value="${iconName}"] .option-icon`).innerHTML;
+      selectedIcon.innerHTML = ICONS[iconName];
       
       document.getElementById('selectDropdown').classList.remove('show');
       
@@ -1538,13 +997,6 @@
         option.classList.remove('selected');
       });
       document.querySelector(`.select-option[data-value="${iconName}"]`).classList.add('selected');
-    }
-
-    function formatIconName(iconName) {
-      return iconName
-        .split('-')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ');
     }
 
     function updateCharCounter(e) {
@@ -1675,6 +1127,10 @@
       }
     }
 
+    function getIconSvg(iconName) {
+      return ICONS[iconName] || ICONS.package;
+    }
+
     function displayPlugins(pluginsToShow) {
       const grid = document.getElementById('pluginsGrid');
       
@@ -1732,11 +1188,6 @@
           </div>
         `;
       }).join('');
-    }
-
-    function getIconSvg(iconName) {
-      const iconElement = document.querySelector(`.select-option[data-value="${iconName}"] .option-icon`);
-      return iconElement ? iconElement.innerHTML : document.querySelector(`.select-option[data-value="package"] .option-icon`).innerHTML;
     }
 
     function handleSearch(e) {
