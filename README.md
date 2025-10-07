@@ -1,8 +1,8 @@
-Vadrifts All-in-One Website
+# Vadrifts All-in-One Website
 
 Vadrifts is an open-source, all-in-one platform featuring Roblox scripts, utilities, and community tools. Designed to centralize various tools, it’s perfect for Roblox developers and enthusiasts.
 
-Links
+# Links
 
 Website: https://vadrifts.onrender.com
 
