@@ -1172,6 +1172,79 @@
   </div>
 </div>
 
+<div class="modal" id="createModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modalTitle">Create New Plugin</h2>
+      <button class="close-modal" onclick="closeCreateModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <form id="pluginForm">
+        <input type="hidden" id="editingPluginId" value="">
+        
+        <div class="form-group" id="nameFormGroup">
+          <label>Plugin Name <span class="required">*</span></label>
+          <div class="input-wrapper">
+            <input type="text" id="pluginName" placeholder="My Awesome Plugin" maxlength="25" required class="has-counter">
+            <span class="char-counter" id="nameCounter">0/25</span>
+          </div>
+          <div class="error-message" id="nameError">Plugin name is required</div>
+        </div>
+
+        <div class="form-group" id="authorFormGroup">
+          <label>Author <span class="optional">(optional)</span></label>
+          <div class="input-wrapper">
+            <input type="text" id="pluginAuthor" placeholder="Anonymous" maxlength="20" class="has-counter">
+            <span class="char-counter" id="authorCounter">0/20</span>
+          </div>
+          <div class="error-message" id="authorError">Only letters and numbers allowed</div>
+        </div>
+
+        <div class="form-group" id="descriptionFormGroup">
+          <label>Description <span class="optional">(optional)</span></label>
+          <textarea id="pluginDescription" placeholder="Describe what your plugin does..." maxlength="200"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Tab Icon <span class="optional">(optional)</span></label>
+          <select id="pluginIcon" style="display: none;"></select>
+          <div class="custom-select-container" id="iconSelectContainer">
+            <div class="select-header" id="selectHeader">
+              <div class="select-header-content">
+                <div class="selected-icon" id="selectedIcon"></div>
+                <span id="selectedIconName">Loading icons...</span>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M7 10l5 5 5-5z"></path>
+              </svg>
+            </div>
+            <div class="select-dropdown" id="selectDropdown">
+              <input type="text" class="select-search" id="iconSearch" placeholder="Search icons...">
+              <div class="select-options" id="iconOptions"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Sections & Bypasses <span class="required">*</span></label>
+          <div id="sectionsContainer"></div>
+          <button type="button" class="add-section-btn" onclick="addSection()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+            </svg>
+            Add Section
+          </button>
+          <div class="error-message" id="sectionsError">At least one section with bypasses is required</div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">Create Plugin</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">Plugin created successfully!</div>
+</body>
   <script>
     let plugins = [];
     let sections = {};
