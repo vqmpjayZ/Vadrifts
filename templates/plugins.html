@@ -1152,26 +1152,6 @@
     </div>
   </div>
 
-<div class="form-group">
-  <label>Tab Icon <span class="optional">(optional)</span></label>
-  <select id="pluginIcon" style="display: none;"></select>
-  <div class="custom-select-container" id="iconSelectContainer">
-    <div class="select-header" id="selectHeader">
-      <div class="select-header-content">
-        <div class="selected-icon" id="selectedIcon"></div>
-        <span id="selectedIconName">Loading icons...</span>
-      </div>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M7 10l5 5 5-5z"></path>
-      </svg>
-    </div>
-    <div class="select-dropdown" id="selectDropdown">
-      <input type="text" class="select-search" id="iconSearch" placeholder="Search icons...">
-      <div class="select-options" id="iconOptions"></div>
-    </div>
-  </div>
-</div>
-
 <div class="modal" id="createModal">
   <div class="modal-content">
     <div class="modal-header">
@@ -1256,12 +1236,22 @@
     let isOwnerMode = false;
     let icons = {};
     
-    async function loadIconsFromGitHub() {
+async function loadIconsFromGitHub() {
   try {
     const response = await fetch('https://cdn.jsdelivr.net/gh/vqmpjayZ/Vadrifts@main/icons.js');
     const code = await response.text();
     eval(code);
-    console.log('Icons loaded!', Object.keys(icons).length);
+  
+    if (window.icons) {
+      icons = window.icons;
+    }
+    
+    console.log('Icons loaded!', icons ? Object.keys(icons).length : 0);
+    
+    if (!icons || Object.keys(icons).length === 0) {
+      throw new Error('No icons found');
+    }
+    
     initIconSelect();
   } catch (error) {
     console.error('Failed to load icons:', error);
