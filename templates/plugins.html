@@ -1240,13 +1240,15 @@ async function loadIconsFromGitHub() {
   try {
     const response = await fetch('https://cdn.jsdelivr.net/gh/vqmpjayZ/Vadrifts@main/icons.js');
     const code = await response.text();
+
     eval(code);
-  
-    if (window.icons) {
-      icons = window.icons;
-    }
     
-    console.log('Icons loaded!', icons ? Object.keys(icons).length : 0);
+    if (typeof ICONS !== 'undefined') {
+      icons = ICONS;
+      console.log('Icons loaded!', Object.keys(icons).length);
+    } else {
+      throw new Error('ICONS not found in loaded file');
+    }
     
     if (!icons || Object.keys(icons).length === 0) {
       throw new Error('No icons found');
