@@ -1845,6 +1845,141 @@
       }
     }
 
+function viewPlugin(pluginId) {
+      const plugin = plugins.find(p => p.id === pluginId);
+      if (!plugin) return;
+      
+      openPluginDetailsModal(plugin);
+    }
+
+    function openPluginDetailsModal(plugin) {
+      const modal = document.getElementById('detailsModal');
+      const sectionCount = Object.keys(plugin.sections || {}).length;
+      const bypassCount = Object.values(plugin.sections || {}).reduce((acc, bypasses) => acc + bypasses.length, 0);
+      
+      document.getElementById('detailsPluginIcon').innerHTML = getIconSvg(plugin.icon || 'package');
+      document.getElementById('detailsPluginName').textContent = plugin.name;
+      document.getElementById('detailsPluginAuthor').textContent = `by ${plugin.author || 'Anonymous'}`;
+      document.getElementById('detailsPluginDescription').textContent = plugin.description || 'This plugin has no description.';
+      document.getElementById('detailsStats').innerHTML = `
+        <span>${sectionCount} sections</span>
+        <span>${bypassCount} bypasses</span>
+      `;
+      
+      const sectionsHtml = Object.entries(plugin.sections || {})
+        .map(([sectionName, bypasses]) => `
+          <div class="details-section">
+            <div class="details-section-header">
+              <div class="details-section-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                </svg>
+              </div>
+              <h4 class="details-section-name">${escapeHtml(sectionName)}</h4>
+              <span class="details-bypass-count">${bypasses.length} bypass${bypasses.length !== 1 ? 'es' : ''}</span>
+            </div>
+            <div class="details-bypasses-list">
+              ${bypasses.map(bypass => `
+                <div class="details-bypass-item">
+                  <span class="bypass-bullet">•</span>
+                  <span class="bypass-text">${escapeHtml(bypass)}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `).join('');
+      
+      document.getElementById('detailsSectionsList').innerHTML = sectionsHtml;
+      
+      const rawUrl = `${window.location.origin}/api/plugins/${plugin.id}/raw`;
+      document.getElementById('rawPluginUrl').textContent = rawUrl;
+      document.getElementById('rawPluginUrl').href = rawUrl;
+      
+      const luaCode = generateLuaCode(plugin);
+      document.getElementById('luaCodeBlock').textContent = luaCode;
+      
+      modal.classList.add('active');
+    }
+
+    function closeDetailsModal() {
+      document.getElementById('detailsModal').classList.remove('active');
+    }
+
+    function copyRawUrl() {
+      const url = document.getElementById('rawPluginUrl').textContent;
+      navigator.clipboard.writeText(url).then(() => {
+        showToast('Raw URL copied to clipboard!');
+      }).catch(() => {
+        showToast('Failed to copy URL', 'error');
+      });
+    }
+
+    function copyLuaCode() {
+      const code = document.getElementById('luaCodeBlock').textContent;
+      navigator.clipboard.writeText(code).then(() => {
+        showToast('Lua code copied to clipboard!');
+      }).catch(() => {
+        showToast('Failed to copy code', 'error');
+      });
+    }
+
+    function generateLuaCode(plugin) {
+      return `-- Load plugin: ${plugin.name}
+local HttpService = game:GetService("HttpService")
+local pluginUrl = "${window.location.origin}/api/plugins/${plugin.id}/raw"
+
+local function loadPlugin()
+    local success, result = pcall(function()
+        return HttpService:GetAsync(pluginUrl)
+    end)
+    
+    if success then
+        local pluginData = HttpService:JSONDecode(result)
+        print("Loaded plugin: " .. pluginData.name)
+        
+        -- Access sections and bypasses
+        for sectionName, bypasses in pairs(pluginData.sections) do
+            print("Section: " .. sectionName)
+            for _, bypass in ipairs(bypasses) do
+                print("  - " .. bypass)
+            end
+        end
+        
+        return pluginData
+    else
+        warn("Failed to load plugin: " .. tostring(result))
+        return nil
+    end
+end
+
+local plugin = loadPlugin()
+
+-- Example: Integrate with Rayfield
+if plugin then
+    local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+    
+    local Window = Rayfield:CreateWindow({
+        Name = plugin.name .. " - " .. plugin.author,
+        LoadingTitle = "Loading " .. plugin.name,
+        LoadingSubtitle = "by " .. plugin.author,
+    })
+    
+    -- Create tabs for each section
+    for sectionName, bypasses in pairs(plugin.sections) do
+        local Tab = Window:CreateTab(sectionName, 4483362458)
+        
+        -- Add bypasses to section
+        for i, bypass in ipairs(bypasses) do
+            Tab:CreateButton({
+                Name = "Bypass " .. i .. ": " .. bypass:sub(1, 30),
+                Callback = function()
+                    print("Executing: " .. bypass)
+                    -- Your bypass execution logic here
+                end,
+            })
+        end
+    end
+end`;}
     async function handleSubmit(e) {
       e.preventDefault();
       
