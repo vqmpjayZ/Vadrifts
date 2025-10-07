@@ -1576,4 +1576,388 @@
     document.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
-</html>
+</html>al {
+      color: #666;
+      font-size: 12px;
+      font-weight: 400;
+      margin-left: 5px;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .char-counter {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 11px;
+      color: #666;
+    }
+
+    .char-counter.warning {
+      color: #ff9f43;
+    }
+
+    .char-counter.error {
+      color: #ff4b4b;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      background: rgba(40, 40, 40, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 14px 16px;
+      color: #ffffff;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.3s ease;
+    }
+
+    input.has-counter {
+      padding-right: 45px;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: #7209b7;
+      background: rgba(40, 40, 40, 0.8);
+      box-shadow: 0 0 0 3px rgba(114, 9, 183, 0.1);
+    }
+
+    .section-builder {
+      background: rgba(20, 20, 20, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .section-name-input {
+      background: rgba(40, 40, 40, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: #9c88ff;
+      font-size: 16px;
+      font-weight: 600;
+      flex: 1;
+      margin-right: 10px;
+    }
+
+    .bypasses-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 15px;
+      min-height: 40px;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+    }
+
+    .bypass-chip {
+      background: rgba(114, 9, 183, 0.2);
+      border: 1px solid rgba(114, 9, 183, 0.3);
+      color: #b8a4ff;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: chipIn 0.3s ease;
+    }
+
+    @keyframes chipIn {
+      from {
+        transform: scale(0.8);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .bypass-remove {
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+      font-size: 16px;
+    }
+
+    .bypass-remove:hover {
+      opacity: 1;
+      color: #ff4b4b;
+    }
+
+    .bypass-input-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .bypass-input {
+      flex: 1;
+    }
+
+    .add-bypass-btn {
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .add-bypass-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
+    }
+
+    .add-section-btn {
+      width: 100%;
+      background: rgba(114, 9, 183, 0.1);
+      border: 2px dashed rgba(114, 9, 183, 0.3);
+      color: #9c88ff;
+      padding: 15px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .add-section-btn:hover {
+      background: rgba(114, 9, 183, 0.2);
+      border-color: #9c88ff;
+    }
+
+    .submit-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #7209b7 0%, #9c88ff 100%);
+      color: white;
+      padding: 18px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 20px;
+    }
+
+    .submit-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(114, 9, 183, 0.4);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .error-message {
+      background: rgba(255, 75, 75, 0.1);
+      border: 1px solid rgba(255, 75, 75, 0.3);
+      color: #ff4b4b;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-top: 8px;
+      display: none;
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    .toast {
+      position: fixed;
+      top: 100px;
+      right: 20px;
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+      color: white;
+      padding: 16px 24px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(34, 197, 94, 0.3);
+      display: none;
+      animation: slideInRight 0.5s ease;
+      z-index: 2000;
+    }
+
+    .toast.show {
+      display: block;
+    }
+
+    .toast.error {
+      background: linear-gradient(135deg, #ff4b4b 0%, #c62828 100%);
+      box-shadow: 0 10px 30px rgba(255, 75, 75, 0.3);
+    }
+
+    @keyframes slideInRight {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 80px 20px;
+      grid-column: 1 / -1;
+    }
+
+    .empty-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+      opacity: 0.3;
+    }
+
+    .empty-title {
+      font-size: 24px;
+      font-weight: 600;
+      color: #888;
+      margin-bottom: 10px;
+    }
+
+    .empty-text {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .remove-section-btn {
+      background: rgba(255, 75, 75, 0.2);
+      border: 1px solid rgba(255, 75, 75, 0.3);
+      color: #ff4b4b;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .remove-section-btn:hover {
+      background: rgba(255, 75, 75, 0.3);
+      border-color: #ff4b4b;
+    }
+
+    .custom-select-container {
+      position: relative;
+      width: 100%;
+    }
+
+    .select-header {
+      background: rgba(40, 40, 40, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 14px 16px;
+      color: #ffffff;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .select-header:hover {
+      background: rgba(40, 40, 40, 0.8);
+    }
+
+    .select-header-content {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .selected-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+    }
+
+    .select-dropdown {
+      position: absolute;
+      top: calc(100% + 5px);
+      left: 0;
+      width: 100%;
+      background: #151515;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      max-height: 300px;
+      overflow-y: auto;
+      z-index: 10;
+      display: none;
+      padding: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .select-dropdown.show {
+      display: block;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .select-search {
+      background: rgba(40, 40, 40, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 10px;
+      color: #ffffff;
+      font-size: 14px;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    .select-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 8px;
+    }
+
+    .select-option {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .select-option:hover {
+      background: rgba(114, 9, 183, 0.2);
+    }
+
+    .select-option.selected {
+      background: rgba(114, 9, 183, 0.3);
+      border: 1px solid rgba(114, 9, 183, 0.5);
+    }
+
+    .option
