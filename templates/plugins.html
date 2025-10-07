@@ -1559,64 +1559,64 @@
       displayPlugins(filtered);
     }
 
-    function openCreateModal() {
-      const now = Date.now();
+function openCreateModal() {
+  const now = Date.now();
 
-      if (timeoutEndTime > now) {
-        const remainingSeconds = Math.ceil((timeoutEndTime - now) / 1000);
-        showToast(`You're creating plugins too fast! Wait <span class="countdown">${remainingSeconds}</span> seconds`, 'error');
-        
-        if (countdownInterval) clearInterval(countdownInterval);
-        
-        countdownInterval = setInterval(() => {
-          const remaining = Math.ceil((timeoutEndTime - Date.now()) / 1000);
-          if (remaining <= 0) {
-            clearInterval(countdownInterval);
-            timeoutEndTime = 0;
-            localStorage.removeItem('pluginTimeout');
-            
-            const toast = document.getElementById('toast');
-            if (toast.classList.contains('show')) {
-              toast.classList.remove('show');
-            }
-          } else {
-            const countdownElement = document.querySelector('.countdown');
-            if (countdownElement) {
-              countdownElement.textContent = remaining;
-            }
-          }
-        }, 1000);
-        
-        return;
+  if (timeoutEndTime > now) {
+    const remainingSeconds = Math.ceil((timeoutEndTime - now) / 1000);
+    showToast(`You're creating plugins too fast! Wait <span class="countdown">${remainingSeconds}</span> seconds`, 'error');
+    
+    if (countdownInterval) clearInterval(countdownInterval);
+    
+    countdownInterval = setInterval(() => {
+      const remaining = Math.ceil((timeoutEndTime - Date.now()) / 1000);
+      if (remaining <= 0) {
+        clearInterval(countdownInterval);
+        timeoutEndTime = 0;
+        localStorage.removeItem('pluginTimeout');
+        const toast = document.getElementById('toast');
+        if (toast.classList.contains('show')) {
+          toast.classList.remove('show');
+        }
+      } else {
+        const countdownElement = document.querySelector('.countdown');
+        if (countdownElement) {
+          countdownElement.textContent = remaining;
+        }
       }
-      
-      resetForm();
-      document.getElementById('modalTitle').textContent = 'Create New Plugin';
-      document.getElementById('submitBtn').textContent = 'Create Plugin';
-      document.getElementById('createModal').classList.add('active');
-    }
+    }, 1000);
+    return;
+  }
+  
+  resetForm();
+  document.getElementById('modalTitle').textContent = 'Create New Plugin';
+  document.getElementById('submitBtn').textContent = 'Create Plugin';
+  document.getElementById('createModal').classList.add('active');
+}
 
     function closeCreateModal() {
       document.getElementById('createModal').classList.remove('active');
       resetForm();
     }
 
-    function resetForm() {
-      document.getElementById('pluginForm').reset();
-      document.getElementById('editingPluginId').value = '';
-      sections = {};
-      sectionIdCounter = 0;
-      document.getElementById('sectionsContainer').innerHTML = '';
-      document.getElementById('nameCounter').textContent = '0/25';
-      document.getElementById('authorCounter').textContent = '0/20';
-      hideAllErrors();
-      
-      selectIcon('package');
-      
-      document.getElementById('nameFormGroup').style.display = 'block';
-      document.getElementById('authorFormGroup').style.display = 'block';
-      document.getElementById('descriptionFormGroup').style.display = 'block';
-    }
+function resetForm() {
+  document.getElementById('pluginForm').reset();
+  document.getElementById('editingPluginId').value = '';
+  sections = {};
+  sectionIdCounter = 0;
+  document.getElementById('sectionsContainer').innerHTML = '';
+  document.getElementById('nameCounter').textContent = '0/25';
+  document.getElementById('authorCounter').textContent = '0/20';
+  hideAllErrors();
+
+  if (icons && Object.keys(icons).length > 0) {
+    selectIcon('package');
+  }
+  
+  document.getElementById('nameFormGroup').style.display = 'block';
+  document.getElementById('authorFormGroup').style.display = 'block';
+  document.getElementById('descriptionFormGroup').style.display = 'block';
+}
 
     function addSection() {
       const sectionId = `section_${sectionIdCounter++}`;
