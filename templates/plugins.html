@@ -396,10 +396,11 @@
       overflow: hidden;
     }
 
-    .plugin-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 20px 60px rgba(114, 9, 183, 0.3);
-    }
+.plugin-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 60px rgba(114, 9, 183, 0.3);
+  cursor: pointer;
+}
 
     .plugin-actions {
       position: absolute;
@@ -1956,17 +1957,9 @@ function resetForm() {
       return isValid;
     }
 
-    function viewPlugin(pluginId) {
-      const plugin = plugins.find(p => p.id === pluginId);
-      if (!plugin) return;
-
-      const sections = Object.entries(plugin.sections || {})
-        .map(([name, bypasses]) => 
-          `${name}: ${bypasses.join(', ')}`
-        ).join('\n\n');
-      
-      alert(`${plugin.name}\nby ${plugin.author || 'Anonymous'}\n\n${plugin.description || 'No description'}\n\n${sections}`);
-    }
+function viewPlugin(pluginId) {
+  window.location.href = `/plugin-details.html?id=${pluginId}`;
+}
 
     function hideAllErrors() {
       document.querySelectorAll('.error-message').forEach(el => {
