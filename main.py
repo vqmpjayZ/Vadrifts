@@ -67,9 +67,25 @@ def plugin_details():
 
 @app.route('/api/plugins/<plugin_id>/raw')
 def get_plugin_raw(plugin_id):
-    plugin = plugins_manager.get_plugin_data(plugin_id)
+    """Serve raw Lua plugin data for loadstring"""
+    plugins = load_plugins()
+    plugin = next((p for p in plugins if p['id'] == plugin_id), None)
+    
     if not plugin:
         return "-- Plugin not found", 404
+    
+    # Generate the Lua code
+    sections = []
+    for section_name, bypasses in plugin.get('sections', {}).items():
+        bypasses_str = ',\n'.join([f'                "{bypass}"' for bypass in bypasses])
+        sections.append(f'''        {{
+            Name = "{section_name}",
+            Bypasses = {{
+{bypasses_str}
+            }}
+        }}''')
+    
+    sections_code = ',\n'.join(sections)
     
     lua_code = f'''-- {plugin['name']} by {plugin.get('author', 'Anonymous')}
 -- {plugin.get('description', 'No description')}
@@ -80,28 +96,15 @@ local Plugin = {{
     Description = "{plugin.get('description', 'No description')}",
     Icon = "{plugin.get('icon', 'package')}",
     Sections = {{
-'''
-    
-    for section_name, bypasses in plugin.get('sections', {}).items():
-        lua_code += f'''        {{
-            Name = "{section_name}",
-            Bypasses = {{
-'''
-        for bypass in bypasses:
-            safe_bypass = bypass.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n')
-            lua_code += f'''                "{safe_bypass}",
-'''
-        lua_code += '''            }}
-        }},
-'''
-    
-    lua_code += '''    }}
+{sections_code}
+    }}
 }}
 
 return Plugin'''
-    
-    return lua_code, 200, {'Content-Type': 'text/plain; charset=utf-8'}
-    
+
+    response = make_response(lua_code)
+    response.headers['Content-Type'] = 'text/plain; charset=utf-8'
+    return response
 @app.route('/script/<int:script_id>')
 def script_detail(script_id):
     script = next((s for s in scripts_data if s['id'] == script_id), None)
