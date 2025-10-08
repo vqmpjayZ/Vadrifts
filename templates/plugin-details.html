@@ -58,6 +58,7 @@
     .view-toggle {
       display: flex;
       gap: 10px;
+      flex-wrap: wrap;
     }
 
     .toggle-btn {
@@ -68,6 +69,7 @@
       border-radius: 8px;
       cursor: pointer;
       transition: all 0.3s ease;
+      font-size: 14px;
     }
 
     .toggle-btn.active {
@@ -133,12 +135,53 @@
       font-size: 14px;
     }
 
-    .styled-view, .raw-view {
+    .styled-view, .raw-view, .loadstring-view {
       display: none;
     }
 
-    .styled-view.active, .raw-view.active {
+    .styled-view.active, .raw-view.active, .loadstring-view.active {
       display: block;
+    }
+    
+    .loadstring-container {
+      background: #1a1a1a;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 25px;
+      margin-bottom: 20px;
+    }
+    
+    .loadstring-url {
+      background: #0a0a0a;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 15px;
+      font-family: 'Courier New', monospace;
+      color: #9c88ff;
+      font-size: 14px;
+      margin-top: 15px;
+      word-break: break-all;
+    }
+    
+    .loadstring-example {
+      background: #0a0a0a;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 20px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #ddd;
+      margin-top: 15px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    
+    .info-text {
+      color: #888;
+      font-size: 14px;
+      margin-top: 10px;
+      line-height: 1.6;
     }
 
     .section {
@@ -315,8 +358,9 @@
         Back to Plugins
       </a>
       <div class="view-toggle">
-        <button class="toggle-btn active" onclick="switchView('styled')">Styled View</button>
+        <button class="toggle-btn active" onclick="switchView('styled')">Styled</button>
         <button class="toggle-btn" onclick="switchView('raw')">Raw Data</button>
+        <button class="toggle-btn" onclick="switchView('loadstring')">Loadstring</button>
       </div>
     </div>
 
@@ -411,10 +455,26 @@
       `;
 
       const rawData = generateRawData(currentPlugin);
+      const loadstringUrl = `${window.location.origin}/api/plugins/${currentPlugin.id}/raw`;
+      const loadstringExample = `-- Load this plugin in your Roblox executor
+local Plugin = loadstring(game:HttpGet("${loadstringUrl}"))()
+
+-- Example usage with ArrayField/Rayfield:
+for _, section in ipairs(Plugin.Sections) do
+    local SectionParent = Tab:CreateSection(section.Name)
+    
+    for _, bypass in ipairs(section.Bypasses) do
+        SectionParent:CreateParagraph({
+            Title = "Bypass",
+            Content = bypass
+        })
+    end
+end`;
+
       const rawView = `
         <div class="raw-container">
           <div class="raw-header">
-            <div class="raw-title">Raw Plugin Data (Luau Compatible)</div>
+            <div class="raw-title">Raw Plugin Data (Rayfield/ArrayField Compatible)</div>
             <button class="copy-btn" onclick="copyRawData()">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -424,6 +484,38 @@
             </button>
           </div>
           <div class="raw-code" id="rawCode">${escapeHtml(rawData)}</div>
+        </div>
+      `;
+      
+      const loadstringView = `
+        <div class="loadstring-container">
+          <div class="raw-header">
+            <div class="raw-title">Loadstring URL</div>
+            <button class="copy-btn" onclick="copyLoadstringUrl()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              Copy URL
+            </button>
+          </div>
+          <div class="loadstring-url" id="loadstringUrl">${escapeHtml(loadstringUrl)}</div>
+          <p class="info-text">Use this URL with loadstring(game:HttpGet()) to load the plugin directly in your executor.</p>
+        </div>
+        
+        <div class="loadstring-container">
+          <div class="raw-header">
+            <div class="raw-title">Example Usage</div>
+            <button class="copy-btn" onclick="copyLoadstringExample()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              Copy
+            </button>
+          </div>
+          <div class="loadstring-example" id="loadstringExample">${escapeHtml(loadstringExample)}</div>
+          <p class="info-text">This example shows how to use the plugin with ArrayField or Rayfield UI library. The sections are automatically created with SectionParents.</p>
         </div>
       `;
 
@@ -439,22 +531,29 @@
 
     function generateRawData(plugin) {
       const sections = Object.entries(plugin.sections || {}).map(([name, bypasses]) => {
-        const bypassesStr = bypasses.map(b => `"${b.replace(/"/g, '\\"')}"`).join(', ');
-        return `    ["${name.replace(/"/g, '\\"')}"] = {${bypassesStr}}`;
+        const bypassesStr = bypasses.map(b => `                "${b.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`).join(',\n');
+        return `        {
+            Name = "${name.replace(/"/g, '\\"')}",
+            Bypasses = {
+${bypassesStr}
+            }
+        }`;
       }).join(',\n');
 
-      return `local plugin = {
-    id = "${plugin.id}",
-    name = "${plugin.name.replace(/"/g, '\\"')}",
-    author = "${(plugin.author || 'Anonymous').replace(/"/g, '\\"')}",
-    description = "${(plugin.description || 'No description').replace(/"/g, '\\"')}",
-    icon = "${plugin.icon || 'package'}",
-    sections = {
+      return `-- ${plugin.name} by ${plugin.author || 'Anonymous'}
+-- ${plugin.description || 'No description'}
+
+local Plugin = {
+    Name = "${plugin.name.replace(/"/g, '\\"')}",
+    Author = "${(plugin.author || 'Anonymous').replace(/"/g, '\\"')}",
+    Description = "${(plugin.description || 'No description').replace(/"/g, '\\"')}",
+    Icon = "${plugin.icon || 'package'}",
+    Sections = {
 ${sections}
     }
 }
 
-return plugin`;
+return Plugin`;
     }
 
     function getIconSvg(iconName) {
