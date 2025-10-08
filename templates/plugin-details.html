@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plugin Details</title>
+  <link rel="icon" href="https://i.imgur.com/ePueN25.png" type="image/png">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #0a0a0a;
+      color: #ffffff;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .back-btn {
+      background: rgba(114, 9, 183, 0.2);
+      border: 1px solid rgba(114, 9, 183, 0.3);
+      color: #9c88ff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .back-btn:hover {
+      background: rgba(114, 9, 183, 0.3);
+      border-color: #9c88ff;
+    }
+
+    .view-toggle {
+      display: flex;
+      gap: 10px;
+    }
+
+    .toggle-btn {
+      background: rgba(40, 40, 40, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #ccc;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .toggle-btn.active {
+      background: rgba(114, 9, 183, 0.3);
+      border-color: rgba(114, 9, 183, 0.5);
+      color: #9c88ff;
+    }
+
+    .plugin-header {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 30px;
+      padding: 25px;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+    }
+
+    .plugin-icon-large {
+      width: 80px;
+      height: 80px;
+      min-width: 80px;
+      background: rgba(114, 9, 183, 0.2);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #9c88ff;
+    }
+
+    .plugin-icon-large svg {
+      width: 48px;
+      height: 48px;
+    }
+
+    .plugin-info {
+      flex: 1;
+    }
+
+    .plugin-title {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .plugin-author {
+      color: #888;
+      margin-bottom: 15px;
+    }
+
+    .plugin-description {
+      color: #ccc;
+      line-height: 1.6;
+    }
+
+    .plugin-stats {
+      display: flex;
+      gap: 25px;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      color: #888;
+      font-size: 14px;
+    }
+
+    .styled-view, .raw-view {
+      display: none;
+    }
+
+    .styled-view.active, .raw-view.active {
+      display: block;
+    }
+
+    .section {
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 25px;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #9c88ff;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .bypass-count {
+      background: rgba(114, 9, 183, 0.3);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .bypasses-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .bypass-item {
+      background: rgba(20, 20, 20, 0.5);
+      padding: 12px 15px;
+      border-radius: 8px;
+      border-left: 3px solid #7209b7;
+      color: #ddd;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+    }
+
+    .raw-container {
+      background: #1a1a1a;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 25px;
+      position: relative;
+    }
+
+    .raw-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .raw-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #9c88ff;
+    }
+
+    .copy-btn {
+      background: rgba(114, 9, 183, 0.2);
+      border: 1px solid rgba(114, 9, 183, 0.3);
+      color: #9c88ff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .copy-btn:hover {
+      background: rgba(114, 9, 183, 0.3);
+      border-color: #9c88ff;
+    }
+
+    .raw-code {
+      background: #0a0a0a;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 20px;
+      overflow-x: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #ddd;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(34, 197, 94, 0.3);
+      display: none;
+      animation: slideIn 0.3s ease;
+      z-index: 1000;
+    }
+
+    .toast.show {
+      display: block;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .error-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .error-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+
+    .error-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .error-text {
+      color: #888;
+    }
+
+    @media (max-width: 768px) {
+      .plugin-header {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .plugin-icon-large {
+        margin: 0 auto;
+      }
+
+      .plugin-stats {
+        justify-content: center;
+      }
+
+      .view-toggle {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <a href="/plugins" class="back-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 11H7.83l4.88-4.88a1 1 0 1 0-1.42-1.42l-6.59 6.59a1 1 0 0 0 0 1.42l6.59 6.59a1 1 0 0 0 1.42-1.42L7.83 13H19a1 1 0 0 0 0-2z"/>
+        </svg>
+        Back to Plugins
+      </a>
+      <div class="view-toggle">
+        <button class="toggle-btn active" onclick="switchView('styled')">Styled View</button>
+        <button class="toggle-btn" onclick="switchView('raw')">Raw Data</button>
+      </div>
+    </div>
+
+    <div id="pluginContent">
+      <div class="error-state">
+        <div class="error-icon">⏳</div>
+        <div class="error-title">Loading plugin...</div>
+        <div class="error-text">Please wait</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Copied to clipboard!</div>
+
+  <script>
+    let currentPlugin = null;
+
+    function getPluginIdFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('id');
+    }
+
+    async function loadPlugin() {
+      const pluginId = getPluginIdFromUrl();
+      
+      if (!pluginId) {
+        showError('No plugin ID provided');
+        return;
+      }
+
+      try {
+        const savedPlugins = localStorage.getItem('vadriftsPlugins');
+        let plugins = [];
+        
+        if (savedPlugins) {
+          plugins = JSON.parse(savedPlugins);
+        }
+
+        currentPlugin = plugins.find(p => p.id === pluginId);
+
+        if (!currentPlugin) {
+          const response = await fetch(`/api/plugins/${pluginId}`);
+          if (response.ok) {
+            currentPlugin = await response.json();
+          } else {
+            throw new Error('Plugin not found');
+          }
+        }
+
+        displayPlugin();
+      } catch (error) {
+        console.error('Error loading plugin:', error);
+        showError('Failed to load plugin');
+      }
+    }
+
+    function displayPlugin() {
+      if (!currentPlugin) return;
+
+      const sectionCount = Object.keys(currentPlugin.sections || {}).length;
+      const bypassCount = Object.values(currentPlugin.sections || {}).reduce((acc, bypasses) => acc + bypasses.length, 0);
+
+      const styledView = `
+        <div class="plugin-header">
+          <div class="plugin-icon-large">
+            ${getIconSvg(currentPlugin.icon || 'package')}
+          </div>
+          <div class="plugin-info">
+            <h1 class="plugin-title">${escapeHtml(currentPlugin.name)}</h1>
+            <div class="plugin-author">by ${escapeHtml(currentPlugin.author || 'Anonymous')}</div>
+            <p class="plugin-description">${escapeHtml(currentPlugin.description || 'No description provided.')}</p>
+            <div class="plugin-stats">
+              <span>📦 ${sectionCount} sections</span>
+              <span>🔧 ${bypassCount} bypasses</span>
+            </div>
+          </div>
+        </div>
+
+        ${Object.entries(currentPlugin.sections || {}).map(([sectionName, bypasses]) => `
+          <div class="section">
+            <div class="section-title">
+              ${escapeHtml(sectionName)}
+              <span class="bypass-count">${bypasses.length}</span>
+            </div>
+            <div class="bypasses-list">
+              ${bypasses.map(bypass => `
+                <div class="bypass-item">${escapeHtml(bypass)}</div>
+              `).join('')}
+            </div>
+          </div>
+        `).join('')}
+      `;
+
+      const rawData = generateRawData(currentPlugin);
+      const rawView = `
+        <div class="raw-container">
+          <div class="raw-header">
+            <div class="raw-title">Raw Plugin Data (Luau Compatible)</div>
+            <button class="copy-btn" onclick="copyRawData()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              Copy
+            </button>
+          </div>
+          <div class="raw-code" id="rawCode">${escapeHtml(rawData)}</div>
+        </div>
+      `;
+
+      document.getElementById('pluginContent').innerHTML = `
+        <div class="styled-view active">
+          ${styledView}
+        </div>
+        <div class="raw-view">
+          ${rawView}
+        </div>
+      `;
+    }
+
+    function generateRawData(plugin) {
+      const sections = Object.entries(plugin.sections || {}).map(([name, bypasses]) => {
+        const bypassesStr = bypasses.map(b => `"${b.replace(/"/g, '\\"')}"`).join(', ');
+        return `    ["${name.replace(/"/g, '\\"')}"] = {${bypassesStr}}`;
+      }).join(',\n');
+
+      return `local plugin = {
+    id = "${plugin.id}",
+    name = "${plugin.name.replace(/"/g, '\\"')}",
+    author = "${(plugin.author || 'Anonymous').replace(/"/g, '\\"')}",
+    description = "${(plugin.description || 'No description').replace(/"/g, '\\"')}",
+    icon = "${plugin.icon || 'package'}",
+    sections = {
+${sections}
+    }
+}
+
+return plugin`;
+    }
+
+    function getIconSvg(iconName) {
+      return '<svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>';
+    }
+
+    function switchView(view) {
+      document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.styled-view, .raw-view').forEach(v => v.classList.remove('active'));
+      
+      if (view === 'styled') {
+        document.querySelector('.toggle-btn:first-child').classList.add('active');
+        document.querySelector('.styled-view').classList.add('active');
+      } else {
+        document.querySelector('.toggle-btn:last-child').classList.add('active');
+        document.querySelector('.raw-view').classList.add('active');
+      }
+    }
+
+    function copyRawData() {
+      const rawCode = document.getElementById('rawCode').textContent;
+      navigator.clipboard.writeText(rawCode).then(() => {
+        showToast('Copied to clipboard!');
+      }).catch(err => {
+        console.error('Failed to copy:', err);
+      });
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2000);
+    }
+
+    function showError(message) {
+      document.getElementById('pluginContent').innerHTML = `
+        <div class="error-state">
+          <div class="error-icon">❌</div>
+          <div class="error-title">Error</div>
+          <div class="error-text">${escapeHtml(message)}</div>
+        </div>
+      `;
+    }
+
+    function escapeHtml(text) {
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return (text || '').replace(/[&<>"']/g, m => map[m]);
+    }
+
+    document.addEventListener('DOMContentLoaded', loadPlugin);
+  </script>
+</body>
+</html>
