@@ -64,7 +64,44 @@ def plugin_details():
     except FileNotFoundError:
         logger.error("plugin-details.html template not found")
         return jsonify({"error": "Plugin details page not found"}), 404
-        
+
+@app.route('/api/plugins/<plugin_id>/raw')
+def get_plugin_raw(plugin_id):
+    plugin = plugins_manager.get_plugin_data(plugin_id)
+    if not plugin:
+        return "-- Plugin not found", 404
+    
+    lua_code = f'''-- {plugin['name']} by {plugin.get('author', 'Anonymous')}
+-- {plugin.get('description', 'No description')}
+
+local Plugin = {{
+    Name = "{plugin['name']}",
+    Author = "{plugin.get('author', 'Anonymous')}",
+    Description = "{plugin.get('description', 'No description')}",
+    Icon = "{plugin.get('icon', 'package')}",
+    Sections = {{
+'''
+    
+    for section_name, bypasses in plugin.get('sections', {}).items():
+        lua_code += f'''        {{
+            Name = "{section_name}",
+            Bypasses = {{
+'''
+        for bypass in bypasses:
+            safe_bypass = bypass.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n')
+            lua_code += f'''                "{safe_bypass}",
+'''
+        lua_code += '''            }}
+        }},
+'''
+    
+    lua_code += '''    }}
+}}
+
+return Plugin'''
+    
+    return lua_code, 200, {'Content-Type': 'text/plain; charset=utf-8'}
+    
 @app.route('/script/<int:script_id>')
 def script_detail(script_id):
     script = next((s for s in scripts_data if s['id'] == script_id), None)
