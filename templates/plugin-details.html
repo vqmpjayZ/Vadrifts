@@ -55,6 +55,365 @@
       border-color: #9c88ff;
     }
 
+    .raw-btn {
+      background: rgba(40, 40, 40, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #9c88ff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .raw-btn:hover {
+      background: rgba(114, 9, 183, 0.2);
+      border-color: rgba(114, 9, 183, 0.3);
+    }
+
+    .plugin-header {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 30px;
+      padding: 25px;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+    }
+
+    .plugin-icon-large {
+      width: 80px;
+      height: 80px;
+      min-width: 80px;
+      background: rgba(114, 9, 183, 0.2);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #9c88ff;
+    }
+
+    .plugin-icon-large svg {
+      width: 48px;
+      height: 48px;
+    }
+
+    .plugin-info {
+      flex: 1;
+    }
+
+    .plugin-title {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .plugin-author {
+      color: #888;
+      margin-bottom: 15px;
+    }
+
+    .plugin-description {
+      color: #ccc;
+      line-height: 1.6;
+    }
+
+    .plugin-stats {
+      display: flex;
+      gap: 25px;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      color: #888;
+      font-size: 14px;
+    }
+
+    .section {
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 25px;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #9c88ff;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .bypass-count {
+      background: rgba(114, 9, 183, 0.3);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .bypasses-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .bypass-item {
+      background: rgba(20, 20, 20, 0.5);
+      padding: 12px 15px;
+      border-radius: 8px;
+      border-left: 3px solid #7209b7;
+      color: #ddd;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+    }
+
+    .error-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .error-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+
+    .error-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .error-text {
+      color: #888;
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .plugin-header {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .plugin-icon-large {
+        margin: 0 auto;
+      }
+
+      .plugin-stats {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <a href="/plugins" class="back-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 11H7.83l4.88-4.88a1 1 0 1 0-1.42-1.42l-6.59 6.59a1 1 0 0 0 0 1.42l6.59 6.59a1 1 0 0 0 1.42-1.42L7.83 13H19a1 1 0 0 0 0-2z"/>
+        </svg>
+        Back to Plugins
+      </a>
+      <a href="#" class="raw-btn" id="rawPageBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        View Raw Page
+      </a>
+    </div>
+
+    <div id="pluginContent">
+      <div class="error-state">
+        <div class="error-icon">⏳</div>
+        <div class="error-title">Loading plugin...</div>
+        <div class="error-text">Please wait</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentPlugin = null;
+
+    function getPluginIdFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('id');
+    }
+
+    async function loadPlugin() {
+      const pluginId = getPluginIdFromUrl();
+      
+      if (!pluginId) {
+        showError('No plugin ID provided');
+        return;
+      }
+
+      // Set the raw page button URL
+      document.getElementById('rawPageBtn').href = `/api/plugins/${pluginId}/raw`;
+
+      try {
+        const savedPlugins = localStorage.getItem('vadriftsPlugins');
+        let plugins = [];
+        
+        if (savedPlugins) {
+          plugins = JSON.parse(savedPlugins);
+        }
+
+        currentPlugin = plugins.find(p => p.id === pluginId);
+
+        if (!currentPlugin) {
+          const response = await fetch(`/api/plugins/${pluginId}`);
+          if (response.ok) {
+            currentPlugin = await response.json();
+          } else {
+            throw new Error('Plugin not found');
+          }
+        }
+
+        displayPlugin();
+      } catch (error) {
+        console.error('Error loading plugin:', error);
+        showError('Failed to load plugin');
+      }
+    }
+
+    function displayPlugin() {
+      if (!currentPlugin) return;
+
+      const sectionCount = Object.keys(currentPlugin.sections || {}).length;
+      const bypassCount = Object.values(currentPlugin.sections || {}).reduce((acc, bypasses) => acc + bypasses.length, 0);
+
+      const styledView = `
+        <div class="plugin-header">
+          <div class="plugin-icon-large">
+            ${getIconSvg(currentPlugin.icon || 'package')}
+          </div>
+          <div class="plugin-info">
+            <h1 class="plugin-title">${escapeHtml(currentPlugin.name)}</h1>
+            <div class="plugin-author">by ${escapeHtml(currentPlugin.author || 'Anonymous')}</div>
+            <p class="plugin-description">${escapeHtml(currentPlugin.description || 'No description provided.')}</p>
+            <div class="plugin-stats">
+              <span>📦 ${sectionCount} sections</span>
+              <span>🔧 ${bypassCount} bypasses</span>
+            </div>
+          </div>
+        </div>
+
+        ${Object.entries(currentPlugin.sections || {}).map(([sectionName, bypasses]) => `
+          <div class="section">
+            <div class="section-title">
+              ${escapeHtml(sectionName)}
+              <span class="bypass-count">${bypasses.length}</span>
+            </div>
+            <div class="bypasses-list">
+              ${bypasses.map(bypass => `
+                <div class="bypass-item">${escapeHtml(bypass)}</div>
+              `).join('')}
+            </div>
+          </div>
+        `).join('')}
+      `;
+
+      document.getElementById('pluginContent').innerHTML = styledView;
+    }
+
+    function getIconSvg(iconName) {
+      return '<svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>';
+    }
+
+    function showError(message) {
+      document.getElementById('pluginContent').innerHTML = `
+        <div class="error-state">
+          <div class="error-icon">❌</div>
+          <div class="error-title">Error</div>
+          <div class="error-text">${escapeHtml(message)}</div>
+        </div>
+      `;
+    }
+
+    function escapeHtml(text) {
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return (text || '').replace(/[&<>"']/g, m => map[m]);
+    }
+
+    document.addEventListener('DOMContentLoaded', loadPlugin);
+  </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plugin Details</title>
+  <link rel="icon" href="https://i.imgur.com/ePueN25.png" type="image/png">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #0a0a0a;
+      color: #ffffff;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .back-btn {
+      background: rgba(114, 9, 183, 0.2);
+      border: 1px solid rgba(114, 9, 183, 0.3);
+      color: #9c88ff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .back-btn:hover {
+      background: rgba(114, 9, 183, 0.3);
+      border-color: #9c88ff;
+    }
+
     .view-toggle {
       display: flex;
       gap: 10px;
