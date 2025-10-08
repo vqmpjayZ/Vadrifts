@@ -57,6 +57,14 @@ def plugins_page():
         logger.error("plugins.html template not found")
         return jsonify({"error": "Plugins page not found"}), 404
 
+@app.route('/plugin-details')
+def plugin_details():
+    try:
+        return send_file('templates/plugin-details.html')
+    except FileNotFoundError:
+        logger.error("plugin-details.html template not found")
+        return jsonify({"error": "Plugin details page not found"}), 404
+        
 @app.route('/script/<int:script_id>')
 def script_detail(script_id):
     script = next((s for s in scripts_data if s['id'] == script_id), None)
