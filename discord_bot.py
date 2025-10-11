@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import asyncio
 import random
+import re
 from config import DISCORD_TOKEN, TARGET_CHANNEL_ID, DELAY_SECONDS
 
 intents = discord.Intents.default()
@@ -10,6 +11,7 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 
 recent_boosts = {}
 pending_tasks = {}
+last_meow_count = None
 
 async def send_good_boy_after_delay(user_id, channel):
     await asyncio.sleep(DELAY_SECONDS)
@@ -20,13 +22,25 @@ async def send_good_boy_after_delay(user_id, channel):
 
 @bot.event
 async def on_message(message):
+    global last_meow_count
     if message.author == bot.user:
         return
 
-    words = [w.lower() for w in message.content.split()]
-    if "meow" in words:
-        meow_weights = [5, 4, 3, 2, 1, 1]  # 2-7 meows, smaller numbers more likely
-        meow_count = random.choices(range(2, 8), weights=meow_weights)[0]
+    words = re.findall(r'\bmeow\b', message.content, flags=re.IGNORECASE)
+    if words:
+        meow_weights = [5, 4, 3, 2, 1, 1]  # for 2-7 meows
+        possible_counts = list(range(2, 8))
+
+        if last_meow_count in possible_counts:
+            last_index = possible_counts.index(last_meow_count)
+            weights = meow_weights[:]
+            weights[last_index] = 0
+        else:
+            weights = meow_weights
+
+        meow_count = random.choices(possible_counts, weights=weights)[0]
+        last_meow_count = meow_count
+
         punctuation = random.choice(["", "!", "!!", "."])
         await message.channel.send(("meow " * meow_count).strip() + punctuation)
 
