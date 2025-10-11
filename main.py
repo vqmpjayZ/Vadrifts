@@ -341,12 +341,9 @@ if __name__ == '__main__':
 
     bot_thread = threading.Thread(target=start_bot, daemon=True)
     bot_thread.start()
-    logger.info("Discord bot started")
 
     ping_thread = threading.Thread(target=server_pinger, daemon=True)
     ping_thread.start()
-    logger.info("Server pinger started")
 
     port = int(os.environ.get("PORT", 5000))
-    logger.info(f"Starting Vadrifts Flask server on port {port}")
     app.run(host='0.0.0.0', port=port, debug=False)
