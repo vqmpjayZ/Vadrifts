@@ -1,11 +1,8 @@
 import discord
 from discord.ext import commands
 import asyncio
-import logging
 import random
 from config import DISCORD_TOKEN, TARGET_CHANNEL_ID, DELAY_SECONDS
-
-logger = logging.getLogger(__name__)
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -13,8 +10,6 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 
 recent_boosts = {}
 pending_tasks = {}
-
-@bot.event
 
 async def send_good_boy_after_delay(user_id, channel):
     await asyncio.sleep(DELAY_SECONDS)
@@ -28,8 +23,10 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
-    if "meow" in message.content.lower():
-        meow_count = random.choice([2, 3, 7])
+    words = [w.lower() for w in message.content.split()]
+    if "meow" in words:
+        meow_weights = [5, 4, 3, 2, 1, 1]  # 2-7 meows, smaller numbers more likely
+        meow_count = random.choices(range(2, 8), weights=meow_weights)[0]
         punctuation = random.choice(["", "!", "!!", "."])
         await message.channel.send(("meow " * meow_count).strip() + punctuation)
 
@@ -46,9 +43,6 @@ async def on_message(message):
     await bot.process_commands(message)
 
 def start_bot():
-    try:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop.run_until_complete(bot.start(DISCORD_TOKEN))
-    except Exception as e:
-        logger.error(f"Discord bot error: {e}")
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(bot.start(DISCORD_TOKEN))
