@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import asyncio
 import logging
+import random
 from config import DISCORD_TOKEN, TARGET_CHANNEL_ID, DELAY_SECONDS
 
 logger = logging.getLogger(__name__)
@@ -14,8 +15,6 @@ recent_boosts = {}
 pending_tasks = {}
 
 @bot.event
-async def on_ready():
-    logger.info(f"Discord bot logged in as {bot.user}")
 
 async def send_good_boy_after_delay(user_id, channel):
     await asyncio.sleep(DELAY_SECONDS)
@@ -28,18 +27,22 @@ async def send_good_boy_after_delay(user_id, channel):
 async def on_message(message):
     if message.author == bot.user:
         return
-    
+
     if "meow" in message.content.lower():
-        await message.channel.send("meow")
-    
+        meow_count = random.choice([2, 3, 7])
+        punctuation = random.choice(["", "!", "!!", "."])
+        await message.channel.send(("meow " * meow_count).strip() + punctuation)
+
     if message.channel.id == TARGET_CHANNEL_ID:
         if "just boosted the server!" in message.content.lower():
             user_id = message.author.id
             recent_boosts[user_id] = True
             if user_id in pending_tasks:
                 pending_tasks[user_id].cancel()
-            pending_tasks[user_id] = bot.loop.create_task(send_good_boy_after_delay(user_id, message.channel))
-    
+            pending_tasks[user_id] = bot.loop.create_task(
+                send_good_boy_after_delay(user_id, message.channel)
+            )
+
     await bot.process_commands(message)
 
 def start_bot():
