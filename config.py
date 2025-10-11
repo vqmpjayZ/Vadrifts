@@ -10,7 +10,6 @@ if not os.path.exists(DATA_DIR):
 
 PLUGINS_FILE = os.path.join(DATA_DIR, 'plugins_data.json')
 
-# Meta tags
 HOME_META_TAGS = '''
     <meta property="og:title" content="Vadrifts - Roblox Scripts & Tools">
     <meta property="og:description" content="Vadrift's all-in-one website!">
