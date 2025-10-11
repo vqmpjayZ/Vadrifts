@@ -13,7 +13,6 @@ def server_pinger():
     while True:
         try:
             requests.get("https://vadrifts.onrender.com/health", timeout=10)
-            logger.info("Server pinged successfully")
         except Exception as e:
             logger.error(f"Ping failed: {e}")
         time.sleep(300)
