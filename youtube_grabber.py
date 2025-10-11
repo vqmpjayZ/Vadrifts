@@ -23,8 +23,6 @@ class YouTubeChannelFinder:
             if time.time() - cached['timestamp'] < self.cache_duration:
                 return cached['data']
         
-        logger.info(f"Finding channel for username: {username}")
-        
         possible_urls = [
             f"https://www.youtube.com/@{username}",
             f"https://www.youtube.com/c/{username}",
@@ -43,7 +41,6 @@ class YouTubeChannelFinder:
                             'data': channel_data,
                             'timestamp': time.time()
                         }
-                        logger.info(f"Found channel for {username}: {channel_data['url']}")
                         return channel_data
                         
             except Exception as e:
