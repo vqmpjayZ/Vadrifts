@@ -89,10 +89,12 @@ async def authenticate(interaction: discord.Interaction):
     embed = discord.Embed(
         title="Authenticate for Premium.",
         description=(
-            "**To authenticate your Premium access**, follow these steps:\n\n"
-            "1️⃣ Run the following script in **Roblox** to copy your HWID:\n"
+            "**Authenticate to get access Premium benefits**, follow these steps:\n\n"
+            "1️⃣ Run the following script in Roblox to copy your HWID:\n"
             "```lua\nloadstring(game:HttpGet('https://raw.githubusercontent.com/vqmpjayZ/utils/refs/heads/main/CopyHWID.lua'))()\n```\n"
-            "2️⃣ Wait for authentication.\n\n"
+            "-# you can get the script by using the 'Get Script' button if you're on mobile\n"
+            "2️⃣ Click 'Enter HWID' and submit your HWID.\n"
+            "3️⃣ Wait to get authenticated by mods.\n\n"
             "_If the owner is online, authentication may take up to 50 minutes. Otherwise, allow up to 15+ hours._"
         ),
         color=discord.Color.blurple()
