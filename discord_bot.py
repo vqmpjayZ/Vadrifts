@@ -1,4 +1,5 @@
 import discord
+from discord import app_commands
 from discord.ext import commands
 import asyncio
 import random
@@ -6,6 +7,9 @@ import re
 from config import DISCORD_TOKEN
 
 TARGET_CHANNEL_ID = 1389210900489044048
+AUTH_CHANNEL_ID = 1287714060716081183
+LOG_CHANNEL_ID = 1270314848764559494
+OWNER_ID = 1144213765424947251
 DELAY_SECONDS = 1
 
 intents = discord.Intents.default()
@@ -23,6 +27,91 @@ async def send_good_boy_after_delay(user_id, channel):
         await channel.send(f"<@{user_id}> good boy")
         recent_boosts.pop(user_id, None)
         pending_tasks.pop(user_id, None)
+
+class HWIDModal(discord.ui.Modal, title="Enter Your HWID"):
+    hwid = discord.ui.TextInput(
+        label="Paste your HWID here",
+        style=discord.TextStyle.short,
+        placeholder="Example: 7d9f3e2b-xxxx-xxxx-xxxx",
+        required=True,
+    )
+
+    async def on_submit(self, interaction: discord.Interaction):
+        user = interaction.user
+        hwid_value = self.hwid.value.strip()
+
+        log_channel = bot.get_channel(LOG_CHANNEL_ID)
+        owner = await bot.fetch_user(OWNER_ID)
+
+        embed = discord.Embed(
+            title="HWID Submitted ✅",
+            description=(
+                "Your HWID has been sent to the owner for authentication.\n\n"
+                "If the owner (<@1144213765424947251>) is **online**, this usually takes up to **50 minutes**.\n"
+                "Otherwise (during school/night), it may take up to **15+ hours**."
+            ),
+            color=discord.Color.green(),
+        )
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+
+        msg = (
+            f"🔐 **New Authentication Request**\n"
+            f"**User:** {user.mention} ({user.id})\n"
+            f"**HWID:** `{hwid_value}`"
+        )
+        if log_channel:
+            await log_channel.send(msg)
+        if owner:
+            try:
+                await owner.send(msg)
+            except:
+                pass
+
+
+class AuthButtonView(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label="Get Script", style=discord.ButtonStyle.primary)
+    async def get_script(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message(
+            "```lua\nloadstring(game:HttpGet('https://raw.githubusercontent.com/vqmpjayZ/utils/refs/heads/main/CopyHWID.lua'))()\n```",
+            ephemeral=True,
+        )
+
+    @discord.ui.button(label="Enter HWID", style=discord.ButtonStyle.success)
+    async def enter_hwid(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_modal(HWIDModal())
+
+
+@bot.tree.command(name="authenticate", description="Authenticate your Premium access.")
+async def authenticate(interaction: discord.Interaction):
+    # Only allow in specific channel
+    if interaction.channel.id != AUTH_CHANNEL_ID:
+        await interaction.response.send_message(
+            "❌ You can only use this command in the designated authentication channel.",
+            ephemeral=True,
+        )
+        return
+
+    embed = discord.Embed(
+        title="🔐 Premium Authentication",
+        description=(
+            "**To authenticate your Premium access**, follow these steps:\n\n"
+            "1️⃣ Run the following script in **Roblox** to copy your HWID:\n"
+            "```lua\nloadstring(game:HttpGet('https://raw.githubusercontent.com/vqmpjayZ/utils/refs/heads/main/CopyHWID.lua'))()\n```\n"
+            "2️⃣ Click **Enter HWID** below to submit it.\n"
+            "3️⃣ Wait for the owner (<@1144213765424947251>) to authenticate you.\n\n"
+            "_Note: If the owner is online, authentication may take up to 50 minutes. "
+            "If not, please allow up to 15+ hours._"
+        ),
+        color=discord.Color.blurple(),
+    )
+    view = AuthButtonView()
+    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+
+
+# ---------- OLD STUFF (kept intact) ----------
 
 @bot.event
 async def on_message(message):
@@ -61,6 +150,17 @@ async def on_message(message):
                 )
 
     await bot.process_commands(message)
+
+
+@bot.event
+async def on_ready():
+    print(f"Bot connected as {bot.user}")
+    try:
+        synced = await bot.tree.sync()
+        print(f"Slash commands synced: {len(synced)}")
+    except Exception as e:
+        print(f"Sync failed: {e}")
+
 
 def start_bot():
     loop = asyncio.new_event_loop()
