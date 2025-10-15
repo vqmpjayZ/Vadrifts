@@ -32,13 +32,16 @@ async def send_good_boy_after_delay(user_id, channel):
         pending_tasks.pop(user_id, None)
 
 class HWIDModal(discord.ui.Modal, title="Enter Your HWID"):
-    hwid = discord.ui.TextInput(label="Paste your HWID here", style=discord.TextStyle.short, placeholder="Example: 56A21F95-D3B9-4723-8BC4-7B85B971A12F", required=True)
+    hwid = discord.ui.TextInput(label="Paste your HWID here", style=discord.TextStyle.short, placeholder="Example: ABCDEFGH-1234-IJKL-5678-MNOPQRSTUVW", required=True)
     async def on_submit(self, interaction: discord.Interaction):
         user = interaction.user
         hwid_value = self.hwid.value.strip()
         now = datetime.utcnow()
         if len(hwid_value) < 10:
             await interaction.response.send_message("HWID too short. Must be at least 10 characters.", ephemeral=True)
+            return
+        if len(hwid_value) > 35:
+            await interaction.response.send_message("HWID too long. Maximum 35 characters.", ephemeral=True)
             return
         if not re.fullmatch(r"[A-Fa-f0-9-]+", hwid_value):
             await interaction.response.send_message("HWID contains invalid characters. Use only letters A-F, numbers 0-9, and dashes.", ephemeral=True)
@@ -84,13 +87,12 @@ async def authenticate(interaction: discord.Interaction):
         await interaction.response.send_message("You can only use this command in the designated authentication channel.", ephemeral=True)
         return
     embed = discord.Embed(
-        title="Premium Authentication",
+        title="Authenticate for Premium.",
         description=(
             "**To authenticate your Premium access**, follow these steps:\n\n"
             "1️⃣ Run the following script in **Roblox** to copy your HWID:\n"
             "```lua\nloadstring(game:HttpGet('https://raw.githubusercontent.com/vqmpjayZ/utils/refs/heads/main/CopyHWID.lua'))()\n```\n"
-            "2️⃣ Click **Get Script** to receive the code in your DMs.\n"
-            "3️⃣ Click **Enter HWID** to submit it.\n\n"
+            "2️⃣ Wait for authentication.\n\n"
             "_If the owner is online, authentication may take up to 50 minutes. Otherwise, allow up to 15+ hours._"
         ),
         color=discord.Color.blurple()
