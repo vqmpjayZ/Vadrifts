@@ -24,14 +24,6 @@ async def send_good_boy_after_delay(user_id, channel):
         recent_boosts.pop(user_id, None)
         pending_tasks.pop(user_id, None)
 
-@bot.command()
-async def late(ctx):
-    boost_channel = bot.get_channel(1389210900489044048)
-    if boost_channel:
-        await boost_channel.send("hi sorry i'm late")
-        await asyncio.sleep(1)
-        await boost_channel.send("<@1403449777978609674> good boy")
-
 @bot.event
 async def on_message(message):
     global last_meow_count
