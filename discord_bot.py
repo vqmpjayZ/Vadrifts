@@ -11,6 +11,7 @@ TARGET_CHANNEL_ID = 1389210900489044048
 AUTH_CHANNEL_ID = 1287714060716081183
 LOG_CHANNEL_ID = 1270314848764559494
 OWNER_ID = 1144213765424947251
+GUILD_ID = 1241797935100989594
 DELAY_SECONDS = 1
 
 intents = discord.Intents.default()
@@ -31,28 +32,28 @@ async def send_good_boy_after_delay(user_id, channel):
         pending_tasks.pop(user_id, None)
 
 class HWIDModal(discord.ui.Modal, title="Enter Your HWID"):
-    hwid = discord.ui.TextInput(label="Paste your HWID here", style=discord.TextStyle.short, placeholder="Example: ABC123DEF456", required=True)
+    hwid = discord.ui.TextInput(label="Paste your HWID here", style=discord.TextStyle.short, placeholder="Example: 56A21F95-D3B9-4723-8BC4-7B85B971A12F", required=True)
     async def on_submit(self, interaction: discord.Interaction):
         user = interaction.user
         hwid_value = self.hwid.value.strip()
         now = datetime.utcnow()
         if len(hwid_value) < 10:
-            await interaction.response.send_message("❌ HWID too short. Minimum 10 characters.", ephemeral=True)
+            await interaction.response.send_message("HWID too short. Must be at least 10 characters.", ephemeral=True)
             return
-        if not hwid_value.isalnum():
-            await interaction.response.send_message("❌ HWID must contain only English letters and numbers, no spaces.", ephemeral=True)
+        if not re.fullmatch(r"[A-Fa-f0-9-]+", hwid_value):
+            await interaction.response.send_message("HWID contains invalid characters. Use only letters A-F, numbers 0-9, and dashes.", ephemeral=True)
             return
         if hwid_value in submitted_hwids:
             last_time = submitted_hwids[hwid_value]
             if now - last_time < timedelta(hours=24):
-                await interaction.response.send_message("❌ This HWID has already been submitted in the last 24 hours.", ephemeral=True)
+                await interaction.response.send_message("This HWID has already been submitted in the last 24 hours.", ephemeral=True)
                 return
         submitted_hwids[hwid_value] = now
         log_channel = bot.get_channel(LOG_CHANNEL_ID)
         owner = await bot.fetch_user(OWNER_ID)
-        embed = discord.Embed(title="HWID Submitted ✅", description="Your HWID has been sent to the owner for authentication.\n\nIf the owner (<@1144213765424947251>) is **online**, this usually takes up to **50 minutes**.\nOtherwise (during school/night), it may take up to **15+ hours**.", color=discord.Color.green())
+        embed = discord.Embed(title="HWID Submitted", description="Your HWID has been sent to the owner for authentication.\n\nIf the owner (<@1144213765424947251>) is online, this usually takes up to 50 minutes. Otherwise, allow up to 15+ hours.", color=discord.Color.green())
         await interaction.response.send_message(embed=embed, ephemeral=True)
-        msg_embed = discord.Embed(title="🔐 New Authentication Request", color=discord.Color.blurple())
+        msg_embed = discord.Embed(title="New Authentication Request", color=discord.Color.blurple())
         msg_embed.add_field(name="User", value=f"{user.mention} ({user.id})", inline=False)
         msg_embed.add_field(name="HWID", value=f"`{hwid_value}`", inline=False)
         if log_channel:
@@ -70,9 +71,9 @@ class AuthButtonView(discord.ui.View):
     async def get_script(self, interaction: discord.Interaction, button: discord.ui.Button):
         try:
             await interaction.user.send("loadstring(game:HttpGet('https://raw.githubusercontent.com/vqmpjayZ/utils/refs/heads/main/CopyHWID.lua'))()")
-            await interaction.response.send_message("✅ Script sent to your DMs!", ephemeral=True)
+            await interaction.response.send_message("Script sent to your DMs!", ephemeral=True)
         except:
-            await interaction.response.send_message("❌ Failed to DM the script. Please check your privacy settings.", ephemeral=True)
+            await interaction.response.send_message("Failed to DM the script. Check your privacy settings.", ephemeral=True)
     @discord.ui.button(label="Enter HWID", style=discord.ButtonStyle.success)
     async def enter_hwid(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_modal(HWIDModal())
@@ -80,16 +81,18 @@ class AuthButtonView(discord.ui.View):
 @app_commands.command(name="authenticate", description="Authenticate your Premium access.")
 async def authenticate(interaction: discord.Interaction):
     if interaction.channel.id != AUTH_CHANNEL_ID:
-        await interaction.response.send_message("❌ You can only use this command in the designated authentication channel.", ephemeral=True)
+        await interaction.response.send_message("You can only use this command in the designated authentication channel.", ephemeral=True)
         return
     embed = discord.Embed(
-        title="🔐 Premium Authentication",
-        description="**To authenticate your Premium access**, follow these steps:\n\n"
-                    "1️⃣ Run the following script in **Roblox** to copy your HWID:\n"
-                    "```lua\nloadstring(game:HttpGet('https://raw.githubusercontent.com/vqmpjayZ/utils/refs/heads/main/CopyHWID.lua'))()\n```\n"
-                    "2️⃣ Click **Get Script** to receive the code in your DMs.\n"
-                    "3️⃣ Click **Enter HWID** to submit it.\n\n"
-                    "_Note: If the owner is online, authentication may take up to 50 minutes. Otherwise, please allow up to 15+ hours._",
+        title="Premium Authentication",
+        description=(
+            "**To authenticate your Premium access**, follow these steps:\n\n"
+            "1️⃣ Run the following script in **Roblox** to copy your HWID:\n"
+            "```lua\nloadstring(game:HttpGet('https://raw.githubusercontent.com/vqmpjayZ/utils/refs/heads/main/CopyHWID.lua'))()\n```\n"
+            "2️⃣ Click **Get Script** to receive the code in your DMs.\n"
+            "3️⃣ Click **Enter HWID** to submit it.\n\n"
+            "_If the owner is online, authentication may take up to 50 minutes. Otherwise, allow up to 15+ hours._"
+        ),
         color=discord.Color.blurple()
     )
     view = AuthButtonView()
@@ -129,9 +132,9 @@ async def on_message(message):
 @bot.event
 async def on_ready():
     try:
-        if not any(cmd.name=="authenticate" for cmd in bot.tree.get_commands()):
+        if not any(cmd.name=="authenticate" for cmd in bot.tree.get_commands(guild=discord.Object(id=GUILD_ID))):
             bot.tree.add_command(authenticate)
-        await bot.tree.sync()
+        await bot.tree.sync(guild=discord.Object(id=GUILD_ID))
     except Exception as e:
         print(f"Slash command sync failed: {e}")
 
