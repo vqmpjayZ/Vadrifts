@@ -32,16 +32,21 @@ async def send_good_boy_after_delay(user_id, channel):
         pending_tasks.pop(user_id, None)
 
 class HWIDModal(discord.ui.Modal, title="Enter Your HWID"):
-    hwid = discord.ui.TextInput(label="Paste your HWID here", style=discord.TextStyle.short, placeholder="Example: ABCDEFGH-1234-IJKL-5678-MNOPQRSTUVW", required=True)
+    hwid = discord.ui.TextInput(
+        label="Paste your HWID here",
+        style=discord.TextStyle.short,
+        placeholder="Example: ABCDEFGH-1234-IJKL-5678-MNOPQRSTUVW",
+        required=True
+    )
     async def on_submit(self, interaction: discord.Interaction):
         user = interaction.user
         hwid_value = self.hwid.value.strip()
         now = datetime.utcnow()
-        if len(hwid_value) < 10:
-            await interaction.response.send_message("HWID too short. Must be at least 10 characters.", ephemeral=True)
+        if len(hwid_value) < 35:
+            await interaction.response.send_message("HWID too short. Must be at least 35 characters.", ephemeral=True)
             return
-        if len(hwid_value) > 35:
-            await interaction.response.send_message("HWID too long. Maximum 35 characters.", ephemeral=True)
+        if len(hwid_value) > 50:
+            await interaction.response.send_message("HWID too long. Maximum 50 characters.", ephemeral=True)
             return
         if not re.fullmatch(r"[A-Fa-f0-9-]+", hwid_value):
             await interaction.response.send_message("HWID contains invalid characters. Use only letters A-F, numbers 0-9, and dashes.", ephemeral=True)
@@ -54,7 +59,11 @@ class HWIDModal(discord.ui.Modal, title="Enter Your HWID"):
         submitted_hwids[hwid_value] = now
         log_channel = bot.get_channel(LOG_CHANNEL_ID)
         owner = await bot.fetch_user(OWNER_ID)
-        embed = discord.Embed(title="HWID Submitted", description="Your HWID has been sent to the owner for authentication.\n\nIf the owner (<@1144213765424947251>) is online, this usually takes up to 50 minutes. Otherwise, allow up to 15+ hours.", color=discord.Color.green())
+        embed = discord.Embed(
+            title="HWID Submitted",
+            description="Your HWID has been sent to the owner for authentication.\n\nIf the owner (<@1144213765424947251>) is online, this usually takes up to 50 minutes. Otherwise, allow up to 15+ hours.",
+            color=discord.Color.green()
+        )
         await interaction.response.send_message(embed=embed, ephemeral=True)
         msg_embed = discord.Embed(title="New Authentication Request", color=discord.Color.blurple())
         msg_embed.add_field(name="User", value=f"{user.mention} ({user.id})", inline=False)
@@ -70,6 +79,7 @@ class HWIDModal(discord.ui.Modal, title="Enter Your HWID"):
 class AuthButtonView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
+
     @discord.ui.button(label="Get Script", style=discord.ButtonStyle.primary)
     async def get_script(self, interaction: discord.Interaction, button: discord.ui.Button):
         try:
@@ -77,6 +87,7 @@ class AuthButtonView(discord.ui.View):
             await interaction.response.send_message("Script sent to your DMs!", ephemeral=True)
         except:
             await interaction.response.send_message("Failed to DM the script. Check your privacy settings.", ephemeral=True)
+
     @discord.ui.button(label="Enter HWID", style=discord.ButtonStyle.success)
     async def enter_hwid(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_modal(HWIDModal())
@@ -89,7 +100,7 @@ async def authenticate(interaction: discord.Interaction):
     embed = discord.Embed(
         title="Authenticate for Premium.",
         description=(
-            "**To gain access to Premium benefits**, follow these steps:\n\n"
+            "**Authenticate to get access Premium benefits**, follow these steps:\n\n"
             "1️⃣ Run the following script in Roblox to copy your HWID:\n"
             "```lua\nloadstring(game:HttpGet('https://raw.githubusercontent.com/vqmpjayZ/utils/refs/heads/main/CopyHWID.lua'))()\n```\n"
             "-# you can get the script by using the 'Get Script' button if you're on mobile\n"
