@@ -28,6 +28,9 @@ async def send_good_boy_after_delay(user_id, channel):
         recent_boosts.pop(user_id, None)
         pending_tasks.pop(user_id, None)
 
+
+# ---------- AUTHENTICATION SYSTEM ----------
+
 class HWIDModal(discord.ui.Modal, title="Enter Your HWID"):
     hwid = discord.ui.TextInput(
         label="Paste your HWID here",
@@ -84,7 +87,7 @@ class AuthButtonView(discord.ui.View):
         await interaction.response.send_modal(HWIDModal())
 
 
-@bot.tree.command(name="authenticate", description="Authenticate your Premium access.")
+@app_commands.command(name="authenticate", description="Authenticate your Premium access.")
 async def authenticate(interaction: discord.Interaction):
     # Only allow in specific channel
     if interaction.channel.id != AUTH_CHANNEL_ID:
@@ -156,6 +159,8 @@ async def on_message(message):
 async def on_ready():
     print(f"Bot connected as {bot.user}")
     try:
+        if not any(cmd.name == "authenticate" for cmd in bot.tree.get_commands()):
+            bot.tree.add_command(authenticate)
         synced = await bot.tree.sync()
         print(f"Slash commands synced: {len(synced)}")
     except Exception as e:
@@ -163,6 +168,4 @@ async def on_ready():
 
 
 def start_bot():
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    loop.run_until_complete(bot.start(DISCORD_TOKEN))
+    bot.run(DISCORD_TOKEN)
