@@ -89,7 +89,7 @@ async def authenticate(interaction: discord.Interaction):
     embed = discord.Embed(
         title="Authenticate for Premium.",
         description=(
-            "**Authenticate to get access Premium benefits**, follow these steps:\n\n"
+            "**To gain access to Premium benefits**, follow these steps:\n\n"
             "1️⃣ Run the following script in Roblox to copy your HWID:\n"
             "```lua\nloadstring(game:HttpGet('https://raw.githubusercontent.com/vqmpjayZ/utils/refs/heads/main/CopyHWID.lua'))()\n```\n"
             "-# you can get the script by using the 'Get Script' button if you're on mobile\n"
