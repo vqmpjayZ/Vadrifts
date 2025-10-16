@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title id="pageTitle">Script Details - Vadrifts</title>
-  <link rel="icon" href="https://i.imgur.com/ePueN25.png" type="image/png">
-  <style>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title id="pageTitle">Script Details - Vadrifts</title>
+		<link rel="icon" href="https://i.imgur.com/ePueN25.png" type="image/png">
+		<style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
     
     * {
@@ -460,13 +460,13 @@
       transform: translate(0, -2px);
     }
 
-    .lua-keyword { color: #ff79c6; font-weight: 600; }
-    .lua-string { color: #f1fa8c; }
-    .lua-comment { color: #6272a4; font-style: italic; }
-    .lua-number { color: #bd93f9; }
-    .lua-function { color: #8be9fd; }
-    .lua-boolean { color: #ffb86c; }
-    .lua-builtin { color: #50fa7b; }
+.lua-keyword { color: #ff8c00; font-weight: 700; }
+.lua-str { color: #8be9fd; }
+.lua-comment { color: #6272a4; font-style: italic; }
+.lua-number { color: #bd93f9; }
+.lua-function { color: #50fa7b; }
+.lua-boolean { color: #ffb86c; }
+.lua-builtin { color: #ff8c00; font-weight: 700; }
 
     .script-actions {
       display: flex;
@@ -712,88 +712,79 @@
         top: 25px;
       }
     }
-  </style>
-</head>
-<body>
-  <div class="bg-lights">
-    <div class="light light-1"></div>
-    <div class="light light-2"></div>
-    <div class="light light-3"></div>
-    <div class="light light-4"></div>
-    <div class="light light-5"></div>
-    <div class="light light-6"></div>
-    <div class="light light-7"></div>
-  </div>
-
-  <div class="particles" id="particles"></div>
-
-  <nav class="navbar">
-    <div class="nav-content">
-      <a href="/" class="nav-logo">
-        <img src="https://i.imgur.com/ePueN25.png" alt="Vadrifts Logo" class="nav-logo-img">
-        Vadrifts
-      </a>
-      <div class="nav-links">
-        <a href="/scripts" class="nav-link">Scripts</a>
-        <a href="/converter" class="nav-link">Image Converter</a>
-      </div>
-    </div>
-  </nav>
-
-  <div class="container">
-    <div id="loadingState" class="loading">
-      <div class="loading-spinner"></div>
-      <p>Loading script details...</p>
-    </div>
-
-    <div id="errorState" class="error-state" style="display: none;">
-      <div class="error-icon">⚠️</div>
-      <h3>Script not found</h3>
-      <p>The script you're looking for doesn't exist or has been removed.</p>
-      <br>
-      <a href="/scripts" class="back-btn">← Back to Scripts</a>
-    </div>
-
-    <div id="scriptContent" style="display: none;">
-      <div class="script-header">
-        <img id="scriptThumbnail" class="script-thumbnail" alt="Script Thumbnail">
-        <div id="scriptGame" class="script-game"></div>
-        <h1 id="scriptTitle" class="script-title"></h1>
-        <p id="scriptDescription" class="script-description"></p>
-      </div>
-
-      <div class="script-content">
-        <div class="features-section">
-          <h2 class="section-title">✨ Features</h2>
-          <ul id="featuresList" class="features-list"></ul>
-        </div>
-
-        <div class="script-section">
-          <h2 class="section-title">📜 Script Code</h2>
-          <div class="script-code-wrapper">
-            <div id="scriptCode" class="script-code"></div>
-            <button class="code-copy-btn" onclick="copyScript()">Copy</button>
-          </div>
-          
-          <div class="script-actions">
-            <button class="action-btn copy-btn" onclick="copyScript()">
-              📋 Copy Script
-            </button>
-            <a id="keyLink" class="action-btn key-btn" href="#" style="cursor: pointer;">
-              🔑 Get Key
-            </a>
-            <button class="action-btn game-link-btn" onclick="copyGameLink()">
-              🎮 Copy Game Link
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="statusMessage" class="status-message"></div>
-
-  <script>
+  
+		</style>
+	</head>
+	<body>
+		<div class="bg-lights">
+			<div class="light light-1"></div>
+			<div class="light light-2"></div>
+			<div class="light light-3"></div>
+			<div class="light light-4"></div>
+			<div class="light light-5"></div>
+			<div class="light light-6"></div>
+			<div class="light light-7"></div>
+		</div>
+		<div class="particles" id="particles"></div>
+		<nav class="navbar">
+			<div class="nav-content">
+				<a href="/" class="nav-logo">
+					<img src="https://i.imgur.com/ePueN25.png" alt="Vadrifts Logo" class="nav-logo-img">
+					Vadrifts
+				</a>
+				<div class="nav-links">
+					<a href="/scripts" class="nav-link">Scripts</a>
+					<a href="/converter" class="nav-link">Image Converter</a>
+				</div>
+			</div>
+		</nav>
+		<div class="container">
+			<div id="loadingState" class="loading">
+				<div class="loading-spinner"></div>
+				<p>Loading script details...</p>
+			</div>
+			<div id="errorState" class="error-state" style="display: none;">
+				<div class="error-icon">⚠️</div>
+				<h3>Script not found</h3>
+				<p>The script you're looking for doesn't exist or has been removed.</p>
+				<br>
+				<a href="/scripts" class="back-btn">← Back to Scripts</a>
+			</div>
+			<div id="scriptContent" style="display: none;">
+				<div class="script-header">
+					<img id="scriptThumbnail" class="script-thumbnail" alt="Script Thumbnail">
+					<div id="scriptGame" class="script-game"></div>
+					<h1 id="scriptTitle" class="script-title"></h1>
+					<p id="scriptDescription" class="script-description"></p>
+				</div>
+				<div class="script-content">
+					<div class="features-section">
+						<h2 class="section-title">✨ Features</h2>
+						<ul id="featuresList" class="features-list"></ul>
+					</div>
+					<div class="script-section">
+						<h2 class="section-title">📜 Script Code</h2>
+						<div class="script-code-wrapper">
+							<div id="scriptCode" class="script-code"></div>
+							<button class="code-copy-btn" onclick="copyScript()">Copy</button>
+						</div>
+						<div class="script-actions">
+							<button class="action-btn copy-btn" onclick="copyScript()">
+								📋 Copy Script
+							</button>
+							<a id="keyLink" class="action-btn key-btn" href="#" style="cursor: pointer;">
+								🔑 Get Key
+							</a>
+							<button class="action-btn game-link-btn" onclick="copyGameLink()">
+								🎮 Copy Game Link
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="statusMessage" class="status-message"></div>
+		<script>
     let currentScript = null;
     let currentScriptId = null;
 
@@ -811,32 +802,53 @@
       }
     }
 
-    function highlightLua(code) {
-      if (!code) return '';
-      
-      const keywords = /\b(local|function|end|if|then|else|elseif|for|while|do|repeat|until|return|break|true|false|nil|and|or|not|in)\b/g;
-      const builtins = /\b(game|workspace|script|wait|print|warn|error|spawn|loadstring|getfenv|setfenv|require|pairs|ipairs|next|tostring|tonumber|type|pcall|xpcall|assert|Vector3|CFrame|Instance|Color3|UDim2|math|string|table|coroutine|os)\b/g;
-      const strings = /(["'])(?:(?=(\\?))\2.)*?\1/g;
-      const comments = /(--.*$)/gm;
-      const numbers = /\b(\d+\.?\d*)\b/g;
-      const functions = /\b(\w+)\s*(?=KATEX_INLINE_OPEN)/g;
-      const booleans = /\b(true|false)\b/g;
-      
-      let highlighted = code
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-      
-      highlighted = highlighted.replace(strings, '<span class="lua-string">$&</span>');
-      highlighted = highlighted.replace(comments, '<span class="lua-comment">$&</span>');
-      highlighted = highlighted.replace(keywords, '<span class="lua-keyword">$&</span>');
-      highlighted = highlighted.replace(builtins, '<span class="lua-builtin">$&</span>');
-      highlighted = highlighted.replace(booleans, '<span class="lua-boolean">$&</span>');
-      highlighted = highlighted.replace(numbers, '<span class="lua-number">$&</span>');
-      highlighted = highlighted.replace(functions, '<span class="lua-function">$1</span>(');
-      
-      return highlighted;
-    }
+function highlightLua(code) {
+  if (!code) return '';
+  const keywords = /\b(local|function|end|if|then|else|elseif|for|while|do|repeat|until|return|break|in)\b/g;
+  const builtins = /\b(game|workspace|script|wait|print|warn|error|spawn|loadstring|getfenv|setfenv|require|pairs|ipairs|next|tostring|tonumber|type|pcall|xpcall|assert|Vector3|CFrame|Instance|Color3|UDim2|math|string|table|coroutine|os)\b/g;
+  const numbers = /\b(\d+\.?\d*)\b/g;
+  const booleans = /\b(true|false|null|nil)\b/g;
+  const funcNameBeforeParen = /\b([A-Za-z_]\w*)\s*(?=\()/g;
+
+  let escaped = code
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  const strings = [];
+  const comments = [];
+
+  escaped = escaped.replace(/(["'])(?:(?=(\\?))\2.)*?\1/g, (m) => {
+    const idx = strings.length;
+    strings.push(m);
+    return `@@STR${idx}@@`;
+  });
+
+  escaped = escaped.replace(/(--.*$)/gm, (m) => {
+    const idx = comments.length;
+    comments.push(m);
+    return `@@CMT${idx}@@`;
+  });
+
+  let highlighted = escaped
+    .replace(keywords, '<span class="lua-keyword">$&</span>')
+    .replace(builtins, '<span class="lua-builtin">$&</span>')
+    .replace(booleans, '<span class="lua-boolean">$&</span>')
+    .replace(numbers, '<span class="lua-number">$&</span>')
+    .replace(funcNameBeforeParen, '<span class="lua-function">$1</span>');
+
+  highlighted = highlighted.replace(/@@CMT(\d+)@@/g, (m, n) => {
+    const txt = comments[Number(n)];
+    return `<span class="lua-comment">${txt}</span>`;
+  });
+
+  highlighted = highlighted.replace(/@@STR(\d+)@@/g, (m, n) => {
+    const txt = strings[Number(n)];
+    return `<span class="lua-str">${txt}</span>`;
+  });
+
+  return highlighted;
+}
 
     function getScriptIdFromURL() {
       const pathParts = window.location.pathname.split('/');
@@ -980,6 +992,7 @@
 
     createParticles();
     document.addEventListener('DOMContentLoaded', loadScript);
-  </script>
-</body>
+  
+		</script>
+	</body>
 </html>
