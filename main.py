@@ -69,9 +69,12 @@ def plugin_details():
 
 @app.route('/api/plugins/<plugin_id>/raw')
 def get_plugin_raw(plugin_id):
-    """Serve raw Lua plugin data for loadstring"""
     try:
         plugins = plugins_manager.load_plugins()
+        
+        if plugins is None:
+            plugins = []
+        
         plugin = next((p for p in plugins if p['id'] == plugin_id), None)
         
         if not plugin:
@@ -115,7 +118,7 @@ return Plugin'''
 
         response = make_response(lua_code)
         response.headers['Content-Type'] = 'text/plain; charset=utf-8'
-        response.headers['Access-Control-Allow-Origin'] = '*' 
+        response.headers['Access-Control-Allow-Origin'] = '*'
         
         logger.info(f"Served raw plugin: {plugin_id}")
         return response
