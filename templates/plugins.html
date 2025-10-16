@@ -1006,36 +1006,6 @@
       display: none;
     }
 
-    .backup-restore {
-      display: flex;
-      justify-content: space-between;
-      margin: 10px 20px 30px;
-      gap: 10px;
-    }
-
-    .backup-btn, .restore-btn {
-      padding: 8px 16px;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      background: rgba(40, 40, 40, 0.5);
-      color: #ccc;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .backup-btn:hover, .restore-btn:hover {
-      background: rgba(114, 9, 183, 0.2);
-      color: #fff;
-    }
-
-    #fileInput {
-      display: none;
-    }
-
     .countdown {
       color: #ff4b4b;
       font-weight: 600;
@@ -1070,10 +1040,6 @@
 
       .add-bypass-btn {
         width: 100%;
-      }
-
-      .backup-restore {
-        flex-direction: column;
       }
     }
   </style>
@@ -1121,18 +1087,6 @@
       </svg>
       Create New Plugin
     </button>
-  </div>
-
-  <div class="backup-restore">
-    <button class="backup-btn" onclick="backupPlugins()">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-      Backup Plugins
-    </button>
-    <button class="restore-btn" onclick="document.getElementById('fileInput').click()">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-      Restore Plugins
-    </button>
-    <input type="file" id="fileInput" accept=".json" onchange="restorePlugins(this)">
   </div>
 
   <div class="search-section">
@@ -1449,64 +1403,6 @@ async function loadIconsFromGitHub() {
           document.getElementById('authorError').classList.remove('show');
         }, 3000);
       }
-    }
-    
-    function backupPlugins() {
-      try {
-        const backupData = {
-          plugins: plugins,
-          myPlugins: myPlugins,
-          timestamp: Date.now()
-        };
-        
-        const blob = new Blob([JSON.stringify(backupData)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `vadrifts_plugins_backup_${new Date().toISOString().slice(0, 10)}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        showToast('Plugins backed up successfully!');
-      } catch (error) {
-        console.error('Backup error:', error);
-        showToast('Failed to backup plugins', 'error');
-      }
-    }
-    
-    function restorePlugins(input) {
-      if (!input.files || !input.files[0]) return;
-      
-      const file = input.files[0];
-      const reader = new FileReader();
-      
-      reader.onload = function(e) {
-        try {
-          const data = JSON.parse(e.target.result);
-          
-          if (!data.plugins || !data.myPlugins) {
-            throw new Error('Invalid backup file format');
-          }
-          
-          plugins = data.plugins;
-          myPlugins = data.myPlugins;
-          
-          localStorage.setItem('vadriftsPlugins', JSON.stringify(plugins));
-          localStorage.setItem('myPlugins', JSON.stringify(myPlugins));
-          
-          displayPlugins(plugins);
-          showToast('Plugins restored successfully!');
-        } catch (error) {
-          console.error('Restore error:', error);
-          showToast('Failed to restore plugins: Invalid file format', 'error');
-        }
-      };
-      
-      reader.readAsText(file);
-      input.value = '';
     }
 
     async function loadPlugins() {
