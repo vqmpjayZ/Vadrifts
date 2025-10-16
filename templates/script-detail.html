@@ -811,7 +811,7 @@
       }
     }
 
-function highlightLuaLoadstring(code) {
+function highlightLua(code) {
   if (!code) return '';
 
   code = code
@@ -819,11 +819,19 @@ function highlightLuaLoadstring(code) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 
-  code = code.replace(/\b(loadstring)\b/g, '<span class="lua-keyword">$1</span>');
+  const patterns = [
+    { regex: /(--.*$)/gm, cls: 'lua-comment' },
+    { regex: /(["'])(?:\\.|(?!\1).)*\1/g, cls: 'lua-string' },
+    { regex: /\b(true|false|nil)\b/g, cls: 'lua-boolean' },
+    { regex: /\b(\d+\.?\d*)\b/g, cls: 'lua-number' },
+    { regex: /\b(local|function|end|if|then|else|elseif|for|while|do|repeat|until|return|break|and|or|not|in)\b/g, cls: 'lua-keyword' },
+    { regex: /\b(game|workspace|script|wait|print|warn|error|spawn|loadstring|getfenv|setfenv|require|pairs|ipairs|next|tostring|tonumber|type|pcall|xpcall|assert|Vector3|CFrame|Instance|Color3|UDim2|math|string|table|coroutine|os)\b/g, cls: 'lua-builtin' },
+    { regex: /\b(\w+)\s*(?=\()/g, cls: 'lua-function' },
+  ];
 
-  code = code.replace(/loadstring\((["'])(.*?)\1\)/g, (match, quote, content) => {
-    return `<span class="lua-keyword">loadstring</span>(<span class="lua-string">${quote}${content}${quote}</span>)`;
-  });
+  for (const { regex, cls } of patterns) {
+    code = code.replace(regex, `<span class="${cls}">$&</span>`);
+  }
 
   return code;
 }
