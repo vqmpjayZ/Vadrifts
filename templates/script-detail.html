@@ -817,11 +817,13 @@ function highlightLua(code) {
   code = code
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 
   const patterns = [
     { regex: /(--.*$)/gm, cls: 'lua-comment' },
-    { regex: /(["'])(?:\\.|(?!\1).)*\1/g, cls: 'lua-string' },
+    { regex: /(["'])(?:\\.|[^\\])*?\1/g, cls: 'lua-string' },
     { regex: /\b(true|false|nil)\b/g, cls: 'lua-boolean' },
     { regex: /\b(\d+\.?\d*)\b/g, cls: 'lua-number' },
     { regex: /\b(local|function|end|if|then|else|elseif|for|while|do|repeat|until|return|break|and|or|not|in)\b/g, cls: 'lua-keyword' },
@@ -829,72 +831,75 @@ function highlightLua(code) {
     { regex: /\b(\w+)\s*(?=\()/g, cls: 'lua-function' },
   ];
 
-  for (const { regex, cls } of patterns) {
-    code = code.replace(regex, `<span class="${cls}">$&</span>`);
-  }
+  patterns.forEach(({regex, cls}) => {
+    code = code.replace(regex, match => `{{${cls}:${match}}}`);
+  });
+
+  code = code.replace(/{{(.*?):(.*?)}}/g, '<span class="$1">$2</span>');
 
   return code;
 }
 
-    function getScriptIdFromURL() {
-      const pathParts = window.location.pathname.split('/');
-      const scriptId = pathParts[pathParts.length - 1];
-      console.log('Script ID from URL:', scriptId);
-      return scriptId;
+function getScriptIdFromURL() {
+  const pathParts = window.location.pathname.split('/');
+  const scriptId = pathParts[pathParts.length - 1];
+  console.log('Script ID from URL:', scriptId);
+  return scriptId;
+}
+
+async function loadScript() {
+  const scriptId = getScriptIdFromURL();
+  currentScriptId = scriptId;
+  
+  try {
+    const response = await fetch(`/api/scripts/${scriptId}`);
+    
+    if (!response.ok) {
+      throw new Error('Script not found');
     }
+    
+    currentScript = await response.json();
+    console.log('Loaded script:', currentScript);
+    displayScript(currentScript);
+    
+  } catch (error) {
+    console.error('Failed to load script:', error);
+    showError();
+  }
+}
 
-    async function loadScript() {
-      const scriptId = getScriptIdFromURL();
-      currentScriptId = scriptId;
-      
-      try {
-        const response = await fetch(`/api/scripts/${scriptId}`);
-        
-        if (!response.ok) {
-          throw new Error('Script not found');
-        }
-        
-        currentScript = await response.json();
-        console.log('Loaded script:', currentScript);
-        displayScript(currentScript);
-        
-      } catch (error) {
-        console.error('Failed to load script:', error);
-        showError();
-      }
-    }
+function displayScript(script) {
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('scriptContent').style.display = 'block';
 
-    function displayScript(script) {
-      document.getElementById('loadingState').style.display = 'none';
-      document.getElementById('scriptContent').style.display = 'block';
-  
-      document.getElementById('pageTitle').textContent = `${script.title} - Vadrifts`;
-      document.getElementById('scriptThumbnail').src = script.thumbnail;
-      document.getElementById('scriptThumbnail').alt = script.title;
-      document.getElementById('scriptGame').textContent = script.game;
-      document.getElementById('scriptTitle').textContent = script.title;
-      document.getElementById('scriptDescription').textContent = script.description;
+  document.getElementById('pageTitle').textContent = `${script.title} - Vadrifts`;
+  document.getElementById('scriptThumbnail').src = script.thumbnail;
+  document.getElementById('scriptThumbnail').alt = script.title;
+  document.getElementById('scriptGame').textContent = script.game;
+  document.getElementById('scriptTitle').textContent = script.title;
+  document.getElementById('scriptDescription').textContent = script.description;
 
-      const scriptCodeEl = document.getElementById('scriptCode');
-      scriptCodeEl.innerHTML = highlightLua(script.script);
-  
-      const keyButton = document.getElementById('keyLink');
-  
-      if (script.key_type === 'no-key') {
-        keyButton.style.display = 'none';
-      } else if (script.key_type === 'discord') {
-        keyButton.style.display = 'block';
-        keyButton.onclick = (e) => {
-          e.preventDefault();
-          window.open(script.key_link, '_blank');
-        };
-      } else {
-        keyButton.style.display = 'block';
-        keyButton.onclick = (e) => {
-          e.preventDefault();
-          goToKeySystem();
-        };
-      }
+  const scriptCodeEl = document.getElementById('scriptCode');
+  scriptCodeEl.innerHTML = highlightLua(script.script);
+
+  const keyButton = document.getElementById('keyLink');
+
+  if (script.key_type === 'no-key') {
+    keyButton.style.display = 'none';
+  } else if (script.key_type === 'discord') {
+    keyButton.style.display = 'block';
+    keyButton.onclick = (e) => {
+      e.preventDefault();
+      window.open(script.key_link, '_blank');
+    };
+  } else {
+    keyButton.style.display = 'block';
+    keyButton.onclick = (e) => {
+      e.preventDefault();
+      goToKeySystem();
+    };
+  }
+}
   
       const featuresList = document.getElementById('featuresList');
       featuresList.innerHTML = script.features.map(feature => `
