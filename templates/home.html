@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vadrifts</title>
-  <link rel="icon" href="https://i.imgur.com/ePueN25.png" type="image/png">
-  <style>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Vadrifts</title>
+		<link rel="icon" href="https://i.imgur.com/ePueN25.png" type="image/png">
+		<style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
     
     * {
@@ -36,121 +36,116 @@
     .light {
       position: absolute;
       border-radius: 50%;
-      filter: blur(150px);
-      opacity: 0.6;
-      animation-duration: 15s;
+      filter: blur(200px);
+      opacity: 0.35;
+      animation-duration: 50s;
       animation-iteration-count: infinite;
       animation-timing-function: ease-in-out;
     }
 
-    .light-1 {
-      width: 500px;
-      height: 500px;
-      background: radial-gradient(circle, #4a148c 0%, transparent 70%);
-      top: 2%;
-      left: 2%;
-      animation-name: float1;
-    }
+.light-1 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, #7b2cbf 0%, transparent 70%);
+  top: 2%;
+  left: 2%;
+  animation-name: float1;
+}
 
-    .light-2 {
-      width: 300px;
-      height: 300px;
-      background: radial-gradient(circle, #7209b7 0%, transparent 70%);
-      top: 15%;
-      right: 8%;
-      animation-name: float2;
-      animation-delay: -3s;
-    }
+.light-2 {
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, #9d4edd 0%, transparent 70%);
+  top: 15%;
+  right: 8%;
+  animation-name: float2;
+  animation-delay: -5s;
+}
 
-    .light-3 {
-      width: 450px;
-      height: 450px;
-      background: radial-gradient(circle, #9c27b0 0%, transparent 70%);
-      bottom: 20%;
-      left: 10%;
-      animation-name: float3;
-      animation-delay: -6s;
-    }
+.light-3 {
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(circle, #b388ff 0%, transparent 70%);
+  bottom: 20%;
+  left: 10%;
+  animation-name: float3;
+  animation-delay: -10s;
+}
 
-    .light-4 {
-      width: 350px;
-      height: 350px;
-      background: radial-gradient(circle, #9c88ff 0%, transparent 70%);
-      bottom: 15%;
-      right: 12%;
-      animation-name: float4;
-      animation-delay: -9s;
-    }
+.light-4 {
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, #c77dff 0%, transparent 70%);
+  bottom: 15%;
+  right: 12%;
+  animation-name: float4;
+  animation-delay: -15s;
+}
 
-    .light-5 {
-      width: 280px;
-      height: 280px;
-      background: radial-gradient(circle, #c478d4 0%, transparent 70%);
-      top: 45%;
-      left: 45%;
-      animation-name: float5;
-      animation-delay: -12s;
-    }
+.light-5 {
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle, #a45cff 0%, transparent 70%);
+  top: 45%;
+  left: 45%;
+  animation-name: float5;
+  animation-delay: -20s;
+}
 
-    .light-6 {
-      width: 200px;
-      height: 200px;
-      background: radial-gradient(circle, #b855d1 0%, transparent 70%);
-      top: 60%;
-      right: 30%;
-      animation-name: float6;
-      animation-delay: -5s;
-    }
+.light-6 {
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, #b15eff 0%, transparent 70%);
+  top: 60%;
+  right: 30%;
+  animation-name: float6;
+  animation-delay: -25s;
+}
 
-    .light-7 {
-      width: 380px;
-      height: 380px;
-      background: radial-gradient(circle, #ff9f43 0%, transparent 70%);
-      bottom: 8%;
-      right: 5%;
-      animation-name: float7;
-      animation-delay: -7s;
-    }
+.light-7 {
+  width: 380px;
+  height: 380px;
+  background: radial-gradient(circle, #ffb347 0%, transparent 70%);
+  bottom: 8%;
+  right: 5%;
+  animation-name: float7;
+  animation-delay: -30s;
+}
 
-    @keyframes float1 {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(120px, -80px) scale(1.1); }
-      66% { transform: translate(-80px, 120px) scale(0.9); }
-    }
+@keyframes float1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(60px, -40px) scale(1.05); }
+}
 
-    @keyframes float2 {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(-100px, 90px) scale(1.2); }
-      66% { transform: translate(150px, -100px) scale(0.8); }
-    }
+@keyframes float2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-50px, 40px) scale(1.05); }
+}
 
-    @keyframes float3 {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(90px, -120px) scale(0.95); }
-      66% { transform: translate(-120px, -90px) scale(1.05); }
-    }
+@keyframes float3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(40px, -60px) scale(0.95); }
+}
 
-    @keyframes float4 {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(-90px, -100px) scale(1.3); }
-      66% { transform: translate(100px, 130px) scale(0.7); }
-    }
+@keyframes float4 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-40px, -50px) scale(1.1); }
+}
 
-    @keyframes float5 {
-      0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
-      50% { transform: translate(-30px, -50px) scale(1.1) rotate(180deg); }
-    }
+@keyframes float5 {
+  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  50% { transform: translate(-20px, -30px) scale(1.05) rotate(180deg); }
+}
 
-    @keyframes float6 {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(60px, -80px) scale(1.4); }
-    }
+@keyframes float6 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(40px, -50px) scale(1.05); }
+}
 
-    @keyframes float7 {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(-60px, -70px) scale(1.1); }
-      66% { transform: translate(40px, 60px) scale(0.9); }
-    }
+@keyframes float7 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-30px, -40px) scale(1.05); }
+}
 
     .particles {
       position: fixed;
@@ -162,27 +157,31 @@
       pointer-events: none;
     }
 
-    .particle {
-      position: absolute;
-      width: 3px;
-      height: 3px;
-      background: #7209b7;
-      border-radius: 50%;
-      opacity: 0.7;
-      animation: floatUp 15s linear infinite;
-      box-shadow: 0 0 6px #7209b7;
-    }
+.particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: #a45cff;
+  border-radius: 50%;
+  opacity: 0.5;
+  box-shadow: 0 0 8px #a45cff;
+  animation: floatUp 240s linear infinite;
+}
 
-    @keyframes floatUp {
-      0% {
-        transform: translateY(100vh) translateX(0);
-        opacity: 0.7;
-      }
-      100% {
-        transform: translateY(-100px) translateX(30px);
-        opacity: 0;
-      }
-    }
+@keyframes floatUp {
+  0% {
+    transform: translateY(100vh) translateX(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(50vh) translateX(20px);
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(-200px) translateX(40px);
+    opacity: 0.3;
+  }
+}
 
     .navbar {
       position: fixed;
@@ -1715,395 +1714,385 @@
         padding: 20px 0;
       }
     }
-  </style>
-</head>
-<body>
-  <div class="bg-lights">
-    <div class="light light-1"></div>
-    <div class="light light-2"></div>
-    <div class="light light-3"></div>
-    <div class="light light-4"></div>
-    <div class="light light-5"></div>
-    <div class="light light-6"></div>
-    <div class="light light-7"></div>
-  </div>
-
-  <div class="particles" id="particles"></div>
-
-  <nav class="navbar">
-    <div class="nav-content">
-      <a href="/" class="nav-logo">
-        <img src="https://i.imgur.com/ePueN25.png" alt="Vadrifts Logo" class="nav-logo-img">
-        Vadrifts
-      </a>
-      <div class="nav-links">
-        <a href="/scripts" class="nav-link">Scripts</a>
-        <a href="/converter" class="nav-link">Image Converter</a>
-      </div>
-    </div>
-  </nav>
-
-  <div class="header">
-    <div class="status-badge">
-      <span class="status-dot"></span>
-      #1 Best Roblox Scripts
-    </div>
-    <h1>Vadrifts Reimagined</h1>
-    <p class="description">
-      After the fall and rise again, <span class="highlight">Vadrifts returns</span> for the second time. 
-      From the ashes of <span class="highlight">Vastral</span> and <span class="highlight">Valorium</span>, we're back with 
-      <span class="highlight">better scripts</span>, stronger community, and the same legendary <span class="highlight">bypassing power</span> you remember.
-    </p>
-    
-    <div class="rating-stars">
-      <div class="stars-display">
-        <span class="star filled">★</span>
-        <span class="star filled">★</span>
-        <span class="star filled">★</span>
-        <span class="star filled">★</span>
-        <span class="star filled">★</span>
-      </div>
-      <span class="rating-text">9.9/10 Community Rating</span>
-    </div>
-    
-    <div class="stats-section">
-      <div class="stat-item">
-        <div class="stat-number" data-target="5542">0</div>
-        <div class="stat-label">Total Users</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-number" data-target="3">0</div>
-        <div class="stat-label">Scripts</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-number" data-target="100">0</div>
-        <div class="stat-label">Executor Support</div>
-      </div>
-    </div>
-    
-    <div class="action-buttons">
-      <a href="#scripts" class="get-started-btn">Get Started</a>
-      <a href="https://discord.com/invite/WDbJ5wE2cR" class="discord-btn" target="_blank">
-        <img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/discord-white-icon.png" alt="Discord" class="discord-icon">
-        Join Discord
-      </a>
-    </div>
-  </div>
-
-  <div class="section dark">
-    <div class="section-content">
-      <h2 class="section-title white">What We Offer</h2>
-      <p class="section-subtitle">There's a reason we're loved by so many.</p>
-      
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"></polygon>
-            </svg>
-          </div>
-          <h3 class="why-title">Lightning Fast</h3>
-          <p class="why-description">Optimized performance means faster load times and smooth execution without lag or crashes.</p>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"></path>
-            </svg>
-          </div>
-          <h3 class="why-title">Trusted Owner</h3>
-          <p class="why-description">Led by experienced developers with a proven track record in the Roblox scripting community.</p>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <circle cx="12" cy="12" r="6"></circle>
-              <circle cx="12" cy="12" r="2"></circle>
-            </svg>
-          </div>
-          <h3 class="why-title">User-Friendly</h3>
-          <p class="why-description">Intuitive interfaces and easy-to-use features make our scripts accessible for everyone.</p>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v5Z"></path>
-              <path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"></path>
-            </svg>
-          </div>
-          <h3 class="why-title">Active Support</h3>
-          <p class="why-description">24/7 community support and regular developer updates keep everything running smoothly.</p>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect width="14" height="20" x="5" y="2" rx="2" ry="2"></rect>
-              <path d="M12 18h.01"></path>
-            </svg>
-          </div>
-          <h3 class="why-title">Mobile Friendly</h3>
-          <p class="why-description">All our scripts work perfectly on mobile devices and support all major executors.</p>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M9 12l2 2 4-4"></path>
-              <path d="M21 12c.552 0 1-.448 1-1V8a2 2 0 0 0-2-2h-5L9.5 4.5A2 2 0 0 0 8.086 4H4a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-1c0-.552-.448-1-1-1z"></path>
-            </svg>
-          </div>
-          <h3 class="why-title">Works on All Executors</h3>
-          <p class="why-description">Compatible with every executor - even the worst ones like Solara and Xeno work perfectly with our scripts.</p>
-        </div>
-      </div>
-
-      <div class="offer-cta">
-        <h3 class="offer-cta-title">What Are You Waiting For!</h3>
-        <p class="offer-cta-subtitle">Experience the best Roblox Scripts on the Market!</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="section" id="scripts">
-    <h2 class="section-title">Featured Scripts</h2>
-    <p class="section-subtitle">Discover our most powerful and popular scripts</p>
-    
-    <div class="scripts-showcase">
-      <div class="featured-script">
-        <div class="featured-image">
-          <img src="https://i.imgur.com/jI8qDiR.jpeg" alt="Vadrifts.byp">
-          <span class="featured-badge">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
-              <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
-            </svg>
-            Hot
-          </span>
-        </div>
-        <div class="featured-content">
-          <h3 class="featured-title">Vadrifts.byp</h3>
-          <p class="featured-description">
-            The ultimate Roblox chat bypasser that's completely undetected. Advanced filtering technology with 700+ premade bypasses, anti-admin protection, and works on all executors including mobile devices.
-          </p>
-          <div class="featured-stats">
-            <div class="stat">
-              <span class="stat-value">2.8K+</span>
-              <span class="stat-name">Current Users</span>
-            </div>
-            <div class="stat">
-              <span class="stat-value">4.7</span>
-              <span class="stat-name">Rating</span>
-            </div>
-            <div class="stat">
-              <span class="stat-value">100%</span>
-              <span class="stat-name">Undetected</span>
-            </div>
-          </div>
-          <div class="featured-actions">
-            <a href="https://vadrifts.onrender.com/script/1" class="primary-btn">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-              </svg>
-              Get Script
-            </a>
-          </div>
-        </div>
-      </div>
-      
-      <div class="scripts-grid">
-        <div class="script-card">
-          <div class="script-thumbnail">
-            <img src="https://tr.rbxcdn.com/180DAY-808f20386cb8582fcd0075aae67cd039/768/432/Image/Webp/noFilter" alt="Starving Artists">
-            <div class="script-status">Free</div>
-          </div>
-          <div class="script-info">
-            <div class="script-game">Starving Artists</div>
-            <h4 class="script-name">Starving Artists Script</h4>
-            <p class="script-description">A free Starving Artists script with simple Discord key system. Generate images using URL input with reliable, undetected, and customizable image generation plus auto booth claiming.</p>
-            <div class="script-footer">
-              <div class="script-rating">
-                <div class="script-stars">
-                  <span class="script-star filled">★</span>
-                  <span class="script-star filled">★</span>
-                  <span class="script-star filled">★</span>
-                  <span class="script-star filled">★</span>
-                  <span class="script-star filled">★</span>
-                </div>
-                <span class="script-rating-text">5.0</span>
-              </div>
-              <a href="https://vadrifts.onrender.com/script/8916037983" class="script-btn">Get Script</a>
-            </div>
-          </div>
-        </div>
-
-        <div class="script-card">
-          <div class="script-thumbnail">
-            <img src="https://tr.rbxcdn.com/180DAY-8598e6c1626e3ccf16eb8b3acbd618fe/768/432/Image/Webp/noFilter" alt="Horrific Housing">
-            <div class="script-status">Keyless</div>
-          </div>
-          <div class="script-info">
-            <div class="script-game">Horrific Housing</div>
-            <h4 class="script-name">Horrific Housing Script</h4>
-            <p class="script-description">Best keyless Horrific Housing script with infinite tokens, unlock all items for free, ESP, reach, item grabber, weapon exploit, godmode, fly, teleportation and much more!</p>
-            <div class="script-footer">
-              <div class="script-rating">
-                <div class="script-stars">
-                  <span class="script-star filled">★</span>
-                  <span class="script-star filled">★</span>
-                  <span class="script-star filled">★</span>
-                  <span class="script-star filled">★</span>
-                  <span class="script-star filled">★</span>
-                </div>
-                <span class="script-rating-text">4.9</span>
-              </div>
-              <a href="https://vadrifts.onrender.com/script/263761432" class="script-btn">Get Script</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="view-all-section">
-        <h3 class="view-all-title">Ready for More?</h3>
-        <p class="view-all-subtitle">Explore our complete collection of scripts</p>
-        <a href="/scripts" class="view-all-btn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-          </svg>
-          View All Scripts
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <h2 class="section-title">Our Beloved Showcasers</h2>
-    <p class="section-subtitle">Showing love to the amazing content creators who showcase our scripts. Want to be featured? Submit a request on our Discord!</p>
-    
-    <div class="showcasers-container">
-      <div class="showcasers-track" id="showcasers-track">
-        <div class="loading-placeholder">
-          <div class="spinner"></div>
-          <p>Finding showcasers...</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="section dark faq-section">
-    <div class="section-content">
-      <h2 class="section-title white">Frequently Asked Questions</h2>
-      <p class="section-subtitle">Find quick answers to common questions about Vadrifts.</p>
-      
-      <div class="faq-container">
-        <div class="faq-item" data-faq="1">
-          <div class="faq-question">
-            <h3>Why Vadrifts?</h3>
-            <div class="faq-arrow">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="m6 9 6 6 6-6"/>
-              </svg>
-            </div>
-          </div>
-          <div class="faq-answer">
-            <p>Vadrifts offers the most reliable and feature-rich scripting tools on the market. Our focus on stability, performance, and user experience makes us the preferred choice for thousands of users. After rising from the ashes of Vastral and Valorium, we've learned from past mistakes and built something even better. Our scripts work on ALL executors, are completely undetected, and come with 24/7 community support.</p>
-          </div>
-        </div>
-
-        <div class="faq-item" data-faq="2">
-          <div class="faq-question">
-            <h3>Is it Safe?</h3>
-            <div class="faq-arrow">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="m6 9 6 6 6-6"/>
-              </svg>
-            </div>
-          </div>
-          <div class="faq-answer">
-            <p>Yes, all Vadrifts scripts are completely safe and undetected. We use advanced obfuscation techniques and constantly update our scripts to stay ahead of detection systems. Our chat bypasser has been undetected for over 8 months, and our other scripts have perfect safety records. We never log your data or include any malicious code. Your account safety is our top priority.</p>
-          </div>
-        </div>
-
-        <div class="faq-item" data-faq="3">
-          <div class="faq-question">
-            <h3>Where do I get the key?</h3>
-            <div class="faq-arrow">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="m6 9 6 6 6-6"/>
-              </svg>
-            </div>
-          </div>
-          <div class="faq-answer">
-            <p>Most of our scripts use a simple Discord key system. Just join our Discord server at <a href="https://discord.com/invite/WDbJ5wE2cR" target="_blank" class="faq-link">discord.gg/WDbJ5wE2cR</a> and follow the instructions in the key channel. Keys are completely free and take less than 30 seconds to get. Some scripts like our Horrific Housing script are completely keyless for your convenience.</p>
-          </div>
-        </div>
-
-        <div class="faq-item" data-faq="4">
-          <div class="faq-question">
-            <h3>Do scripts work on mobile?</h3>
-            <div class="faq-arrow">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="m6 9 6 6 6-6"/>
-              </svg>
-            </div>
-          </div>
-          <div class="faq-answer">
-            <p>Yes! All Vadrifts scripts are designed to be mobile-friendly and work perfectly on mobile executors like Solara, Xeno, and others. We specifically optimize our UIs for smaller screens and touch controls. Whether you're on PC or mobile, you'll get the same powerful experience.</p>
-          </div>
-        </div>
-
-        <div class="faq-item" data-faq="5">
-          <div class="faq-question">
-            <h3>I need help!</h3>
-            <div class="faq-arrow">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="m6 9 6 6 6-6"/>
-              </svg>
-            </div>
-          </div>
-          <div class="faq-answer">
-            <p>No problem! Join our <a href="https://discord.com/invite/WDbJ5wE2cR" target="_blank" class="faq-link">Discord server</a> for 24/7 support from our active community and staff members. We have dedicated support channels, detailed setup guides, and helpful community members who are always ready to assist. You can also check our <a href="/scripts" class="faq-link">scripts page</a> for tutorials and documentation.</p>
-          </div>
-        </div>
-
-        <div class="faq-item" data-faq="6">
-          <div class="faq-question">
-            <h3>How often are scripts updated?</h3>
-            <div class="faq-arrow">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="m6 9 6 6 6-6"/>
-              </svg>
-            </div>
-          </div>
-          <div class="faq-answer">
-            <p>We actively maintain all our scripts and push updates regularly. Our chat bypasser gets updated weekly with new bypasses and improvements. Game-specific scripts are updated whenever the game receives major updates. We monitor game changes closely and usually have fixes deployed within 24-48 hours of any breaking changes.</p>
-          </div>
-        </div>
-      </div>
-      
-      <div class="faq-footer">
-        <p>Still have questions? <a href="https://discord.com/invite/WDbJ5wE2cR" target="_blank" class="faq-discord-link">Join our Discord</a> for more help.</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="footer">
-    <div class="footer-content">
-      <div class="footer-left">
-        <a href="/" class="footer-logo">
-          <img src="https://i.imgur.com/ePueN25.png" alt="Vadrifts Logo" class="footer-logo-img">
-        </a>
-        <div class="footer-copyright">
-          &copy; 2025 Vadrifts. All Rights Reserved
-        </div>
-      </div>
-      <div class="footer-discord">
-        <a href="https://discord.com/invite/WDbJ5wE2cR" class="footer-discord-link" target="_blank">
-          <img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/discord-white-icon.png" alt="Discord" class="footer-discord-icon">
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <script>
+  
+		
+		</style>
+	</head>
+	<body>
+		<div class="bg-lights">
+			<div class="light light-1"></div>
+			<div class="light light-2"></div>
+			<div class="light light-3"></div>
+			<div class="light light-4"></div>
+			<div class="light light-5"></div>
+			<div class="light light-6"></div>
+			<div class="light light-7"></div>
+		</div>
+		<div class="particles" id="particles"></div>
+		<nav class="navbar">
+			<div class="nav-content">
+				<a href="/" class="nav-logo">
+					<img src="https://i.imgur.com/ePueN25.png" alt="Vadrifts Logo" class="nav-logo-img">
+					Vadrifts
+				</a>
+				<div class="nav-links">
+					<a href="/scripts" class="nav-link">Scripts</a>
+					<a href="/converter" class="nav-link">Image Converter</a>
+				</div>
+			</div>
+		</nav>
+		<div class="header">
+			<div class="status-badge">
+				<span class="status-dot"></span>
+				#1 Best Roblox Scripts
+			</div>
+			<h1>Vadrifts Reimagined</h1>
+			<p class="description">
+				After the fall and rise again,
+				<span class="highlight">Vadrifts returns</span>
+				for the second time.        From the ashes of
+				<span class="highlight">Vastral</span>
+				and
+				<span class="highlight">Valorium</span>, we're back with
+				<span class="highlight">better scripts</span>, stronger community, and the same legendary
+				<span class="highlight">bypassing power</span>
+				you remember.
+			</p>
+			<div class="rating-stars">
+				<div class="stars-display">
+					<span class="star filled">★</span>
+					<span class="star filled">★</span>
+					<span class="star filled">★</span>
+					<span class="star filled">★</span>
+					<span class="star filled">★</span>
+				</div>
+				<span class="rating-text">9.9/10 Community Rating</span>
+			</div>
+			<div class="stats-section">
+				<div class="stat-item">
+					<div class="stat-number" data-target="5542">0</div>
+					<div class="stat-label">Total Users</div>
+				</div>
+				<div class="stat-item">
+					<div class="stat-number" data-target="3">0</div>
+					<div class="stat-label">Scripts</div>
+				</div>
+				<div class="stat-item">
+					<div class="stat-number" data-target="100">0</div>
+					<div class="stat-label">Executor Support</div>
+				</div>
+			</div>
+			<div class="action-buttons">
+				<a href="#scripts" class="get-started-btn">Get Started</a>
+				<a href="https://discord.com/invite/WDbJ5wE2cR" class="discord-btn" target="_blank">
+					<img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/discord-white-icon.png" alt="Discord" class="discord-icon">
+					Join Discord
+				</a>
+			</div>
+		</div>
+		<div class="section dark">
+			<div class="section-content">
+				<h2 class="section-title white">What We Offer</h2>
+				<p class="section-subtitle">There's a reason we're loved by so many.</p>
+				<div class="why-grid">
+					<div class="why-card">
+						<div class="why-icon">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"></polygon>
+							</svg>
+						</div>
+						<h3 class="why-title">Lightning Fast</h3>
+						<p class="why-description">Optimized performance means faster load times and smooth execution without lag or crashes.</p>
+					</div>
+					<div class="why-card">
+						<div class="why-icon">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"></path>
+							</svg>
+						</div>
+						<h3 class="why-title">Trusted Owner</h3>
+						<p class="why-description">Led by experienced developers with a proven track record in the Roblox scripting community.</p>
+					</div>
+					<div class="why-card">
+						<div class="why-icon">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<circle cx="12" cy="12" r="10"></circle>
+								<circle cx="12" cy="12" r="6"></circle>
+								<circle cx="12" cy="12" r="2"></circle>
+							</svg>
+						</div>
+						<h3 class="why-title">User-Friendly</h3>
+						<p class="why-description">Intuitive interfaces and easy-to-use features make our scripts accessible for everyone.</p>
+					</div>
+					<div class="why-card">
+						<div class="why-icon">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v5Z"></path>
+								<path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"></path>
+							</svg>
+						</div>
+						<h3 class="why-title">Active Support</h3>
+						<p class="why-description">24/7 community support and regular developer updates keep everything running smoothly.</p>
+					</div>
+					<div class="why-card">
+						<div class="why-icon">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<rect width="14" height="20" x="5" y="2" rx="2" ry="2"></rect>
+								<path d="M12 18h.01"></path>
+							</svg>
+						</div>
+						<h3 class="why-title">Mobile Friendly</h3>
+						<p class="why-description">All our scripts work perfectly on mobile devices and support all major executors.</p>
+					</div>
+					<div class="why-card">
+						<div class="why-icon">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M9 12l2 2 4-4"></path>
+								<path d="M21 12c.552 0 1-.448 1-1V8a2 2 0 0 0-2-2h-5L9.5 4.5A2 2 0 0 0 8.086 4H4a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-1c0-.552-.448-1-1-1z"></path>
+							</svg>
+						</div>
+						<h3 class="why-title">Works on All Executors</h3>
+						<p class="why-description">Compatible with every executor - even the worst ones like Solara and Xeno work perfectly with our scripts.</p>
+					</div>
+				</div>
+				<div class="offer-cta">
+					<h3 class="offer-cta-title">What Are You Waiting For!</h3>
+					<p class="offer-cta-subtitle">Experience the best Roblox Scripts on the Market!</p>
+				</div>
+			</div>
+		</div>
+		<div class="section" id="scripts">
+			<h2 class="section-title">Featured Scripts</h2>
+			<p class="section-subtitle">Discover our most powerful and popular scripts</p>
+			<div class="scripts-showcase">
+				<div class="featured-script">
+					<div class="featured-image">
+						<img src="https://i.imgur.com/jI8qDiR.jpeg" alt="Vadrifts.byp">
+						<span class="featured-badge">
+							<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
+								<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path>
+							</svg>
+							Hot
+						</span>
+					</div>
+					<div class="featured-content">
+						<h3 class="featured-title">Vadrifts.byp</h3>
+						<p class="featured-description">
+							The ultimate Roblox chat bypasser that's completely undetected. Advanced filtering technology with 700+ premade bypasses, anti-admin protection, and works on all executors including mobile devices.
+						</p>
+						<div class="featured-stats">
+							<div class="stat">
+								<span class="stat-value">2.8K+</span>
+								<span class="stat-name">Current Users</span>
+							</div>
+							<div class="stat">
+								<span class="stat-value">4.7</span>
+								<span class="stat-name">Rating</span>
+							</div>
+							<div class="stat">
+								<span class="stat-value">100%</span>
+								<span class="stat-name">Undetected</span>
+							</div>
+						</div>
+						<div class="featured-actions">
+							<a href="https://vadrifts.onrender.com/script/1" class="primary-btn">
+								<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+									<path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path>
+								</svg>
+								Get Script
+							</a>
+						</div>
+					</div>
+				</div>
+				<div class="scripts-grid">
+					<div class="script-card">
+						<div class="script-thumbnail">
+							<img src="https://tr.rbxcdn.com/180DAY-808f20386cb8582fcd0075aae67cd039/768/432/Image/Webp/noFilter" alt="Starving Artists">
+							<div class="script-status">Free</div>
+						</div>
+						<div class="script-info">
+							<div class="script-game">Starving Artists</div>
+							<h4 class="script-name">Starving Artists Script</h4>
+							<p class="script-description">A free Starving Artists script with simple Discord key system. Generate images using URL input with reliable, undetected, and customizable image generation plus auto booth claiming.</p>
+							<div class="script-footer">
+								<div class="script-rating">
+									<div class="script-stars">
+										<span class="script-star filled">★</span>
+										<span class="script-star filled">★</span>
+										<span class="script-star filled">★</span>
+										<span class="script-star filled">★</span>
+										<span class="script-star filled">★</span>
+									</div>
+									<span class="script-rating-text">5.0</span>
+								</div>
+								<a href="https://vadrifts.onrender.com/script/8916037983" class="script-btn">Get Script</a>
+							</div>
+						</div>
+					</div>
+					<div class="script-card">
+						<div class="script-thumbnail">
+							<img src="https://tr.rbxcdn.com/180DAY-8598e6c1626e3ccf16eb8b3acbd618fe/768/432/Image/Webp/noFilter" alt="Horrific Housing">
+							<div class="script-status">Keyless</div>
+						</div>
+						<div class="script-info">
+							<div class="script-game">Horrific Housing</div>
+							<h4 class="script-name">Horrific Housing Script</h4>
+							<p class="script-description">Best keyless Horrific Housing script with infinite tokens, unlock all items for free, ESP, reach, item grabber, weapon exploit, godmode, fly, teleportation and much more!</p>
+							<div class="script-footer">
+								<div class="script-rating">
+									<div class="script-stars">
+										<span class="script-star filled">★</span>
+										<span class="script-star filled">★</span>
+										<span class="script-star filled">★</span>
+										<span class="script-star filled">★</span>
+										<span class="script-star filled">★</span>
+									</div>
+									<span class="script-rating-text">4.9</span>
+								</div>
+								<a href="https://vadrifts.onrender.com/script/263761432" class="script-btn">Get Script</a>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="view-all-section">
+					<h3 class="view-all-title">Ready for More?</h3>
+					<p class="view-all-subtitle">Explore our complete collection of scripts</p>
+					<a href="/scripts" class="view-all-btn">
+						<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+							<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+						</svg>
+						View All Scripts
+					</a>
+				</div>
+			</div>
+		</div>
+		<div class="section">
+			<h2 class="section-title">Our Beloved Showcasers</h2>
+			<p class="section-subtitle">Showing love to the amazing content creators who showcase our scripts. Want to be featured? Submit a request on our Discord!</p>
+			<div class="showcasers-container">
+				<div class="showcasers-track" id="showcasers-track">
+					<div class="loading-placeholder">
+						<div class="spinner"></div>
+						<p>Finding showcasers...</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="section dark faq-section">
+			<div class="section-content">
+				<h2 class="section-title white">Frequently Asked Questions</h2>
+				<p class="section-subtitle">Find quick answers to common questions about Vadrifts.</p>
+				<div class="faq-container">
+					<div class="faq-item" data-faq="1">
+						<div class="faq-question">
+							<h3>Why Vadrifts?</h3>
+							<div class="faq-arrow">
+								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+									<path d="m6 9 6 6 6-6"></path>
+								</svg>
+							</div>
+						</div>
+						<div class="faq-answer">
+							<p>Vadrifts offers the most reliable and feature-rich scripting tools on the market. Our focus on stability, performance, and user experience makes us the preferred choice for thousands of users. After rising from the ashes of Vastral and Valorium, we've learned from past mistakes and built something even better. Our scripts work on ALL executors, are completely undetected, and come with 24/7 community support.</p>
+						</div>
+					</div>
+					<div class="faq-item" data-faq="2">
+						<div class="faq-question">
+							<h3>Is it Safe?</h3>
+							<div class="faq-arrow">
+								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+									<path d="m6 9 6 6 6-6"></path>
+								</svg>
+							</div>
+						</div>
+						<div class="faq-answer">
+							<p>Yes, all Vadrifts scripts are completely safe and undetected. We use advanced obfuscation techniques and constantly update our scripts to stay ahead of detection systems. Our chat bypasser has been undetected for over 8 months, and our other scripts have perfect safety records. We never log your data or include any malicious code. Your account safety is our top priority.</p>
+						</div>
+					</div>
+					<div class="faq-item" data-faq="3">
+						<div class="faq-question">
+							<h3>Where do I get the key?</h3>
+							<div class="faq-arrow">
+								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+									<path d="m6 9 6 6 6-6"></path>
+								</svg>
+							</div>
+						</div>
+						<div class="faq-answer">
+							<p>Most of our scripts use a simple Discord key system. Just join our Discord server at
+								<a href="https://discord.com/invite/WDbJ5wE2cR" target="_blank" class="faq-link">discord.gg/WDbJ5wE2cR</a>
+								and follow the instructions in the key channel. Keys are completely free and take less than 30 seconds to get. Some scripts like our Horrific Housing script are completely keyless for your convenience.</p>
+						</div>
+					</div>
+					<div class="faq-item" data-faq="4">
+						<div class="faq-question">
+							<h3>Do scripts work on mobile?</h3>
+							<div class="faq-arrow">
+								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+									<path d="m6 9 6 6 6-6"></path>
+								</svg>
+							</div>
+						</div>
+						<div class="faq-answer">
+							<p>Yes! All Vadrifts scripts are designed to be mobile-friendly and work perfectly on mobile executors like Solara, Xeno, and others. We specifically optimize our UIs for smaller screens and touch controls. Whether you're on PC or mobile, you'll get the same powerful experience.</p>
+						</div>
+					</div>
+					<div class="faq-item" data-faq="5">
+						<div class="faq-question">
+							<h3>I need help!</h3>
+							<div class="faq-arrow">
+								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+									<path d="m6 9 6 6 6-6"></path>
+								</svg>
+							</div>
+						</div>
+						<div class="faq-answer">
+							<p>No problem! Join our
+								<a href="https://discord.com/invite/WDbJ5wE2cR" target="_blank" class="faq-link">Discord server</a>
+								for 24/7 support from our active community and staff members. We have dedicated support channels, detailed setup guides, and helpful community members who are always ready to assist. You can also check our
+								<a href="/scripts" class="faq-link">scripts page</a>
+								for tutorials and documentation.</p>
+						</div>
+					</div>
+					<div class="faq-item" data-faq="6">
+						<div class="faq-question">
+							<h3>How often are scripts updated?</h3>
+							<div class="faq-arrow">
+								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+									<path d="m6 9 6 6 6-6"></path>
+								</svg>
+							</div>
+						</div>
+						<div class="faq-answer">
+							<p>We actively maintain all our scripts and push updates regularly. Our chat bypasser gets updated weekly with new bypasses and improvements. Game-specific scripts are updated whenever the game receives major updates. We monitor game changes closely and usually have fixes deployed within 24-48 hours of any breaking changes.</p>
+						</div>
+					</div>
+				</div>
+				<div class="faq-footer">
+					<p>Still have questions?
+						<a href="https://discord.com/invite/WDbJ5wE2cR" target="_blank" class="faq-discord-link">Join our Discord</a>
+						for more help.</p>
+				</div>
+			</div>
+		</div>
+		<div class="footer">
+			<div class="footer-content">
+				<div class="footer-left">
+					<a href="/" class="footer-logo">
+						<img src="https://i.imgur.com/ePueN25.png" alt="Vadrifts Logo" class="footer-logo-img">
+					</a>
+					<div class="footer-copyright">
+						© 2025 Vadrifts. All Rights Reserved
+					</div>
+				</div>
+				<div class="footer-discord">
+					<a href="https://discord.com/invite/WDbJ5wE2cR" class="footer-discord-link" target="_blank">
+						<img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/discord-white-icon.png" alt="Discord" class="footer-discord-icon">
+					</a>
+				</div>
+			</div>
+		</div>
+		<script>
     function createParticles() {
       const particlesContainer = document.getElementById('particles');
       const particleCount = 15;
@@ -2361,6 +2350,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       new FAQManager();
     });
-  </script>
-</body>
+  
+		</script>
+	</body>
 </html>
