@@ -162,27 +162,31 @@
       pointer-events: none;
     }
 
-    .particle {
-      position: absolute;
-      width: 3px;
-      height: 3px;
-      background: #7209b7;
-      border-radius: 50%;
-      opacity: 0.7;
-      animation: floatUp 15s linear infinite;
-      box-shadow: 0 0 6px #7209b7;
-    }
+.particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: #a45cff;
+  border-radius: 50%;
+  opacity: 0.5;
+  box-shadow: 0 0 8px #a45cff;
+  animation: floatUp 240s linear infinite;
+}
 
-    @keyframes floatUp {
-      0% {
-        transform: translateY(100vh) translateX(0);
-        opacity: 0.7;
-      }
-      100% {
-        transform: translateY(-100px) translateX(30px);
-        opacity: 0;
-      }
-    }
+@keyframes floatUp {
+  0% {
+    transform: translateY(100vh) translateX(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(50vh) translateX(20px);
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(-200px) translateX(40px);
+    opacity: 0.3;
+  }
+}
 
     .navbar {
       position: fixed;
