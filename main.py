@@ -75,7 +75,9 @@ def get_plugin_raw(plugin_id):
         if plugins is None:
             plugins = []
         
-        plugin = next((p for p in plugins if p['id'] == plugin_id), None)
+        logger.info(f"Looking for plugin: {plugin_id}, Available plugins: {[p.get('id') for p in plugins]}")
+        
+        plugin = next((p for p in plugins if str(p.get('id')) == str(plugin_id)), None)
         
         if not plugin:
             response = make_response("-- Plugin not found")
@@ -128,7 +130,6 @@ return Plugin'''
         response = make_response(f"-- Error generating plugin: {str(e)}")
         response.headers['Content-Type'] = 'text/plain; charset=utf-8'
         return response, 500
-
 @app.route('/script/<int:script_id>')
 def script_detail(script_id):
     script = next((s for s in scripts_data if s['id'] == script_id), None)
