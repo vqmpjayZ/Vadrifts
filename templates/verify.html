@@ -187,7 +187,7 @@
         0 30px 60px rgba(0, 0, 0, 0.5),
         0 0 100px rgba(16, 185, 129, 0.1);
       text-align: center;
-      width: 480px;
+      width: 520px;
       max-width: 90vw;
       position: relative;
       transition: all 0.3s ease;
@@ -240,19 +240,60 @@
     .subtitle {
       color: #888;
       font-size: 14px;
-      margin-bottom: 40px;
+      margin-bottom: 35px;
       line-height: 1.7;
       font-weight: 400;
     }
 
     .subtitle strong {
-      color: #aaa;
+      color: #10b981;
       font-weight: 600;
+    }
+
+    .subtitle .highlight {
+      color: #aaa;
+      font-weight: 500;
+    }
+
+    .instruction-box {
+      background: rgba(16, 185, 129, 0.05);
+      border: 1px solid rgba(16, 185, 129, 0.15);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 30px;
+      text-align: left;
+    }
+
+    .instruction-title {
+      color: #10b981;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .instruction-steps {
+      color: #999;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .instruction-steps li {
+      margin-bottom: 6px;
+      padding-left: 4px;
+    }
+
+    .instruction-steps li:last-child {
+      margin-bottom: 0;
     }
 
     .input-group {
       position: relative;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
     }
 
     .input-label {
@@ -280,6 +321,16 @@
       letter-spacing: 0.5px;
     }
 
+    input.error {
+      border-color: rgba(239, 68, 68, 0.5);
+      background: rgba(239, 68, 68, 0.05);
+    }
+
+    input.valid {
+      border-color: rgba(16, 185, 129, 0.5);
+      background: rgba(16, 185, 129, 0.05);
+    }
+
     input:focus {
       border-color: #10b981;
       background: rgba(0, 0, 0, 0.7);
@@ -287,6 +338,13 @@
         0 0 0 4px rgba(16, 185, 129, 0.1),
         0 0 30px rgba(16, 185, 129, 0.2);
       transform: translateY(-2px);
+    }
+
+    input.error:focus {
+      border-color: #ef4444;
+      box-shadow: 
+        0 0 0 4px rgba(239, 68, 68, 0.1),
+        0 0 30px rgba(239, 68, 68, 0.2);
     }
 
     input::placeholder {
@@ -384,16 +442,16 @@
     }
 
     .status {
-      margin-top: 25px;
+      margin-top: 20px;
       padding: 16px 20px;
       border-radius: 12px;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 500;
       transition: all 0.3s ease;
-      min-height: 20px;
       backdrop-filter: blur(10px);
       display: none;
       animation: slideIn 0.3s ease;
+      text-align: left;
     }
 
     .status.show {
@@ -497,6 +555,18 @@
         font-size: 13px;
       }
 
+      .instruction-box {
+        padding: 14px 16px;
+      }
+
+      .instruction-title {
+        font-size: 12px;
+      }
+
+      .instruction-steps {
+        font-size: 12px;
+      }
+
       input {
         font-size: 14px;
         padding: 16px 45px 16px 18px;
@@ -542,21 +612,35 @@
       <div class="logo-wrapper">🔐</div>
       <h2>HWID Verification</h2>
       <p class="subtitle">
-        To generate your access key, please enter your <strong>Hardware ID (HWID)</strong>.<br>
-        You can obtain this from the script executor.
+        To generate your access key, enter your <strong>Hardware ID (HWID)</strong> below.
       </p>
+
+      <div class="instruction-box">
+        <div class="instruction-title">
+          <span>📋</span>
+          <span>How to get your HWID:</span>
+        </div>
+        <ol class="instruction-steps">
+          <li>Execute the <span class="highlight">Roblox script hub</span></li>
+          <li>The <span class="highlight">key system popup</span> will appear</li>
+          <li>Click <span class="highlight">"Copy HWID"</span> button in the script</li>
+          <li>Paste it in the field below</li>
+        </ol>
+      </div>
       
       <div class="input-group">
         <label class="input-label" for="hwidInput">Hardware ID</label>
         <input 
           id="hwidInput" 
           type="text" 
-          placeholder="Enter your HWID here..." 
+          placeholder="Paste your HWID here..." 
           autocomplete="off"
           spellcheck="false"
         />
         <div class="hwid-indicator" id="hwidIndicator"></div>
       </div>
+
+      <div class="status" id="validationStatus"></div>
       
       <button class="verify-btn" onclick="getKey()" id="verifyBtn">
         Generate Access Key
@@ -573,7 +657,7 @@
 
   <script>
     let isValidHwid = false;
-    const allowedReferrers = ['work.ink', 'www.work.ink', 'lootdest.org'];
+    const allowedReferrers = ['work.ink', 'www.work.ink', 'lootdest.org', 'lootlabs.gg', 'www.lootlabs.gg'];
 
     function createParticles() {
       const particlesContainer = document.getElementById('particles');
@@ -591,11 +675,12 @@
 
     function checkAccess() {
       const referrer = document.referrer;
-      const hasValidReferrer = allowedReferrers.some(domain => 
+
+      const hasValidReferrer = referrer && allowedReferrers.some(domain => 
         referrer.includes(domain)
       );
 
-      if (!hasValidReferrer && referrer) {
+      if (!hasValidReferrer) {
         showAccessDenied();
         return false;
       }
@@ -605,28 +690,82 @@
     function showAccessDenied() {
       const box = document.querySelector('.box');
       box.classList.add('access-denied');
+      box.style.borderColor = 'rgba(239, 68, 68, 0.3)';
       box.innerHTML = `
-        <div class="logo-wrapper" style="background: linear-gradient(135deg, #dc2626, #ef4444);">🚫</div>
+        <div class="logo-wrapper" style="background: linear-gradient(135deg, #dc2626, #ef4444); box-shadow: 0 20px 40px rgba(239, 68, 68, 0.3), 0 0 60px rgba(239, 68, 68, 0.2);">🚫</div>
         <h2 style="background: linear-gradient(135deg, #ef4444, #f87171); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Access Denied</h2>
         <p class="subtitle">
-          Direct access to this page is not permitted.<br>
-          Please access through the <strong>authorized verification portal</strong>.
+          Direct access to this verification page is <strong style="color: #ef4444;">not permitted</strong>.<br>
+          Please access through the authorized <span class="highlight">key system portal</span>.
         </p>
+        <div class="instruction-box" style="background: rgba(239, 68, 68, 0.05); border-color: rgba(239, 68, 68, 0.15);">
+          <div class="instruction-title" style="color: #ef4444;">
+            <span>⚠️</span>
+            <span>Proper Access Route:</span>
+          </div>
+          <ol class="instruction-steps">
+            <li>Complete the key system challenge (Work.ink or LootLabs)</li>
+            <li>You'll be automatically redirected here</li>
+            <li>Enter your HWID to generate the key</li>
+          </ol>
+        </div>
         <div class="status error show" style="margin-top: 30px;">
-          <span>⚠️</span> Unauthorized access attempt detected
+          <strong>⛔ Unauthorized Access Detected</strong><br>
+          You must complete the key system first.
         </div>
       `;
+    }
+
+    function validateHwid(hwid) {
+      const validPattern = /^[a-zA-Z0-9_-]+$/;
+      const errors = [];
+
+      if (hwid.length < 35) {
+        errors.push('HWID must be at least 35 characters');
+      }
+
+      if (hwid.includes(' ')) {
+        errors.push('HWID cannot contain spaces');
+      }
+
+      if (!validPattern.test(hwid)) {
+        errors.push('HWID can only contain letters, numbers, hyphens (-), and underscores (_)');
+      }
+
+      return {
+        isValid: errors.length === 0,
+        errors: errors
+      };
     }
 
     function updateHwidIndicator() {
       const hwid = document.getElementById("hwidInput").value.trim();
       const indicator = document.getElementById("hwidIndicator");
+      const input = document.getElementById("hwidInput");
+      const validationStatus = document.getElementById("validationStatus");
       
-      if (hwid && hwid.length >= 25) {
+      if (!hwid) {
+        indicator.classList.remove("valid");
+        input.classList.remove("valid", "error");
+        validationStatus.classList.remove("show");
+        isValidHwid = false;
+        return;
+      }
+
+      const validation = validateHwid(hwid);
+      
+      if (validation.isValid) {
         indicator.classList.add("valid");
+        input.classList.add("valid");
+        input.classList.remove("error");
+        validationStatus.classList.remove("show");
         isValidHwid = true;
       } else {
         indicator.classList.remove("valid");
+        input.classList.add("error");
+        input.classList.remove("valid");
+        validationStatus.className = "status error show";
+        validationStatus.innerHTML = `<strong>❌ Invalid HWID:</strong><br>${validation.errors.join('<br>')}`;
         isValidHwid = false;
       }
     }
@@ -647,8 +786,15 @@
       const hwid = document.getElementById("hwidInput").value.trim();
       const btn = document.getElementById("verifyBtn");
       
-      if (!hwid || hwid.length < 25) {
-        setStatus("⚠️ Please enter a valid HWID (minimum 25 characters)", "error");
+      if (!hwid) {
+        setStatus("⚠️ Please enter your HWID", "error");
+        return;
+      }
+
+      const validation = validateHwid(hwid);
+      
+      if (!validation.isValid) {
+        setStatus(`<strong>❌ Invalid HWID:</strong><br>${validation.errors.join('<br>')}`, "error");
         return;
       }
 
@@ -692,11 +838,10 @@
 
     if (checkAccess()) {
       createParticles();
+      window.addEventListener('load', () => {
+        document.getElementById("hwidInput").focus();
+      });
     }
-
-    window.addEventListener('load', () => {
-      document.getElementById("hwidInput").focus();
-    });
   </script>
 </body>
 </html>
