@@ -70,32 +70,42 @@ def plugin_details():
 @app.route('/api/plugins/<plugin_id>/raw')
 def get_plugin_raw(plugin_id):
     """Serve raw Lua plugin data for loadstring"""
-    plugins = plugins_manager.load_plugins()
-    plugin = next((p for p in plugins if p['id'] == plugin_id), None)
-    
-    if not plugin:
-        return "-- Plugin not found", 404
-    
-    sections = []
-    for section_name, bypasses in plugin.get('sections', {}).items():
-        bypasses_str = ',\n'.join([f'                "{bypass}"' for bypass in bypasses])
-        sections.append(f'''        {{
-            Name = "{section_name}",
+    try:
+        plugins = plugins_manager.load_plugins()
+        plugin = next((p for p in plugins if p['id'] == plugin_id), None)
+        
+        if not plugin:
+            response = make_response("-- Plugin not found")
+            response.headers['Content-Type'] = 'text/plain; charset=utf-8'
+            return response, 404
+        
+        def escape_lua_string(s):
+            if s is None:
+                return ""
+            return str(s).replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n').replace('\r', '\\r')
+        
+        sections = []
+        for section_name, bypasses in plugin.get('sections', {}).items():
+            escaped_bypasses = [f'                "{escape_lua_string(bypass)}"' for bypass in bypasses]
+            bypasses_str = ',\n'.join(escaped_bypasses)
+            
+            sections.append(f'''        {{
+            Name = "{escape_lua_string(section_name)}",
             Bypasses = {{
 {bypasses_str}
             }}
         }}''')
-    
-    sections_code = ',\n'.join(sections)
-    
-    lua_code = f'''-- {plugin['name']} by {plugin.get('author', 'Anonymous')}
--- {plugin.get('description', 'No description')}
+        
+        sections_code = ',\n'.join(sections)
+        
+        lua_code = f'''-- {escape_lua_string(plugin['name'])} by {escape_lua_string(plugin.get('author', 'Anonymous'))}
+-- {escape_lua_string(plugin.get('description', 'No description'))}
 
 local Plugin = {{
-    Name = "{plugin['name']}",
-    Author = "{plugin.get('author', 'Anonymous')}",
-    Description = "{plugin.get('description', 'No description')}",
-    Icon = "{plugin.get('icon', 'package')}",
+    Name = "{escape_lua_string(plugin['name'])}",
+    Author = "{escape_lua_string(plugin.get('author', 'Anonymous'))}",
+    Description = "{escape_lua_string(plugin.get('description', 'No description'))}",
+    Icon = "{escape_lua_string(plugin.get('icon', 'package'))}",
     Sections = {{
 {sections_code}
     }}
@@ -103,9 +113,18 @@ local Plugin = {{
 
 return Plugin'''
 
-    response = make_response(lua_code)
-    response.headers['Content-Type'] = 'text/plain; charset=utf-8'
-    return response
+        response = make_response(lua_code)
+        response.headers['Content-Type'] = 'text/plain; charset=utf-8'
+        response.headers['Access-Control-Allow-Origin'] = '*' 
+        
+        logger.info(f"Served raw plugin: {plugin_id}")
+        return response
+        
+    except Exception as e:
+        logger.error(f"Error serving raw plugin {plugin_id}: {str(e)}", exc_info=True)
+        response = make_response(f"-- Error generating plugin: {str(e)}")
+        response.headers['Content-Type'] = 'text/plain; charset=utf-8'
+        return response, 500
 
 @app.route('/script/<int:script_id>')
 def script_detail(script_id):
