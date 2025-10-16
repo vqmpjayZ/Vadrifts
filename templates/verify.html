@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Key Verification</title>
+  <title>HWID Verification - Vadrifts</title>
+  <link rel="icon" href="https://i.imgur.com/ePueN25.png" type="image/png">
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+    
     * {
       margin: 0;
       padding: 0;
@@ -12,9 +15,9 @@
     }
 
     body {
-      background: #0a0a0a;
-      color: #e8e8e8;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #000000;
+      color: #ffffff;
+      font-family: 'Inter', sans-serif;
       min-height: 100vh;
       display: flex;
       justify-content: center;
@@ -24,7 +27,7 @@
     }
 
     .bg-lights {
-      position: absolute;
+      position: fixed;
       top: 0;
       left: 0;
       width: 100%;
@@ -36,247 +39,312 @@
     .light {
       position: absolute;
       border-radius: 50%;
-      filter: blur(100px);
+      filter: blur(150px);
       opacity: 0.6;
-      animation-duration: 8s;
+      animation-duration: 15s;
       animation-iteration-count: infinite;
       animation-timing-function: ease-in-out;
     }
 
     .light-1 {
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, #ff4757 0%, transparent 70%);
-      top: -200px;
-      left: -200px;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, #065f46 0%, transparent 70%);
+      top: 2%;
+      left: 2%;
       animation-name: float1;
     }
 
     .light-2 {
       width: 300px;
       height: 300px;
-      background: radial-gradient(circle, #00d2ff 0%, transparent 70%);
-      top: -150px;
-      right: -150px;
+      background: radial-gradient(circle, #047857 0%, transparent 70%);
+      top: 15%;
+      right: 8%;
       animation-name: float2;
-      animation-delay: -2s;
+      animation-delay: -3s;
     }
 
     .light-3 {
-      width: 350px;
-      height: 350px;
-      background: radial-gradient(circle, #ff6b9d 0%, transparent 70%);
-      bottom: -175px;
-      left: -175px;
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, #059669 0%, transparent 70%);
+      bottom: 20%;
+      left: 10%;
       animation-name: float3;
-      animation-delay: -4s;
+      animation-delay: -6s;
     }
 
     .light-4 {
-      width: 250px;
-      height: 250px;
-      background: radial-gradient(circle, #7209b7 0%, transparent 70%);
-      bottom: -125px;
-      right: -125px;
+      width: 350px;
+      height: 350px;
+      background: radial-gradient(circle, #10b981 0%, transparent 70%);
+      bottom: 15%;
+      right: 12%;
       animation-name: float4;
-      animation-delay: -6s;
+      animation-delay: -9s;
+    }
+
+    .light-5 {
+      width: 280px;
+      height: 280px;
+      background: radial-gradient(circle, #34d399 0%, transparent 70%);
+      top: 45%;
+      left: 45%;
+      animation-name: float5;
+      animation-delay: -12s;
     }
 
     @keyframes float1 {
       0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(100px, -50px) scale(1.1); }
-      66% { transform: translate(-50px, 100px) scale(0.9); }
+      33% { transform: translate(120px, -80px) scale(1.1); }
+      66% { transform: translate(-80px, 120px) scale(0.9); }
     }
 
     @keyframes float2 {
       0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(-80px, 60px) scale(1.2); }
-      66% { transform: translate(120px, -80px) scale(0.8); }
+      33% { transform: translate(-100px, 90px) scale(1.2); }
+      66% { transform: translate(150px, -100px) scale(0.8); }
     }
 
     @keyframes float3 {
       0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(60px, -100px) scale(0.9); }
-      66% { transform: translate(-100px, -60px) scale(1.1); }
+      33% { transform: translate(90px, -120px) scale(0.95); }
+      66% { transform: translate(-120px, -90px) scale(1.05); }
     }
 
     @keyframes float4 {
       0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(-60px, -80px) scale(1.3); }
-      66% { transform: translate(80px, 100px) scale(0.7); }
+      33% { transform: translate(-90px, -100px) scale(1.3); }
+      66% { transform: translate(100px, 130px) scale(0.7); }
     }
 
-    body::after {
-      content: '';
-      position: absolute;
+    @keyframes float5 {
+      0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+      50% { transform: translate(-30px, -50px) scale(1.1) rotate(180deg); }
+    }
+
+    .particles {
+      position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-      background-size: 50px 50px;
       z-index: 2;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: #10b981;
+      border-radius: 50%;
+      opacity: 0.5;
+      box-shadow: 0 0 8px #10b981;
+      animation: floatUp 240s linear infinite;
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(100vh) translateX(0);
+        opacity: 0.5;
+      }
+      50% {
+        transform: translateY(50vh) translateX(20px);
+        opacity: 0.4;
+      }
+      100% {
+        transform: translateY(-200px) translateX(40px);
+        opacity: 0.3;
+      }
     }
 
     .container {
       position: relative;
       z-index: 10;
-      perspective: 1000px;
+      animation: fadeInUp 1s ease-out;
     }
 
-    .box {
-      background: rgba(10, 10, 10, 0.95);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 40px;
-      border-radius: 16px;
-      box-shadow: 
-        0 25px 50px rgba(0, 0, 0, 0.5),
-        inset 0 1px 0 rgba(255, 255, 255, 0.05),
-        0 0 100px rgba(255, 71, 87, 0.1);
-      text-align: center;
-      width: 420px;
-      max-width: 90vw;
-      transform: translateZ(0);
-      animation: slideUp 0.8s ease-out;
-      position: relative;
-    }
-
-    .box::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      border-radius: 16px;
-      padding: 1px;
-      background: linear-gradient(45deg, 
-        rgba(255, 71, 87, 0.3) 0%, 
-        rgba(0, 210, 255, 0.3) 25%, 
-        transparent 50%, 
-        rgba(255, 107, 157, 0.3) 75%, 
-        rgba(114, 9, 183, 0.3) 100%);
-      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      mask-composite: exclude;
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      animation: borderGlow 3s ease-in-out infinite;
-    }
-
-    @keyframes borderGlow {
-      0%, 100% { opacity: 0.5; }
-      50% { opacity: 1; }
-    }
-
-    @keyframes slideUp {
+    @keyframes fadeInUp {
       from {
         opacity: 0;
-        transform: translateY(30px) rotateX(10deg);
+        transform: translateY(40px);
       }
       to {
         opacity: 1;
-        transform: translateY(0) rotateX(0deg);
+        transform: translateY(0);
       }
     }
 
-    .logo {
-      width: 70px;
-      height: 70px;
-      margin: 0 auto 25px;
-      background: linear-gradient(135deg, #ff4757 0%, #ff6b9d 50%, #7209b7 100%);
-      border-radius: 20px;
+    .box {
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(30px);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      padding: 50px 45px;
+      border-radius: 24px;
+      box-shadow: 
+        0 30px 60px rgba(0, 0, 0, 0.5),
+        0 0 100px rgba(16, 185, 129, 0.1);
+      text-align: center;
+      width: 480px;
+      max-width: 90vw;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .box:hover {
+      border-color: rgba(16, 185, 129, 0.3);
+      box-shadow: 
+        0 30px 60px rgba(0, 0, 0, 0.5),
+        0 0 120px rgba(16, 185, 129, 0.15);
+    }
+
+    .logo-wrapper {
+      width: 90px;
+      height: 90px;
+      margin: 0 auto 30px;
+      background: linear-gradient(135deg, #059669, #10b981);
+      border-radius: 22px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 28px;
-      color: white;
+      font-size: 40px;
       position: relative;
-      animation: logoGlow 2s ease-in-out infinite;
-      box-shadow: 0 10px 30px rgba(255, 71, 87, 0.3);
+      animation: logoFloat 3s ease-in-out infinite;
+      box-shadow: 
+        0 20px 40px rgba(16, 185, 129, 0.3),
+        0 0 60px rgba(16, 185, 129, 0.2);
     }
 
-    @keyframes logoGlow {
+    @keyframes logoFloat {
       0%, 100% { 
-        transform: scale(1);
-        box-shadow: 0 10px 30px rgba(255, 71, 87, 0.3);
+        transform: translateY(0) scale(1);
       }
       50% { 
-        transform: scale(1.05);
-        box-shadow: 0 15px 40px rgba(255, 71, 87, 0.5);
+        transform: translateY(-8px) scale(1.03);
       }
     }
 
     h2 {
-      font-size: 32px;
-      font-weight: 700;
-      background: linear-gradient(135deg, #ff4757, #00d2ff, #ff6b9d);
+      font-size: 36px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
       background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin-bottom: 10px;
-      letter-spacing: -0.5px;
-      text-shadow: 0 0 30px rgba(255, 71, 87, 0.3);
+      margin-bottom: 12px;
+      letter-spacing: -1px;
     }
 
     .subtitle {
       color: #888;
       font-size: 14px;
-      margin-bottom: 35px;
-      line-height: 1.5;
-      opacity: 0.9;
+      margin-bottom: 40px;
+      line-height: 1.7;
+      font-weight: 400;
+    }
+
+    .subtitle strong {
+      color: #aaa;
+      font-weight: 600;
     }
 
     .input-group {
       position: relative;
-      margin-bottom: 30px;
+      margin-bottom: 25px;
+    }
+
+    .input-label {
+      display: block;
+      text-align: left;
+      margin-bottom: 10px;
+      color: #aaa;
+      font-weight: 500;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     input {
       width: 100%;
-      padding: 18px 24px;
-      font-size: 16px;
-      background: rgba(20, 20, 20, 0.8);
+      padding: 18px 50px 18px 20px;
+      font-size: 15px;
+      background: rgba(0, 0, 0, 0.5);
       border: 2px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      color: #e8e8e8;
+      border-radius: 14px;
+      color: #ffffff;
       outline: none;
       transition: all 0.3s ease;
       font-family: 'Consolas', 'Monaco', monospace;
-      position: relative;
+      letter-spacing: 0.5px;
     }
 
     input:focus {
-      border-color: #ff4757;
-      background: rgba(25, 25, 25, 0.9);
+      border-color: #10b981;
+      background: rgba(0, 0, 0, 0.7);
       box-shadow: 
-        0 0 0 4px rgba(255, 71, 87, 0.1),
-        0 0 20px rgba(255, 71, 87, 0.2);
+        0 0 0 4px rgba(16, 185, 129, 0.1),
+        0 0 30px rgba(16, 185, 129, 0.2);
       transform: translateY(-2px);
     }
 
     input::placeholder {
       color: #555;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 0;
+    }
+
+    .hwid-indicator {
+      position: absolute;
+      top: 50%;
+      right: 18px;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: rgba(239, 68, 68, 0.8);
+      transition: all 0.3s ease;
+      box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
+      border: 2px solid rgba(0, 0, 0, 0.3);
+    }
+
+    .hwid-indicator.valid {
+      background: #10b981;
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.6);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: translateY(-50%) scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: translateY(-50%) scale(1.15);
+        opacity: 0.8;
+      }
     }
 
     .verify-btn {
       width: 100%;
       padding: 18px;
-      background: linear-gradient(135deg, #ff4757 0%, #ff6b9d 50%, #7209b7 100%);
+      background: linear-gradient(135deg, #059669, #10b981);
       border: none;
-      border-radius: 12px;
+      border-radius: 14px;
       color: white;
-      font-size: 16px;
-      font-weight: 600;
+      font-size: 15px;
+      font-weight: 700;
       cursor: pointer;
       transition: all 0.3s ease;
       position: relative;
       overflow: hidden;
       text-transform: uppercase;
       letter-spacing: 1px;
-      box-shadow: 0 8px 25px rgba(255, 71, 87, 0.3);
+      box-shadow: 
+        0 10px 30px rgba(16, 185, 129, 0.3),
+        0 0 60px rgba(16, 185, 129, 0.1);
+      font-family: 'Inter', sans-serif;
     }
 
     .verify-btn::before {
@@ -286,13 +354,15 @@
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
       transition: left 0.5s ease;
     }
 
     .verify-btn:hover {
       transform: translateY(-3px);
-      box-shadow: 0 15px 40px rgba(255, 71, 87, 0.5);
+      box-shadow: 
+        0 15px 40px rgba(16, 185, 129, 0.4),
+        0 0 80px rgba(16, 185, 129, 0.2);
     }
 
     .verify-btn:hover::before {
@@ -304,70 +374,74 @@
     }
 
     .verify-btn:disabled {
-      opacity: 0.6;
+      opacity: 0.5;
       cursor: not-allowed;
+      transform: none;
+    }
+
+    .verify-btn:disabled:hover {
       transform: none;
     }
 
     .status {
       margin-top: 25px;
-      padding: 15px;
-      border-radius: 10px;
+      padding: 16px 20px;
+      border-radius: 12px;
       font-size: 14px;
       font-weight: 500;
       transition: all 0.3s ease;
       min-height: 20px;
       backdrop-filter: blur(10px);
+      display: none;
+      animation: slideIn 0.3s ease;
+    }
+
+    .status.show {
+      display: block;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .status.loading {
-      background: rgba(255, 193, 7, 0.15);
-      color: #ffc107;
-      border-left: 4px solid #ffc107;
-      box-shadow: 0 0 20px rgba(255, 193, 7, 0.2);
+      background: rgba(251, 191, 36, 0.15);
+      color: #fbbf24;
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      box-shadow: 0 0 20px rgba(251, 191, 36, 0.1);
     }
 
     .status.error {
-      background: rgba(255, 71, 87, 0.15);
-      color: #ff4757;
-      border-left: 4px solid #ff4757;
-      box-shadow: 0 0 20px rgba(255, 71, 87, 0.2);
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.1);
     }
 
     .status.success {
-      background: rgba(46, 204, 113, 0.15);
-      color: #2ecc71;
-      border-left: 4px solid #2ecc71;
-      box-shadow: 0 0 20px rgba(46, 204, 113, 0.2);
-    }
-
-    .hwid-indicator {
-      position: absolute;
-      top: 50%;
-      right: 20px;
-      transform: translateY(-50%);
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: #ff4757;
-      transition: all 0.3s ease;
-      box-shadow: 0 0 10px rgba(255, 71, 87, 0.5);
-    }
-
-    .hwid-indicator.valid {
-      background: #2ecc71;
-      box-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.1);
     }
 
     .loading-spinner {
       display: inline-block;
-      width: 18px;
-      height: 18px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
       border-radius: 50%;
-      border-top: 2px solid #ffc107;
-      animation: spin 1s linear infinite;
+      border-top: 2px solid currentColor;
+      animation: spin 0.8s linear infinite;
       margin-right: 10px;
+      vertical-align: middle;
     }
 
     @keyframes spin {
@@ -375,56 +449,78 @@
       100% { transform: rotate(360deg); }
     }
 
-    .particles {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      z-index: 3;
+    .info-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      color: #34d399;
+      margin-top: 20px;
+      font-weight: 500;
     }
 
-    .particle {
-      position: absolute;
-      width: 2px;
-      height: 2px;
-      background: rgba(255, 255, 255, 0.5);
-      border-radius: 50%;
-      animation: particleFloat 6s infinite linear;
+    .info-icon {
+      font-size: 16px;
     }
 
-    @keyframes particleFloat {
-      0% {
-        transform: translateY(100vh) translateX(0);
-        opacity: 0;
+    .access-denied {
+      animation: shake 0.5s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    @media (max-width: 768px) {
+      .box {
+        padding: 40px 30px;
+        width: 95vw;
       }
-      10% {
-        opacity: 1;
+      
+      h2 {
+        font-size: 30px;
       }
-      90% {
-        opacity: 1;
+
+      .logo-wrapper {
+        width: 75px;
+        height: 75px;
+        font-size: 34px;
       }
-      100% {
-        transform: translateY(-10px) translateX(100px);
-        opacity: 0;
+
+      .subtitle {
+        font-size: 13px;
+      }
+
+      input {
+        font-size: 14px;
+        padding: 16px 45px 16px 18px;
+      }
+
+      .verify-btn {
+        font-size: 14px;
+        padding: 16px;
       }
     }
 
     @media (max-width: 480px) {
       .box {
-        padding: 30px 25px;
-        width: 380px;
+        padding: 35px 25px;
       }
-      
+
       h2 {
         font-size: 26px;
       }
 
-      .logo {
-        width: 60px;
-        height: 60px;
-        font-size: 24px;
+      .logo-wrapper {
+        width: 70px;
+        height: 70px;
+        font-size: 30px;
       }
     }
   </style>
@@ -436,18 +532,29 @@
     <div class="light light-2"></div>
     <div class="light light-3"></div>
     <div class="light light-4"></div>
+    <div class="light light-5"></div>
   </div>
 
   <div class="particles" id="particles"></div>
 
   <div class="container">
     <div class="box">
-      <div class="logo">🔐</div>
-      <h2>Verify HWID</h2>
-      <p class="subtitle">For us to generate you the correct key you must give us your HWID, which you can get from the script.<br>Verify below to generate your access key.</p>
+      <div class="logo-wrapper">🔐</div>
+      <h2>HWID Verification</h2>
+      <p class="subtitle">
+        To generate your access key, please enter your <strong>Hardware ID (HWID)</strong>.<br>
+        You can obtain this from the script executor.
+      </p>
       
       <div class="input-group">
-        <input id="hwidInput" type="text" placeholder="Hardware ID will appear here..." />
+        <label class="input-label" for="hwidInput">Hardware ID</label>
+        <input 
+          id="hwidInput" 
+          type="text" 
+          placeholder="Enter your HWID here..." 
+          autocomplete="off"
+          spellcheck="false"
+        />
         <div class="hwid-indicator" id="hwidIndicator"></div>
       </div>
       
@@ -456,6 +563,11 @@
       </button>
       
       <div class="status" id="status"></div>
+
+      <div class="info-badge">
+        <span class="info-icon">🛡️</span>
+        <span>Secure verification system</span>
+      </div>
     </div>
   </div>
 
@@ -465,12 +577,14 @@
 
     function createParticles() {
       const particlesContainer = document.getElementById('particles');
-      for (let i = 0; i < 50; i++) {
+      const particleCount = 15;
+      
+      for (let i = 0; i < particleCount; i++) {
         const particle = document.createElement('div');
         particle.className = 'particle';
         particle.style.left = Math.random() * 100 + '%';
-        particle.style.animationDelay = Math.random() * 6 + 's';
-        particle.style.animationDuration = (3 + Math.random() * 3) + 's';
+        particle.style.animationDelay = -Math.random() * 15 + 's';
+        particle.style.animationDuration = (15 + Math.random() * 5) + 's';
         particlesContainer.appendChild(particle);
       }
     }
@@ -481,9 +595,7 @@
         referrer.includes(domain)
       );
 
-      const isDirectAccess = !referrer;
-      
-      if (!hasValidReferrer) {
+      if (!hasValidReferrer && referrer) {
         showAccessDenied();
         return false;
       }
@@ -491,21 +603,26 @@
     }
 
     function showAccessDenied() {
-      document.querySelector('.box').innerHTML = `
-        <div class="logo">🚫</div>
-        <h2 style="background: linear-gradient(135deg, #ff4757, #dc3545); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Access Denied</h2>
-        <p class="subtitle">Direct access to this page is not permitted.<br>Please access through the authorized portal.</p>
-        <div class="status error" style="margin-top: 30px;">
-          Unauthorized access attempt detected
+      const box = document.querySelector('.box');
+      box.classList.add('access-denied');
+      box.innerHTML = `
+        <div class="logo-wrapper" style="background: linear-gradient(135deg, #dc2626, #ef4444);">🚫</div>
+        <h2 style="background: linear-gradient(135deg, #ef4444, #f87171); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Access Denied</h2>
+        <p class="subtitle">
+          Direct access to this page is not permitted.<br>
+          Please access through the <strong>authorized verification portal</strong>.
+        </p>
+        <div class="status error show" style="margin-top: 30px;">
+          <span>⚠️</span> Unauthorized access attempt detected
         </div>
       `;
     }
 
     function updateHwidIndicator() {
-      const hwid = document.getElementById("hwidInput").value;
+      const hwid = document.getElementById("hwidInput").value.trim();
       const indicator = document.getElementById("hwidIndicator");
       
-      if (hwid && hwid.length >= 6) {
+      if (hwid && hwid.length >= 25) {
         indicator.classList.add("valid");
         isValidHwid = true;
       } else {
@@ -518,14 +635,20 @@
       const statusEl = document.getElementById("status");
       statusEl.className = `status ${type}`;
       statusEl.innerHTML = message;
+      
+      if (type) {
+        statusEl.classList.add('show');
+      } else {
+        statusEl.classList.remove('show');
+      }
     }
 
     async function getKey() {
-      const hwid = document.getElementById("hwidInput").value;
+      const hwid = document.getElementById("hwidInput").value.trim();
       const btn = document.getElementById("verifyBtn");
       
       if (!hwid || hwid.length < 25) {
-        setStatus("Please enter your HWID.", "error");
+        setStatus("⚠️ Please enter a valid HWID (minimum 25 characters)", "error");
         return;
       }
 
@@ -538,32 +661,42 @@
         const link = await res.text();
         
         if (res.ok) {
-          setStatus("Access key generated successfully! Redirecting...", "success");
+          setStatus("✓ Access key generated successfully! Redirecting...", "success");
           setTimeout(() => {
             window.location.href = link;
           }, 1500);
         } else {
-          setStatus(`Failed to generate key: ${link}`, "error");
+          setStatus(`✗ Failed to generate key: ${link}`, "error");
           btn.disabled = false;
           btn.innerHTML = 'Generate Access Key';
         }
       } catch (err) {
-        setStatus("Network error. Please check your connection and try again.", "error");
+        console.error('Generation error:', err);
+        setStatus("✗ Network error. Please check your connection and try again.", "error");
         btn.disabled = false;
         btn.innerHTML = 'Generate Access Key';
       }
     }
 
     document.getElementById("hwidInput").addEventListener("input", updateHwidIndicator);
+    
     document.getElementById("hwidInput").addEventListener("keypress", (e) => {
       if (e.key === "Enter" && isValidHwid) {
         getKey();
       }
     });
 
+    document.getElementById("hwidInput").addEventListener("paste", (e) => {
+      setTimeout(updateHwidIndicator, 10);
+    });
+
     if (checkAccess()) {
       createParticles();
     }
+
+    window.addEventListener('load', () => {
+      document.getElementById("hwidInput").focus();
+    });
   </script>
 </body>
 </html>
