@@ -1,8 +1,6 @@
 import os
 
 DISCORD_TOKEN = os.environ.get('DISCORD_TOKEN')
-TARGET_CHANNEL_ID = 1389210900489044048
-DELAY_SECONDS = 2
 
 DATA_DIR = 'data'
 if not os.path.exists(DATA_DIR):
