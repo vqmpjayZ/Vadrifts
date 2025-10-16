@@ -70,19 +70,14 @@ def plugin_details():
 @app.route('/api/plugins/<plugin_id>/raw')
 def get_plugin_raw(plugin_id):
     try:
-        plugins = plugins_manager.load_plugins()
+        plugin_response = plugins_manager.get_plugin(plugin_id)
         
-        if plugins is None:
-            plugins = []
-        
-        logger.info(f"Looking for plugin: {plugin_id}, Available plugins: {[p.get('id') for p in plugins]}")
-        
-        plugin = next((p for p in plugins if str(p.get('id')) == str(plugin_id)), None)
-        
-        if not plugin:
+        if plugin_response[1] == 404:
             response = make_response("-- Plugin not found")
             response.headers['Content-Type'] = 'text/plain; charset=utf-8'
             return response, 404
+        
+        plugin = plugin_response[0].get_json()
         
         def escape_lua_string(s):
             if s is None:
