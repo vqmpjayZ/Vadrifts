@@ -1,6 +1,6 @@
 import os
 import logging
-from flask import Flask, request, jsonify, send_file, redirect, send_from_directory
+from flask import Flask, request, jsonify, send_file, redirect, send_from_directory, make_response
 from datetime import datetime
 
 from config import *
@@ -10,6 +10,7 @@ from image_converter import convert_image_endpoint
 from plugins_manager import PluginsManager
 from scripts_data import scripts_data, process_script_data
 from utils import inject_meta_tags, server_pinger
+from key_system import KeySystemManager
 
 logging.basicConfig(
     level=logging.INFO,
@@ -22,6 +23,7 @@ app = Flask(__name__)
 
 youtube_finder = YouTubeChannelFinder()
 plugins_manager = PluginsManager()
+key_system = KeySystemManager()
 
 @app.route('/')
 def home():
@@ -68,13 +70,12 @@ def plugin_details():
 @app.route('/api/plugins/<plugin_id>/raw')
 def get_plugin_raw(plugin_id):
     """Serve raw Lua plugin data for loadstring"""
-    plugins = load_plugins()
+    plugins = plugins_manager.load_plugins()
     plugin = next((p for p in plugins if p['id'] == plugin_id), None)
     
     if not plugin:
         return "-- Plugin not found", 404
     
-    # Generate the Lua code
     sections = []
     for section_name, bypasses in plugin.get('sections', {}).items():
         bypasses_str = ',\n'.join([f'                "{bypass}"' for bypass in bypasses])
@@ -105,6 +106,7 @@ return Plugin'''
     response = make_response(lua_code)
     response.headers['Content-Type'] = 'text/plain; charset=utf-8'
     return response
+
 @app.route('/script/<int:script_id>')
 def script_detail(script_id):
     script = next((s for s in scripts_data if s['id'] == script_id), None)
@@ -141,6 +143,52 @@ def converter():
     except FileNotFoundError:
         logger.error("converter.html template not found")
         return jsonify({"error": "Converter page not found"}), 404
+
+@app.route('/key-system')
+def key_system_page():
+    """Serve the key system page"""
+    try:
+        return send_file('templates/key-system.html')
+    except FileNotFoundError:
+        logger.error("key-system.html template not found")
+        return jsonify({"error": "Key system page not found"}), 404
+
+@app.route('/verify')
+def verify_page():
+    """Serve the verification page"""
+    try:
+        return send_file('templates/verify.html')
+    except FileNotFoundError:
+        logger.error("verify.html template not found")
+        return jsonify({"error": "Verify page not found"}), 404
+
+@app.route('/create')
+def create_key():
+    """Create a key link with HWID"""
+    hwid = request.args.get('hwid')
+    if not hwid:
+        return "Missing HWID", 400
+    
+    slug = key_system.create_slug(hwid)
+    host = request.headers.get('host', 'vadrifts.onrender.com')
+    
+    logger.info(f"Created key slug for HWID: {hwid[:8]}...")
+    return f"https://{host}/getkey/{slug}"
+
+@app.route('/getkey/<slug>')
+def get_key(slug):
+    """Get key from slug and consume it"""
+    hwid = key_system.get_hwid_from_slug(slug)
+    
+    if not hwid:
+        logger.warning(f"Invalid or expired slug attempted: {slug}")
+        return "Invalid or expired key link", 404
+    
+    key_system.consume_slug(slug)
+    key = key_system.generate_key(hwid)
+    
+    logger.info(f"Key generated for HWID: {hwid[:8]}... Key: {key}")
+    return key
 
 @app.route('/plugin/<plugin_id>')
 def plugin_detail(plugin_id):
@@ -333,7 +381,6 @@ def find_channels():
 from bypass_dashboard import BypassDashboard
 
 bypass_dashboard = BypassDashboard()
-
 bypass_dashboard.register_routes(app)
 
 if __name__ == '__main__':
