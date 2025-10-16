@@ -460,7 +460,6 @@
       transform: translate(0, -2px);
     }
 
-    /* Lua syntax highlighting */
     .lua-keyword { color: #ff79c6; font-weight: 600; }
     .lua-string { color: #f1fa8c; }
     .lua-comment { color: #6272a4; font-style: italic; }
@@ -812,35 +811,22 @@
       }
     }
 
-    function highlightLua(code) {
-      if (!code) return '';
-      
-      // Keywords
-      const keywords = /\b(local|function|end|if|then|else|elseif|for|while|do|repeat|until|return|break|true|false|nil|and|or|not|in)\b/g;
-      const builtins = /\b(game|workspace|script|wait|print|warn|error|spawn|loadstring|getfenv|setfenv|require|pairs|ipairs|next|tostring|tonumber|type|pcall|xpcall|assert|Vector3|CFrame|Instance|Color3|UDim2|math|string|table|coroutine|os)\b/g;
-      const strings = /(["'])(?:(?=(\\?))\2.)*?\1/g;
-      const comments = /(--.*$)/gm;
-      const numbers = /\b(\d+\.?\d*)\b/g;
-      const functions = /\b(\w+)\s*(?=KATEX_INLINE_OPEN)/g;
-      const booleans = /\b(true|false)\b/g;
-      
-      // Apply highlighting
-      let highlighted = code
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-      
-      // Order matters - do strings and comments first
-      highlighted = highlighted.replace(strings, '<span class="lua-string">$&</span>');
-      highlighted = highlighted.replace(comments, '<span class="lua-comment">$&</span>');
-      highlighted = highlighted.replace(keywords, '<span class="lua-keyword">$&</span>');
-      highlighted = highlighted.replace(builtins, '<span class="lua-builtin">$&</span>');
-      highlighted = highlighted.replace(booleans, '<span class="lua-boolean">$&</span>');
-      highlighted = highlighted.replace(numbers, '<span class="lua-number">$&</span>');
-      highlighted = highlighted.replace(functions, '<span class="lua-function">$1</span>(');
-      
-      return highlighted;
-    }
+function highlightLuaLoadstring(code) {
+  if (!code) return '';
+
+  code = code
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  code = code.replace(/\b(loadstring)\b/g, '<span class="lua-keyword">$1</span>');
+
+  code = code.replace(/loadstring\((["'])(.*?)\1\)/g, (match, quote, content) => {
+    return `<span class="lua-keyword">loadstring</span>(<span class="lua-string">${quote}${content}${quote}</span>)`;
+  });
+
+  return code;
+}
 
     function getScriptIdFromURL() {
       const pathParts = window.location.pathname.split('/');
