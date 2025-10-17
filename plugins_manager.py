@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 class PluginsManager:
     def __init__(self):
         self.rate_limit_data = {}
+        self.plugins = None
         try:
             self.client = MongoClient(MONGODB_URI)
             self.db = self.client['vadrifts']
@@ -18,11 +19,10 @@ class PluginsManager:
             logger.info("Connected to MongoDB successfully")
         except Exception as e:
             logger.error(f"Failed to connect to MongoDB: {e}")
-            self.plugins = None
     
     def get_all_plugins(self):
         try:
-            if not self.plugins:
+            if self.plugins is None:
                 return jsonify([])
             
             plugins_list = list(self.plugins.find({}, {'_id': 0}).sort('created_at', -1).limit(50))
@@ -33,7 +33,7 @@ class PluginsManager:
     
     def get_plugin_data(self, plugin_id):
         try:
-            if not self.plugins:
+            if self.plugins is None:
                 return None
             return self.plugins.find_one({'id': plugin_id}, {'_id': 0})
         except Exception as e:
@@ -42,7 +42,7 @@ class PluginsManager:
     
     def create_plugin(self, request):
         try:
-            if not self.plugins:
+            if self.plugins is None:
                 return jsonify({"error": "Database not available"}), 500
             
             data = request.get_json()
@@ -97,7 +97,7 @@ class PluginsManager:
     
     def get_plugin(self, plugin_id):
         try:
-            if not self.plugins:
+            if self.plugins is None:
                 return jsonify({"error": "Database not available"}), 500
             
             plugin = self.plugins.find_one({'id': plugin_id}, {'_id': 0})
@@ -117,7 +117,7 @@ class PluginsManager:
     
     def update_plugin(self, plugin_id, request):
         try:
-            if not self.plugins:
+            if self.plugins is None:
                 return jsonify({"error": "Database not available"}), 500
             
             data = request.get_json()
@@ -151,7 +151,7 @@ class PluginsManager:
     
     def delete_plugin(self, plugin_id):
         try:
-            if not self.plugins:
+            if self.plugins is None:
                 return jsonify({"error": "Database not available"}), 500
             
             result = self.plugins.delete_one({'id': plugin_id})
