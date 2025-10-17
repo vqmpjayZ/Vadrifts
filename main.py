@@ -70,6 +70,14 @@ def plugin_details():
 @app.route('/api/plugins/<plugin_id>/raw')
 def get_plugin_raw(plugin_id):
     try:
+        logger.info(f"Plugins in memory: {len(plugins_manager.plugins_data)}")
+        logger.info(f"Plugin IDs: {[p.get('id') for p in plugins_manager.plugins_data]}")
+        logger.info(f"Looking for: {plugin_id}")
+        
+        plugins_manager.load_plugins()
+        
+        logger.info(f"After reload: {len(plugins_manager.plugins_data)}")
+        
         plugin = next((p for p in plugins_manager.plugins_data if str(p.get('id')) == str(plugin_id)), None)
         
         if not plugin:
