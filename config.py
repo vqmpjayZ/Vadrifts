@@ -1,5 +1,6 @@
 import os
 
+MONGODB_URI = os.environ.get('MONGODB_URI')
 DISCORD_TOKEN = os.environ.get('DISCORD_TOKEN')
 
 DATA_DIR = 'data'
