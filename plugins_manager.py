@@ -1,49 +1,50 @@
-import json
-import os
 import uuid
 import re
 from datetime import datetime
 from flask import jsonify
 import logging
-from config import PLUGINS_FILE
+from pymongo import MongoClient
+from config import MONGODB_URI
 
 logger = logging.getLogger(__name__)
 
 class PluginsManager:
     def __init__(self):
-        self.plugins_data = []
         self.rate_limit_data = {}
-        self.load_plugins()
-    
-    def load_plugins(self):
         try:
-            if os.path.exists(PLUGINS_FILE):
-                with open(PLUGINS_FILE, 'r') as f:
-                    self.plugins_data = json.load(f)
-            else:
-                self.plugins_data = []
+            self.client = MongoClient(MONGODB_URI)
+            self.db = self.client['vadrifts']
+            self.plugins = self.db['plugins']
+            logger.info("Connected to MongoDB successfully")
         except Exception as e:
-            logger.error(f"Error loading plugins: {e}")
-            self.plugins_data = []
-    
-    def save_plugins(self):
-        try:
-            os.makedirs(os.path.dirname(PLUGINS_FILE), exist_ok=True)
-            with open(PLUGINS_FILE, 'w') as f:
-                json.dump(self.plugins_data, f, indent=2)
-        except Exception as e:
-            logger.error(f"Error saving plugins: {e}")
+            logger.error(f"Failed to connect to MongoDB: {e}")
+            self.plugins = None
     
     def get_all_plugins(self):
-        sorted_plugins = sorted(self.plugins_data, key=lambda x: x.get('created_at', ''), reverse=True)
-        return jsonify(sorted_plugins[:50])
+        try:
+            if not self.plugins:
+                return jsonify([])
+            
+            plugins_list = list(self.plugins.find({}, {'_id': 0}).sort('created_at', -1).limit(50))
+            return jsonify(plugins_list)
+        except Exception as e:
+            logger.error(f"Error getting plugins: {e}")
+            return jsonify([])
     
     def get_plugin_data(self, plugin_id):
-        """Get raw plugin data for display"""
-        return next((p for p in self.plugins_data if p['id'] == plugin_id), None)
+        try:
+            if not self.plugins:
+                return None
+            return self.plugins.find_one({'id': plugin_id}, {'_id': 0})
+        except Exception as e:
+            logger.error(f"Error getting plugin data: {e}")
+            return None
     
     def create_plugin(self, request):
         try:
+            if not self.plugins:
+                return jsonify({"error": "Database not available"}), 500
+            
             data = request.get_json()
             client_ip = request.remote_addr
             now = datetime.now()
@@ -83,12 +84,10 @@ class PluginsManager:
                 'uses': 0
             }
             
-            self.plugins_data.append(plugin)
+            self.plugins.insert_one(plugin.copy())
 
             self.rate_limit_data[client_ip]['count'] += 1
             self.rate_limit_data[client_ip]['last_create'] = now
-            
-            self.save_plugins()
             
             return jsonify(plugin), 201
             
@@ -97,18 +96,33 @@ class PluginsManager:
             return jsonify({"error": "Failed to create plugin"}), 500
     
     def get_plugin(self, plugin_id):
-        plugin = next((p for p in self.plugins_data if p['id'] == plugin_id), None)
-        if plugin:
-            plugin['uses'] = plugin.get('uses', 0) + 1
-            self.save_plugins()
-            return jsonify(plugin)
-        return jsonify({"error": "Plugin not found"}), 404
+        try:
+            if not self.plugins:
+                return jsonify({"error": "Database not available"}), 500
+            
+            plugin = self.plugins.find_one({'id': plugin_id}, {'_id': 0})
+            
+            if plugin:
+                self.plugins.update_one(
+                    {'id': plugin_id},
+                    {'$inc': {'uses': 1}}
+                )
+                plugin['uses'] = plugin.get('uses', 0) + 1
+                return jsonify(plugin)
+            
+            return jsonify({"error": "Plugin not found"}), 404
+        except Exception as e:
+            logger.error(f"Error getting plugin: {e}")
+            return jsonify({"error": "Failed to get plugin"}), 500
     
     def update_plugin(self, plugin_id, request):
         try:
+            if not self.plugins:
+                return jsonify({"error": "Database not available"}), 500
+            
             data = request.get_json()
             
-            plugin = next((p for p in self.plugins_data if p['id'] == plugin_id), None)
+            plugin = self.plugins.find_one({'id': plugin_id}, {'_id': 0})
             if not plugin:
                 return jsonify({"error": "Plugin not found"}), 404
             
@@ -117,27 +131,35 @@ class PluginsManager:
                 if not re.match(r'^[a-zA-Z0-9]+$', author):
                     return jsonify({"error": "Author name can only contain letters and numbers"}), 400
             
-            plugin['name'] = data.get('name', plugin['name'])[:25]
-            plugin['author'] = author if author else 'Anonymous'
-            plugin['description'] = data.get('description', '')[:200]
-            plugin['icon'] = data.get('icon', '')
-            plugin['sections'] = data.get('sections', plugin['sections'])
-            plugin['updated_at'] = datetime.now().isoformat()
+            update_data = {
+                'name': data.get('name', plugin['name'])[:25],
+                'author': author if author else 'Anonymous',
+                'description': data.get('description', '')[:200],
+                'icon': data.get('icon', ''),
+                'sections': data.get('sections', plugin['sections']),
+                'updated_at': datetime.now().isoformat()
+            }
             
-            self.save_plugins()
+            self.plugins.update_one({'id': plugin_id}, {'$set': update_data})
             
-            return jsonify(plugin), 200
+            updated_plugin = self.plugins.find_one({'id': plugin_id}, {'_id': 0})
+            return jsonify(updated_plugin), 200
             
         except Exception as e:
             logger.error(f"Error updating plugin: {e}")
             return jsonify({"error": "Failed to update plugin"}), 500
     
     def delete_plugin(self, plugin_id):
-        plugin = next((p for p in self.plugins_data if p['id'] == plugin_id), None)
-        if not plugin:
-            return jsonify({"error": "Plugin not found"}), 404
-        
-        self.plugins_data = [p for p in self.plugins_data if p['id'] != plugin_id]
-        self.save_plugins()
-        
-        return jsonify({"message": "Plugin deleted successfully"}), 200
+        try:
+            if not self.plugins:
+                return jsonify({"error": "Database not available"}), 500
+            
+            result = self.plugins.delete_one({'id': plugin_id})
+            
+            if result.deleted_count == 0:
+                return jsonify({"error": "Plugin not found"}), 404
+            
+            return jsonify({"message": "Plugin deleted successfully"}), 200
+        except Exception as e:
+            logger.error(f"Error deleting plugin: {e}")
+            return jsonify({"error": "Failed to delete plugin"}), 500
