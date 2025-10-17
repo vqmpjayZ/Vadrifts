@@ -70,22 +70,7 @@ def plugin_details():
 @app.route('/api/plugins/<plugin_id>/raw')
 def get_plugin_raw(plugin_id):
     try:
-        logger.info(f"PLUGINS_FILE path: {PLUGINS_FILE}")
-        logger.info(f"File exists: {os.path.exists(PLUGINS_FILE)}")
-        
-        if os.path.exists(PLUGINS_FILE):
-            with open(PLUGINS_FILE, 'r') as f:
-                content = f.read()
-                logger.info(f"File content length: {len(content)}")
-                logger.info(f"File content preview: {content[:200]}")
-        
-        logger.info(f"Plugins in memory: {len(plugins_manager.plugins_data)}")
-        
-        plugins_manager.load_plugins()
-        
-        logger.info(f"After reload: {len(plugins_manager.plugins_data)}")
-        
-        plugin = next((p for p in plugins_manager.plugins_data if str(p.get('id')) == str(plugin_id)), None)
+        plugin = plugins_manager.get_plugin_data(plugin_id)
         
         if not plugin:
             response = make_response("-- Plugin not found")
