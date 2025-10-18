@@ -310,6 +310,82 @@
       color: #888;
     }
 
+    /* Custom prompt modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal {
+      background: #1a1a1a;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 30px;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #9c88ff;
+      margin-bottom: 15px;
+    }
+
+    .modal-text {
+      color: #ccc;
+      line-height: 1.6;
+      margin-bottom: 25px;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .modal-btn {
+      flex: 1;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .modal-btn-primary {
+      background: rgba(114, 9, 183, 0.3);
+      border: 1px solid rgba(114, 9, 183, 0.5);
+      color: #9c88ff;
+    }
+
+    .modal-btn-primary:hover {
+      background: rgba(114, 9, 183, 0.4);
+    }
+
+    .modal-btn-secondary {
+      background: rgba(40, 40, 40, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #ccc;
+    }
+
+    .modal-btn-secondary:hover {
+      background: rgba(60, 60, 60, 0.5);
+    }
+
     @media (max-width: 768px) {
       .header {
         flex-direction: column;
@@ -349,8 +425,8 @@
         Back to Plugins
       </a>
       <div class="view-toggle">
-        <button class="toggle-btn active" data-view="styled">Styled</button>
-        <button class="toggle-btn" data-view="loadstring">Loadstring</button>
+        <button class="toggle-btn active" data-view="styled">Main</button>
+        <button class="toggle-btn" data-view="raw">Raw</button>
       </div>
     </div>
 
@@ -365,8 +441,21 @@
 
   <div class="toast" id="toast">Copied to clipboard!</div>
 
+  <!-- Modal for raw redirect confirmation -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-title">View Raw Plugin Data?</div>
+      <div class="modal-text">This will take you to the raw Lua code for this plugin. You can use this with loadstring in your executor.</div>
+      <div class="modal-buttons">
+        <button class="modal-btn modal-btn-secondary" onclick="closeModal()">Cancel</button>
+        <button class="modal-btn modal-btn-primary" onclick="confirmRawRedirect()">View Raw</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     let currentPlugin = null;
+    let rawUrl = '';
 
     function getPluginIdFromUrl() {
       const params = new URLSearchParams(window.location.search);
@@ -400,6 +489,7 @@
           }
         }
 
+        rawUrl = `${window.location.origin}/api/plugins/${currentPlugin.id}/raw`;
         displayPlugin();
         setupViewToggle();
       } catch (error) {
@@ -507,7 +597,11 @@ end`;
       document.querySelectorAll('.toggle-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           const view = btn.getAttribute('data-view');
-          switchView(view);
+          if (view === 'raw') {
+            openModal();
+          } else {
+            switchView(view);
+          }
         });
       });
     }
@@ -518,6 +612,21 @@ end`;
       
       document.querySelector(`[data-view="${view}"]`).classList.add('active');
       document.querySelector(`.${view}-view`).classList.add('active');
+    }
+
+    function openModal() {
+      document.getElementById('modalOverlay').classList.add('show');
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('show');
+      // Reset the button state back to Main
+      document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelector('[data-view="styled"]').classList.add('active');
+    }
+
+    function confirmRawRedirect() {
+      window.location.href = rawUrl;
     }
 
     function getIconSvg(iconName) {
