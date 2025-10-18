@@ -444,8 +444,8 @@
   <!-- Modal for raw redirect confirmation -->
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
-      <div class="modal-title">View Raw Plugin Data?</div>
-      <div class="modal-text">This will take you to the raw Lua code for this plugin. You can use this with loadstring in your executor.</div>
+      <div class="modal-title">View Raw API Data</div>
+      <div class="modal-text">This is the raw Lua data that ArrayField fetches to build plugin tabs. It's meant for developers and debugging.</div>
       <div class="modal-buttons">
         <button class="modal-btn modal-btn-secondary" onclick="closeModal()">Cancel</button>
         <button class="modal-btn modal-btn-primary" onclick="confirmRawRedirect()">View Raw</button>
@@ -535,60 +535,9 @@
         `).join('')}
       `;
 
-      const loadstringUrl = `${window.location.origin}/api/plugins/${currentPlugin.id}/raw`;
-      const loadstringExample = `-- Load this plugin in your Roblox executor
-local Plugin = loadstring(game:HttpGet("${loadstringUrl}"))()
-
--- Example usage with ArrayField/Rayfield:
-for _, section in ipairs(Plugin.Sections) do
-    local SectionParent = Tab:CreateSection(section.Name)
-    
-    for _, bypass in ipairs(section.Bypasses) do
-        SectionParent:CreateParagraph({
-            Title = "Bypass",
-            Content = bypass
-        })
-    end
-end`;
-      
-      const loadstringView = `
-        <div class="loadstring-container">
-          <div class="raw-header">
-            <div class="raw-title">Loadstring URL</div>
-            <button class="copy-btn" onclick="copyLoadstringUrl()">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-              </svg>
-              Copy URL
-            </button>
-          </div>
-          <div class="loadstring-url" id="loadstringUrl">${escapeHtml(loadstringUrl)}</div>
-          <p class="info-text">Use this URL with loadstring(game:HttpGet()) to load the plugin directly in your executor.</p>
-        </div>
-        
-        <div class="loadstring-container">
-          <div class="raw-header">
-            <div class="raw-title">Example Usage</div>
-            <button class="copy-btn" onclick="copyLoadstringExample()">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2 2v1"></path>
-              </svg>
-              Copy
-            </button>
-          </div>
-          <div class="loadstring-example" id="loadstringExample">${escapeHtml(loadstringExample)}</div>
-          <p class="info-text">This example shows how to use the plugin with ArrayField or Rayfield UI library. The sections are automatically created with SectionParents.</p>
-        </div>
-      `;
-
       document.getElementById('pluginContent').innerHTML = `
         <div class="styled-view active">
           ${styledView}
-        </div>
-        <div class="loadstring-view">
-          ${loadstringView}
         </div>
       `;
     }
@@ -608,7 +557,7 @@ end`;
 
     function switchView(view) {
       document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.styled-view, .loadstring-view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.styled-view').forEach(v => v.classList.remove('active'));
       
       document.querySelector(`[data-view="${view}"]`).classList.add('active');
       document.querySelector(`.${view}-view`).classList.add('active');
@@ -631,24 +580,6 @@ end`;
 
     function getIconSvg(iconName) {
       return '<svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>';
-    }
-
-    function copyLoadstringUrl() {
-      const url = document.getElementById('loadstringUrl').textContent;
-      navigator.clipboard.writeText(url).then(() => {
-        showToast('URL copied to clipboard!');
-      }).catch(err => {
-        console.error('Failed to copy:', err);
-      });
-    }
-
-    function copyLoadstringExample() {
-      const example = document.getElementById('loadstringExample').textContent;
-      navigator.clipboard.writeText(example).then(() => {
-        showToast('Example copied to clipboard!');
-      }).catch(err => {
-        console.error('Failed to copy:', err);
-      });
     }
 
     function showToast(message) {
