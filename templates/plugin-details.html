@@ -139,11 +139,11 @@
       font-size: 14px;
     }
 
-    .styled-view, .raw-view, .loadstring-view {
+    .styled-view, .loadstring-view {
       display: none;
     }
 
-    .styled-view.active, .raw-view.active, .loadstring-view.active {
+    .styled-view.active, .loadstring-view.active {
       display: block;
     }
     
@@ -230,14 +230,6 @@
       font-size: 14px;
     }
 
-    .raw-container {
-      background: #1a1a1a;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 15px;
-      padding: 25px;
-      position: relative;
-    }
-
     .raw-header {
       display: flex;
       justify-content: space-between;
@@ -267,20 +259,6 @@
     .copy-btn:hover {
       background: rgba(114, 9, 183, 0.3);
       border-color: #9c88ff;
-    }
-
-    .raw-code {
-      background: #0a0a0a;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 10px;
-      padding: 20px;
-      overflow-x: auto;
-      font-family: 'Courier New', monospace;
-      font-size: 13px;
-      line-height: 1.6;
-      color: #ddd;
-      white-space: pre-wrap;
-      word-wrap: break-word;
     }
 
     .toast {
@@ -372,7 +350,6 @@
       </a>
       <div class="view-toggle">
         <button class="toggle-btn active" data-view="styled">Styled</button>
-        <button class="toggle-btn" data-view="raw">Raw Data</button>
         <button class="toggle-btn" data-view="loadstring">Loadstring</button>
       </div>
     </div>
@@ -468,7 +445,6 @@
         `).join('')}
       `;
 
-      const rawData = generateRawData(currentPlugin);
       const loadstringUrl = `${window.location.origin}/api/plugins/${currentPlugin.id}/raw`;
       const loadstringExample = `-- Load this plugin in your Roblox executor
 local Plugin = loadstring(game:HttpGet("${loadstringUrl}"))()
@@ -484,22 +460,6 @@ for _, section in ipairs(Plugin.Sections) do
         })
     end
 end`;
-
-      const rawView = `
-        <div class="raw-container">
-          <div class="raw-header">
-            <div class="raw-title">Raw Plugin Data (Rayfield/ArrayField Compatible)</div>
-            <button class="copy-btn" onclick="copyRawData()">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-              </svg>
-              Copy
-            </button>
-          </div>
-          <div class="raw-code" id="rawCode">${escapeHtml(rawData)}</div>
-        </div>
-      `;
       
       const loadstringView = `
         <div class="loadstring-container">
@@ -537,9 +497,6 @@ end`;
         <div class="styled-view active">
           ${styledView}
         </div>
-        <div class="raw-view">
-          ${rawView}
-        </div>
         <div class="loadstring-view">
           ${loadstringView}
         </div>
@@ -557,50 +514,14 @@ end`;
 
     function switchView(view) {
       document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.styled-view, .raw-view, .loadstring-view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.styled-view, .loadstring-view').forEach(v => v.classList.remove('active'));
       
       document.querySelector(`[data-view="${view}"]`).classList.add('active');
       document.querySelector(`.${view}-view`).classList.add('active');
     }
 
-    function generateRawData(plugin) {
-      const sections = Object.entries(plugin.sections || {}).map(([name, bypasses]) => {
-        const bypassesStr = bypasses.map(b => `                "${b.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`).join(',\n');
-        return `        {
-            Name = "${name.replace(/"/g, '\\"')}",
-            Bypasses = {
-${bypassesStr}
-            }
-        }`;
-      }).join(',\n');
-
-      return `-- ${plugin.name} by ${plugin.author || 'Anonymous'}
--- ${plugin.description || 'No description'}
-
-local Plugin = {
-    Name = "${plugin.name.replace(/"/g, '\\"')}",
-    Author = "${(plugin.author || 'Anonymous').replace(/"/g, '\\"')}",
-    Description = "${(plugin.description || 'No description').replace(/"/g, '\\"')}",
-    Icon = "${plugin.icon || 'package'}",
-    Sections = {
-${sections}
-    }
-}
-
-return Plugin`;
-    }
-
     function getIconSvg(iconName) {
       return '<svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>';
-    }
-
-    function copyRawData() {
-      const rawCode = document.getElementById('rawCode').textContent;
-      navigator.clipboard.writeText(rawCode).then(() => {
-        showToast('Copied to clipboard!');
-      }).catch(err => {
-        console.error('Failed to copy:', err);
-      });
     }
 
     function copyLoadstringUrl() {
