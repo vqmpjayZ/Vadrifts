@@ -1002,10 +1002,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    #pluginIcon {
-      display: none;
-    }
-
     .countdown {
       color: #ff4b4b;
       font-weight: 600;
@@ -1145,7 +1141,7 @@
 
         <div class="form-group">
           <label>Tab Icon <span class="optional">(optional)</span></label>
-          <select id="pluginIcon" style="display: none;"></select>
+          <input type="hidden" id="pluginIcon" value="package">
           <div class="custom-select-container" id="iconSelectContainer">
             <div class="select-header" id="selectHeader">
               <div class="select-header-content">
@@ -1781,6 +1777,8 @@ function resetForm() {
         icon: document.getElementById('pluginIcon').value || 'package',
         sections: {}
       };
+
+      console.log('Selected icon:', pluginData.icon);
       
       Object.values(sections).forEach(section => {
         if (section.bypasses.length > 0) {
