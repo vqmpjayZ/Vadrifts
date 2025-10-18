@@ -34,7 +34,6 @@ async def send_good_boy_after_delay(user_id, channel):
         recent_boosts.pop(user_id, None)
         pending_tasks.pop(user_id, None)
 
-# PREMIUM HWID MODAL
 class HWIDModal(discord.ui.Modal, title="Enter Your HWID"):
     hwid = discord.ui.TextInput(
         label="Paste your HWID here",
@@ -52,8 +51,8 @@ class HWIDModal(discord.ui.Modal, title="Enter Your HWID"):
         if len(hwid_value) > 50:
             await interaction.response.send_message("HWID too long. Maximum 50 characters.", ephemeral=True)
             return
-        if not re.fullmatch(r"[A-Fa-f0-9-]+", hwid_value):
-            await interaction.response.send_message("HWID contains invalid characters. Use only letters A-F, numbers 0-9, and dashes.", ephemeral=True)
+        if not re.fullmatch(r"[A-Za-z0-9-]+", hwid_value):
+            await interaction.response.send_message("HWID contains invalid characters. Use only letters, numbers, and dashes.", ephemeral=True)
             return
         if hwid_value in submitted_hwids:
             last_time = submitted_hwids[hwid_value]
@@ -70,6 +69,7 @@ class HWIDModal(discord.ui.Modal, title="Enter Your HWID"):
         )
         await interaction.response.send_message(embed=embed, ephemeral=True)
         msg_embed = discord.Embed(title="New Authentication Request", color=discord.Color.blurple())
+        msg_embed.add_field(name="Type", value="**Premium**", inline=False)
         msg_embed.add_field(name="User", value=f"{user.mention} ({user.id})", inline=False)
         msg_embed.add_field(name="HWID", value=f"`{hwid_value}`", inline=False)
         if log_channel:
@@ -80,7 +80,6 @@ class HWIDModal(discord.ui.Modal, title="Enter Your HWID"):
             except:
                 pass
 
-# TESTER HWID MODAL
 class TesterHWIDModal(discord.ui.Modal, title="Enter Your HWID (Tester)"):
     hwid = discord.ui.TextInput(
         label="Paste your HWID here",
@@ -98,8 +97,8 @@ class TesterHWIDModal(discord.ui.Modal, title="Enter Your HWID (Tester)"):
         if len(hwid_value) > 50:
             await interaction.response.send_message("HWID too long. Maximum 50 characters.", ephemeral=True)
             return
-        if not re.fullmatch(r"[A-Fa-f0-9-]+", hwid_value):
-            await interaction.response.send_message("HWID contains invalid characters. Use only letters A-F, numbers 0-9, and dashes.", ephemeral=True)
+        if not re.fullmatch(r"[A-Za-z0-9-]+", hwid_value):
+            await interaction.response.send_message("HWID contains invalid characters. Use only letters, numbers, and dashes.", ephemeral=True)
             return
         if hwid_value in submitted_tester_hwids:
             last_time = submitted_tester_hwids[hwid_value]
@@ -107,6 +106,7 @@ class TesterHWIDModal(discord.ui.Modal, title="Enter Your HWID (Tester)"):
                 await interaction.response.send_message("This HWID has already been submitted in the last 24 hours.", ephemeral=True)
                 return
         submitted_tester_hwids[hwid_value] = now
+        log_channel = bot.get_channel(LOG_CHANNEL_ID)
         co_owner = await bot.fetch_user(CO_OWNER_ID)
         embed = discord.Embed(
             title="HWID Submitted (Tester)",
@@ -115,17 +115,17 @@ class TesterHWIDModal(discord.ui.Modal, title="Enter Your HWID (Tester)"):
         )
         await interaction.response.send_message(embed=embed, ephemeral=True)
         msg_embed = discord.Embed(title="New Tester Authentication Request", color=discord.Color.orange())
+        msg_embed.add_field(name="Type", value="**Script Tester**", inline=False)
         msg_embed.add_field(name="User", value=f"{user.mention} ({user.id})", inline=False)
         msg_embed.add_field(name="HWID", value=f"`{hwid_value}`", inline=False)
-        msg_embed.add_field(name="Type", value="**Script Tester**", inline=False)
-        
+        if log_channel:
+            await log_channel.send(embed=msg_embed)
         if co_owner:
             try:
                 await co_owner.send(embed=msg_embed)
             except:
                 pass
 
-# PREMIUM AUTH BUTTONS
 class AuthButtonView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
@@ -142,7 +142,6 @@ class AuthButtonView(discord.ui.View):
     async def enter_hwid(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_modal(HWIDModal())
 
-# TESTER AUTH BUTTONS
 class TesterAuthButtonView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
@@ -159,7 +158,6 @@ class TesterAuthButtonView(discord.ui.View):
     async def enter_hwid(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_modal(TesterHWIDModal())
 
-# PREMIUM AUTHENTICATE COMMAND
 @app_commands.command(name="authenticate", description="Authenticate your Premium access.")
 async def authenticate(interaction: discord.Interaction):
     if interaction.channel.id != AUTH_CHANNEL_ID:
@@ -181,7 +179,6 @@ async def authenticate(interaction: discord.Interaction):
     view = AuthButtonView()
     await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
-# TESTER AUTHENTICATE COMMAND
 @app_commands.command(name="authenticate_tester", description="Authenticate as a Script Tester.")
 async def authenticate_tester(interaction: discord.Interaction):
     if interaction.channel.id != TESTER_AUTH_CHANNEL_ID:
