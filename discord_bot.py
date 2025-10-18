@@ -235,8 +235,11 @@ async def on_message(message):
 async def on_ready():
     print(f'Bot logged in as {bot.user}')
     try:
+        bot.tree.clear_commands(guild=discord.Object(id=GUILD_ID))
+        bot.tree.clear_commands(guild=None)
         await bot.tree.sync(guild=discord.Object(id=GUILD_ID))
-        print(f"Commands synced successfully!")
+        await bot.tree.sync()
+        print(f"Commands cleared and synced successfully!")
     except Exception as e:
         print(f"Slash command sync failed: {e}")
 
