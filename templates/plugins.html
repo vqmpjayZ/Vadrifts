@@ -134,6 +134,7 @@
     opacity: 0.3;
   }
 }
+
     .navbar {
       position: fixed;
       top: 20px;
@@ -151,6 +152,20 @@
       transition: all 0.3s ease;
     }
 
+    .navbar.scrolled {
+      top: 15px;
+    }
+
+    .navbar.scrolled:hover {
+      top: 20px;
+    }
+
+    .navbar:hover {
+      background: rgba(0, 0, 0, 0.6);
+      border-color: rgba(255, 255, 255, 0.1);
+      transform: translateX(-50%) translateY(-2px);
+    }
+
     @keyframes slideInDown {
       from {
         opacity: 0;
@@ -159,6 +174,17 @@
       to {
         opacity: 1;
         transform: translateX(-50%) translateY(0);
+      }
+    }
+
+    @keyframes slideInDownMobile {
+      from {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
       }
     }
 
@@ -192,6 +218,7 @@
       width: 28px;
       height: 28px;
       flex-shrink: 0;
+      transition: none;
     }
 
     .nav-links {
@@ -1021,7 +1048,105 @@
       box-shadow: 0 4px 12px rgba(255, 75, 75, 0.4);
     }
 
+    .footer {
+      position: relative;
+      z-index: 10;
+      padding: 60px 20px;
+      color: #888;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      margin-top: 40px;
+      animation: fadeInUp 1.2s ease-out 1.5s both;
+    }
+
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .footer-logo:hover {
+      transform: scale(1.02);
+      filter: drop-shadow(0 0 10px rgba(114, 9, 183, 0.4));
+    }
+
+    .footer-logo-img {
+      width: 24px;
+      height: 24px;
+      transition: none;
+    }
+
+    .footer-copyright {
+      color: #888;
+      font-size: 14px;
+    }
+
+    .footer-discord {
+      display: flex;
+      align-items: center;
+    }
+
+    .footer-discord-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      background: #2a2a2a;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .footer-discord-link:hover {
+      background: #3a3a3a;
+      transform: translateY(-2px);
+    }
+
+    .footer-discord-icon {
+      width: 20px;
+      height: 20px;
+    }
+
     @media (max-width: 768px) {
+      .navbar {
+        top: 25px;
+        left: 10px;
+        right: 10px;
+        width: auto;
+        transform: none;
+        padding: 16px 18px;
+        animation: slideInDownMobile 0.8s ease-out;
+      }
+
+      .navbar.scrolled {
+        top: 20px;
+      }
+
+      .navbar.scrolled:hover {
+        top: 20px;
+      }
+
+      .navbar:hover {
+        background: rgba(0, 0, 0, 0.6);
+        border-color: rgba(255, 255, 255, 0.1);
+        transform: none;
+      }
+
       h1 {
         font-size: 48px;
       }
@@ -1036,6 +1161,17 @@
 
       .add-bypass-btn {
         width: 100%;
+      }
+
+      .footer-content {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+      }
+
+      .footer-left {
+        flex-direction: column;
+        gap: 10px;
       }
     }
   </style>
@@ -1177,8 +1313,25 @@
   </div>
 </div>
 
+  <div class="footer">
+    <div class="footer-content">
+      <div class="footer-left">
+        <a href="/" class="footer-logo">
+          <img src="https://i.imgur.com/ePueN25.png" alt="Vadrifts Logo" class="footer-logo-img">
+        </a>
+        <div class="footer-copyright">
+          &copy; 2025 Vadrifts. All Rights Reserved
+        </div>
+      </div>
+      <div class="footer-discord">
+        <a href="https://discord.com/invite/WDbJ5wE2cR" class="footer-discord-link" target="_blank">
+          <img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/discord-white-icon.png" alt="Discord" class="footer-discord-icon">
+        </a>
+      </div>
+    </div>
+  </div>
+
 <div class="toast" id="toast">Plugin created successfully!</div>
-</body>
   <script>
     let plugins = [];
     let sections = {};
@@ -1889,6 +2042,20 @@ function viewPlugin(pluginId) {
       };
       return (text || '').replace(/[&<>"']/g, m => map[m]);
     }
+
+    let lastScrollTop = 0;
+    window.addEventListener('scroll', function() {
+      let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const navbar = document.querySelector('.navbar');
+      
+      if (scrollTop > 100) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+      
+      lastScrollTop = scrollTop;
+    });
 
     document.addEventListener('DOMContentLoaded', init);
   </script>
