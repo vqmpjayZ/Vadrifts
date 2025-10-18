@@ -236,12 +236,13 @@ async def on_message(message):
 
 @bot.event
 async def on_ready():
+    print(f'Bot logged in as {bot.user}')
     try:
-        if not any(cmd.name=="authenticate" for cmd in bot.tree.get_commands(guild=discord.Object(id=GUILD_ID))):
-            bot.tree.add_command(authenticate)
-        if not any(cmd.name=="authenticate_tester" for cmd in bot.tree.get_commands(guild=discord.Object(id=GUILD_ID))):
-            bot.tree.add_command(authenticate_tester)
+        bot.tree.clear_commands(guild=discord.Object(id=GUILD_ID))
+        bot.tree.add_command(authenticate, guild=discord.Object(id=GUILD_ID))
+        bot.tree.add_command(authenticate_tester, guild=discord.Object(id=GUILD_ID))
         await bot.tree.sync(guild=discord.Object(id=GUILD_ID))
+        print(f"Commands synced successfully!")
     except Exception as e:
         print(f"Slash command sync failed: {e}")
 
