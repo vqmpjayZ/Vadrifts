@@ -139,53 +139,12 @@
       font-size: 14px;
     }
 
-    .styled-view, .loadstring-view {
+    .styled-view {
       display: none;
     }
 
-    .styled-view.active, .loadstring-view.active {
+    .styled-view.active {
       display: block;
-    }
-    
-    .loadstring-container {
-      background: #1a1a1a;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 15px;
-      padding: 25px;
-      margin-bottom: 20px;
-    }
-    
-    .loadstring-url {
-      background: #0a0a0a;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-      padding: 15px;
-      font-family: 'Courier New', monospace;
-      color: #9c88ff;
-      font-size: 14px;
-      margin-top: 15px;
-      word-break: break-all;
-    }
-    
-    .loadstring-example {
-      background: #0a0a0a;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 10px;
-      padding: 20px;
-      font-family: 'Courier New', monospace;
-      font-size: 13px;
-      line-height: 1.6;
-      color: #ddd;
-      margin-top: 15px;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-    }
-    
-    .info-text {
-      color: #888;
-      font-size: 14px;
-      margin-top: 10px;
-      line-height: 1.6;
     }
 
     .section {
@@ -228,37 +187,6 @@
       color: #ddd;
       font-family: 'Courier New', monospace;
       font-size: 14px;
-    }
-
-    .raw-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .raw-title {
-      font-size: 18px;
-      font-weight: 600;
-      color: #9c88ff;
-    }
-
-    .copy-btn {
-      background: rgba(114, 9, 183, 0.2);
-      border: 1px solid rgba(114, 9, 183, 0.3);
-      color: #9c88ff;
-      padding: 8px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .copy-btn:hover {
-      background: rgba(114, 9, 183, 0.3);
-      border-color: #9c88ff;
     }
 
     .toast {
@@ -443,7 +371,7 @@
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
       <div class="modal-title">View Raw API Data</div>
-      <div class="modal-text">Are you sure you want to get redirected to the raw page of this Plugin?</div>
+      <div class="modal-text">This is the raw Lua data that ArrayField fetches to build plugin tabs. It's meant for developers and debugging.</div>
       <div class="modal-buttons">
         <button class="modal-btn modal-btn-secondary" onclick="closeModal()">Cancel</button>
         <button class="modal-btn modal-btn-primary" onclick="confirmRawRedirect()">View Raw</button>
@@ -454,6 +382,29 @@
   <script>
     let currentPlugin = null;
     let rawUrl = '';
+    let icons = {};
+
+    async function loadIconsFromGitHub() {
+      try {
+        const response = await fetch('https://cdn.jsdelivr.net/gh/vqmpjayZ/Vadrifts@main/icons.js');
+        let code = await response.text();
+        
+        code = code.replace('const ICONS', 'window.ICONS');
+        code = code.replace('const ICON_LABELS', 'window.ICON_LABELS');
+
+        eval(code);
+      
+        if (window.ICONS) {
+          icons = window.ICONS;
+          console.log('Icons loaded successfully!', Object.keys(icons).length);
+        } else {
+          throw new Error('ICONS not found after eval');
+        }
+        
+      } catch (error) {
+        console.error('Failed to load icons:', error);
+      }
+    }
 
     function getPluginIdFromUrl() {
       const params = new URLSearchParams(window.location.search);
@@ -461,6 +412,8 @@
     }
 
     async function loadPlugin() {
+      await loadIconsFromGitHub();
+      
       const pluginId = getPluginIdFromUrl();
       
       if (!pluginId) {
@@ -567,7 +520,6 @@
 
     function closeModal() {
       document.getElementById('modalOverlay').classList.remove('show');
-      // Reset the button state back to Main
       document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
       document.querySelector('[data-view="styled"]').classList.add('active');
     }
@@ -577,6 +529,14 @@
     }
 
     function getIconSvg(iconName) {
+      if (icons && icons[iconName]) {
+        return icons[iconName];
+      }
+      
+      if (icons && icons.package) {
+        return icons.package;
+      }
+      
       return '<svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>';
     }
 
