@@ -158,7 +158,7 @@ class TesterAuthButtonView(discord.ui.View):
     async def enter_hwid(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_modal(TesterHWIDModal())
 
-@app_commands.command(name="authenticate", description="Authenticate your Premium access.")
+@bot.tree.command(name="authenticate", description="Authenticate your Premium access.", guild=discord.Object(id=GUILD_ID))
 async def authenticate(interaction: discord.Interaction):
     if interaction.channel.id != AUTH_CHANNEL_ID:
         await interaction.response.send_message("You can only use this command in the designated authentication channel.", ephemeral=True)
@@ -179,7 +179,7 @@ async def authenticate(interaction: discord.Interaction):
     view = AuthButtonView()
     await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
-@app_commands.command(name="authenticate_tester", description="Authenticate as a Script Tester.")
+@bot.tree.command(name="authenticate_tester", description="Authenticate as a Script Tester.", guild=discord.Object(id=GUILD_ID))
 async def authenticate_tester(interaction: discord.Interaction):
     if interaction.channel.id != TESTER_AUTH_CHANNEL_ID:
         await interaction.response.send_message("You can only use this command in the designated tester authentication channel.", ephemeral=True)
@@ -235,9 +235,6 @@ async def on_message(message):
 async def on_ready():
     print(f'Bot logged in as {bot.user}')
     try:
-        bot.tree.clear_commands(guild=discord.Object(id=GUILD_ID))
-        bot.tree.add_command(authenticate, guild=discord.Object(id=GUILD_ID))
-        bot.tree.add_command(authenticate_tester, guild=discord.Object(id=GUILD_ID))
         await bot.tree.sync(guild=discord.Object(id=GUILD_ID))
         print(f"Commands synced successfully!")
     except Exception as e:
