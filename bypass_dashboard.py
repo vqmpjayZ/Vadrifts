@@ -56,16 +56,16 @@ class BypassDashboard:
         
         if status['testing']:
             return {'first_tester': False, 'reason': 'already_testing'}
-        
+
         if status['last_tested']:
             last_test = datetime.fromisoformat(status['last_tested'])
-            if datetime.now() - last_test < timedelta(hours=24):
+            if last_test.date() == datetime.now().date():
                 return {'first_tester': False, 'reason': 'already_tested_today'}
-        
+
         status['testing'] = True
         status['tester'] = player_id
         status['started_at'] = time.time()
-        
+
         return {'first_tester': True}
     
     def complete_bypass_test(self, category, success_rate):
