@@ -207,6 +207,12 @@ def get_key(slug):
     logger.info(f"Key generated for HWID: {hwid[:8]}... Key: {key}")
     return key
 
+@app.route('/.well-known/discord')
+def discord_verification():
+    response = make_response("dh=6a7d0bee33f82bdb67f20d7ac5d8254e1a36cb64")
+    response.headers['Content-Type'] = 'text/plain; charset=utf-8'
+    return response
+
 @app.route('/plugin/<plugin_id>')
 def plugin_detail(plugin_id):
     plugin = plugins_manager.get_plugin_data(plugin_id)
