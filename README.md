@@ -4,6 +4,6 @@ Vadrifts is an open-source, all-in-one platform featuring Roblox scripts, utilit
 
 # Links
 
-Website: https://vadrifts.onrender.com
+Website: https://vadrifts.onrender.com or https://vadrifts.web.app
 
 Discord: https://discord.gg/WDbJ5wE2cR
