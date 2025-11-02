@@ -340,6 +340,12 @@ def serve_static(filename):
 def discord_invite():
     return redirect("https://discord.com/invite/WDbJ5wE2cR")
 
+@app.route('/.well-known/discord')
+def discord_verification():
+    response = make_response('dh=6a7d0bee33f82bdb67f20d7ac5d8254e1a36cb64')
+    response.headers['Content-Type'] = 'text/plain'
+    return response
+    
 @app.route('/health')
 def health():
     return jsonify({"status": "healthy", "timestamp": datetime.now().isoformat()}), 200
