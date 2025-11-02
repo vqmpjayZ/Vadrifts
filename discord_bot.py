@@ -222,7 +222,10 @@ async def on_message(message):
         symbol = random.choice(cute_symbols) if symbol_chance==1 else ""
         await message.channel.send(("meow "*meow_count).strip()+punctuation+(" "+symbol if symbol else ""))
     if message.channel.id == TARGET_CHANNEL_ID:
-        if "just boosted the server!" in message.content.lower():
+        if message.type in [discord.MessageType.premium_guild_subscription, 
+                           discord.MessageType.premium_guild_subscription_tier_1,
+                           discord.MessageType.premium_guild_subscription_tier_2,
+                           discord.MessageType.premium_guild_subscription_tier_3]:
             user_id = message.author.id
             if user_id not in recent_boosts:
                 recent_boosts[user_id] = True
