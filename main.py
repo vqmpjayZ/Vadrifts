@@ -348,11 +348,13 @@ def discord_verification():
 
 @app.route('/status-check')
 def status_check():
-    return jsonify({
+    response = jsonify({
         "status": "operational",
         "timestamp": datetime.now().isoformat(),
         "code": "VADRIFTS_ONLINE_2025"
-    }), 200
+    })
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response, 200
     
 @app.route('/health')
 def health():
