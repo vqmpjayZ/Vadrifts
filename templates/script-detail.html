@@ -1,4 +1,915 @@
-try {
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title id="pageTitle">Script Details - Vadrifts</title>
+		<link rel="icon" href="https://i.imgur.com/ePueN25.png" type="image/png">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.min.js"></script>
+		<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000000;
+      color: #ffffff;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    .bg-lights {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .light {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(150px);
+      opacity: 0.6;
+      animation-duration: 15s;
+      animation-iteration-count: infinite;
+      animation-timing-function: ease-in-out;
+    }
+
+    .light-1 {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, #4a148c 0%, transparent 70%);
+      top: 2%;
+      left: 2%;
+      animation-name: float1;
+    }
+
+    .light-2 {
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, #7209b7 0%, transparent 70%);
+      top: 15%;
+      right: 8%;
+      animation-name: float2;
+      animation-delay: -3s;
+    }
+
+    .light-3 {
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, #9c27b0 0%, transparent 70%);
+      bottom: 20%;
+      left: 10%;
+      animation-name: float3;
+      animation-delay: -6s;
+    }
+
+    .light-4 {
+      width: 350px;
+      height: 350px;
+      background: radial-gradient(circle, #9c88ff 0%, transparent 70%);
+      bottom: 15%;
+      right: 12%;
+      animation-name: float4;
+      animation-delay: -9s;
+    }
+
+    .light-5 {
+      width: 280px;
+      height: 280px;
+      background: radial-gradient(circle, #c478d4 0%, transparent 70%);
+      top: 45%;
+      left: 45%;
+      animation-name: float5;
+      animation-delay: -12s;
+    }
+
+    .light-6 {
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, #b855d1 0%, transparent 70%);
+      top: 60%;
+      right: 30%;
+      animation-name: float6;
+      animation-delay: -5s;
+    }
+
+    .light-7 {
+      width: 380px;
+      height: 380px;
+      background: radial-gradient(circle, #ff9f43 0%, transparent 70%);
+      bottom: 8%;
+      right: 5%;
+      animation-name: float7;
+      animation-delay: -7s;
+    }
+
+    @keyframes float1 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(120px, -80px) scale(1.1); }
+      66% { transform: translate(-80px, 120px) scale(0.9); }
+    }
+
+    @keyframes float2 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(-100px, 90px) scale(1.2); }
+      66% { transform: translate(150px, -100px) scale(0.8); }
+    }
+
+    @keyframes float3 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(90px, -120px) scale(0.95); }
+      66% { transform: translate(-120px, -90px) scale(1.05); }
+    }
+
+    @keyframes float4 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(-90px, -100px) scale(1.3); }
+      66% { transform: translate(100px, 130px) scale(0.7); }
+    }
+
+    @keyframes float5 {
+      0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+      50% { transform: translate(-30px, -50px) scale(1.1) rotate(180deg); }
+    }
+
+    @keyframes float6 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(60px, -80px) scale(1.4); }
+    }
+
+    @keyframes float7 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(-60px, -70px) scale(1.1); }
+      66% { transform: translate(40px, 60px) scale(0.9); }
+    }
+
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+.particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: #a45cff;
+  border-radius: 50%;
+  opacity: 0.5;
+  box-shadow: 0 0 8px #a45cff;
+  animation: floatUp 240s linear infinite;
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(100vh) translateX(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(50vh) translateX(20px);
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(-200px) translateX(40px);
+    opacity: 0.3;
+  }
+}
+    .navbar {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 24px 32px;
+      animation: slideInDown 0.8s ease-out;
+      max-width: 1000px;
+      width: 90%;
+      transition: all 0.3s ease;
+    }
+
+    .navbar.scrolled {
+      top: 15px;
+    }
+
+    .navbar.scrolled:hover {
+      top: 20px;
+    }
+
+    .navbar:hover {
+      background: rgba(0, 0, 0, 0.6);
+      border-color: rgba(255, 255, 255, 0.4);
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @keyframes slideInDown {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+
+    @keyframes slideInDownMobile {
+      from {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .nav-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 100%;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 24px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #ffffff 0%, #ffffff 40%, #7209b7 80%, #c478d4 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .nav-logo:hover {
+      transform: translateY(-3px);
+      filter: drop-shadow(0 0 15px rgba(114, 9, 183, 0.6));
+    }
+
+    .nav-logo-img {
+      width: 28px;
+      height: 28px;
+      flex-shrink: 0;
+      transition: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+      height: 100%;
+    }
+
+    .nav-link {
+      color: #ccc;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      height: 100%;
+      position: relative;
+    }
+
+    .nav-link:hover {
+      color: #ffffff;
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 120px 20px 40px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .script-header {
+      text-align: center;
+      margin-bottom: 40px;
+      animation: fadeInUp 1.2s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .script-thumbnail {
+      width: 200px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 15px;
+      margin: 0 auto 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      background: linear-gradient(135deg, #7209b7 0%, #ff6b9d 50%, #ff9f43 100%);
+    }
+
+    .script-game {
+      font-size: 14px;
+      color: #7209b7;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+
+    .script-title {
+      font-size: 48px;
+      font-weight: 800;
+      background: linear-gradient(90deg, #ffffff 0%, #9c88ff 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 15px;
+      letter-spacing: -1px;
+    }
+
+    .script-description {
+      font-size: 18px;
+      color: #ccc;
+      line-height: 1.6;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .script-content {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 30px;
+      margin-bottom: 40px;
+      animation: fadeInUp 1.2s ease-out 0.6s both;
+      align-items: start;
+    }
+
+    .features-section, .script-section {
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 30px;
+      position: relative;
+      height: fit-content;
+    }
+
+    .section-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      background: linear-gradient(90deg, #ffffff 0%, #9c88ff 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title-icon {
+      width: 24px;
+      height: 24px;
+      stroke: url(#icon-gradient);
+    }
+
+    .features-list {
+      list-style: none;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: #ccc;
+    }
+
+    .feature-item:last-child {
+      border-bottom: none;
+    }
+
+    .feature-icon {
+      color: #7209b7;
+      font-weight: bold;
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    .script-code-wrapper {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .script-code {
+      background: rgba(0, 0, 0, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #e8e8e8;
+      white-space: pre-wrap;
+      overflow-x: auto;
+      max-height: 300px;
+      overflow-y: auto;
+      word-break: break-all;
+      min-height: 80px;
+    }
+
+    .script-code-wrapper:hover .code-copy-btn {
+      opacity: 1;
+      transform: translate(0, 0);
+    }
+
+    .code-copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(114, 9, 183, 0.8);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      opacity: 0;
+      transform: translate(10px, -10px);
+      backdrop-filter: blur(10px);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .code-copy-btn:hover {
+      background: rgba(114, 9, 183, 1);
+      transform: translate(0, -2px);
+    }
+
+.lua-keyword { color: #ff8c00; font-weight: 700; }
+.lua-str { color: #8be9fd; }
+.lua-comment { color: #6272a4; font-style: italic; }
+.lua-number { color: #bd93f9; }
+.lua-function { color: #50fa7b; }
+.lua-boolean { color: #ffb86c; }
+.lua-builtin { color: #ff8c00; font-weight: 700; }
+
+    .script-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 20px;
+      z-index: 50;
+      position: relative;
+    }
+
+    .action-btn {
+      padding: 14px 20px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      text-align: center;
+      font-size: 14px;
+      position: relative;
+      z-index: 51;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .action-btn-icon {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .copy-btn {
+      background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+      color: white;
+      box-shadow: 0 10px 25px rgba(46, 204, 113, 0.3);
+    }
+
+    .copy-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 35px rgba(46, 204, 113, 0.4);
+    }
+
+    .key-btn {
+      background: linear-gradient(135deg, #7209b7 0%, #ff9f43 100%);
+      color: white;
+      box-shadow: 0 10px 25px rgba(114, 9, 183, 0.3);
+    }
+
+    .key-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 35px rgba(114, 9, 183, 0.4);
+    }
+
+    .game-link-btn {
+      background: linear-gradient(135deg, #5865f2 0%, #4752c4 100%);
+      color: white;
+      box-shadow: 0 10px 25px rgba(88, 101, 242, 0.3);
+    }
+
+    .game-link-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 35px rgba(88, 101, 242, 0.4);
+    }
+
+    .status-message {
+      position: fixed;
+      top: 100px;
+      right: 20px;
+      padding: 15px 20px;
+      border-radius: 10px;
+      font-weight: 600;
+      z-index: 200;
+      transform: translateX(400px);
+      transition: all 0.3s ease;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .status-message.show {
+      transform: translateX(0);
+    }
+
+    .status-message.success {
+      background: rgba(46, 204, 113, 0.9);
+      color: white;
+      border-left: 4px solid #27ae60;
+    }
+
+    .status-message.error {
+      background: rgba(231, 76, 60, 0.9);
+      color: white;
+      border-left: 4px solid #c0392b;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 60px 20px;
+      color: #888;
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      border-top: 4px solid #7209b7;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .error-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #888;
+    }
+
+    .error-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 20px;
+      opacity: 0.5;
+      color: #ff6b6b;
+    }
+
+    .back-btn {
+      background: rgba(114, 9, 183, 0.2);
+      color: #9c88ff;
+      border: 1px solid rgba(114, 9, 183, 0.3);
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: inline-block;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .back-btn:hover {
+      background: rgba(114, 9, 183, 0.3);
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        top: 25px;
+        left: 10px;
+        right: 10px;
+        width: auto;
+        transform: none;
+        padding: 16px 18px;
+        animation: slideInDownMobile 0.8s ease-out;
+      }
+
+      .navbar.scrolled {
+        top: 20px;
+      }
+
+      .navbar.scrolled:hover {
+        top: 20px;
+      }
+
+      .navbar:hover {
+        background: rgba(0, 0, 0, 0.6);
+        border-color: rgba(255, 255, 255, 0.4);
+        transform: none;
+      }
+
+      .nav-content {
+        justify-content: space-between;
+        gap: 15px;
+      }
+
+      .nav-links {
+        gap: 15px;
+      }
+
+      .nav-link {
+        font-size: 12px;
+        padding: 6px 10px;
+      }
+
+      .nav-logo {
+        font-size: 20px;
+        gap: 8px;
+      }
+
+      .nav-logo-img {
+        width: 24px;
+        height: 24px;
+      }
+
+      .script-title {
+        font-size: 32px;
+      }
+
+      .script-content {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+
+      .script-actions {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .action-btn {
+        width: 100%;
+        max-width: 300px;
+      }
+
+      .status-message {
+        right: 10px;
+        left: 10px;
+        transform: translateY(-100px);
+      }
+
+      .status-message.show {
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .nav-links {
+        gap: 10px;
+      }
+
+      .nav-link {
+        font-size: 11px;
+        padding: 5px 8px;
+      }
+
+      .navbar {
+        left: 10px;
+        right: 10px;
+        padding: 10px 15px;
+        top: 30px;
+      }
+
+      .navbar.scrolled {
+        top: 25px;
+      }
+
+      .navbar.scrolled:hover {
+        top: 25px;
+      }
+    }
+  
+		</style>
+	</head>
+	<body>
+		<svg style="display: none;">
+			<defs>
+				<linearGradient id="icon-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+					<stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+					<stop offset="100%" style="stop-color:#9c88ff;stop-opacity:1" />
+				</linearGradient>
+			</defs>
+		</svg>
+		<div class="bg-lights">
+			<div class="light light-1"></div>
+			<div class="light light-2"></div>
+			<div class="light light-3"></div>
+			<div class="light light-4"></div>
+			<div class="light light-5"></div>
+			<div class="light light-6"></div>
+			<div class="light light-7"></div>
+		</div>
+		<div class="particles" id="particles"></div>
+		<nav class="navbar">
+			<div class="nav-content">
+				<a href="/" class="nav-logo">
+					<img src="https://i.imgur.com/ePueN25.png" alt="Vadrifts Logo" class="nav-logo-img">
+					Vadrifts
+				</a>
+				<div class="nav-links">
+					<a href="/scripts" class="nav-link">Scripts</a>
+				</div>
+			</div>
+		</nav>
+		<div class="container">
+			<div id="loadingState" class="loading">
+				<div class="loading-spinner"></div>
+				<p>Loading script details...</p>
+			</div>
+			<div id="errorState" class="error-state" style="display: none;">
+				<i data-lucide="triangle-alert" class="error-icon"></i>
+				<h3>Script not found</h3>
+				<p>The script you're looking for doesn't exist or has been removed.</p>
+				<br>
+				<a href="/scripts" class="back-btn">← Back to Scripts</a>
+			</div>
+			<div id="scriptContent" style="display: none;">
+				<div class="script-header">
+					<img id="scriptThumbnail" class="script-thumbnail" alt="Script Thumbnail">
+					<div id="scriptGame" class="script-game"></div>
+					<h1 id="scriptTitle" class="script-title"></h1>
+					<p id="scriptDescription" class="script-description"></p>
+				</div>
+				<div class="script-content">
+					<div class="features-section">
+						<h2 class="section-title">
+							<i data-lucide="sparkles" class="section-title-icon"></i>
+							Features
+						</h2>
+						<ul id="featuresList" class="features-list"></ul>
+					</div>
+					<div class="script-section">
+						<h2 class="section-title">
+							<i data-lucide="scroll-text" class="section-title-icon"></i>
+							Script Code
+						</h2>
+						<div class="script-code-wrapper">
+							<div id="scriptCode" class="script-code"></div>
+							<button class="code-copy-btn" onclick="copyScript()">Copy</button>
+						</div>
+						<div class="script-actions">
+							<button class="action-btn copy-btn" onclick="copyScript()">
+								<i data-lucide="copy" class="action-btn-icon"></i>
+								Copy Script
+							</button>
+							<a id="keyLink" class="action-btn key-btn" href="#" style="cursor: pointer;">
+								<i data-lucide="key" class="action-btn-icon"></i>
+								Get Key
+							</a>
+							<button class="action-btn game-link-btn" onclick="copyGameLink()">
+								<i data-lucide="link" class="action-btn-icon"></i>
+								Copy Game Link
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="statusMessage" class="status-message"></div>
+		<script>
+    let currentScript = null;
+    let currentScriptId = null;
+
+    function initLucideIcons() {
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+    }
+
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      const particleCount = 15;
+
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = -Math.random() * 15 + 's';
+        particle.style.animationDuration = (15 + Math.random() * 5) + 's';
+        particlesContainer.appendChild(particle);
+      }
+    }
+
+function highlightLua(code) {
+  if (!code) return '';
+  const keywords = /\b(local|function|end|if|then|else|elseif|for|while|do|repeat|until|return|break|in)\b/g;
+  const builtins = /\b(game|workspace|script|wait|print|warn|error|spawn|loadstring|getfenv|setfenv|require|pairs|ipairs|next|tostring|tonumber|type|pcall|xpcall|assert|Vector3|CFrame|Instance|Color3|UDim2|math|string|table|coroutine|os)\b/g;
+  const numbers = /\b(\d+\.?\d*)\b/g;
+  const booleans = /\b(true|false|null|nil)\b/g;
+  const funcNameBeforeParen = /\b([A-Za-z_]\w*)\s*(?=\()/g;
+
+  let escaped = code
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  const strings = [];
+  const comments = [];
+
+  escaped = escaped.replace(/(["'])(?:(?=(\\?))\2.)*?\1/g, (m) => {
+    const idx = strings.length;
+    strings.push(m);
+    return `@@STR${idx}@@`;
+  });
+
+  escaped = escaped.replace(/(--.*$)/gm, (m) => {
+    const idx = comments.length;
+    comments.push(m);
+    return `@@CMT${idx}@@`;
+  });
+
+  let highlighted = escaped
+    .replace(keywords, '<span class="lua-keyword">$&</span>')
+    .replace(builtins, '<span class="lua-builtin">$&</span>')
+    .replace(booleans, '<span class="lua-boolean">$&</span>')
+    .replace(numbers, '<span class="lua-number">$&</span>')
+    .replace(funcNameBeforeParen, '<span class="lua-function">$1</span>');
+
+  highlighted = highlighted.replace(/@@CMT(\d+)@@/g, (m, n) => {
+    const txt = comments[Number(n)];
+    return `<span class="lua-comment">${txt}</span>`;
+  });
+
+  highlighted = highlighted.replace(/@@STR(\d+)@@/g, (m, n) => {
+    const txt = strings[Number(n)];
+    return `<span class="lua-str">${txt}</span>`;
+  });
+
+  return highlighted;
+}
+
+    function getScriptIdFromURL() {
+      const pathParts = window.location.pathname.split('/');
+      const scriptId = pathParts[pathParts.length - 1];
+      console.log('Script ID from URL:', scriptId);
+      return scriptId;
+    }
+
+    async function loadScript() {
+      const scriptId = getScriptIdFromURL();
+      currentScriptId = scriptId;
+      try {
         const response = await fetch(`/api/scripts/${scriptId}`);
         
         if (!response.ok) {
