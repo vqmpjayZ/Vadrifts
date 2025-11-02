@@ -345,6 +345,14 @@ def discord_verification():
     response = make_response('dh=6a7d0bee33f82bdb67f20d7ac5d8254e1a36cb64')
     response.headers['Content-Type'] = 'text/plain'
     return response
+
+@app.route('/status-check')
+def status_check():
+    return jsonify({
+        "status": "operational",
+        "timestamp": datetime.now().isoformat(),
+        "code": "VADRIFTS_ONLINE_2025"
+    }), 200
     
 @app.route('/health')
 def health():
