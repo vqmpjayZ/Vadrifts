@@ -162,31 +162,31 @@
       pointer-events: none;
     }
 
-.particle {
-  position: absolute;
-  width: 3px;
-  height: 3px;
-  background: #a45cff;
-  border-radius: 50%;
-  opacity: 0.5;
-  box-shadow: 0 0 8px #a45cff;
-  animation: floatUp 240s linear infinite;
-}
+    .particle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: #a45cff;
+      border-radius: 50%;
+      opacity: 0.5;
+      box-shadow: 0 0 8px #a45cff;
+      animation: floatUp 240s linear infinite;
+    }
 
-@keyframes floatUp {
-  0% {
-    transform: translateY(100vh) translateX(0);
-    opacity: 0.5;
-  }
-  50% {
-    transform: translateY(50vh) translateX(20px);
-    opacity: 0.4;
-  }
-  100% {
-    transform: translateY(-200px) translateX(40px);
-    opacity: 0.3;
-  }
-}
+    @keyframes floatUp {
+      0% {
+        transform: translateY(100vh) translateX(0);
+        opacity: 0.5;
+      }
+      50% {
+        transform: translateY(50vh) translateX(20px);
+        opacity: 0.4;
+      }
+      100% {
+        transform: translateY(-200px) translateX(40px);
+        opacity: 0.3;
+      }
+    }
 
     .navbar {
       position: fixed;
@@ -230,7 +230,6 @@
       }
     }
 
-    /* Mobile animation keyframe */
     @keyframes slideInDownMobile {
       from {
         opacity: 0;
@@ -813,7 +812,6 @@
       </a>
       <div class="nav-links">
         <a href="/scripts" class="nav-link active">Scripts</a>
-        <a href="/converter" class="nav-link">Image Converter</a>
       </div>
     </div>
   </nav>
