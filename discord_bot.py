@@ -110,7 +110,7 @@ class TesterHWIDModal(discord.ui.Modal, title="Enter Your HWID (Tester)"):
         co_owner = await bot.fetch_user(CO_OWNER_ID)
         embed = discord.Embed(
             title="HWID Submitted (Tester)",
-            description=f"Your HWID has been sent to the co-owner (<@{CO_OWNER_ID}>) for tester authentication.\n\nYou'll be contacted once reviewed.",
+            description=f"Your HWID has been sent to the Owner (<@{CO_OWNER_ID}>) for tester authentication.\n\nYou'll be contacted once reviewed.",
             color=discord.Color.green()
         )
         await interaction.response.send_message(embed=embed, ephemeral=True)
