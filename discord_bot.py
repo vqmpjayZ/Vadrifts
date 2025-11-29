@@ -1,4 +1,5 @@
 import discord
+from discord import app_commands
 from discord.ext import commands
 import asyncio
 import random
@@ -41,13 +42,18 @@ class HWIDModal(discord.ui.Modal, title="Enter Your HWID"):
         placeholder="Example: ABCDEFGH-1234-IJKL-5678-MNOPQRSTUVW",
         required=True
     )
-
     async def on_submit(self, interaction: discord.Interaction):
         user = interaction.user
         hwid_value = self.hwid.value.strip()
         now = datetime.utcnow()
-        if len(hwid_value) < 35 or len(hwid_value) > 50 or not re.fullmatch(r"[A-Za-z0-9-]+", hwid_value):
-            await interaction.response.send_message("Invalid HWID.", ephemeral=True)
+        if len(hwid_value) < 35:
+            await interaction.response.send_message("HWID too short. Must be at least 35 characters.", ephemeral=True)
+            return
+        if len(hwid_value) > 50:
+            await interaction.response.send_message("HWID too long. Maximum 50 characters.", ephemeral=True)
+            return
+        if not re.fullmatch(r"[A-Za-z0-9-]+", hwid_value):
+            await interaction.response.send_message("HWID contains invalid characters. Use only letters, numbers, and dashes.", ephemeral=True)
             return
         if hwid_value in submitted_hwids:
             last_time = submitted_hwids[hwid_value]
@@ -59,7 +65,7 @@ class HWIDModal(discord.ui.Modal, title="Enter Your HWID"):
         owner = await bot.fetch_user(OWNER_ID)
         embed = discord.Embed(
             title="HWID Submitted",
-            description="Your HWID has been sent to the owner for authentication.",
+            description="Your HWID has been sent to the owner for authentication.\n\nIf the owner (<@1144213765424947251>) is online, this usually takes up to 50 minutes. Otherwise, allow up to 15+ hours.",
             color=discord.Color.green()
         )
         await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -82,13 +88,18 @@ class TesterHWIDModal(discord.ui.Modal, title="Enter Your HWID (Tester)"):
         placeholder="Example: ABCDEFGH-1234-IJKL-5678-MNOPQRSTUVW",
         required=True
     )
-
     async def on_submit(self, interaction: discord.Interaction):
         user = interaction.user
         hwid_value = self.hwid.value.strip()
         now = datetime.utcnow()
-        if len(hwid_value) < 35 or len(hwid_value) > 50 or not re.fullmatch(r"[A-Za-z0-9-]+", hwid_value):
-            await interaction.response.send_message("Invalid HWID.", ephemeral=True)
+        if len(hwid_value) < 35:
+            await interaction.response.send_message("HWID too short. Must be at least 35 characters.", ephemeral=True)
+            return
+        if len(hwid_value) > 50:
+            await interaction.response.send_message("HWID too long. Maximum 50 characters.", ephemeral=True)
+            return
+        if not re.fullmatch(r"[A-Za-z0-9-]+", hwid_value):
+            await interaction.response.send_message("HWID contains invalid characters. Use only letters, numbers, and dashes.", ephemeral=True)
             return
         if hwid_value in submitted_tester_hwids:
             last_time = submitted_tester_hwids[hwid_value]
@@ -100,7 +111,7 @@ class TesterHWIDModal(discord.ui.Modal, title="Enter Your HWID (Tester)"):
         co_owner = await bot.fetch_user(CO_OWNER_ID)
         embed = discord.Embed(
             title="HWID Submitted (Tester)",
-            description=f"Your HWID has been sent to the Owner (<@{CO_OWNER_ID}>) for tester authentication.",
+            description=f"Your HWID has been sent to the Owner (<@{CO_OWNER_ID}>) for tester authentication.\n\nYou'll be contacted once reviewed.",
             color=discord.Color.green()
         )
         await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -119,15 +130,13 @@ class TesterHWIDModal(discord.ui.Modal, title="Enter Your HWID (Tester)"):
 class AuthButtonView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
-
     @discord.ui.button(label="Get Script", style=discord.ButtonStyle.primary)
     async def get_script(self, interaction: discord.Interaction, button: discord.ui.Button):
         try:
             await interaction.user.send("loadstring(game:HttpGet('https://raw.githubusercontent.com/vqmpjayZ/utils/refs/heads/main/CopyHWID.lua'))()")
             await interaction.response.send_message("Script sent to your DMs!", ephemeral=True)
         except:
-            await interaction.response.send_message("Failed to DM the script.", ephemeral=True)
-
+            await interaction.response.send_message("Failed to DM the script. Check your privacy settings.", ephemeral=True)
     @discord.ui.button(label="Enter HWID", style=discord.ButtonStyle.success)
     async def enter_hwid(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_modal(HWIDModal())
@@ -135,15 +144,13 @@ class AuthButtonView(discord.ui.View):
 class TesterAuthButtonView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
-
     @discord.ui.button(label="Get Script", style=discord.ButtonStyle.primary)
     async def get_script(self, interaction: discord.Interaction, button: discord.ui.Button):
         try:
             await interaction.user.send("loadstring(game:HttpGet('https://raw.githubusercontent.com/vqmpjayZ/utils/refs/heads/main/CopyHWID.lua'))()")
             await interaction.response.send_message("Script sent to your DMs!", ephemeral=True)
         except:
-            await interaction.response.send_message("Failed to DM the script.", ephemeral=True)
-
+            await interaction.response.send_message("Failed to DM the script. Check your privacy settings.", ephemeral=True)
     @discord.ui.button(label="Enter HWID", style=discord.ButtonStyle.success)
     async def enter_hwid(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_modal(TesterHWIDModal())
@@ -158,7 +165,7 @@ async def authenticate(interaction: discord.Interaction):
         description=(
             "Authenticate to get access Premium benefits, follow these steps:\n\n"
             "1 Run the following script in Roblox to copy your HWID:\n"
-            "```lua\nloadstring(game:HttpGet('https://raw.githubusercontent.com/vqmpjayZ/utils/refs/heads/main/CopyHWID.lua'))()\n```\n"
+            "```lua\nloadstring(game:HttpGet('https://raw.githubusercontent.com/vqmpjayZ/utils/refs/heads/main/CopyHWID.lua'))()\n```"
             "2 Click 'Enter HWID' and submit your HWID.\n"
             "3 Wait to get authenticated by mods.\n\n"
             "If the owner is online, authentication may take up to 50 minutes. Otherwise, allow up to 15+ hours."
@@ -178,7 +185,7 @@ async def authenticate_tester(interaction: discord.Interaction):
         description=(
             "Authenticate to get access as a Script Tester, follow these steps:\n\n"
             "1 Run the following script in Roblox to copy your HWID:\n"
-            "```lua\nloadstring(game:HttpGet('https://raw.githubusercontent.com/vqmpjayZ/utils/refs/heads/main/CopyHWID.lua'))()\n```\n"
+            "```lua\nloadstring(game:HttpGet('https://raw.githubusercontent.com/vqmpjayZ/utils/refs/heads/main/CopyHWID.lua'))()\n```"
             "2 Click 'Enter HWID' and submit your HWID.\n"
             "3 Wait to get authenticated by the co-owner.\n\n"
             "Your request will be reviewed by the co-owner."
@@ -188,21 +195,13 @@ async def authenticate_tester(interaction: discord.Interaction):
     view = TesterAuthButtonView()
     await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
-def pronoun_response(pronouns):
-    pronouns = pronouns.lower()
-    if "she" in pronouns:
-        return "good girl"
-    if "he" in pronouns:
-        return "good boy"
-    if "they" in pronouns:
-        return "good human"
-    return "good boy"
-
 @bot.event
 async def on_message(message):
     global last_meow_count
+
     if message.author == bot.user:
         return
+
     words = re.findall(r'\bmeow\b', message.content, flags=re.IGNORECASE)
     if words:
         meow_weights = [5,4,3,2,1,1]
@@ -219,11 +218,13 @@ async def on_message(message):
         symbol_chance = random.randint(1,3)
         symbol = random.choice(cute_symbols) if symbol_chance==1 else ""
         await message.channel.send(("meow "*meow_count).strip()+punctuation+(" "+symbol if symbol else ""))
+
     boost_channels = {TARGET_CHANNEL_ID, BOOST_TEST_CHANNEL_ID}
     if message.channel.id in boost_channels:
         content = message.content.lower()
         is_text_boost = ("boosted the server" in content or "just boosted" in content)
         is_system_boost = (message.type == discord.MessageType.default and message.author.bot)
+
         if is_text_boost or is_system_boost:
             user_id = message.author.id
             if user_id not in recent_boosts:
@@ -231,14 +232,7 @@ async def on_message(message):
                 if user_id in pending_tasks:
                     pending_tasks[user_id].cancel()
                 pending_tasks[user_id] = bot.loop.create_task(send_good_boy_after_delay(user_id, message.channel))
-    if bot.user.mentioned_in(message):
-        pronouns_match = re.search(r'\b(?:she|her|he|him|they|them)\b', message.content, re.IGNORECASE)
-        if pronouns_match:
-            pronouns = pronouns_match.group(0)
-            response = f"<@{message.author.id}> {pronoun_response(pronouns)}"
-        else:
-            response = f"<@{message.author.id}> good boy"
-        await message.channel.send(response)
+
     await bot.process_commands(message)
 
 @bot.event
