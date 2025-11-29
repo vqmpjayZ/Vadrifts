@@ -1765,20 +1765,7 @@
 				</div>
 				<span class="rating-text">9.9/10 Community Rating</span>
 			</div>
-			<div class="stats-section">
-				<div class="stat-item">
-					<div class="stat-number" data-target="5542">0</div>
-					<div class="stat-label">Total Users</div>
-				</div>
-				<div class="stat-item">
-					<div class="stat-number" data-target="3">0</div>
-					<div class="stat-label">Scripts</div>
-				</div>
-				<div class="stat-item">
-					<div class="stat-number" data-target="100">0</div>
-					<div class="stat-label">Executor Support</div>
-				</div>
-			</div>
+			<div class="stats-section" id="stats-section"></div>
 			<div class="action-buttons">
 				<a href="#scripts" class="get-started-btn">Get Started</a>
 				<a href="https://discord.com/invite/WDbJ5wE2cR" class="discord-btn" target="_blank">
@@ -2090,6 +2077,37 @@
 			</div>
 		</div>
 		<script>
+    const SITE_CONFIG = {
+      stats: [
+        { id: 'users', value: 5908, label: 'Total Users', suffix: '+', useCommas: true },
+        { id: 'scripts', value: 3, label: 'Scripts', suffix: '+', useCommas: false },
+        { id: 'executor', value: 100, label: 'Executor Support', suffix: '%', useCommas: false }
+      ],
+      showcasers: [
+        'MastersMZ', '1F0YT', 'ReverseScripts', 'Sr_LDS', 'Ras-Scripts'
+      ]
+    };
+
+    function formatNumber(num, useCommas, suffix) {
+      let formatted = useCommas ? num.toLocaleString() : num.toString();
+      return formatted + suffix;
+    }
+
+    function buildStats() {
+      const statsSection = document.getElementById('stats-section');
+      statsSection.innerHTML = '';
+      
+      SITE_CONFIG.stats.forEach(stat => {
+        const statItem = document.createElement('div');
+        statItem.className = 'stat-item';
+        statItem.innerHTML = `
+          <div class="stat-number" data-target="${stat.value}" data-suffix="${stat.suffix}" data-commas="${stat.useCommas}">0</div>
+          <div class="stat-label">${stat.label}</div>
+        `;
+        statsSection.appendChild(statItem);
+      });
+    }
+
     function createParticles() {
       const particlesContainer = document.getElementById('particles');
       const particleCount = 15;
@@ -2109,28 +2127,18 @@
       
       counters.forEach(counter => {
         const target = parseInt(counter.getAttribute('data-target'));
+        const suffix = counter.getAttribute('data-suffix');
+        const useCommas = counter.getAttribute('data-commas') === 'true';
         const increment = target / 100;
         let current = 0;
         
         const timer = setInterval(() => {
           current += increment;
           if (current >= target) {
-            if (target === 5542) {
-              counter.textContent = '5,542+';
-            } else if (target === 3) {
-              counter.textContent = '3+';
-            } else if (target === 100) {
-              counter.textContent = '100%';
-            }
+            counter.textContent = formatNumber(target, useCommas, suffix);
             clearInterval(timer);
           } else {
-            if (target === 5542) {
-              counter.textContent = Math.floor(current).toLocaleString() + '+';
-            } else if (target === 3) {
-                            counter.textContent = Math.floor(current) + '+';
-            } else if (target === 100) {
-              counter.textContent = Math.floor(current) + '%';
-            }
+            counter.textContent = formatNumber(Math.floor(current), useCommas, suffix);
           }
         }, 20);
       });
@@ -2146,6 +2154,7 @@
       });
     });
 
+    buildStats();
     createParticles();
     animateCounters();
 
@@ -2166,10 +2175,7 @@
     class AutoShowcasersManager {
       constructor() {
         this.track = document.getElementById('showcasers-track');
-        this.usernames = [
-          'MastersMZ', '1F0YT', 'ReverseScripts', 
-          'Sr_LDS', 'Ras-Scripts'
-        ];
+        this.usernames = SITE_CONFIG.showcasers;
         this.channels = [];
         this.init();
       }
