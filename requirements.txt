@@ -2,5 +2,4 @@ Flask
 Pillow
 requests
 discord.py
-gpt4all
 pymongo
