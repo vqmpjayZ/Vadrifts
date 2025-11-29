@@ -778,7 +778,7 @@
 					Vadrifts
 				</a>
 				<div class="nav-links">
-					<a href="/scripts" class="nav-link active">Scripts</a>
+					<a href="/scripts" class="nav-link">Scripts</a>
 					<a href="/plugins" class="nav-link">Plugins</a>
 				</div>
 			</div>
@@ -847,6 +847,96 @@
         lucide.createIcons();
       }
     }
+
+    function showStatus(message, type = 'success') {
+      const statusEl = document.getElementById('statusMessage');
+      statusEl.textContent = message;
+      statusEl.className = `status-message show ${type}`;
+      setTimeout(() => {
+        statusEl.classList.remove('show');
+      }, 3000);
+    }
+
+    async function copyScript() {
+      if (!currentScript) return;
+      try {
+        await navigator.clipboard.writeText(currentScript);
+        showStatus('Script copied to clipboard!', 'success');
+      } catch (err) {
+        showStatus('Failed to copy script', 'error');
+      }
+    }
+
+    function copyGameLink() {
+      if (!currentScriptId) return;
+      const link = `${window.location.origin}/game/${currentScriptId}`;
+      navigator.clipboard.writeText(link).then(() => {
+        showStatus('Game link copied!', 'success');
+      }).catch(() => {
+        showStatus('Failed to copy link', 'error');
+      });
+    }
+
+    function loadScript() {
+      const params = new URLSearchParams(window.location.search);
+      const scriptId = params.get('id');
+      
+      if (!scriptId) {
+        showError();
+        return;
+      }
+
+      currentScriptId = scriptId;
+      
+      // Simulate loading script data - replace with your actual API call
+      setTimeout(() => {
+        const mockData = {
+          id: scriptId,
+          title: 'Auto Farm Script',
+          description: 'Automatically farms resources in the game for you.',
+          game: 'Farming Simulator',
+          thumbnail: 'https://via.placeholder.com/200x150',
+          code: 'local function autoFarm()\n  while true do\n    farm()\n    wait(1)\n  end\nend\n\nautoFarm()',
+          features: [
+            'Auto-farming capability',
+            'Resource collection',
+            'Performance optimized',
+            'Easy to use'
+          ],
+          keyLink: 'https://example.com/get-key'
+        };
+
+        displayScript(mockData);
+      }, 500);
+    }
+
+    function displayScript(data) {
+      currentScript = data.code;
+      document.getElementById('scriptTitle').textContent = data.title;
+      document.getElementById('scriptDescription').textContent = data.description;
+      document.getElementById('scriptGame').textContent = data.game;
+      document.getElementById('scriptThumbnail').src = data.thumbnail;
+      document.getElementById('scriptCode').textContent = data.code;
+      document.getElementById('keyLink').href = data.keyLink;
+
+      const featuresList = document.getElementById('featuresList');
+      featuresList.innerHTML = data.features.map(feature => 
+        `<li class="feature-item"><span class="feature-icon">✓</span>${feature}</li>`
+      ).join('');
+
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('scriptContent').style.display = 'block';
+      
+      initLucideIcons();
+    }
+
+    function showError() {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('errorState').style.display = 'block';
+      initLucideIcons();
+    }
+
+    document.addEventListener('DOMContentLoaded', loadScript);
 		</script>
 	</body>
 </html>
