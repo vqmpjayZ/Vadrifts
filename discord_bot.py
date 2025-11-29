@@ -1,5 +1,4 @@
 import discord
-from discord import app_commands
 from discord.ext import commands
 import asyncio
 import random
@@ -189,12 +188,21 @@ async def authenticate_tester(interaction: discord.Interaction):
     view = TesterAuthButtonView()
     await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
+def pronoun_response(pronouns):
+    pronouns = pronouns.lower()
+    if "she" in pronouns:
+        return "good girl"
+    if "he" in pronouns:
+        return "good boy"
+    if "they" in pronouns:
+        return "good human"
+    return "good boy"
+
 @bot.event
 async def on_message(message):
     global last_meow_count
     if message.author == bot.user:
         return
-
     words = re.findall(r'\bmeow\b', message.content, flags=re.IGNORECASE)
     if words:
         meow_weights = [5,4,3,2,1,1]
@@ -211,7 +219,6 @@ async def on_message(message):
         symbol_chance = random.randint(1,3)
         symbol = random.choice(cute_symbols) if symbol_chance==1 else ""
         await message.channel.send(("meow "*meow_count).strip()+punctuation+(" "+symbol if symbol else ""))
-
     boost_channels = {TARGET_CHANNEL_ID, BOOST_TEST_CHANNEL_ID}
     if message.channel.id in boost_channels:
         content = message.content.lower()
@@ -224,10 +231,14 @@ async def on_message(message):
                 if user_id in pending_tasks:
                     pending_tasks[user_id].cancel()
                 pending_tasks[user_id] = bot.loop.create_task(send_good_boy_after_delay(user_id, message.channel))
-
     if bot.user.mentioned_in(message):
-        await message.channel.send(f"<@{message.author.id}> good boy")
-
+        pronouns_match = re.search(r'\b(?:she|her|he|him|they|them)\b', message.content, re.IGNORECASE)
+        if pronouns_match:
+            pronouns = pronouns_match.group(0)
+            response = f"<@{message.author.id}> {pronoun_response(pronouns)}"
+        else:
+            response = f"<@{message.author.id}> good boy"
+        await message.channel.send(response)
     await bot.process_commands(message)
 
 @bot.event
