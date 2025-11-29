@@ -5,7 +5,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title id="pageTitle">Script Details - Vadrifts</title>
 		<link rel="icon" href="https://i.imgur.com/ePueN25.png" type="image/png">
-		<script src="https://cdn.jsdelivr.net/npm/lucide@0.263.1/dist/umd/lucide.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/lucide@0.263.1/dist/umd/lucide.min.js"></script>
 		<style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
     
@@ -397,7 +397,7 @@
     .section-title-icon {
       width: 24px;
       height: 24px;
-      stroke: url(#icon-gradient);
+      stroke: white;
     }
 
     .features-list {
@@ -833,8 +833,10 @@
     let currentScriptId = null;
 
     function initLucideIcons() {
-      if (typeof lucide !== 'undefined') {
+      if (window.lucide && lucide.createIcons) {
         lucide.createIcons();
+      } else {
+        setTimeout(initLucideIcons, 50);
       }
     }
 
