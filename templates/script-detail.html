@@ -5,7 +5,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title id="pageTitle">Script Details - Vadrifts</title>
 		<link rel="icon" href="https://i.imgur.com/ePueN25.png" type="image/png">
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/lucide@0.263.1/dist/umd/lucide.min.js"></script>
 		<style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
     
@@ -260,7 +260,6 @@
       -webkit-text-fill-color: transparent;
       text-decoration: none;
       transition: all 0.3s ease;
-      white-space: nowrap;
     }
 
     .nav-logo:hover {
@@ -293,16 +292,11 @@
       align-items: center;
       height: 100%;
       position: relative;
-      white-space: nowrap;
     }
 
     .nav-link:hover {
       color: #ffffff;
       text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
-    }
-
-    .nav-link.active {
-      color: #9c88ff;
     }
 
     .container {
@@ -403,9 +397,7 @@
     .section-title-icon {
       width: 24px;
       height: 24px;
-      stroke-width: 2;
-      flex-shrink: 0;
-      color: #9c88ff;
+      stroke: url(#icon-gradient);
     }
 
     .features-list {
@@ -525,7 +517,6 @@
       width: 18px;
       height: 18px;
       flex-shrink: 0;
-      stroke-width: 2;
     }
 
     .copy-btn {
@@ -624,7 +615,6 @@
       margin: 0 auto 20px;
       opacity: 0.5;
       color: #ff6b6b;
-      stroke-width: 1.5;
     }
 
     .back-btn {
@@ -778,7 +768,7 @@
 					Vadrifts
 				</a>
 				<div class="nav-links">
-					<a href="/scripts" class="nav-link">Scripts</a>
+					<a href="/scripts" class="nav-link active">Scripts</a>
 					<a href="/plugins" class="nav-link">Plugins</a>
 				</div>
 			</div>
@@ -789,7 +779,7 @@
 				<p>Loading script details...</p>
 			</div>
 			<div id="errorState" class="error-state" style="display: none;">
-				<svg class="error-icon" data-lucide="triangle-alert"></svg>
+				<i data-lucide="triangle-alert" class="error-icon"></i>
 				<h3>Script not found</h3>
 				<p>The script you're looking for doesn't exist or has been removed.</p>
 				<br>
@@ -805,14 +795,14 @@
 				<div class="script-content">
 					<div class="features-section">
 						<h2 class="section-title">
-							<svg data-lucide="sparkles" class="section-title-icon"></svg>
+							<i data-lucide="sparkles" class="section-title-icon"></i>
 							Features
 						</h2>
 						<ul id="featuresList" class="features-list"></ul>
 					</div>
 					<div class="script-section">
 						<h2 class="section-title">
-							<svg data-lucide="scroll-text" class="section-title-icon"></svg>
+							<i data-lucide="scroll-text" class="section-title-icon"></i>
 							Script Code
 						</h2>
 						<div class="script-code-wrapper">
@@ -821,15 +811,15 @@
 						</div>
 						<div class="script-actions">
 							<button class="action-btn copy-btn" onclick="copyScript()">
-								<svg data-lucide="copy" class="action-btn-icon"></svg>
+								<i data-lucide="copy" class="action-btn-icon"></i>
 								Copy Script
 							</button>
 							<a id="keyLink" class="action-btn key-btn" href="#" style="cursor: pointer;">
-								<svg data-lucide="key" class="action-btn-icon"></svg>
+								<i data-lucide="key" class="action-btn-icon"></i>
 								Get Key
 							</a>
 							<button class="action-btn game-link-btn" onclick="copyGameLink()">
-								<svg data-lucide="link" class="action-btn-icon"></svg>
+								<i data-lucide="link" class="action-btn-icon"></i>
 								Copy Game Link
 							</button>
 						</div>
@@ -847,6 +837,217 @@
         lucide.createIcons();
       }
     }
+
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      const particleCount = 15;
+
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = -Math.random() * 15 + 's';
+        particle.style.animationDuration = (15 + Math.random() * 5) + 's';
+        particlesContainer.appendChild(particle);
+      }
+    }
+
+function highlightLua(code) {
+  if (!code) return '';
+  const keywords = /\b(local|function|end|if|then|else|elseif|for|while|do|repeat|until|return|break|in)\b/g;
+  const builtins = /\b(game|workspace|script|wait|print|warn|error|spawn|loadstring|getfenv|setfenv|require|pairs|ipairs|next|tostring|tonumber|type|pcall|xpcall|assert|Vector3|CFrame|Instance|Color3|UDim2|math|string|table|coroutine|os)\b/g;
+  const numbers = /\b(\d+\.?\d*)\b/g;
+  const booleans = /\b(true|false|null|nil)\b/g;
+  const funcNameBeforeParen = /\b([A-Za-z_]\w*)\s*(?=\()/g;
+
+  let escaped = code
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  const strings = [];
+  const comments = [];
+
+  escaped = escaped.replace(/(["'])(?:(?=(\\?))\2.)*?\1/g, (m) => {
+    const idx = strings.length;
+    strings.push(m);
+    return `@@STR${idx}@@`;
+  });
+
+  escaped = escaped.replace(/(--.*$)/gm, (m) => {
+    const idx = comments.length;
+    comments.push(m);
+    return `@@CMT${idx}@@`;
+  });
+
+  let highlighted = escaped
+    .replace(keywords, '<span class="lua-keyword">$&</span>')
+    .replace(builtins, '<span class="lua-builtin">$&</span>')
+    .replace(booleans, '<span class="lua-boolean">$&</span>')
+    .replace(numbers, '<span class="lua-number">$&</span>')
+    .replace(funcNameBeforeParen, '<span class="lua-function">$1</span>');
+
+  highlighted = highlighted.replace(/@@CMT(\d+)@@/g, (m, n) => {
+    const txt = comments[Number(n)];
+    return `<span class="lua-comment">${txt}</span>`;
+  });
+
+  highlighted = highlighted.replace(/@@STR(\d+)@@/g, (m, n) => {
+    const txt = strings[Number(n)];
+    return `<span class="lua-str">${txt}</span>`;
+  });
+
+  return highlighted;
+}
+
+    function getScriptIdFromURL() {
+      const pathParts = window.location.pathname.split('/');
+      const scriptId = pathParts[pathParts.length - 1];
+      console.log('Script ID from URL:', scriptId);
+      return scriptId;
+    }
+
+    async function loadScript() {
+      const scriptId = getScriptIdFromURL();
+      currentScriptId = scriptId;
+      try {
+        const response = await fetch(`/api/scripts/${scriptId}`);
+        
+        if (!response.ok) {
+          throw new Error('Script not found');
+        }
+        
+        currentScript = await response.json();
+        console.log('Loaded script:', currentScript);
+        displayScript(currentScript);
+        
+      } catch (error) {
+        console.error('Failed to load script:', error);
+        showError();
+      }
+    }
+
+    function displayScript(script) {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('scriptContent').style.display = 'block';
+  
+      document.getElementById('pageTitle').textContent = `${script.title} - Vadrifts`;
+      document.getElementById('scriptThumbnail').src = script.thumbnail;
+      document.getElementById('scriptThumbnail').alt = script.title;
+      document.getElementById('scriptGame').textContent = script.game;
+      document.getElementById('scriptTitle').textContent = script.title;
+      document.getElementById('scriptDescription').textContent = script.description;
+
+      const scriptCodeEl = document.getElementById('scriptCode');
+      scriptCodeEl.innerHTML = highlightLua(script.script);
+  
+      const keyButton = document.getElementById('keyLink');
+  
+      if (script.key_type === 'no-key') {
+        keyButton.style.display = 'none';
+      } else if (script.key_type === 'discord') {
+        keyButton.style.display = 'flex';
+        keyButton.onclick = (e) => {
+          e.preventDefault();
+          window.open(script.key_link, '_blank');
+        };
+      } else {
+        keyButton.style.display = 'flex';
+        keyButton.onclick = (e) => {
+          e.preventDefault();
+          goToKeySystem();
+        };
+      }
+  
+      const featuresList = document.getElementById('featuresList');
+      featuresList.innerHTML = script.features.map(feature => `
+        <li class="feature-item">
+          <i data-lucide="badge-check" class="feature-icon"></i>
+          <span>${feature}</span>
+        </li>
+      `).join('');
+
+      initLucideIcons();
+    }
+
+    function goToKeySystem() {
+      console.log('goToKeySystem called with scriptId:', currentScriptId);
+      console.log('currentScript:', currentScript);
+      
+      if (!currentScriptId) {
+        console.error('No script ID available');
+        return;
+      }
+      
+      if (currentScript && currentScript.key_type === 'discord') {
+        window.open(currentScript.key_link, '_blank');
+      } else {
+        const keySystemUrl = `/key-system?script=${currentScriptId}`;
+        console.log('Redirecting to:', keySystemUrl);
+        window.location.href = keySystemUrl;
+      }
+    }
+
+    function showError() {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('errorState').style.display = 'block';
+      initLucideIcons();
+    }
+
+    function copyScript() {
+      if (!currentScript) return;
+      
+      navigator.clipboard.writeText(currentScript.script).then(() => {
+        showStatus('Script copied to clipboard!', 'success');
+      }).catch(err => {
+        console.error('Failed to copy script:', err);
+        showStatus('Failed to copy script', 'error');
+      });
+    }
+
+    function copyGameLink() {
+      if (!currentScript) return;
+      
+      const gameLink = currentScript.game_link || 'https://www.roblox.com/games';
+      navigator.clipboard.writeText(gameLink).then(() => {
+        showStatus('Game link copied to clipboard!', 'success');
+      }).catch(err => {
+        console.error('Failed to copy game link:', err);
+        showStatus('Failed to copy game link', 'error');
+      });
+    }
+
+    function showStatus(message, type) {
+      const statusEl = document.getElementById('statusMessage');
+      statusEl.textContent = message;
+      statusEl.className = `status-message ${type}`;
+      statusEl.classList.add('show');
+      
+      setTimeout(() => {
+        statusEl.classList.remove('show');
+      }, 3000);
+    }
+
+    let lastScrollTop = 0;
+    window.addEventListener('scroll', function() {
+      let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const navbar = document.querySelector('.navbar');
+      
+      if (scrollTop > 100) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+      
+      lastScrollTop = scrollTop;
+    });
+
+    createParticles();
+    window.addEventListener('load', () => {
+      loadScript();
+      initLucideIcons();
+    });
+  
 		</script>
 	</body>
 </html>
