@@ -12,9 +12,10 @@ AUTH_CHANNEL_ID = 1287714060716081183
 TESTER_AUTH_CHANNEL_ID = 1429023673704255488
 LOG_CHANNEL_ID = 1270314848764559494
 OWNER_ID = 1144213765424947251
-CO_OWNER_ID = 1144213765424947251 # 1187237945317527566 - vinnie ; switched out with vqmpjay cuz vinnie left fr
+CO_OWNER_ID = 1144213765424947251
 GUILD_ID = 1241797935100989594
 DELAY_SECONDS = 1
+BOOST_TEST_CHANNEL_ID = 1270301984897110148
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -69,7 +70,7 @@ class HWIDModal(discord.ui.Modal, title="Enter Your HWID"):
         )
         await interaction.response.send_message(embed=embed, ephemeral=True)
         msg_embed = discord.Embed(title="New Authentication Request", color=discord.Color.blurple())
-        msg_embed.add_field(name="Type", value="**Premium**", inline=False)
+        msg_embed.add_field(name="Type", value="Premium", inline=False)
         msg_embed.add_field(name="User", value=f"{user.mention} ({user.id})", inline=False)
         msg_embed.add_field(name="HWID", value=f"`{hwid_value}`", inline=False)
         if log_channel:
@@ -115,7 +116,7 @@ class TesterHWIDModal(discord.ui.Modal, title="Enter Your HWID (Tester)"):
         )
         await interaction.response.send_message(embed=embed, ephemeral=True)
         msg_embed = discord.Embed(title="New Tester Authentication Request", color=discord.Color.orange())
-        msg_embed.add_field(name="Type", value="**Script Tester**", inline=False)
+        msg_embed.add_field(name="Type", value="Script Tester", inline=False)
         msg_embed.add_field(name="User", value=f"{user.mention} ({user.id})", inline=False)
         msg_embed.add_field(name="HWID", value=f"`{hwid_value}`", inline=False)
         if log_channel:
@@ -129,7 +130,6 @@ class TesterHWIDModal(discord.ui.Modal, title="Enter Your HWID (Tester)"):
 class AuthButtonView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
-
     @discord.ui.button(label="Get Script", style=discord.ButtonStyle.primary)
     async def get_script(self, interaction: discord.Interaction, button: discord.ui.Button):
         try:
@@ -137,7 +137,6 @@ class AuthButtonView(discord.ui.View):
             await interaction.response.send_message("Script sent to your DMs!", ephemeral=True)
         except:
             await interaction.response.send_message("Failed to DM the script. Check your privacy settings.", ephemeral=True)
-
     @discord.ui.button(label="Enter HWID", style=discord.ButtonStyle.success)
     async def enter_hwid(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_modal(HWIDModal())
@@ -145,7 +144,6 @@ class AuthButtonView(discord.ui.View):
 class TesterAuthButtonView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
-
     @discord.ui.button(label="Get Script", style=discord.ButtonStyle.primary)
     async def get_script(self, interaction: discord.Interaction, button: discord.ui.Button):
         try:
@@ -153,7 +151,6 @@ class TesterAuthButtonView(discord.ui.View):
             await interaction.response.send_message("Script sent to your DMs!", ephemeral=True)
         except:
             await interaction.response.send_message("Failed to DM the script. Check your privacy settings.", ephemeral=True)
-
     @discord.ui.button(label="Enter HWID", style=discord.ButtonStyle.success)
     async def enter_hwid(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_modal(TesterHWIDModal())
@@ -166,13 +163,12 @@ async def authenticate(interaction: discord.Interaction):
     embed = discord.Embed(
         title="Authenticate for Premium.",
         description=(
-            "**Authenticate to get access Premium benefits**, follow these steps:\n\n"
-            "1️⃣ Run the following script in Roblox to copy your HWID:\n"
-            "```lua\nloadstring(game:HttpGet('https://raw.githubusercontent.com/vqmpjayZ/utils/refs/heads/main/CopyHWID.lua'))()\n```\n"
-            "-# you can get the script by using the 'Get Script' button if you're on mobile\n"
-            "2️⃣ Click 'Enter HWID' and submit your HWID.\n"
-            "3️⃣ Wait to get authenticated by mods.\n\n"
-            "_If the owner is online, authentication may take up to 50 minutes. Otherwise, allow up to 15+ hours._"
+            "Authenticate to get access Premium benefits, follow these steps:\n\n"
+            "1 Run the following script in Roblox to copy your HWID:\n"
+            "```lua\nloadstring(game:HttpGet('https://raw.githubusercontent.com/vqmpjayZ/utils/refs/heads/main/CopyHWID.lua'))()\n```"
+            "2 Click 'Enter HWID' and submit your HWID.\n"
+            "3 Wait to get authenticated by mods.\n\n"
+            "If the owner is online, authentication may take up to 50 minutes. Otherwise, allow up to 15+ hours."
         ),
         color=discord.Color.blurple()
     )
@@ -187,13 +183,12 @@ async def authenticate_tester(interaction: discord.Interaction):
     embed = discord.Embed(
         title="Authenticate for Script Tester.",
         description=(
-            "**Authenticate to get access as a Script Tester**, follow these steps:\n\n"
-            "1️⃣ Run the following script in Roblox to copy your HWID:\n"
-            "```lua\nloadstring(game:HttpGet('https://raw.githubusercontent.com/vqmpjayZ/utils/refs/heads/main/CopyHWID.lua'))()\n```\n"
-            "-# you can get the script by using the 'Get Script' button if you're on mobile\n"
-            "2️⃣ Click 'Enter HWID' and submit your HWID.\n"
-            "3️⃣ Wait to get authenticated by the co-owner.\n\n"
-            "_Your request will be reviewed by the co-owner._"
+            "Authenticate to get access as a Script Tester, follow these steps:\n\n"
+            "1 Run the following script in Roblox to copy your HWID:\n"
+            "```lua\nloadstring(game:HttpGet('https://raw.githubusercontent.com/vqmpjayZ/utils/refs/heads/main/CopyHWID.lua'))()\n```"
+            "2 Click 'Enter HWID' and submit your HWID.\n"
+            "3 Wait to get authenticated by the co-owner.\n\n"
+            "Your request will be reviewed by the co-owner."
         ),
         color=discord.Color.orange()
     )
@@ -203,8 +198,10 @@ async def authenticate_tester(interaction: discord.Interaction):
 @bot.event
 async def on_message(message):
     global last_meow_count
+
     if message.author == bot.user:
         return
+
     words = re.findall(r'\bmeow\b', message.content, flags=re.IGNORECASE)
     if words:
         meow_weights = [5,4,3,2,1,1]
@@ -221,17 +218,21 @@ async def on_message(message):
         symbol_chance = random.randint(1,3)
         symbol = random.choice(cute_symbols) if symbol_chance==1 else ""
         await message.channel.send(("meow "*meow_count).strip()+punctuation+(" "+symbol if symbol else ""))
-    if message.channel.id == TARGET_CHANNEL_ID:
-        if message.type in [discord.MessageType.premium_guild_subscription, 
-                           discord.MessageType.premium_guild_subscription_tier_1,
-                           discord.MessageType.premium_guild_subscription_tier_2,
-                           discord.MessageType.premium_guild_subscription_tier_3]:
+
+    boost_channels = {TARGET_CHANNEL_ID, BOOST_TEST_CHANNEL_ID}
+    if message.channel.id in boost_channels:
+        content = message.content.lower()
+        is_text_boost = ("boosted the server" in content or "just boosted" in content)
+        is_system_boost = (message.type == discord.MessageType.default and message.author.bot)
+
+        if is_text_boost or is_system_boost:
             user_id = message.author.id
             if user_id not in recent_boosts:
                 recent_boosts[user_id] = True
                 if user_id in pending_tasks:
                     pending_tasks[user_id].cancel()
                 pending_tasks[user_id] = bot.loop.create_task(send_good_boy_after_delay(user_id, message.channel))
+
     await bot.process_commands(message)
 
 @bot.event
@@ -239,7 +240,7 @@ async def on_ready():
     print(f'Bot logged in as {bot.user}')
     try:
         await bot.tree.sync(guild=discord.Object(id=GUILD_ID))
-        print(f"Commands synced successfully!")
+        print("Commands synced successfully!")
     except Exception as e:
         print(f"Slash command sync failed: {e}")
 
