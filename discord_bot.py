@@ -6,7 +6,6 @@ import random
 import re
 from datetime import datetime, timedelta
 from config import DISCORD_TOKEN
-from gpt4all import GPT4All
 
 TARGET_CHANNEL_ID = 1389210900489044048
 AUTH_CHANNEL_ID = 1287714060716081183
@@ -28,8 +27,6 @@ last_meow_count = None
 cute_symbols = [">///<", "^-^", "o///o", "x3"]
 submitted_hwids = {}
 submitted_tester_hwids = {}
-
-ai_model = GPT4All("ggml-gpt4all-j-v1.3-groovy.bin")
 
 async def send_good_boy_after_delay(user_id, channel):
     await asyncio.sleep(DELAY_SECONDS)
@@ -229,13 +226,7 @@ async def on_message(message):
                 pending_tasks[user_id] = bot.loop.create_task(send_good_boy_after_delay(user_id, message.channel))
 
     if bot.user.mentioned_in(message):
-        prompt = message.content.replace(f"<@{bot.user.id}>", "").strip()
-        if prompt:
-            try:
-                response = ai_model.generate(prompt)
-            except:
-                response = f"<@{message.author.id}> good boy"
-            await message.channel.send(response)
+        await message.channel.send(f"<@{message.author.id}> good boy")
 
     await bot.process_commands(message)
 
