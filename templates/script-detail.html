@@ -37,28 +37,50 @@ pointer-events: none;
 
 .main-light {
 position: absolute;
-width: 900px;
-height: 900px;
+width: 1400px;
+height: 1400px;
+border-radius: 50%;
+filter: blur(160px);
+opacity: 0.35;
+background: radial-gradient(circle, #6a00ff 0%, #3d008a 25%, transparent 65%);
+animation: slowPulse 18s ease-in-out infinite;
+transition: background 1.2s ease, opacity 1.2s ease;
+}
+
+#mainLight1 {
+top: -200px;
+left: -200px;
+animation-delay: 0s;
+}
+
+#mainLight2 {
+bottom: -300px;
+right: -300px;
+width: 1600px;
+height: 1600px;
+opacity: 0.3;
+animation-delay: -9s;
+}
+
+#accentLight {
+position: absolute;
+width: 800px;
+height: 800px;
 top: 50%;
 left: 50%;
 transform: translate(-50%, -50%);
 border-radius: 50%;
-filter: blur(180px);
-opacity: 0.8;
-background: radial-gradient(circle, #6a00ff 0%, transparent 70%);
-animation: slowPulse 12s ease-in-out infinite;
-}
-
-#mainLight2 {
-width: 1100px;
-height: 1100px;
-opacity: 0.55;
+filter: blur(120px);
+opacity: 0.15;
+background: radial-gradient(circle, #ffffff 0%, transparent 60%);
+animation: slowPulse 22s ease-in-out infinite;
 animation-delay: -5s;
+transition: background 1.2s ease;
 }
 
 @keyframes slowPulse {
-0%, 100% { transform: translate(-50%, -50%) scale(1); }
-50% { transform: translate(-50%, -50%) scale(1.15); }
+0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.15; }
+50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.25; }
 }
 
 .particles {
@@ -75,17 +97,31 @@ pointer-events: none;
 position: absolute;
 width: 3px;
 height: 3px;
-background: #a45cff;
+background: var(--particle-color, #a45cff);
 border-radius: 50%;
-opacity: 0.5;
-box-shadow: 0 0 8px #a45cff;
-animation: floatUp 240s linear infinite;
+opacity: 0.7;
+box-shadow: 0 0 12px var(--particle-color, #a45cff), 0 0 6px var(--particle-color, #a45cff);
+animation: floatParticle 25s linear infinite;
+transition: background 1.2s ease, box-shadow 1.2s ease;
 }
 
-@keyframes floatUp {
-0% { transform: translateY(100vh) translateX(0); opacity: 0.5; }
-50% { transform: translateY(50vh) translateX(20px); opacity: 0.4; }
-100% { transform: translateY(-200px) translateX(40px); opacity: 0.3; }
+@keyframes floatParticle {
+0% { 
+transform: translateY(100vh) translateX(0) scale(0); 
+opacity: 0; 
+}
+5% { 
+opacity: 0.7; 
+transform: translateY(95vh) translateX(10px) scale(1);
+}
+95% { 
+opacity: 0.5; 
+transform: translateY(5vh) translateX(60px) scale(0.8);
+}
+100% { 
+transform: translateY(-5vh) translateX(80px) scale(0); 
+opacity: 0; 
+}
 }
 
 .navbar {
@@ -94,9 +130,9 @@ top: 20px;
 left: 50%;
 transform: translateX(-50%);
 z-index: 100;
-background: rgba(0,0,0,0.1);
+background: rgba(0,0,0,0.4);
 backdrop-filter: blur(20px);
-border: 1px solid rgba(255,255,255,0.15);
+border: 1px solid rgba(255,255,255,0.12);
 border-radius: 20px;
 padding: 24px 32px;
 animation: slideInDown 0.8s ease-out;
@@ -109,8 +145,8 @@ transition: all 0.3s ease;
 .navbar.scrolled:hover { top: 20px; }
 
 .navbar:hover {
-background: rgba(0,0,0,0.6);
-border-color: rgba(255,255,255,0.4);
+background: rgba(0,0,0,0.65);
+border-color: rgba(255,255,255,0.25);
 transform: translateX(-50%) translateY(0);
 }
 
@@ -132,7 +168,7 @@ align-items: center;
 gap: 10px;
 font-size: 24px;
 font-weight: 700;
-background: linear-gradient(90deg, #ffffff 0%, #ffffff 40%, #7209b7 80%, #c478d4 100%);
+background: var(--gradient-primary, linear-gradient(90deg, #ffffff 0%, #7209b7 100%));
 background-clip: text;
 -webkit-background-clip: text;
 -webkit-text-fill-color: transparent;
@@ -142,7 +178,7 @@ transition: all 0.3s ease;
 
 .nav-logo:hover {
 transform: translateY(-3px);
-filter: drop-shadow(0 0 15px rgba(114,9,183,0.6));
+filter: drop-shadow(0 0 15px var(--accent-glow, rgba(114,9,183,0.6)));
 }
 
 .nav-logo-img { width: 28px; height: 28px; flex-shrink: 0; }
@@ -196,28 +232,32 @@ height: 150px;
 object-fit: cover;
 border-radius: 15px;
 margin: 0 auto 20px;
-box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-background: linear-gradient(135deg, #7209b7 0%, #ff6b9d 50%, #ff9f43 100%);
+box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 60px var(--accent-glow, rgba(114,9,183,0.3));
+background: var(--gradient-primary, linear-gradient(135deg, #7209b7 0%, #ff6b9d 50%, #ff9f43 100%));
+transition: box-shadow 1.2s ease;
 }
 
 .script-game {
 font-size: 14px;
-color: #7209b7;
+color: var(--accent-color, #7209b7);
 font-weight: 600;
 text-transform: uppercase;
 letter-spacing: 1px;
 margin-bottom: 10px;
+transition: color 1.2s ease;
+text-shadow: 0 0 20px var(--accent-glow, rgba(114,9,183,0.4));
 }
 
 .script-title {
 font-size: 48px;
 font-weight: 800;
-background: linear-gradient(90deg, #ffffff 0%, #9c88ff 100%);
+background: var(--gradient-primary, linear-gradient(90deg, #ffffff 0%, #9c88ff 100%));
 background-clip: text;
 -webkit-background-clip: text;
 -webkit-text-fill-color: transparent;
 margin-bottom: 15px;
 letter-spacing: -1px;
+transition: background 1.2s ease;
 }
 
 .script-description {
@@ -238,26 +278,28 @@ align-items: start;
 }
 
 .features-section, .script-section {
-background: rgba(0,0,0,0.6);
+background: rgba(0,0,0,0.5);
 backdrop-filter: blur(20px);
-border: 1px solid rgba(255,255,255,0.1);
+border: 1px solid rgba(255,255,255,0.08);
 border-radius: 20px;
 padding: 30px;
 position: relative;
 height: fit-content;
+box-shadow: 0 8px 32px rgba(0,0,0,0.3);
 }
 
 .section-title {
 font-size: 24px;
 font-weight: 700;
 margin-bottom: 20px;
-background: linear-gradient(90deg, #ffffff 0%, #9c88ff 100%);
+background: var(--gradient-primary, linear-gradient(90deg, #ffffff 0%, #9c88ff 100%));
 background-clip: text;
 -webkit-background-clip: text;
 -webkit-text-fill-color: transparent;
 display: flex;
 align-items: center;
 gap: 10px;
+transition: background 1.2s ease;
 }
 
 .section-title-icon { width: 24px; height: 24px; }
@@ -275,13 +317,19 @@ color: #ccc;
 
 .feature-item:last-child { border-bottom: none; }
 
-.feature-icon { width: 20px; height: 20px; }
+.feature-icon { 
+width: 20px; 
+height: 20px;
+color: var(--accent-color, #a45cff);
+transition: color 1.2s ease;
+filter: drop-shadow(0 0 4px var(--accent-glow, rgba(164,92,255,0.5)));
+}
 
 .script-code-wrapper { position: relative; margin-bottom: 20px; }
 
 .script-code {
-background: rgba(0,0,0,0.8);
-border: 1px solid rgba(255,255,255,0.1);
+background: rgba(0,0,0,0.7);
+border: 1px solid rgba(255,255,255,0.08);
 border-radius: 12px;
 padding: 20px;
 font-family: 'Consolas', 'Monaco', monospace;
@@ -300,7 +348,7 @@ min-height: 80px;
 position: absolute;
 top: 10px;
 right: 10px;
-background: rgba(114,9,183,0.8);
+background: var(--accent-color-rgba, rgba(114,9,183,0.8));
 color: white;
 border: none;
 padding: 8px 12px;
@@ -318,6 +366,12 @@ backdrop-filter: blur(10px);
 opacity: 1;
 transform: translate(0,0);
 }
+
+.code-copy-btn:hover {
+background: var(--accent-color, #7209b7);
+box-shadow: 0 0 20px var(--accent-glow, rgba(114,9,183,0.6));
+}
+
 .lua-keyword { color: #ff8c00; font-weight: 700; }
 .lua-str { color: #8be9fd; }
 .lua-comment { color: #6272a4; font-style: italic; }
@@ -369,18 +423,19 @@ box-shadow: 0 10px 25px rgba(46,204,113,0.3);
 
 .copy-btn:hover {
 transform: translateY(-2px);
-box-shadow: 0 15px 35px rgba(46,204,113,0.4);
+box-shadow: 0 15px 35px rgba(46,204,113,0.5);
 }
 
 .key-btn {
-background: linear-gradient(135deg, #7209b7 0%, #ff9f43 100%);
+background: var(--gradient-button, linear-gradient(135deg, #7209b7 0%, #ff9f43 100%));
 color: white;
-box-shadow: 0 10px 25px rgba(114,9,183,0.3);
+box-shadow: var(--box-shadow-primary, 0 10px 25px rgba(114,9,183,0.3));
+transition: all 0.3s ease;
 }
 
 .key-btn:hover {
 transform: translateY(-2px);
-box-shadow: 0 15px 35px rgba(114,9,183,0.4);
+box-shadow: var(--box-shadow-primary-hover, 0 15px 40px rgba(114,9,183,0.5));
 }
 
 .game-link-btn {
@@ -391,7 +446,7 @@ box-shadow: 0 10px 25px rgba(88,101,242,0.3);
 
 .game-link-btn:hover {
 transform: translateY(-2px);
-box-shadow: 0 15px 35px rgba(88,101,242,0.4);
+box-shadow: 0 15px 35px rgba(88,101,242,0.5);
 }
 
 .status-message {
@@ -435,9 +490,10 @@ width: 40px;
 height: 40px;
 border: 4px solid rgba(255,255,255,0.1);
 border-radius: 50%;
-border-top: 4px solid #7209b7;
+border-top: 4px solid var(--accent-color, #7209b7);
 animation: spin 1s linear infinite;
 margin-bottom: 20px;
+transition: border-top-color 1.2s ease;
 }
 
 @keyframes spin {
@@ -509,6 +565,24 @@ to { opacity: 1; transform: translateY(0); }
 .action-btn { width: 100%; max-width: 300px; }
 .status-message { right: 10px; left: 10px; transform: translateY(-100px); }
 .status-message.show { transform: translateY(0); }
+.main-light {
+width: 1000px;
+height: 1000px;
+}
+#mainLight1 {
+top: -100px;
+left: -100px;
+}
+#mainLight2 {
+width: 1200px;
+height: 1200px;
+bottom: -200px;
+right: -200px;
+}
+#accentLight {
+width: 600px;
+height: 600px;
+}
 }
 
 @media (max-width: 480px) {
@@ -533,6 +607,7 @@ to { opacity: 1; transform: translateY(0); }
 <div class="bg-lights">
 <div id="mainLight1" class="main-light"></div>
 <div id="mainLight2" class="main-light"></div>
+<div id="accentLight"></div>
 </div>
 <div class="particles" id="particles"></div>
 <nav class="navbar">
@@ -600,6 +675,7 @@ Copy Game Link
 </div>
 </div>
 </div>
+</div>
 <div id="statusMessage" class="status-message"></div>
 <script>
 let currentScript = null;
@@ -615,13 +691,16 @@ setTimeout(initLucideIcons, 50);
 
 function createParticles() {
 const particlesContainer = document.getElementById('particles');
-const particleCount = 15;
+const particleCount = 25;
 for (let i = 0; i < particleCount; i++) {
 const particle = document.createElement('div');
 particle.className = 'particle';
 particle.style.left = Math.random() * 100 + '%';
-particle.style.animationDelay = -Math.random() * 15 + 's';
-particle.style.animationDuration = (15 + Math.random() * 5) + 's';
+particle.style.animationDelay = -Math.random() * 25 + 's';
+particle.style.animationDuration = (20 + Math.random() * 10) + 's';
+const size = 2 + Math.random() * 3;
+particle.style.width = size + 'px';
+particle.style.height = size + 'px';
 particlesContainer.appendChild(particle);
 }
 }
@@ -722,7 +801,7 @@ featuresList.innerHTML = (script.features || []).map(feature => `
 </li>
 `).join('');
 initLucideIcons();
-setDynamicLights(script.thumbnail);
+extractAndApplyColors(script.thumbnail);
 }
 
 function goToKeySystem() {
@@ -772,66 +851,106 @@ statusEl.classList.remove('show');
 }, 3000);
 }
 
-function getImageColors(url, callback) {
+function rgbToHex(r, g, b) {
+return '#' + [r, g, b].map(x => {
+const hex = x.toString(16);
+return hex.length === 1 ? '0' + hex : hex;
+}).join('');
+}
+
+function hexToRgb(hex) {
+const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+return result ? {
+r: parseInt(result[1], 16),
+g: parseInt(result[2], 16),
+b: parseInt(result[3], 16)
+} : null;
+}
+
+function adjustColor(hex, percent) {
+const rgb = hexToRgb(hex);
+if (!rgb) return hex;
+const adjust = (color) => {
+const adjusted = color + Math.round((255 - color) * (percent / 100));
+return Math.min(255, Math.max(0, adjusted));
+};
+return rgbToHex(adjust(rgb.r), adjust(rgb.g), adjust(rgb.b));
+}
+
+function extractAndApplyColors(imageUrl) {
 const img = new Image();
 img.crossOrigin = 'Anonymous';
-img.src = url || '';
+img.src = imageUrl || '';
 img.onload = () => {
 const canvas = document.createElement('canvas');
-const maxSize = 200;
-let w = img.width;
-let h = img.height;
-if (w > maxSize || h > maxSize) {
-if (w > h) {
-h = Math.round((maxSize / w) * h);
-w = maxSize;
-} else {
-w = Math.round((maxSize / h) * w);
-h = maxSize;
-}
-}
-canvas.width = w;
-canvas.height = h;
+const size = 120;
+canvas.width = size;
+canvas.height = size;
 const ctx = canvas.getContext('2d');
-ctx.drawImage(img, 0, 0, w, h);
-const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-const colorCounts = {};
-const skip = 6;
-for (let i = 0; i < data.length; i += skip * 4) {
-const r = data[i];
-const g = data[i + 1];
-const b = data[i + 2];
-const key = `${Math.round(r/10)*10},${Math.round(g/10)*10},${Math.round(b/10)*10}`;
-colorCounts[key] = (colorCounts[key] || 0) + 1;
+ctx.drawImage(img, 0, 0, size, size);
+const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+const pixels = imageData.data;
+const colorMap = {};
+const skip = 10;
+for (let i = 0; i < pixels.length; i += skip * 4) {
+const r = pixels[i];
+const g = pixels[i + 1];
+const b = pixels[i + 2];
+const brightness = (r * 0.299 + g * 0.587 + b * 0.114);
+if (brightness < 25 || brightness > 235) continue;
+const saturation = Math.max(r, g, b) - Math.min(r, g, b);
+if (saturation < 15) continue;
+const key = `${Math.floor(r / 25) * 25},${Math.floor(g / 25) * 25},${Math.floor(b / 25) * 25}`;
+colorMap[key] = (colorMap[key] || 0) + 1;
 }
-const sorted = Object.entries(colorCounts).sort((a, b) => b[1] - a[1]);
-const colors = sorted.slice(0, 3).map(c => {
-const parts = c[0].split(',');
-return `rgb(${parts[0]}, ${parts[1]}, ${parts[2]})`;
+const sortedColors = Object.entries(colorMap)
+.sort((a, b) => b[1] - a[1])
+.slice(0, 3)
+.map(entry => {
+const parts = entry[0].split(',').map(Number);
+return rgbToHex(parts[0], parts[1], parts[2]);
 });
-if (colors.length === 0) {
-callback(['rgb(114,9,183)', 'rgb(156,136,255)']);
-} else if (colors.length === 1) {
-callback([colors[0], 'rgb(156,136,255)']);
+if (sortedColors.length >= 2) {
+applyColorScheme(sortedColors[0], sortedColors[1]);
+} else if (sortedColors.length === 1) {
+const color2 = adjustColor(sortedColors[0], 25);
+applyColorScheme(sortedColors[0], color2);
 } else {
-callback(colors);
+applyColorScheme('#7209b7', '#9c88ff');
 }
 };
 img.onerror = () => {
-callback(['rgb(114,9,183)', 'rgb(156,136,255)']);
+applyColorScheme('#7209b7', '#9c88ff');
 };
 }
 
-function setDynamicLights(thumbnailURL) {
-getImageColors(thumbnailURL, (colors) => {
+function applyColorScheme(color1, color2) {
+const root = document.documentElement;
 const light1 = document.getElementById('mainLight1');
 const light2 = document.getElementById('mainLight2');
-if (colors[0]) {
-light1.style.background = `radial-gradient(circle, ${colors[0]} 0%, transparent 70%)`;
+const accentLight = document.getElementById('accentLight');
+light1.style.background = `radial-gradient(circle, ${color1} 0%, ${color1}cc 15%, ${color1}88 30%, ${color1}44 50%, transparent 65%)`;
+light2.style.background = `radial-gradient(circle, ${color2} 0%, ${color2}cc 15%, ${color2}88 30%, ${color2}44 50%, transparent 65%)`;
+accentLight.style.background = `radial-gradient(circle, ${color1}33 0%, ${color2}22 40%, transparent 60%)`;
+const gradient = `linear-gradient(90deg, #ffffff 0%, ${color1} 50%, ${color2} 100%)`;
+const gradientButton = `linear-gradient(135deg, ${color1} 0%, ${color2} 100%)`;
+root.style.setProperty('--gradient-primary', gradient);
+root.style.setProperty('--gradient-button', gradientButton);
+root.style.setProperty('--accent-color', color1);
+const rgb1 = hexToRgb(color1);
+const rgb2 = hexToRgb(color2);
+if (rgb1) {
+root.style.setProperty('--accent-color-rgba', `rgba(${rgb1.r}, ${rgb1.g}, ${rgb1.b}, 0.9)`);
+root.style.setProperty('--box-shadow-primary', `0 10px 25px rgba(${rgb1.r}, ${rgb1.g}, ${rgb1.b}, 0.35)`);
+root.style.setProperty('--box-shadow-primary-hover', `0 15px 40px rgba(${rgb1.r}, ${rgb1.g}, ${rgb1.b}, 0.55)`);
+root.style.setProperty('--accent-glow', `rgba(${rgb1.r}, ${rgb1.g}, ${rgb1.b}, 0.5)`);
 }
-if (colors[1]) {
-light2.style.background = `radial-gradient(circle, ${colors[1]} 0%, transparent 70%)`;
-}
+const particles = document.querySelectorAll('.particle');
+particles.forEach((particle, index) => {
+const particleColor = index % 2 === 0 ? color1 : color2;
+particle.style.setProperty('--particle-color', particleColor);
+particle.style.background = particleColor;
+particle.style.boxShadow = `0 0 12px ${particleColor}, 0 0 6px ${particleColor}`;
 });
 }
 
