@@ -99,6 +99,7 @@ scripts_data = [
         "script": '''loadstring(game:HttpGet("https://raw.githubusercontent.com/vqmpjayZ/More-Scripts/refs/heads/main/Vadrifts-Horrific-Housing.lua"))()''',
         "key_type": "no-key"
     },
+]
 
 def process_script_data(scripts):
     for script in scripts:
