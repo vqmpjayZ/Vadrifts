@@ -17,7 +17,7 @@ box-sizing: border-box;
 
 :root {
 --gradient-primary: linear-gradient(90deg, #ffffff 0%, #7209b7 100%);
---gradient-button: linear-gradient(135deg, #7209b7 0%, #ff9f43 100%);
+--gradient-button: linear-gradient(135deg, #7209b7 0%, #9c88ff 100%);
 --accent-color: #7209b7;
 --accent-color-rgba: rgba(114, 9, 183, 0.9);
 --box-shadow-primary: 0 10px 25px rgba(114, 9, 183, 0.35);
@@ -52,10 +52,10 @@ width: 1400px;
 height: 1400px;
 border-radius: 50%;
 filter: blur(160px);
-opacity: 0.35;
+opacity: 0;
 background: radial-gradient(circle, #6a00ff 0%, #3d008a 25%, transparent 65%);
 animation: slowPulse 18s ease-in-out infinite;
-transition: background 1.5s ease, opacity 1.5s ease;
+transition: opacity 1.2s ease;
 }
 
 #mainLight1 {
@@ -69,7 +69,6 @@ bottom: -300px;
 right: -300px;
 width: 1600px;
 height: 1600px;
-opacity: 0.3;
 animation-delay: -9s;
 }
 
@@ -82,16 +81,16 @@ left: 50%;
 transform: translate(-50%, -50%);
 border-radius: 50%;
 filter: blur(120px);
-opacity: 0.15;
-background: radial-gradient(circle, #ffffff 0%, transparent 60%);
+opacity: 0;
+background: radial-gradient(circle, #7209b7 0%, transparent 60%);
 animation: slowPulse 22s ease-in-out infinite;
 animation-delay: -5s;
-transition: background 1.5s ease;
+transition: opacity 1.2s ease;
 }
 
 @keyframes slowPulse {
-0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.15; }
-50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.25; }
+0%, 100% { transform: translate(-50%, -50%) scale(1); }
+50% { transform: translate(-50%, -50%) scale(1.15); }
 }
 
 .particles {
@@ -102,6 +101,12 @@ width: 100%;
 height: 100%;
 z-index: 2;
 pointer-events: none;
+opacity: 0;
+transition: opacity 1.5s ease;
+}
+
+.particles.visible {
+opacity: 1;
 }
 
 .particle {
@@ -113,7 +118,6 @@ border-radius: 50%;
 opacity: 0.7;
 box-shadow: 0 0 12px var(--particle-color), 0 0 6px var(--particle-color);
 animation: floatParticle 25s linear infinite;
-transition: background 1.5s ease, box-shadow 1.5s ease;
 }
 
 @keyframes floatParticle {
@@ -184,7 +188,7 @@ background-clip: text;
 -webkit-background-clip: text;
 -webkit-text-fill-color: transparent;
 text-decoration: none;
-transition: all 0.3s ease, background 1.5s ease;
+transition: transform 0.3s ease, filter 0.3s ease;
 }
 
 .nav-logo:hover {
@@ -273,7 +277,7 @@ border-radius: 15px;
 margin: 0 auto 20px;
 box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 60px var(--accent-glow);
 background: var(--gradient-primary);
-transition: box-shadow 1.5s ease, background 1.5s ease;
+transition: box-shadow 0.8s ease;
 }
 
 .script-game {
@@ -283,7 +287,6 @@ font-weight: 600;
 text-transform: uppercase;
 letter-spacing: 1px;
 margin-bottom: 10px;
-transition: color 1.5s ease, text-shadow 1.5s ease;
 text-shadow: 0 0 20px var(--accent-glow);
 }
 
@@ -296,7 +299,6 @@ background-clip: text;
 -webkit-text-fill-color: transparent;
 margin-bottom: 15px;
 letter-spacing: -1px;
-transition: background 1.5s ease;
 }
 
 .script-description {
@@ -338,7 +340,6 @@ background-clip: text;
 display: flex;
 align-items: center;
 gap: 10px;
-transition: background 1.5s ease;
 }
 
 .section-title-icon { width: 24px; height: 24px; }
@@ -360,7 +361,6 @@ color: #ccc;
 width: 20px; 
 height: 20px;
 color: var(--accent-color);
-transition: color 1.5s ease, filter 1.5s ease;
 filter: drop-shadow(0 0 4px var(--accent-glow));
 }
 
@@ -469,7 +469,7 @@ box-shadow: 0 15px 35px rgba(46,204,113,0.5);
 background: var(--gradient-button);
 color: white;
 box-shadow: var(--box-shadow-primary);
-transition: all 0.3s ease, background 1.5s ease, box-shadow 1.5s ease;
+transition: all 0.3s ease;
 }
 
 .key-btn:hover {
@@ -532,7 +532,6 @@ border-radius: 50%;
 border-top: 4px solid var(--accent-color);
 animation: spin 1s linear infinite;
 margin-bottom: 20px;
-transition: border-top-color 1.5s ease;
 }
 
 @keyframes spin {
@@ -570,6 +569,22 @@ font-family: 'Inter', sans-serif;
 .back-btn:hover {
 background: rgba(114,9,183,0.3);
 transform: translateY(-2px);
+}
+
+.color-fade-overlay {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+z-index: 5;
+pointer-events: none;
+opacity: 0;
+transition: opacity 0.6s ease;
+}
+
+.color-fade-overlay.visible {
+opacity: 1;
 }
 
 @media (max-width: 768px) {
@@ -723,6 +738,7 @@ Copy Game Link
 <script>
 let currentScript = null;
 let currentScriptId = null;
+let colorsApplied = false;
 
 function initLucideIcons() {
 if (window.lucide && lucide.createIcons) {
@@ -806,7 +822,19 @@ currentScript = await response.json();
 displayScript(currentScript);
 } catch (error) {
 showError();
+showDefaultLights();
 }
+}
+
+function showDefaultLights() {
+const light1 = document.getElementById('mainLight1');
+const light2 = document.getElementById('mainLight2');
+const accentLight = document.getElementById('accentLight');
+const particles = document.getElementById('particles');
+light1.style.opacity = '0.35';
+light2.style.opacity = '0.3';
+accentLight.style.opacity = '0.15';
+particles.classList.add('visible');
 }
 
 function displayScript(script) {
@@ -844,9 +872,7 @@ featuresList.innerHTML = (script.features || []).map(feature => `
 </li>
 `).join('');
 initLucideIcons();
-setTimeout(() => {
 extractAndApplyColors(script.thumbnail);
-}, 300);
 }
 
 function goToKeySystem() {
@@ -970,18 +996,25 @@ applyColorScheme('#7209b7', '#9c88ff');
 }
 
 function applyColorScheme(color1, color2) {
+if (colorsApplied) return;
+colorsApplied = true;
+
 const root = document.documentElement;
 const light1 = document.getElementById('mainLight1');
 const light2 = document.getElementById('mainLight2');
 const accentLight = document.getElementById('accentLight');
+const particles = document.getElementById('particles');
+
 light1.style.background = `radial-gradient(circle, ${color1} 0%, ${color1}cc 15%, ${color1}88 30%, ${color1}44 50%, transparent 65%)`;
 light2.style.background = `radial-gradient(circle, ${color2} 0%, ${color2}cc 15%, ${color2}88 30%, ${color2}44 50%, transparent 65%)`;
 accentLight.style.background = `radial-gradient(circle, ${color1}33 0%, ${color2}22 40%, transparent 60%)`;
+
 const gradient = `linear-gradient(90deg, #ffffff 0%, ${color1} 50%, ${color2} 100%)`;
 const gradientButton = `linear-gradient(135deg, ${color1} 0%, ${color2} 100%)`;
 root.style.setProperty('--gradient-primary', gradient);
 root.style.setProperty('--gradient-button', gradientButton);
 root.style.setProperty('--accent-color', color1);
+
 const rgb1 = hexToRgb(color1);
 const rgb2 = hexToRgb(color2);
 if (rgb1) {
@@ -990,12 +1023,21 @@ root.style.setProperty('--box-shadow-primary', `0 10px 25px rgba(${rgb1.r}, ${rg
 root.style.setProperty('--box-shadow-primary-hover', `0 15px 40px rgba(${rgb1.r}, ${rgb1.g}, ${rgb1.b}, 0.55)`);
 root.style.setProperty('--accent-glow', `rgba(${rgb1.r}, ${rgb1.g}, ${rgb1.b}, 0.5)`);
 }
-const particles = document.querySelectorAll('.particle');
-particles.forEach((particle, index) => {
+
+const particleElements = document.querySelectorAll('.particle');
+particleElements.forEach((particle, index) => {
 const particleColor = index % 2 === 0 ? color1 : color2;
-particle.style.setProperty('--particle-color', particleColor);
 particle.style.background = particleColor;
 particle.style.boxShadow = `0 0 12px ${particleColor}, 0 0 6px ${particleColor}`;
+});
+
+requestAnimationFrame(() => {
+setTimeout(() => {
+light1.style.opacity = '0.35';
+light2.style.opacity = '0.3';
+accentLight.style.opacity = '0.15';
+particles.classList.add('visible');
+}, 50);
 });
 }
 
