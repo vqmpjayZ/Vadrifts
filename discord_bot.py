@@ -5,7 +5,6 @@ import asyncio
 import random
 import re
 from datetime import datetime, timedelta
-import aiohttp
 from config import DISCORD_TOKEN
 
 TARGET_CHANNEL_ID = 1389210900489044048
@@ -17,8 +16,6 @@ CO_OWNER_ID = 1144213765424947251
 GUILD_ID = 1241797935100989594
 DELAY_SECONDS = 1
 BOOST_TEST_CHANNEL_ID = 1270301984897110148
-GITHUB_RAW_URL = "https://raw.githubusercontent.com/vqmpjayZ/Vadrifts-web/refs/heads/main/bot.txt"
-GITHUB_CHECK_INTERVAL = 30
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -31,7 +28,6 @@ last_meow_count = None
 cute_symbols = [">///<", "^-^", "o///o", "x3"]
 submitted_hwids = {}
 submitted_tester_hwids = {}
-remote_task = None
 
 async def send_good_boy_after_delay(user_id, channel):
     await asyncio.sleep(DELAY_SECONDS)
@@ -169,7 +165,7 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
-    words = re.findall(r'\bmeow\b', message.content, flags=re.IGNORECASE)
+    words = re.findall(r'\bmeow\b', message.content or "", flags=re.IGNORECASE)
     if words:
         meow_weights = [5,4,3,2,1,1]
         possible_counts = list(range(2,8))
@@ -206,41 +202,13 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-async def remote_command_loop():
-    await bot.wait_until_ready()
-    session = aiohttp.ClientSession()
-    try:
-        while not bot.is_closed():
-            try:
-                async with session.get(GITHUB_RAW_URL, timeout=10) as r:
-                    if r.status == 200:
-                        text = await r.text()
-                        lower = text.lower()
-                        if "restart" in lower or "stop" in lower or "shutdown" in lower or "close" in lower:
-                            await session.close()
-                            await bot.close()
-                            return
-                await asyncio.sleep(GITHUB_CHECK_INTERVAL)
-            except asyncio.CancelledError:
-                break
-            except Exception:
-                await asyncio.sleep(GITHUB_CHECK_INTERVAL)
-    finally:
-        try:
-            await session.close()
-        except:
-            pass
-
 @bot.event
 async def on_ready():
-    global remote_task
     print(f'Bot logged in as {bot.user}')
     try:
         await bot.tree.sync(guild=discord.Object(id=GUILD_ID))
     except Exception as e:
         print(f"Slash command sync failed: {e}")
-    if remote_task is None or remote_task.done():
-        remote_task = asyncio.create_task(remote_command_loop())
 
 def start_bot():
     bot.run(DISCORD_TOKEN)
