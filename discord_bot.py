@@ -160,12 +160,7 @@ async def authenticate_tester(interaction: discord.Interaction):
     view = TesterAuthButtonView()
     await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
-BOOST_TYPES = {
-    discord.MessageType.premium_guild_subscription,
-    discord.MessageType.premium_guild_subscription_tier_1,
-    discord.MessageType.premium_guild_subscription_tier_2,
-    discord.MessageType.premium_guild_subscription_tier_3,
-}
+BOOST_TYPES = {discord.MessageType.premium_guild_subscription}
 
 @bot.event
 async def on_message(message):
