@@ -5,6 +5,7 @@ import asyncio
 import random
 import re
 from datetime import datetime, timedelta
+import aiohttp
 from config import DISCORD_TOKEN
 
 TARGET_CHANNEL_ID = 1389210900489044048
@@ -16,9 +17,12 @@ CO_OWNER_ID = 1144213765424947251
 GUILD_ID = 1241797935100989594
 DELAY_SECONDS = 1
 BOOST_TEST_CHANNEL_ID = 1270301984897110148
+GITHUB_RAW_URL = "https://raw.githubusercontent.com/vqmpjayZ/Vadrifts-web/refs/heads/main/bot.txt"
+GITHUB_CHECK_INTERVAL = 30
 
 intents = discord.Intents.default()
 intents.message_content = True
+intents.members = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 recent_boosts = {}
@@ -27,6 +31,7 @@ last_meow_count = None
 cute_symbols = [">///<", "^-^", "o///o", "x3"]
 submitted_hwids = {}
 submitted_tester_hwids = {}
+remote_task = None
 
 async def send_good_boy_after_delay(user_id, channel):
     await asyncio.sleep(DELAY_SECONDS)
@@ -36,12 +41,7 @@ async def send_good_boy_after_delay(user_id, channel):
         pending_tasks.pop(user_id, None)
 
 class HWIDModal(discord.ui.Modal, title="Enter Your HWID"):
-    hwid = discord.ui.TextInput(
-        label="Paste your HWID here",
-        style=discord.TextStyle.short,
-        placeholder="Example: ABCDEFGH-1234-IJKL-5678-MNOPQRSTUVW",
-        required=True
-    )
+    hwid = discord.ui.TextInput(label="Paste your HWID here", style=discord.TextStyle.short, placeholder="Example: ABCDEFGH-1234-IJKL-5678-MNOPQRSTUVW", required=True)
     async def on_submit(self, interaction: discord.Interaction):
         user = interaction.user
         hwid_value = self.hwid.value.strip()
@@ -63,11 +63,7 @@ class HWIDModal(discord.ui.Modal, title="Enter Your HWID"):
         submitted_hwids[hwid_value] = now
         log_channel = bot.get_channel(LOG_CHANNEL_ID)
         owner = await bot.fetch_user(OWNER_ID)
-        embed = discord.Embed(
-            title="HWID Submitted",
-            description="Your HWID has been sent to the owner for authentication.\n\nIf the owner (<@1144213765424947251>) is online, this usually takes up to 50 minutes. Otherwise, allow up to 15+ hours.",
-            color=discord.Color.green()
-        )
+        embed = discord.Embed(title="HWID Submitted", description="Your HWID has been sent to the owner for authentication.\n\nIf the owner (<@1144213765424947251>) is online, this usually takes up to 50 minutes. Otherwise, allow up to 15+ hours.", color=discord.Color.green())
         await interaction.response.send_message(embed=embed, ephemeral=True)
         msg_embed = discord.Embed(title="New Authentication Request", color=discord.Color.blurple())
         msg_embed.add_field(name="Type", value="Premium", inline=False)
@@ -82,12 +78,7 @@ class HWIDModal(discord.ui.Modal, title="Enter Your HWID"):
                 pass
 
 class TesterHWIDModal(discord.ui.Modal, title="Enter Your HWID (Tester)"):
-    hwid = discord.ui.TextInput(
-        label="Paste your HWID here",
-        style=discord.TextStyle.short,
-        placeholder="Example: ABCDEFGH-1234-IJKL-5678-MNOPQRSTUVW",
-        required=True
-    )
+    hwid = discord.ui.TextInput(label="Paste your HWID here", style=discord.TextStyle.short, placeholder="Example: ABCDEFGH-1234-IJKL-5678-MNOPQRSTUVW", required=True)
     async def on_submit(self, interaction: discord.Interaction):
         user = interaction.user
         hwid_value = self.hwid.value.strip()
@@ -109,11 +100,7 @@ class TesterHWIDModal(discord.ui.Modal, title="Enter Your HWID (Tester)"):
         submitted_tester_hwids[hwid_value] = now
         log_channel = bot.get_channel(LOG_CHANNEL_ID)
         co_owner = await bot.fetch_user(CO_OWNER_ID)
-        embed = discord.Embed(
-            title="HWID Submitted (Tester)",
-            description=f"Your HWID has been sent to the Owner (<@{CO_OWNER_ID}>) for tester authentication.\n\nYou'll be contacted once reviewed.",
-            color=discord.Color.green()
-        )
+        embed = discord.Embed(title="HWID Submitted (Tester)", description=f"Your HWID has been sent to the Owner (<@{CO_OWNER_ID}>) for tester authentication.\n\nYou'll be contacted once reviewed.", color=discord.Color.green())
         await interaction.response.send_message(embed=embed, ephemeral=True)
         msg_embed = discord.Embed(title="New Tester Authentication Request", color=discord.Color.orange())
         msg_embed.add_field(name="Type", value="Script Tester", inline=False)
@@ -160,18 +147,7 @@ async def authenticate(interaction: discord.Interaction):
     if interaction.channel.id != AUTH_CHANNEL_ID:
         await interaction.response.send_message("You can only use this command in the designated authentication channel.", ephemeral=True)
         return
-    embed = discord.Embed(
-        title="Authenticate for Premium.",
-        description=(
-            "Authenticate to get access Premium benefits, follow these steps:\n\n"
-            "1 Run the following script in Roblox to copy your HWID:\n"
-            "```lua\nloadstring(game:HttpGet('https://raw.githubusercontent.com/vqmpjayZ/utils/refs/heads/main/CopyHWID.lua'))()\n```"
-            "2 Click 'Enter HWID' and submit your HWID.\n"
-            "3 Wait to get authenticated by mods.\n\n"
-            "If the owner is online, authentication may take up to 50 minutes. Otherwise, allow up to 15+ hours."
-        ),
-        color=discord.Color.blurple()
-    )
+    embed = discord.Embed(title="Authenticate for Premium.", description=("Authenticate to get access Premium benefits, follow these steps:\n\n1 Run the following script in Roblox to copy your HWID:\n```lua\nloadstring(game:HttpGet('https://raw.githubusercontent.com/vqmpjayZ/utils/refs/heads/main/CopyHWID.lua'))()\n```\n2 Click 'Enter HWID' and submit your HWID.\n3 Wait to get authenticated by mods.\n\nIf the owner is online, authentication may take up to 50 minutes. Otherwise, allow up to 15+ hours."), color=discord.Color.blurple())
     view = AuthButtonView()
     await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
@@ -180,20 +156,16 @@ async def authenticate_tester(interaction: discord.Interaction):
     if interaction.channel.id != TESTER_AUTH_CHANNEL_ID:
         await interaction.response.send_message("You can only use this command in the designated tester authentication channel.", ephemeral=True)
         return
-    embed = discord.Embed(
-        title="Authenticate for Script Tester.",
-        description=(
-            "Authenticate to get access as a Script Tester, follow these steps:\n\n"
-            "1 Run the following script in Roblox to copy your HWID:\n"
-            "```lua\nloadstring(game:HttpGet('https://raw.githubusercontent.com/vqmpjayZ/utils/refs/heads/main/CopyHWID.lua'))()\n```"
-            "2 Click 'Enter HWID' and submit your HWID.\n"
-            "3 Wait to get authenticated by the co-owner.\n\n"
-            "Your request will be reviewed by the co-owner."
-        ),
-        color=discord.Color.orange()
-    )
+    embed = discord.Embed(title="Authenticate for Script Tester.", description=("Authenticate to get access as a Script Tester, follow these steps:\n\n1 Run the following script in Roblox to copy your HWID:\n```lua\nloadstring(game:HttpGet('https://raw.githubusercontent.com/vqmpjayZ/utils/refs/heads/main/CopyHWID.lua'))()\n```\n2 Click 'Enter HWID' and submit your HWID.\n3 Wait to get authenticated by the co-owner.\n\nYour request will be reviewed by the co-owner."), color=discord.Color.orange())
     view = TesterAuthButtonView()
     await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+
+BOOST_TYPES = {
+    discord.MessageType.premium_guild_subscription,
+    discord.MessageType.premium_guild_subscription_tier_1,
+    discord.MessageType.premium_guild_subscription_tier_2,
+    discord.MessageType.premium_guild_subscription_tier_3,
+}
 
 @bot.event
 async def on_message(message):
@@ -221,28 +193,62 @@ async def on_message(message):
 
     boost_channels = {TARGET_CHANNEL_ID, BOOST_TEST_CHANNEL_ID}
     if message.channel.id in boost_channels:
-        content = message.content.lower()
+        content = message.content.lower() if message.content else ""
         is_text_boost = ("boosted the server" in content or "just boosted" in content)
-        is_system_boost = (message.type == discord.MessageType.default and message.author.bot)
-
+        is_system_boost = message.type in BOOST_TYPES
         if is_text_boost or is_system_boost:
+            if not message.author:
+                return
             user_id = message.author.id
             if user_id not in recent_boosts:
                 recent_boosts[user_id] = True
                 if user_id in pending_tasks:
-                    pending_tasks[user_id].cancel()
+                    try:
+                        pending_tasks[user_id].cancel()
+                    except:
+                        pass
                 pending_tasks[user_id] = bot.loop.create_task(send_good_boy_after_delay(user_id, message.channel))
 
     await bot.process_commands(message)
 
+async def remote_command_loop():
+    await bot.wait_until_ready()
+    session = aiohttp.ClientSession()
+    try:
+        while not bot.is_closed():
+            try:
+                async with session.get(GITHUB_RAW_URL, timeout=10) as r:
+                    if r.status == 200:
+                        text = await r.text()
+                        lower = text.lower()
+                        if "restart" in lower or "stop" in lower or "shutdown" in lower or "close" in lower:
+                            await session.close()
+                            await bot.close()
+                            return
+                await asyncio.sleep(GITHUB_CHECK_INTERVAL)
+            except asyncio.CancelledError:
+                break
+            except Exception:
+                await asyncio.sleep(GITHUB_CHECK_INTERVAL)
+    finally:
+        try:
+            await session.close()
+        except:
+            pass
+
 @bot.event
 async def on_ready():
+    global remote_task
     print(f'Bot logged in as {bot.user}')
     try:
         await bot.tree.sync(guild=discord.Object(id=GUILD_ID))
-        print("Commands synced successfully!")
     except Exception as e:
         print(f"Slash command sync failed: {e}")
+    if remote_task is None or remote_task.done():
+        remote_task = asyncio.create_task(remote_command_loop())
 
 def start_bot():
     bot.run(DISCORD_TOKEN)
+
+if __name__ == "__main__":
+    start_bot()
