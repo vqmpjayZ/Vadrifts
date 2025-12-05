@@ -48,19 +48,19 @@ def parse_bypass_mappings(code_text):
         us_char_match = re.search(r'local US_CHAR = "([^"]*)"', code_text)
         us_char = us_char_match.group(1) if us_char_match else ""
         print(f"Found US_CHAR: '{us_char}'")
-        
-        auto_logic_pattern = r'if currentMethod == "auto" then\s*local bypassLogic = \{(.*?)\}'
-        match = re.search(auto_logic_pattern, code_text, re.DOTALL)
+
+        pattern = r'if currentMethod == "auto" then\s*local bypassLogic = \{(.*?)\}'
+        match = re.search(pattern, code_text, re.DOTALL)
         
         if not match:
-            print("Could not find auto method bypassLogic pattern")
+            print("Could not find auto method pattern")
             return None
         
         print("Found auto method bypassLogic table")
         table_content = match.group(1)
         methods = {}
-        method_pattern = r'\[(\d+)\] = \{([^}]+)\}'
         
+        method_pattern = r'\[(\d+)\] = \{([^}]+)\}'
         method_matches = list(re.finditer(method_pattern, table_content))
         print(f"Found {len(method_matches)} methods")
         
@@ -68,28 +68,36 @@ def parse_bypass_mappings(code_text):
             method_num = int(method_match.group(1))
             mappings_str = method_match.group(2)
             mappings = {}
-            char_pattern = r'(\w+)="([^"]*)"'
+
+            char_pattern = r'(\w+)="([^"]*)"|\[" "\]=US_CHAR'
             
-            char_matches = list(re.finditer(char_pattern, mappings_str))
-            print(f"Method {method_num}: found {len(char_matches)} character mappings")
-            
-            for char_match in char_matches:
-                key = char_match.group(1)
-                value = char_match.group(2)
-                mappings[key] = value
+            for char_match in re.finditer(char_pattern, mappings_str):
+                if char_match.group(1):
+                    key = char_match.group(1)
+                    value = char_match.group(2)
+                    mappings[key] = value
+                else:
+                    mappings[" "] = us_char
             
             methods[str(method_num)] = mappings
+            print(f"Method {method_num}: {len(mappings)} mappings")
         
         result = {
             "us_char": us_char,
             "methods": methods,
-            "prefix": "", 
+            "prefix": "",
             "suffix": "",
             "timestamp": datetime.utcnow().isoformat()
         }
         
         print(f"Successfully parsed {len(methods)} methods")
         return result
+        
+    except Exception as e:
+        print(f"Error parsing bypass mappings: {e}")
+        import traceback
+        traceback.print_exc()
+        return None
         
     except Exception as e:
         print(f"Error parsing bypass mappings: {e}")
