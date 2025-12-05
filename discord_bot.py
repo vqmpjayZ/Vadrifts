@@ -43,54 +43,69 @@ async def send_good_boy_after_delay(user_id, channel):
 
 def parse_bypass_mappings(code_text):
     try:
+        print("Starting to parse bypass mappings...")
+        
         us_char_match = re.search(r'local US_CHAR = "([^"]*)"', code_text)
         us_char = us_char_match.group(1) if us_char_match else ""
+        print(f"Found US_CHAR: '{us_char}'")
         
         premium_logic_pattern = r'local premiumLogicRaw = \{(.*?)\n\}'
         match = re.search(premium_logic_pattern, code_text, re.DOTALL)
         
         if not match:
+            print("Could not find premiumLogicRaw pattern")
             return None
         
+        print("Found premiumLogicRaw table")
         table_content = match.group(1)
         methods = {}
         method_pattern = r'\[(\d+)\] = \{([^}]+)\}'
         
-        for method_match in re.finditer(method_pattern, table_content):
+        method_matches = list(re.finditer(method_pattern, table_content))
+        print(f"Found {len(method_matches)} methods")
+        
+        for method_match in method_matches:
             method_num = int(method_match.group(1))
             mappings_str = method_match.group(2)
             mappings = {}
             char_pattern = r'(\w+)="([^"]*)"'
             
-            for char_match in re.finditer(char_pattern, mappings_str):
+            char_matches = list(re.finditer(char_pattern, mappings_str))
+            print(f"Method {method_num}: found {len(char_matches)} character mappings")
+            
+            for char_match in char_matches:
                 key = char_match.group(1)
                 value = char_match.group(2)
                 mappings[key] = value
             
             methods[str(method_num)] = mappings
         
-        wrapper_match = re.search(r'return "\{㍰".*?"㍰\}"', code_text)
-        has_wrappers = wrapper_match is not None
-        
-        return {
+        result = {
             "us_char": us_char,
             "methods": methods,
-            "prefix": "㍰" if has_wrappers else "",
-            "suffix": "㍰" if has_wrappers else "",
+            "prefix": "㍰",
+            "suffix": "㍰", 
             "timestamp": datetime.utcnow().isoformat()
         }
+        
+        print(f"Successfully parsed {len(methods)} methods")
+        return result
+        
     except Exception as e:
         print(f"Error parsing bypass mappings: {e}")
         return None
 
 async def update_bypass_data(data):
     try:
+        print(f"Attempting to update bypass data to {WEBSITE_URL}/api/update_bypass")
         async with aiohttp.ClientSession() as session:
             async with session.post(
                 f'{WEBSITE_URL}/api/update_bypass',
                 json=data,
                 headers={'Authorization': API_SECRET}
             ) as resp:
+                response_text = await resp.text()
+                print(f"Server response: {resp.status} - {response_text}")
                 return resp.status == 200
     except Exception as e:
         print(f"Error updating bypass data: {e}")
