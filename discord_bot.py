@@ -19,7 +19,7 @@ GUILD_ID = 1241797935100989594
 DELAY_SECONDS = 1
 BOOST_TEST_CHANNEL_ID = 1270301984897110148
 
-WEBSITE_URL = "http://vadrifts.onrender.com"
+WEBSITE_URL = "https://vadrifts.onrender.com"
 API_SECRET = "vadriftsisalwaysinseason"
 
 intents = discord.Intents.default()
