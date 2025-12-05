@@ -4,6 +4,8 @@ from discord.ext import commands
 import asyncio
 import random
 import re
+import json
+import aiohttp
 from datetime import datetime, timedelta
 from config import DISCORD_TOKEN
 
@@ -16,6 +18,9 @@ CO_OWNER_ID = 1144213765424947251
 GUILD_ID = 1241797935100989594
 DELAY_SECONDS = 1
 BOOST_TEST_CHANNEL_ID = 1270301984897110148
+
+WEBSITE_URL = "http://vadrifts.onrender.com"
+API_SECRET = "vadriftsisalwaysinseason"
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -35,6 +40,65 @@ async def send_good_boy_after_delay(user_id, channel):
         await channel.send(f"<@{user_id}> good boy")
         recent_boosts.pop(user_id, None)
         pending_tasks.pop(user_id, None)
+
+def parse_bypass_mappings(code_text):
+    try:
+        us_char_match = re.search(r'local US_CHAR = "([^"]*)"', code_text)
+        us_char = us_char_match.group(1) if us_char_match else ""
+        
+        premium_logic_pattern = r'local premiumLogicRaw = \{(.*?)\n\}'
+        match = re.search(premium_logic_pattern, code_text, re.DOTALL)
+        
+        if not match:
+            return None
+        
+        table_content = match.group(1)
+        methods = {}
+        method_pattern = r'\[(\d+)\] = \{([^}]+)\}'
+        
+        for method_match in re.finditer(method_pattern, table_content):
+            method_num = int(method_match.group(1))
+            mappings_str = method_match.group(2)
+            mappings = {}
+            char_pattern = r'(\w+)="([^"]*)"'
+            
+            for char_match in re.finditer(char_pattern, mappings_str):
+                key = char_match.group(1)
+                value = char_match.group(2)
+                mappings[key] = value
+            
+            methods[str(method_num)] = mappings
+        
+        wrapper_match = re.search(r'return "\{㍰".*?"㍰\}"', code_text)
+        has_wrappers = wrapper_match is not None
+        
+        return {
+            "us_char": us_char,
+            "methods": methods,
+            "prefix": "㍰" if has_wrappers else "",
+            "suffix": "㍰" if has_wrappers else "",
+            "timestamp": datetime.utcnow().isoformat()
+        }
+    except Exception as e:
+        print(f"Error parsing bypass mappings: {e}")
+        return None
+
+async def update_bypass_data(data):
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                f'{WEBSITE_URL}/api/update_bypass',
+                json=data,
+                headers={'Authorization': API_SECRET}
+            ) as resp:
+                return resp.status == 200
+    except Exception as e:
+        print(f"Error updating bypass data: {e}")
+        return False
+
+def validate_bypass_code(content):
+    required_markers = ["premiumLogicRaw", "local US_CHAR", "WindUI"]
+    return all(marker in content for marker in required_markers)
 
 class HWIDModal(discord.ui.Modal, title="Enter Your HWID"):
     hwid = discord.ui.TextInput(label="Paste your HWID here", style=discord.TextStyle.short, placeholder="Example: ABCDEFGH-1234-IJKL-5678-MNOPQRSTUVW", required=True)
@@ -164,6 +228,27 @@ async def on_message(message):
 
     if message.author == bot.user:
         return
+
+    if isinstance(message.channel, discord.DMChannel) and message.author.id == OWNER_ID:
+        content = message.content
+        
+        if validate_bypass_code(content):
+            try:
+                extracted_data = parse_bypass_mappings(content)
+                
+                if extracted_data:
+                    success = await update_bypass_data(extracted_data)
+                    
+                    if success:
+                        await message.channel.send("✅ Bypass mappings updated successfully!")
+                    else:
+                        await message.channel.send("❌ Failed to update mappings on server")
+                else:
+                    await message.channel.send("❌ Could not extract mappings from code")
+            except Exception as e:
+                await message.channel.send(f"❌ Error processing code: {str(e)}")
+                print(f"Error in bypass update: {e}")
+            return
 
     words = re.findall(r'\bmeow\b', message.content or "", flags=re.IGNORECASE)
     if words:
