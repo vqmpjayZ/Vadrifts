@@ -48,6 +48,66 @@ def scripts_page():
         logger.error("scripts.html template not found")
         return jsonify({"error": "Scripts page not found"}), 404
 
+import json
+from functools import wraps
+
+API_SECRET = "vadriftsisalwaysinseason"
+
+def require_api_key(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        auth_header = request.headers.get('Authorization')
+        if auth_header != API_SECRET:
+            return jsonify({"error": "Unauthorized"}), 401
+        return f(*args, **kwargs)
+    return decorated_function
+
+@app.route('/api/update_bypass', methods=['POST'])
+@require_api_key
+def update_bypass():
+    try:
+        data = request.get_json()
+        
+        with open('bypass_mappings.json', 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        
+        logger.info(f"Bypass mappings updated at {data.get('timestamp')}")
+        return jsonify({"success": True, "message": "Mappings updated"})
+    except Exception as e:
+        logger.error(f"Error updating bypass mappings: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/bypass_mappings', methods=['GET'])
+def get_bypass_mappings():
+    try:
+        with open('bypass_mappings.json', 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        
+        lua_output = f'''local US_CHAR = "{data.get('us_char', '')}"
+local prefix = "{data.get('prefix', '')}"
+local suffix = "{data.get('suffix', '')}"
+
+local bypassLogic = {{
+'''
+        
+        for method_num, mappings in sorted(data.get('methods', {}).items(), key=lambda x: int(x[0])):
+            lua_output += f"    [{method_num}] = {{"
+            
+            for key, value in mappings.items():
+                lua_output += f'{key}="{value}",'
+            
+            lua_output += f'[" "]=US_CHAR,["/"]="⁄"}},\n'
+        
+        lua_output += "}\n\nreturn {US_CHAR=US_CHAR, prefix=prefix, suffix=suffix, bypassLogic=bypassLogic}"
+        
+        return lua_output, 200, {'Content-Type': 'text/plain; charset=utf-8'}
+    
+    except FileNotFoundError:
+        return "-- No mappings available yet", 404
+    except Exception as e:
+        logger.error(f"Error serving bypass mappings: {e}")
+        return f"-- Error: {str(e)}", 500
+        
 @app.route('/plugins')
 def plugins_page():
     try:
