@@ -49,14 +49,14 @@ def parse_bypass_mappings(code_text):
         us_char = us_char_match.group(1) if us_char_match else ""
         print(f"Found US_CHAR: '{us_char}'")
         
-        premium_logic_pattern = r'local premiumLogicRaw = \{(.*?)\n\}'
-        match = re.search(premium_logic_pattern, code_text, re.DOTALL)
+        auto_logic_pattern = r'if currentMethod == "auto" then\s*local bypassLogic = \{(.*?)\}'
+        match = re.search(auto_logic_pattern, code_text, re.DOTALL)
         
         if not match:
-            print("Could not find premiumLogicRaw pattern")
+            print("Could not find auto method bypassLogic pattern")
             return None
         
-        print("Found premiumLogicRaw table")
+        print("Found auto method bypassLogic table")
         table_content = match.group(1)
         methods = {}
         method_pattern = r'\[(\d+)\] = \{([^}]+)\}'
@@ -83,13 +83,17 @@ def parse_bypass_mappings(code_text):
         result = {
             "us_char": us_char,
             "methods": methods,
-            "prefix": "㍰",
-            "suffix": "㍰", 
+            "prefix": "", 
+            "suffix": "",
             "timestamp": datetime.utcnow().isoformat()
         }
         
         print(f"Successfully parsed {len(methods)} methods")
         return result
+        
+    except Exception as e:
+        print(f"Error parsing bypass mappings: {e}")
+        return None
         
     except Exception as e:
         print(f"Error parsing bypass mappings: {e}")
