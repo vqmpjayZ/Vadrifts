@@ -230,9 +230,22 @@ async def on_message(message):
         return
 
     if isinstance(message.channel, discord.DMChannel) and message.author.id == OWNER_ID:
-        content = message.content
+        content = ""
         
-        if validate_bypass_code(content):
+        if message.content:
+            content = message.content
+        elif message.attachments:
+            for attachment in message.attachments:
+                if attachment.filename.endswith(('.lua', '.txt')):
+                    try:
+                        file_content = await attachment.read()
+                        content = file_content.decode('utf-8')
+                        break
+                    except:
+                        await message.channel.send("❌ Could not read file")
+                        return
+        
+        if content and validate_bypass_code(content):
             try:
                 extracted_data = parse_bypass_mappings(content)
                 
