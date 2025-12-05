@@ -1,5 +1,7 @@
 import os
 import logging
+import json
+from functools import wraps
 from flask import Flask, request, jsonify, send_file, redirect, send_from_directory, make_response
 from datetime import datetime
 
@@ -25,6 +27,8 @@ youtube_finder = YouTubeChannelFinder()
 plugins_manager = PluginsManager()
 key_system = KeySystemManager()
 
+API_SECRET = "vadriftsisalwaysinseason"
+
 @app.route('/')
 def home():
     try:
@@ -47,11 +51,6 @@ def scripts_page():
     except FileNotFoundError:
         logger.error("scripts.html template not found")
         return jsonify({"error": "Scripts page not found"}), 404
-
-import json
-from functools import wraps
-
-API_SECRET = "vadriftsisalwaysinseason"
 
 def require_api_key(f):
     @wraps(f)
@@ -223,7 +222,6 @@ def converter():
 
 @app.route('/key-system')
 def key_system_page():
-    """Serve the key system page"""
     try:
         return send_file('templates/key-system.html')
     except FileNotFoundError:
@@ -232,7 +230,6 @@ def key_system_page():
 
 @app.route('/verify')
 def verify_page():
-    """Serve the verification page"""
     try:
         return send_file('templates/verify.html')
     except FileNotFoundError:
@@ -241,7 +238,6 @@ def verify_page():
 
 @app.route('/create')
 def create_key():
-    """Create a key link with HWID"""
     hwid = request.args.get('hwid')
     if not hwid:
         return "Missing HWID", 400
@@ -254,7 +250,6 @@ def create_key():
 
 @app.route('/getkey/<slug>')
 def get_key(slug):
-    """Get key from slug and consume it"""
     hwid = key_system.get_hwid_from_slug(slug)
     
     if not hwid:
@@ -273,7 +268,6 @@ def plugin_detail(plugin_id):
     if not plugin:
         return jsonify({"error": "Plugin not found"}), 404
     
-    import json
     html = f"""
     <!DOCTYPE html>
     <html>
