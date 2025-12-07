@@ -83,9 +83,6 @@ def get_bypass_mappings():
             data = json.load(f)
         
         lua_output = f'''local US_CHAR = "{data.get('us_char', '')}"
-local prefix = "{data.get('prefix', '')}"
-local suffix = "{data.get('suffix', '')}"
-
 local bypassLogic = {{
 '''
         
@@ -97,7 +94,14 @@ local bypassLogic = {{
             
             lua_output += f'[" "]=US_CHAR,["/"]="⁄"}},\n'
         
-        lua_output += "}\n\nreturn {US_CHAR=US_CHAR, prefix=prefix, suffix=suffix, bypassLogic=bypassLogic}"
+        priority_order = data.get('priority_order', [7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6])
+        priority_str = '{' + ','.join(map(str, priority_order)) + '}'
+        
+        lua_output += f'''}}
+
+local priorityOrder = {priority_str}
+
+return {{US_CHAR=US_CHAR, bypassLogic=bypassLogic, priorityOrder=priorityOrder}}'''
         
         return lua_output, 200, {'Content-Type': 'text/plain; charset=utf-8'}
     
