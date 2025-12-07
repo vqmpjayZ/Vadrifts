@@ -48,18 +48,23 @@ def parse_bypass_mappings(code_text):
         us_char_match = re.search(r'local US_CHAR = "([^"]*)"', code_text)
         us_char = us_char_match.group(1) if us_char_match else ""
         print(f"Found US_CHAR: '{us_char}'")
-        
-        auto_logic_pattern = r'if currentMethod == "auto" then\s*local bypassLogic = \{(.*?)\}'
+
+        auto_logic_pattern = r'if currentMethod == "auto" then\s*local bypassLogic = \{((?:[^{}]*\{[^}]*\}[^{}]*)*)\}'
         match = re.search(auto_logic_pattern, code_text, re.DOTALL)
         
         if not match:
-            print("Could not find auto method pattern")
-            return None
+            print("Could not find auto method pattern, trying alternative...")
+            alt_pattern = r'local bypassLogic = \{(\s*\[\d+\]\s*=\s*\{[^}]+\}[,\s]*)+\s*\}'
+            match = re.search(alt_pattern, code_text, re.DOTALL)
+            
+            if not match:
+                print("Could not find bypassLogic table at all")
+                return None
         
         print("Found auto method bypassLogic table")
-        table_content = match.group(1)
+        table_content = match.group(1) if match.group(1) else match.group(0)
         methods = {}
-        
+
         method_pattern = r'\[(\d+)\]\s*=\s*\{([^}]+)\}'
         method_matches = list(re.finditer(method_pattern, table_content))
         print(f"Found {len(method_matches)} methods in auto logic")
@@ -68,20 +73,20 @@ def parse_bypass_mappings(code_text):
             method_num = int(method_match.group(1))
             mappings_str = method_match.group(2)
             mappings = {}
-            
+
             char_pattern = r'(\w+)="([^"]*)"'
             for char_match in re.finditer(char_pattern, mappings_str):
                 key = char_match.group(1)
                 value = char_match.group(2)
                 mappings[key] = value
-            
+
             if '[" "]=US_CHAR' in mappings_str:
                 mappings[" "] = us_char
             
             methods[str(method_num)] = mappings
-            print(f"Auto method {method_num}: {len(mappings)} mappings")
-        
-        priority_pattern = r'priorityOrder = \{([^}]+)\}'
+            print(f"Method {method_num}: found {len(mappings)} character mappings")
+
+        priority_pattern = r'priorityOrder\s*=\s*\{([^}]+)\}'
         priority_match = re.search(priority_pattern, code_text)
         priority_order = [7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6]
         
@@ -100,7 +105,14 @@ def parse_bypass_mappings(code_text):
         }
         
         print(f"Successfully parsed {len(methods)} auto methods")
+        print(f"Sample method 1 mappings: {methods.get('1', {})}")
         return result
+        
+    except Exception as e:
+        print(f"Error parsing bypass mappings: {e}")
+        import traceback
+        traceback.print_exc()
+        return None
         
     except Exception as e:
         print(f"Error parsing bypass mappings: {e}")
@@ -145,7 +157,7 @@ async def update_bypass_data(data):
         return False
 
 def validate_bypass_code(content):
-    required_markers = ["premiumLogicRaw", "local US_CHAR", "WindUI"]
+    required_markers = ["bypassLogic", "local US_CHAR", "currentMethod"]
     return all(marker in content for marker in required_markers)
 
 class HWIDModal(discord.ui.Modal, title="Enter Your HWID"):
