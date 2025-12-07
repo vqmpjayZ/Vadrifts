@@ -49,22 +49,17 @@ def parse_bypass_mappings(code_text):
         us_char = us_char_match.group(1) if us_char_match else ""
         print(f"Found US_CHAR: '{us_char}'")
         
-        convert_func_pattern = r'local function convert\(.*?\)\s*.*?if currentMethod == "auto" then\s*local bypassLogic = \{(.*?)\s*\}\s*for i = 1, 6 do'
-        match = re.search(convert_func_pattern, code_text, re.DOTALL)
+        auto_logic_pattern = r'if currentMethod == "auto" then\s*local bypassLogic = \{(.*?)\}'
+        match = re.search(auto_logic_pattern, code_text, re.DOTALL)
         
         if not match:
-            print("Could not find auto method in convert function")
-            alt_pattern = r'currentMethod == "auto".*?local bypassLogic = \{(.*?)\s*\}'
-            match = re.search(alt_pattern, code_text, re.DOTALL)
-            
-            if not match:
-                print("Could not find auto method with alternative pattern either")
-                return None
+            print("Could not find auto method pattern")
+            return None
         
         print("Found auto method bypassLogic table")
         table_content = match.group(1)
         methods = {}
-
+        
         method_pattern = r'\[(\d+)\]\s*=\s*\{([^}]+)\}'
         method_matches = list(re.finditer(method_pattern, table_content))
         print(f"Found {len(method_matches)} methods in auto logic")
@@ -73,29 +68,45 @@ def parse_bypass_mappings(code_text):
             method_num = int(method_match.group(1))
             mappings_str = method_match.group(2)
             mappings = {}
-
+            
             char_pattern = r'(\w+)="([^"]*)"'
             for char_match in re.finditer(char_pattern, mappings_str):
                 key = char_match.group(1)
                 value = char_match.group(2)
                 mappings[key] = value
-
+            
             if '[" "]=US_CHAR' in mappings_str:
                 mappings[" "] = us_char
             
             methods[str(method_num)] = mappings
             print(f"Auto method {method_num}: {len(mappings)} mappings")
         
+        priority_pattern = r'priorityOrder = \{([^}]+)\}'
+        priority_match = re.search(priority_pattern, code_text)
+        priority_order = [7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6]
+        
+        if priority_match:
+            priority_str = priority_match.group(1)
+            priority_nums = re.findall(r'\d+', priority_str)
+            if priority_nums:
+                priority_order = [int(x) for x in priority_nums]
+                print(f"Found priority order: {priority_order}")
+        
         result = {
             "us_char": us_char,
             "methods": methods,
-            "prefix": "",
-            "suffix": "",
+            "priority_order": priority_order,
             "timestamp": datetime.utcnow().isoformat()
         }
         
         print(f"Successfully parsed {len(methods)} auto methods")
         return result
+        
+    except Exception as e:
+        print(f"Error parsing bypass mappings: {e}")
+        import traceback
+        traceback.print_exc()
+        return None
         
     except Exception as e:
         print(f"Error parsing bypass mappings: {e}")
