@@ -87,12 +87,15 @@ local bypassLogic = {{
 '''
         
         for method_num, mappings in sorted(data.get('methods', {}).items(), key=lambda x: int(x[0])):
-            lua_output += f"    [{method_num}] = {{"
+            lua_output += f"    [{int(method_num)}] = {{"
             
             for key, value in mappings.items():
-                lua_output += f'{key}="{value}",'
+                if key == " ":
+                    lua_output += f'[" "]=US_CHAR,'
+                else:
+                    lua_output += f'{key}="{value}",'
             
-            lua_output += f'[" "]=US_CHAR,["/"]="⁄"}},\n'
+            lua_output += f'["/"]="⁄"}},\n'
         
         priority_order = data.get('priority_order', [7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6])
         priority_str = '{' + ','.join(map(str, priority_order)) + '}'
