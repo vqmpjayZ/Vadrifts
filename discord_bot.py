@@ -48,44 +48,82 @@ def parse_bypass_mappings(code_text):
         us_char_match = re.search(r'local US_CHAR = "([^"]*)"', code_text)
         us_char = us_char_match.group(1) if us_char_match else ""
         print(f"Found US_CHAR: '{us_char}'")
-
-        auto_logic_pattern = r'if currentMethod == "auto" then\s*local bypassLogic = \{((?:[^{}]*\{[^}]*\}[^{}]*)*)\}'
-        match = re.search(auto_logic_pattern, code_text, re.DOTALL)
         
-        if not match:
-            print("Could not find auto method pattern, trying alternative...")
-            alt_pattern = r'local bypassLogic = \{(\s*\[\d+\]\s*=\s*\{[^}]+\}[,\s]*)+\s*\}'
-            match = re.search(alt_pattern, code_text, re.DOTALL)
-            
-            if not match:
-                print("Could not find bypassLogic table at all")
-                return None
+        auto_start = code_text.find('if currentMethod == "auto" then')
+        if auto_start == -1:
+            print("Could not find auto method section")
+            return None
         
-        print("Found auto method bypassLogic table")
-        table_content = match.group(1) if match.group(1) else match.group(0)
+        logic_start = code_text.find('local bypassLogic = {', auto_start)
+        if logic_start == -1:
+            print("Could not find bypassLogic table")
+            return None
+        
+        brace_count = 0
+        pos = logic_start + len('local bypassLogic = {')
+        start_pos = pos
+        
+        while pos < len(code_text):
+            if code_text[pos] == '{':
+                brace_count += 1
+            elif code_text[pos] == '}':
+                if brace_count == 0:
+                    break
+                brace_count -= 1
+            pos += 1
+        
+        if pos >= len(code_text):
+            print("Could not find closing brace for bypassLogic")
+            return None
+        
+        table_content = code_text[start_pos:pos]
+        print(f"Extracted table content length: {len(table_content)}")
+        
         methods = {}
-
-        method_pattern = r'\[(\d+)\]\s*=\s*\{([^}]+)\}'
-        method_matches = list(re.finditer(method_pattern, table_content))
-        print(f"Found {len(method_matches)} methods in auto logic")
         
-        for method_match in method_matches:
-            method_num = int(method_match.group(1))
-            mappings_str = method_match.group(2)
-            mappings = {}
-
-            char_pattern = r'(\w+)="([^"]*)"'
-            for char_match in re.finditer(char_pattern, mappings_str):
-                key = char_match.group(1)
-                value = char_match.group(2)
-                mappings[key] = value
-
-            if '[" "]=US_CHAR' in mappings_str:
-                mappings[" "] = us_char
+        i = 0
+        while i < len(table_content):
+            match = re.search(r'\[(\d+)\]\s*=\s*\{', table_content[i:])
+            if not match:
+                break
+            method_num = int(match.group(1))
+            start = i + match.start()
             
-            methods[str(method_num)] = mappings
-            print(f"Method {method_num}: found {len(mappings)} character mappings")
-
+            brace_start = i + match.end() - 1
+            brace_count = 1
+            pos = brace_start + 1
+            
+            while pos < len(table_content) and brace_count > 0:
+                if table_content[pos] == '{':
+                    brace_count += 1
+                elif table_content[pos] == '}':
+                    brace_count -= 1
+                pos += 1
+            
+            if brace_count == 0:
+                method_content = table_content[brace_start + 1:pos - 1]
+                
+                mappings = {}
+                char_pattern = r'(\w+)="([^"]*)"'
+                for char_match in re.finditer(char_pattern, method_content):
+                    key = char_match.group(1)
+                    value = char_match.group(2)
+                    mappings[key] = value
+                
+                if '[" "]=US_CHAR' in method_content:
+                    mappings[" "] = us_char
+                
+                methods[str(method_num)] = mappings
+                print(f"Method {method_num}: found {len(mappings)} mappings")
+                
+                i = pos
+            else:
+                i += match.end()
+        
+        if not methods:
+            print("No methods found!")
+            return None
+        
         priority_pattern = r'priorityOrder\s*=\s*\{([^}]+)\}'
         priority_match = re.search(priority_pattern, code_text)
         priority_order = [7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6]
@@ -104,8 +142,7 @@ def parse_bypass_mappings(code_text):
             "timestamp": datetime.utcnow().isoformat()
         }
         
-        print(f"Successfully parsed {len(methods)} auto methods")
-        print(f"Sample method 1 mappings: {methods.get('1', {})}")
+        print(f"Successfully parsed {len(methods)} methods")
         return result
         
     except Exception as e:
@@ -114,32 +151,6 @@ def parse_bypass_mappings(code_text):
         traceback.print_exc()
         return None
         
-    except Exception as e:
-        print(f"Error parsing bypass mappings: {e}")
-        import traceback
-        traceback.print_exc()
-        return None
-        
-    except Exception as e:
-        print(f"Error parsing bypass mappings: {e}")
-        import traceback
-        traceback.print_exc()
-        return None
-        
-    except Exception as e:
-        print(f"Error parsing bypass mappings: {e}")
-        import traceback
-        traceback.print_exc()
-        return None
-        
-    except Exception as e:
-        print(f"Error parsing bypass mappings: {e}")
-        return None
-        
-    except Exception as e:
-        print(f"Error parsing bypass mappings: {e}")
-        return None
-
 async def update_bypass_data(data):
     try:
         print(f"Attempting to update bypass data to {WEBSITE_URL}/api/update_bypass")
