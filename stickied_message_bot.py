@@ -1,16 +1,16 @@
 import os
 import asyncio
 import json
-from discord import Intents, Embed
+import discord
 from discord.ext import commands
+from discord import Embed
 from discord import app_commands
 
-intents = Intents.default()
-intents.messages = True
+GUILD_ID = 1241797935100989594
+\ nintents = discord.Intents.default()
 intents.message_content = True
-bot = commands.Bot(command_prefix="/", intents=intents)
-
-stickied_messages = {}
+bot = commands.Bot(command_prefix="!", intents=intents)
+\ nstickied_messages = {}
 
 async def save_data():
     with open("stickied_data.json", "w") as f:
@@ -27,25 +27,28 @@ async def load_data():
 @bot.event
 async def on_ready():
     await load_data()
-    await bot.tree.sync()
+    try:
+        await bot.tree.sync(guild=discord.Object(id=GUILD_ID))
+    except:
+        pass
 
-@bot.tree.command(name="setstickied", description="Set a stickied message for this channel.")
-async def setstickied(interaction, message_text: str):
+@bot.tree.command(name="setstickied", description="Set a stickied message.", guild=discord.Object(id=GUILD_ID))
+async def setstickied(interaction: discord.Interaction, message_text: str):
     channel_id = str(interaction.channel_id)
     stickied_messages[channel_id] = {"content": message_text, "embed": None, "last_message": None}
     await save_data()
     await interaction.response.send_message("Stickied message set.", ephemeral=True)
 
-@bot.tree.command(name="setstickiedembed", description="Set a stickied embed for this channel.")
-async def setstickiedembed(interaction, title: str, description: str):
+@bot.tree.command(name="setstickiedembed", description="Set a stickied embed.", guild=discord.Object(id=GUILD_ID))
+async def setstickiedembed(interaction: discord.Interaction, title: str, description: str):
     channel_id = str(interaction.channel_id)
     embed_data = {"title": title, "description": description}
     stickied_messages[channel_id] = {"content": None, "embed": embed_data, "last_message": None}
     await save_data()
     await interaction.response.send_message("Stickied embed set.", ephemeral=True)
 
-@bot.tree.command(name="removestickied", description="Remove stickied message from this channel.")
-async def removestickied(interaction):
+@bot.tree.command(name="removestickied", description="Remove stickied message.", guild=discord.Object(id=GUILD_ID))
+async def removestickied(interaction: discord.Interaction):
     channel_id = str(interaction.channel_id)
     if channel_id in stickied_messages:
         del stickied_messages[channel_id]
@@ -54,16 +57,15 @@ async def removestickied(interaction):
     else:
         await interaction.response.send_message("No stickied message set.", ephemeral=True)
 
-@bot.tree.command(name="stickiedhelp", description="Show help for stickied bot commands.")
-async def stickiedhelp(interaction):
-    help_text = """
-/setstickied <message> – Set a stickied text message
-/setstickiedembed <title> <description> – Set a stickied embed
-/removestickied – Remove stickied message
-/stickiedhelp – Show this help menu
+@bot.tree.command(name="stickiedhelp", description="Show stickied bot help.", guild=discord.Object(id=GUILD_ID))
+async def stickiedhelp(interaction: discord.Interaction):
+    msg = """
+/setstickied <message>
+/setstickiedembed <title> <description>
+/removestickied
+/stickiedhelp
 """
-    await interaction.response.send_message(help_text, ephemeral=True)
-
+    await interaction.response.send_message(msg, ephemeral=True)
 
 @bot.event
 async def on_message(message):
