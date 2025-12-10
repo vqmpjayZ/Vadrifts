@@ -54,6 +54,17 @@ async def removestickied(interaction):
     else:
         await interaction.response.send_message("No stickied message set.", ephemeral=True)
 
+@bot.tree.command(name="stickiedhelp", description="Show help for stickied bot commands.")
+async def stickiedhelp(interaction):
+    help_text = """
+/setstickied <message> – Set a stickied text message
+/setstickiedembed <title> <description> – Set a stickied embed
+/removestickied – Remove stickied message
+/stickiedhelp – Show this help menu
+"""
+    await interaction.response.send_message(help_text, ephemeral=True)
+
+
 @bot.event
 async def on_message(message):
     if message.author.bot:
