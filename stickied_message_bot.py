@@ -5,8 +5,6 @@ import discord
 from discord.ext import commands
 from discord import Embed, app_commands
 
-GUILD_ID = 1241797935100989594
-
 intents = discord.Intents.default()
 intents.message_content = True
 intents.guilds = True
@@ -31,11 +29,12 @@ def load_data():
 async def on_ready():
     load_data()
     print(f'Stickied bot logged in as {bot.user}')
+    print(f'Bot is in {len(bot.guilds)} servers')
     try:
-        synced = await bot.tree.sync(guild=discord.Object(id=GUILD_ID))
-        print(f"Synced {len(synced)} stickied commands")
+        synced = await bot.tree.sync()
+        print(f"Synced {len(synced)} global commands")
     except Exception as e:
-        print(f"Stickied bot slash command sync failed: {e}")
+        print(f"Slash command sync failed: {e}")
 
 def create_embed_from_data(data):
     embed = Embed(
@@ -71,7 +70,10 @@ async def get_or_create_webhook(channel):
     
     return webhook
 
-@bot.tree.command(name="setstickied", description="Set a stickied text message.", guild=discord.Object(id=GUILD_ID))
+def get_channel_key(guild_id, channel_id):
+    return f"{guild_id}_{channel_id}"
+
+@bot.tree.command(name="setstickied", description="Set a stickied text message.")
 @app_commands.default_permissions(manage_messages=True)
 async def setstickied(
     interaction: discord.Interaction, 
@@ -85,9 +87,9 @@ async def setstickied(
     await interaction.response.defer(ephemeral=True)
     
     target_channel = channel or interaction.channel
-    channel_id = str(target_channel.id)
+    channel_key = get_channel_key(interaction.guild_id, target_channel.id)
     
-    stickied_messages[channel_id] = {
+    stickied_messages[channel_key] = {
         "content": message_text, 
         "embed": None, 
         "last_message": None,
@@ -111,15 +113,15 @@ async def setstickied(
         else:
             msg = await target_channel.send(message_text)
         
-        stickied_messages[channel_id]["last_message"] = msg.id
-        stickied_messages[channel_id]["last_sent"] = time.time()
+        stickied_messages[channel_key]["last_message"] = msg.id
+        stickied_messages[channel_key]["last_sent"] = time.time()
         save_data()
         
         await interaction.followup.send(f"✅ Stickied message set and sent in {target_channel.mention}!")
     except Exception as e:
         await interaction.followup.send(f"❌ Error: {str(e)}")
 
-@bot.tree.command(name="setstickiedembed", description="Set a stickied embed message.", guild=discord.Object(id=GUILD_ID))
+@bot.tree.command(name="setstickiedembed", description="Set a stickied embed message.")
 @app_commands.default_permissions(manage_messages=True)
 async def setstickiedembed(
     interaction: discord.Interaction, 
@@ -138,7 +140,7 @@ async def setstickiedembed(
     await interaction.response.defer(ephemeral=True)
     
     target_channel = channel or interaction.channel
-    channel_id = str(target_channel.id)
+    channel_key = get_channel_key(interaction.guild_id, target_channel.id)
     
     embed_data = {
         "title": title, 
@@ -149,7 +151,7 @@ async def setstickiedembed(
         "thumbnail": thumbnail_url
     }
     
-    stickied_messages[channel_id] = {
+    stickied_messages[channel_key] = {
         "content": None, 
         "embed": embed_data, 
         "last_message": None,
@@ -175,53 +177,56 @@ async def setstickiedembed(
         else:
             msg = await target_channel.send(embed=embed)
         
-        stickied_messages[channel_id]["last_message"] = msg.id
-        stickied_messages[channel_id]["last_sent"] = time.time()
+        stickied_messages[channel_key]["last_message"] = msg.id
+        stickied_messages[channel_key]["last_sent"] = time.time()
         save_data()
         
         await interaction.followup.send(f"✅ Stickied embed set and sent in {target_channel.mention}!")
     except Exception as e:
         await interaction.followup.send(f"❌ Error: {str(e)}")
 
-@bot.tree.command(name="removestickied", description="Remove stickied message from a channel.", guild=discord.Object(id=GUILD_ID))
+@bot.tree.command(name="removestickied", description="Remove stickied message from a channel.")
 @app_commands.default_permissions(manage_messages=True)
 async def removestickied(interaction: discord.Interaction, channel: discord.TextChannel = None):
     await interaction.response.defer(ephemeral=True)
     
     target_channel = channel or interaction.channel
-    channel_id = str(target_channel.id)
+    channel_key = get_channel_key(interaction.guild_id, target_channel.id)
     
-    if channel_id in stickied_messages:
-        if stickied_messages[channel_id].get("last_message"):
+    if channel_key in stickied_messages:
+        if stickied_messages[channel_key].get("last_message"):
             try:
-                msg = await target_channel.fetch_message(stickied_messages[channel_id]["last_message"])
+                msg = await target_channel.fetch_message(stickied_messages[channel_key]["last_message"])
                 await msg.delete()
             except:
                 pass
         
-        del stickied_messages[channel_id]
+        del stickied_messages[channel_key]
         save_data()
         await interaction.followup.send(f"✅ Stickied message removed from {target_channel.mention}.")
     else:
         await interaction.followup.send(f"❌ No stickied message set in {target_channel.mention}.")
 
-@bot.tree.command(name="liststickied", description="List all active stickied messages in the server.", guild=discord.Object(id=GUILD_ID))
+@bot.tree.command(name="liststickied", description="List all active stickied messages in this server.")
 @app_commands.default_permissions(manage_messages=True)
 async def liststickied(interaction: discord.Interaction):
     await interaction.response.defer(ephemeral=True)
     
-    if not stickied_messages:
-        await interaction.followup.send("No stickied messages set.")
+    server_stickied = {k: v for k, v in stickied_messages.items() if k.startswith(f"{interaction.guild_id}_")}
+    
+    if not server_stickied:
+        await interaction.followup.send("No stickied messages set in this server.")
         return
     
     embed = Embed(
         title="📌 Active Stickied Messages",
-        description=f"Total: {len(stickied_messages)} channel(s)",
+        description=f"Total: {len(server_stickied)} channel(s) in this server",
         color=0x9c88ff
     )
     
-    for channel_id, data in stickied_messages.items():
-        channel = bot.get_channel(int(channel_id))
+    for channel_key, data in server_stickied.items():
+        channel_id = int(channel_key.split("_")[1])
+        channel = bot.get_channel(channel_id)
         if channel:
             content_preview = data.get("content") or f"Embed: {data['embed']['title']}"
             if len(content_preview) > 50:
@@ -238,7 +243,7 @@ async def liststickied(interaction: discord.Interaction):
     embed.set_footer(text="Use /removestickied to remove them")
     await interaction.followup.send(embed=embed)
 
-@bot.tree.command(name="stickiedhelp", description="Show stickied bot help and commands.", guild=discord.Object(id=GUILD_ID))
+@bot.tree.command(name="stickiedhelp", description="Show stickied bot help and commands.")
 async def stickiedhelp(interaction: discord.Interaction):
     embed = Embed(
         title="📌 Stickied Message Bot",
@@ -287,7 +292,7 @@ async def stickiedhelp(interaction: discord.Interaction):
     
     embed.add_field(
         name="📋 /liststickied",
-        value="**View all active stickied messages** in the server",
+        value="**View all active stickied messages** in this server",
         inline=False
     )
     
@@ -311,9 +316,10 @@ async def on_message(message):
     if message.author.bot:
         return
     
-    channel_id = str(message.channel.id)
-    if channel_id in stickied_messages:
-        data = stickied_messages[channel_id]
+    channel_key = get_channel_key(message.guild.id, message.channel.id)
+    
+    if channel_key in stickied_messages:
+        data = stickied_messages[channel_key]
         
         cooldown = data.get("cooldown", 0)
         last_sent = data.get("last_sent", 0)
@@ -354,8 +360,8 @@ async def on_message(message):
                 else:
                     new_msg = await message.channel.send(data["content"])
             
-            stickied_messages[channel_id]["last_message"] = new_msg.id
-            stickied_messages[channel_id]["last_sent"] = time.time()
+            stickied_messages[channel_key]["last_message"] = new_msg.id
+            stickied_messages[channel_key]["last_sent"] = time.time()
             save_data()
         except Exception as e:
             print(f"Error sending stickied message: {e}")
