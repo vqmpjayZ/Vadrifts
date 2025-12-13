@@ -72,6 +72,7 @@ async def get_or_create_webhook(channel):
     return webhook
 
 @bot.tree.command(name="setstickied", description="Set a stickied text message.", guild=discord.Object(id=GUILD_ID))
+@app_commands.default_permissions(manage_messages=True)
 async def setstickied(
     interaction: discord.Interaction, 
     message_text: str,
@@ -119,6 +120,7 @@ async def setstickied(
         await interaction.followup.send(f"❌ Error: {str(e)}")
 
 @bot.tree.command(name="setstickiedembed", description="Set a stickied embed message.", guild=discord.Object(id=GUILD_ID))
+@app_commands.default_permissions(manage_messages=True)
 async def setstickiedembed(
     interaction: discord.Interaction, 
     title: str, 
@@ -182,6 +184,7 @@ async def setstickiedembed(
         await interaction.followup.send(f"❌ Error: {str(e)}")
 
 @bot.tree.command(name="removestickied", description="Remove stickied message from a channel.", guild=discord.Object(id=GUILD_ID))
+@app_commands.default_permissions(manage_messages=True)
 async def removestickied(interaction: discord.Interaction, channel: discord.TextChannel = None):
     await interaction.response.defer(ephemeral=True)
     
@@ -203,6 +206,7 @@ async def removestickied(interaction: discord.Interaction, channel: discord.Text
         await interaction.followup.send(f"❌ No stickied message set in {target_channel.mention}.")
 
 @bot.tree.command(name="liststickied", description="List all active stickied messages in the server.", guild=discord.Object(id=GUILD_ID))
+@app_commands.default_permissions(manage_messages=True)
 async def liststickied(interaction: discord.Interaction):
     await interaction.response.defer(ephemeral=True)
     
@@ -298,7 +302,7 @@ async def stickiedhelp(interaction: discord.Interaction):
         inline=False
     )
     
-    embed.set_footer(text="Made with 💜 by Vadrifts")
+    embed.set_footer(text="Made with 💜 by Vadrifts • Requires Manage Messages permission")
     
     await interaction.response.send_message(embed=embed)
 
