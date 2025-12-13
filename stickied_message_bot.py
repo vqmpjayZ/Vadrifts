@@ -28,10 +28,12 @@ async def load_data():
 @bot.event
 async def on_ready():
     await load_data()
+    print(f'Stickied bot logged in as {bot.user}')
     try:
-        await bot.tree.sync(guild=discord.Object(id=GUILD_ID))
-    except:
-        pass
+        synced = await bot.tree.sync(guild=discord.Object(id=GUILD_ID))
+        print(f"Synced {len(synced)} stickied commands")
+    except Exception as e:
+        print(f"Stickied bot slash command sync failed: {e}")
 
 @bot.tree.command(name="setstickied", description="Set a stickied message.", guild=discord.Object(id=GUILD_ID))
 async def setstickied(interaction: discord.Interaction, message_text: str):
@@ -85,4 +87,12 @@ async def on_message(message):
         await save_data()
     await bot.process_commands(message)
 
-bot.run(os.getenv("STICKIED_TOKEN"))
+def start_stickied_bot():
+    token = os.getenv("STICKIED_TOKEN")
+    if not token:
+        print("ERROR: STICKIED_TOKEN environment variable not set!")
+        return
+    bot.run(token)
+
+if __name__ == "__main__":
+    start_stickied_bot()
