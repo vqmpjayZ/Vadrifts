@@ -7,6 +7,7 @@ from datetime import datetime
 
 from config import *
 from discord_bot import start_bot
+from stickied_message_bot import start_stickied_bot
 from youtube_grabber import YouTubeChannelFinder
 from image_converter import convert_image_endpoint
 from plugins_manager import PluginsManager
@@ -482,6 +483,9 @@ if __name__ == '__main__':
 
     bot_thread = threading.Thread(target=start_bot, daemon=True)
     bot_thread.start()
+
+    stickied_bot_thread = threading.Thread(target=start_stickied_bot, daemon=True)
+    stickied_bot_thread.start()
 
     ping_thread = threading.Thread(target=server_pinger, daemon=True)
     ping_thread.start()
