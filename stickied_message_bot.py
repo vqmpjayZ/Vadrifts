@@ -9,7 +9,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 intents.guilds = True
 intents.webhooks = True
-bot = commands.Bot(command_prefix="!", intents=intents)
+bot = commands.Bot(command_prefix="?", intents=intents)
 
 stickied_messages = {}
 
@@ -120,6 +120,103 @@ async def stick(
         await interaction.followup.send(f"✅ Stickied message set in {target_channel.mention}!")
     except Exception as e:
         await interaction.followup.send(f"❌ Error: {str(e)}")
+
+@bot.command(name="stick")
+@commands.has_permissions(manage_messages=True)
+async def stick_prefix(ctx, *, message: str):
+    channel_key = get_channel_key(ctx.guild.id, ctx.channel.id)
+    
+    stickied_messages[channel_key] = {
+        "content": message, 
+        "embed": None, 
+        "last_message": None,
+        "cooldown": 0,
+        "last_sent": 0,
+        "use_webhook": False,
+        "webhook_name": None,
+        "webhook_avatar": None
+    }
+    save_data()
+    
+    try:
+        await ctx.message.delete()
+    except:
+        pass
+    
+    try:
+        msg = await ctx.channel.send(message)
+        stickied_messages[channel_key]["last_message"] = msg.id
+        stickied_messages[channel_key]["last_sent"] = time.time()
+        save_data()
+        
+        confirm = await ctx.send("✅ Stickied message set!")
+        await confirm.delete(delay=3)
+    except Exception as e:
+        await ctx.send(f"❌ Error: {str(e)}")
+
+@bot.command(name="stickwh")
+@commands.has_permissions(manage_messages=True)
+async def stick_webhook_prefix(ctx, webhook_name: str, *, message: str):
+    channel_key = get_channel_key(ctx.guild.id, ctx.channel.id)
+    
+    stickied_messages[channel_key] = {
+        "content": message, 
+        "embed": None, 
+        "last_message": None,
+        "cooldown": 0,
+        "last_sent": 0,
+        "use_webhook": True,
+        "webhook_name": webhook_name,
+        "webhook_avatar": None
+    }
+    save_data()
+    
+    try:
+        await ctx.message.delete()
+    except:
+        pass
+    
+    try:
+        webhook = await get_or_create_webhook(ctx.channel)
+        msg = await webhook.send(
+            content=message,
+            username=webhook_name,
+            wait=True
+        )
+        stickied_messages[channel_key]["last_message"] = msg.id
+        stickied_messages[channel_key]["last_sent"] = time.time()
+        save_data()
+        
+        confirm = await ctx.send("✅ Stickied webhook message set!")
+        await confirm.delete(delay=3)
+    except Exception as e:
+        await ctx.send(f"❌ Error: {str(e)}")
+
+@bot.command(name="unstick")
+@commands.has_permissions(manage_messages=True)
+async def unstick_prefix(ctx):
+    channel_key = get_channel_key(ctx.guild.id, ctx.channel.id)
+    
+    if channel_key in stickied_messages:
+        if stickied_messages[channel_key].get("last_message"):
+            try:
+                msg = await ctx.channel.fetch_message(stickied_messages[channel_key]["last_message"])
+                await msg.delete()
+            except:
+                pass
+        
+        del stickied_messages[channel_key]
+        save_data()
+        
+        try:
+            await ctx.message.delete()
+        except:
+            pass
+        
+        confirm = await ctx.send("✅ Stickied message removed!")
+        await confirm.delete(delay=3)
+    else:
+        await ctx.send("❌ No stickied message in this channel.")
 
 @bot.tree.command(name="stickembed", description="Set a stickied embed message.")
 @app_commands.default_permissions(manage_messages=True)
@@ -240,7 +337,7 @@ async def list_stickied(interaction: discord.Interaction):
                 inline=False
             )
     
-    embed.set_footer(text="Use /unstick to remove")
+    embed.set_footer(text="Use /unstick or ?unstick to remove")
     await interaction.followup.send(embed=embed)
 
 @bot.tree.command(name="help", description="Show bot commands and info.")
@@ -252,57 +349,49 @@ async def help_command(interaction: discord.Interaction):
     )
     
     embed.add_field(
-        name="📝 /stick",
+        name="📝 Slash Commands",
         value=(
-            "**Set a text stickied message**\n"
-            "`message` - Your message\n"
-            "`channel` - Target channel (optional)\n"
-            "`cooldown` - Seconds between re-sticks (optional)\n"
-            "`use_webhook` - Custom appearance (optional)\n"
-            "`webhook_name` - Custom name (optional)\n"
-            "`webhook_avatar` - Custom avatar URL (optional)"
+            "`/stick` - Set text stickied (single line)\n"
+            "`/stickembed` - Set embed stickied\n"
+            "`/unstick` - Remove stickied\n"
+            "`/list` - View all stickied messages"
         ),
         inline=False
     )
     
     embed.add_field(
-        name="✨ /stickembed",
+        name="📝 Prefix Commands (multi-line support)",
         value=(
-            "**Set an embed stickied message**\n"
-            "`title` - Embed title\n"
-            "`description` - Embed description\n"
-            "`channel` - Target channel (optional)\n"
-            "`cooldown` - Seconds between re-sticks (optional)\n"
-            "`color` - Hex color like #9c88ff (optional)\n"
-            "`footer` - Footer text (optional)\n"
-            "`image_url` - Large image (optional)\n"
-            "`thumbnail_url` - Small image (optional)\n"
-            "`use_webhook` - Custom appearance (optional)\n"
-            "`webhook_name` - Custom name (optional)\n"
-            "`webhook_avatar` - Custom avatar URL (optional)"
+            "`?stick <message>` - Set text stickied with line breaks\n"
+            "`?stickwh <name> <message>` - Same but with webhook name\n"
+            "`?unstick` - Remove stickied"
         ),
         inline=False
     )
     
     embed.add_field(
-        name="🗑️ /unstick",
-        value="**Remove a stickied message**\n`channel` - Target channel (optional)",
-        inline=False
-    )
-    
-    embed.add_field(
-        name="📋 /list",
-        value="**View all stickied messages** in this server",
+        name="✨ Slash Command Options",
+        value=(
+            "`channel` - Target channel\n"
+            "`cooldown` - Seconds between re-sticks\n"
+            "`color` - Hex color (embeds)\n"
+            "`footer` - Footer text (embeds)\n"
+            "`image_url` - Large image (embeds)\n"
+            "`thumbnail_url` - Small image (embeds)\n"
+            "`use_webhook` - Custom appearance\n"
+            "`webhook_name` - Custom name\n"
+            "`webhook_avatar` - Custom avatar URL"
+        ),
         inline=False
     )
     
     embed.add_field(
         name="💡 Tips",
         value=(
-            "• `cooldown` prevents spam (10 = wait 10s before re-sticking)\n"
-            "• Webhooks let you customize name & avatar\n"
+            "• Use `?stick` for multi-line messages\n"
+            "• `cooldown` prevents spam\n"
             "• Messages send instantly when set\n"
-            "• Colors use hex codes without # (e.g. 9c88ff)"
+            "• Colors use hex codes (e.g. 9c88ff)"
         ),
         inline=False
     )
@@ -317,6 +406,11 @@ async def on_message(message):
         return
     
     if not message.guild:
+        return
+    
+    await bot.process_commands(message)
+    
+    if message.content.startswith("?"):
         return
     
     channel_key = get_channel_key(message.guild.id, message.channel.id)
@@ -368,8 +462,6 @@ async def on_message(message):
             save_data()
         except Exception as e:
             print(f"Error sending stickied message: {e}")
-    
-    await bot.process_commands(message)
 
 def start_stickied_bot():
     token = os.getenv("STICKIED_TOKEN")
