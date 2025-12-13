@@ -24,12 +24,21 @@
     }
 
     .modal-content::-webkit-scrollbar {
-      display: none;
+      width: 6px;
     }
 
-    .modal-content {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
+    .modal-content::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 3px;
+    }
+
+    .modal-content::-webkit-scrollbar-thumb {
+      background: rgba(114, 9, 183, 0.3);
+      border-radius: 3px;
+    }
+
+    .modal-content::-webkit-scrollbar-thumb:hover {
+      background: rgba(114, 9, 183, 0.5);
     }
 
     .bg-lights {
@@ -109,31 +118,31 @@
       pointer-events: none;
     }
 
-.particle {
-  position: absolute;
-  width: 3px;
-  height: 3px;
-  background: #a45cff;
-  border-radius: 50%;
-  opacity: 0.5;
-  box-shadow: 0 0 8px #a45cff;
-  animation: floatUp 240s linear infinite;
-}
+    .particle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: #a45cff;
+      border-radius: 50%;
+      opacity: 0.5;
+      box-shadow: 0 0 8px #a45cff;
+      animation: floatUp 240s linear infinite;
+    }
 
-@keyframes floatUp {
-  0% {
-    transform: translateY(100vh) translateX(0);
-    opacity: 0.5;
-  }
-  50% {
-    transform: translateY(50vh) translateX(20px);
-    opacity: 0.4;
-  }
-  100% {
-    transform: translateY(-200px) translateX(40px);
-    opacity: 0.3;
-  }
-}
+    @keyframes floatUp {
+      0% {
+        transform: translateY(100vh) translateX(0);
+        opacity: 0.5;
+      }
+      50% {
+        transform: translateY(50vh) translateX(20px);
+        opacity: 0.4;
+      }
+      100% {
+        transform: translateY(-200px) translateX(40px);
+        opacity: 0.3;
+      }
+    }
 
     .navbar {
       position: fixed;
@@ -426,11 +435,11 @@
       overflow: hidden;
     }
 
-.plugin-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 60px rgba(114, 9, 183, 0.3);
-  cursor: pointer;
-}
+    .plugin-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 60px rgba(114, 9, 183, 0.3);
+      cursor: pointer;
+    }
 
     .plugin-actions {
       position: absolute;
@@ -542,7 +551,7 @@
       font-weight: 500;
       border: 1px solid rgba(114, 9, 183, 0.5);
     }
-
+    
     .modal {
       display: none;
       position: fixed;
@@ -550,184 +559,604 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.9);
-      backdrop-filter: blur(10px);
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(20px);
       z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
     }
 
     .modal.active {
       display: flex;
       align-items: center;
       justify-content: center;
+      opacity: 1;
+      animation: modalFadeIn 0.3s ease;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
     .modal-content {
-      background: #0a0a0a;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 20px;
+      background: linear-gradient(180deg, #0d0d0d 0%, #080808 100%);
+      border: 1px solid rgba(114, 9, 183, 0.2);
+      border-radius: 24px;
       width: 90%;
-      max-width: 800px;
-      max-height: 90vh;
+      max-width: 700px;
+      max-height: 85vh;
       overflow-y: auto;
+      position: relative;
+      box-shadow: 
+        0 0 0 1px rgba(255, 255, 255, 0.05),
+        0 25px 80px rgba(0, 0, 0, 0.8),
+        0 0 100px rgba(114, 9, 183, 0.15);
+      animation: modalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
 
     .modal-header {
-      padding: 30px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 32px 36px 24px;
       position: relative;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      background: linear-gradient(180deg, rgba(114, 9, 183, 0.08) 0%, transparent 100%);
+    }
+
+    .modal-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #7209b7, transparent);
+      border-radius: 0 0 3px 3px;
+    }
+
+    .modal-title-container {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .modal-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, rgba(114, 9, 183, 0.3) 0%, rgba(156, 136, 255, 0.2) 100%);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(114, 9, 183, 0.3);
+    }
+
+    .modal-icon svg {
+      width: 24px;
+      height: 24px;
+      color: #b8a4ff;
     }
 
     .modal-title {
-      font-size: 28px;
+      font-size: 26px;
       font-weight: 700;
-      color: #ffffff;
+      background: linear-gradient(135deg, #ffffff 0%, #b8a4ff 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .modal-subtitle {
+      font-size: 14px;
+      color: #666;
+      margin-top: 6px;
+      font-weight: 400;
     }
 
     .close-modal {
       position: absolute;
-      top: 30px;
-      right: 30px;
-      background: rgba(255, 255, 255, 0.1);
-      border: none;
-      color: #888;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      font-size: 24px;
+      top: 28px;
+      right: 28px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #666;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      font-size: 20px;
       cursor: pointer;
       transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .close-modal:hover {
-      background: rgba(255, 255, 255, 0.2);
-      color: #ffffff;
+      background: rgba(255, 75, 75, 0.15);
+      border-color: rgba(255, 75, 75, 0.3);
+      color: #ff4b4b;
+      transform: rotate(90deg);
     }
 
     .modal-body {
-      padding: 30px;
+      padding: 28px 36px 36px;
     }
 
     .form-group {
-      margin-bottom: 25px;
+      margin-bottom: 28px;
+      position: relative;
+    }
+
+    .form-group-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
     }
 
     label {
-      display: block;
-      color: #ccc;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #e0e0e0;
       font-size: 14px;
-      font-weight: 500;
-      margin-bottom: 10px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+
+    .label-icon {
+      width: 18px;
+      height: 18px;
+      color: #7209b7;
+      opacity: 0.8;
     }
 
     .required {
-      color: #ff4b4b;
+      color: #ff6b9d;
+      font-weight: 700;
     }
 
     .optional {
+      background: rgba(255, 255, 255, 0.05);
       color: #666;
-      font-size: 12px;
-      font-weight: 400;
-      margin-left: 5px;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 3px 8px;
+      border-radius: 6px;
+      margin-left: 6px;
     }
 
     .input-wrapper {
       position: relative;
     }
 
-    .char-counter {
+    .input-icon {
       position: absolute;
-      right: 12px;
+      left: 16px;
       top: 50%;
       transform: translateY(-50%);
-      font-size: 11px;
-      color: #666;
-    }
-
-    .char-counter.warning {
-      color: #ff9f43;
-    }
-
-    .char-counter.error {
-      color: #ff4b4b;
+      width: 18px;
+      height: 18px;
+      color: #555;
+      transition: color 0.3s ease;
+      pointer-events: none;
     }
 
     input, textarea, select {
       width: 100%;
-      background: rgba(40, 40, 40, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-      padding: 14px 16px;
+      background: rgba(20, 20, 20, 0.8);
+      border: 2px solid rgba(255, 255, 255, 0.06);
+      border-radius: 14px;
+      padding: 16px 18px;
       color: #ffffff;
-      font-size: 14px;
+      font-size: 15px;
       font-family: 'Inter', sans-serif;
       transition: all 0.3s ease;
     }
 
-    input.has-counter {
-      padding-right: 45px;
+    input.has-icon {
+      padding-left: 48px;
     }
 
-    input:focus, textarea:focus, select:focus {
+    input.has-counter {
+      padding-right: 55px;
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    input:hover, textarea:hover {
+      border-color: rgba(255, 255, 255, 0.12);
+      background: rgba(25, 25, 25, 0.8);
+    }
+
+    input:focus, textarea:focus {
       outline: none;
-      border-color: #7209b7;
-      background: rgba(40, 40, 40, 0.8);
-      box-shadow: 0 0 0 3px rgba(114, 9, 183, 0.1);
+      border-color: rgba(114, 9, 183, 0.6);
+      background: rgba(20, 20, 20, 1);
+      box-shadow: 
+        0 0 0 4px rgba(114, 9, 183, 0.1),
+        0 0 30px rgba(114, 9, 183, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    }
+
+    input:focus + .input-icon,
+    input:focus ~ .input-icon {
+      color: #9c88ff;
+    }
+
+    input::placeholder, textarea::placeholder {
+      color: #444;
+    }
+
+    .char-counter {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 11px;
+      font-weight: 600;
+      color: #444;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+    }
+
+    .char-counter.warning {
+      color: #ff9f43;
+      background: rgba(255, 159, 67, 0.1);
+    }
+
+    .char-counter.error {
+      color: #ff4b4b;
+      background: rgba(255, 75, 75, 0.1);
+    }
+
+    .custom-select-container {
+      position: relative;
+      width: 100%;
+    }
+
+    .select-header {
+      background: rgba(20, 20, 20, 0.8);
+      border: 2px solid rgba(255, 255, 255, 0.06);
+      border-radius: 14px;
+      padding: 14px 18px;
+      color: #ffffff;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .select-header:hover {
+      border-color: rgba(255, 255, 255, 0.12);
+      background: rgba(25, 25, 25, 0.8);
+    }
+
+    .select-header.open {
+      border-color: rgba(114, 9, 183, 0.6);
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    .select-header-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .selected-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: rgba(114, 9, 183, 0.15);
+      border-radius: 8px;
+      color: #b8a4ff;
+    }
+
+    .select-arrow {
+      transition: transform 0.3s ease;
+      color: #666;
+    }
+
+    .select-header.open .select-arrow {
+      transform: rotate(180deg);
+      color: #9c88ff;
+    }
+
+    .select-dropdown {
+      position: absolute;
+      top: calc(100% - 2px);
+      left: 0;
+      width: 100%;
+      background: #0f0f0f;
+      border: 2px solid rgba(114, 9, 183, 0.6);
+      border-top: none;
+      border-radius: 0 0 14px 14px;
+      max-height: 280px;
+      overflow-y: auto;
+      z-index: 10;
+      display: none;
+      padding: 12px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .select-dropdown.show {
+      display: block;
+      animation: dropdownFade 0.2s ease;
+    }
+
+    @keyframes dropdownFade {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .select-search {
+      background: rgba(30, 30, 30, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: #ffffff;
+      font-size: 14px;
+      width: 100%;
+      margin-bottom: 12px;
+    }
+
+    .select-search:focus {
+      outline: none;
+      border-color: rgba(114, 9, 183, 0.4);
+    }
+
+    .select-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+      gap: 8px;
+    }
+
+    .select-option {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 12px 8px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+      border: 1px solid transparent;
+    }
+
+    .select-option:hover {
+      background: rgba(114, 9, 183, 0.15);
+      border-color: rgba(114, 9, 183, 0.3);
+    }
+
+    .select-option.selected {
+      background: rgba(114, 9, 183, 0.25);
+      border: 1px solid rgba(114, 9, 183, 0.5);
+    }
+
+    .option-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      color: #b8a4ff;
+    }
+
+    .option-label {
+      font-size: 11px;
+      color: #999;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .sections-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .sections-count {
+      font-size: 12px;
+      color: #666;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 4px 10px;
+      border-radius: 6px;
     }
 
     .section-builder {
-      background: rgba(20, 20, 20, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 15px;
+      background: linear-gradient(180deg, rgba(20, 20, 20, 0.6) 0%, rgba(15, 15, 15, 0.8) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
       padding: 20px;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .section-builder:hover {
+      border-color: rgba(114, 9, 183, 0.2);
+      box-shadow: 0 0 30px rgba(114, 9, 183, 0.05);
+    }
+
+    .section-number {
+      position: absolute;
+      top: -10px;
+      left: 20px;
+      background: linear-gradient(135deg, #7209b7 0%, #9c88ff 100%);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(114, 9, 183, 0.3);
     }
 
     .section-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 15px;
+      margin-bottom: 16px;
+      margin-top: 6px;
+    }
+
+    .section-name-wrapper {
+      flex: 1;
+      margin-right: 12px;
+      position: relative;
     }
 
     .section-name-input {
-      background: rgba(40, 40, 40, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-      padding: 8px 12px;
-      color: #9c88ff;
-      font-size: 16px;
+      width: 100%;
+      background: rgba(30, 30, 30, 0.6);
+      border: 2px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 12px 16px;
+      color: #ffffff;
+      font-size: 15px;
       font-weight: 600;
-      flex: 1;
-      margin-right: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .section-name-input:focus {
+      outline: none;
+      border-color: rgba(114, 9, 183, 0.5);
+      background: rgba(30, 30, 30, 0.8);
+    }
+
+    .section-name-input::placeholder {
+      color: #555;
+      font-weight: 400;
+    }
+
+    .remove-section-btn {
+      background: rgba(255, 75, 75, 0.1);
+      border: 1px solid rgba(255, 75, 75, 0.2);
+      color: #ff6b6b;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .remove-section-btn:hover {
+      background: rgba(255, 75, 75, 0.2);
+      border-color: rgba(255, 75, 75, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .remove-section-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .bypasses-label {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .bypasses-label svg {
+      width: 14px;
+      height: 14px;
+      color: #555;
     }
 
     .bypasses-container {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-bottom: 15px;
-      min-height: 40px;
-      padding: 10px;
+      min-height: 50px;
+      padding: 14px;
       background: rgba(0, 0, 0, 0.3);
-      border-radius: 10px;
+      border: 2px dashed rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      margin-bottom: 14px;
+      transition: all 0.3s ease;
     }
 
-    .bypass-chip {
-      background: rgba(114, 9, 183, 0.2);
-      border: 1px solid rgba(114, 9, 183, 0.3);
-      color: #b8a4ff;
-      padding: 6px 12px;
-      border-radius: 20px;
+    .bypasses-container:empty::before,
+    .bypasses-container:has(.bypasses-empty)::before {
+      content: '';
+    }
+
+    .bypasses-empty {
+      color: #444;
       font-size: 13px;
+      font-style: italic;
       display: flex;
       align-items: center;
       gap: 8px;
-      animation: chipIn 0.3s ease;
+    }
+
+    .bypasses-empty svg {
+      width: 16px;
+      height: 16px;
+      opacity: 0.5;
+    }
+
+    .bypasses-container:hover {
+      border-color: rgba(114, 9, 183, 0.2);
+    }
+
+    .bypass-chip {
+      background: linear-gradient(135deg, rgba(114, 9, 183, 0.2) 0%, rgba(156, 136, 255, 0.15) 100%);
+      border: 1px solid rgba(114, 9, 183, 0.3);
+      color: #d4c4ff;
+      padding: 8px 14px;
+      border-radius: 25px;
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: chipIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: all 0.2s ease;
+    }
+
+    .bypass-chip:hover {
+      background: linear-gradient(135deg, rgba(114, 9, 183, 0.3) 0%, rgba(156, 136, 255, 0.25) 100%);
+      transform: translateY(-1px);
     }
 
     @keyframes chipIn {
       from {
-        transform: scale(0.8);
+        transform: scale(0.5);
         opacity: 0;
       }
       to {
@@ -738,14 +1167,22 @@
 
     .bypass-remove {
       cursor: pointer;
-      opacity: 0.7;
-      transition: opacity 0.2s;
-      font-size: 16px;
+      opacity: 0.6;
+      transition: all 0.2s ease;
+      font-size: 18px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
     }
 
     .bypass-remove:hover {
       opacity: 1;
       color: #ff4b4b;
+      background: rgba(255, 75, 75, 0.2);
     }
 
     .bypass-input-group {
@@ -753,14 +1190,32 @@
       gap: 10px;
     }
 
-    .bypass-input {
+    .bypass-input-wrapper {
       flex: 1;
+      position: relative;
+    }
+
+    .bypass-input {
+      width: 100%;
+      background: rgba(30, 30, 30, 0.6);
+      border: 2px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 12px 16px;
+      color: #ffffff;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .bypass-input:focus {
+      outline: none;
+      border-color: rgba(34, 197, 94, 0.5);
+      background: rgba(30, 30, 30, 0.8);
     }
 
     .add-bypass-btn {
       background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
       color: white;
-      padding: 10px 20px;
+      padding: 12px 20px;
       border: none;
       border-radius: 10px;
       font-weight: 600;
@@ -768,20 +1223,29 @@
       cursor: pointer;
       transition: all 0.3s ease;
       white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 15px rgba(34, 197, 94, 0.2);
     }
 
     .add-bypass-btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
+      box-shadow: 0 8px 25px rgba(34, 197, 94, 0.3);
+    }
+
+    .add-bypass-btn svg {
+      width: 16px;
+      height: 16px;
     }
 
     .add-section-btn {
       width: 100%;
-      background: rgba(114, 9, 183, 0.1);
-      border: 2px dashed rgba(114, 9, 183, 0.3);
+      background: rgba(114, 9, 183, 0.05);
+      border: 2px dashed rgba(114, 9, 183, 0.25);
       color: #9c88ff;
-      padding: 15px;
-      border-radius: 10px;
+      padding: 18px;
+      border-radius: 14px;
       font-weight: 600;
       font-size: 14px;
       cursor: pointer;
@@ -789,12 +1253,18 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 10px;
     }
 
     .add-section-btn:hover {
-      background: rgba(114, 9, 183, 0.2);
-      border-color: #9c88ff;
+      background: rgba(114, 9, 183, 0.1);
+      border-color: rgba(114, 9, 183, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .add-section-btn svg {
+      width: 18px;
+      height: 18px;
     }
 
     .submit-btn {
@@ -803,230 +1273,89 @@
       color: white;
       padding: 18px;
       border: none;
-      border-radius: 12px;
+      border-radius: 14px;
       font-weight: 700;
       font-size: 16px;
       cursor: pointer;
       transition: all 0.3s ease;
-      margin-top: 20px;
+      margin-top: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 8px 30px rgba(114, 9, 183, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .submit-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .submit-btn:hover:not(:disabled)::before {
+      left: 100%;
     }
 
     .submit-btn:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(114, 9, 183, 0.4);
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(114, 9, 183, 0.4);
     }
 
     .submit-btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
+      transform: none;
+    }
+
+    .submit-btn svg {
+      width: 20px;
+      height: 20px;
     }
 
     .error-message {
-      background: rgba(255, 75, 75, 0.1);
-      border: 1px solid rgba(255, 75, 75, 0.3);
-      color: #ff4b4b;
-      padding: 10px 15px;
-      border-radius: 8px;
-      font-size: 13px;
-      margin-top: 8px;
-      display: none;
-    }
-
-    .error-message.show {
-      display: block;
-    }
-
-    .toast {
-      position: fixed;
-      top: 100px;
-      right: 20px;
-      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-      color: white;
-      padding: 16px 24px;
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(34, 197, 94, 0.3);
-      display: none;
-      animation: slideInRight 0.5s ease;
-      z-index: 2000;
-    }
-
-    .toast.show {
-      display: block;
-    }
-
-    .toast.error {
-      background: linear-gradient(135deg, #ff4b4b 0%, #c62828 100%);
-      box-shadow: 0 10px 30px rgba(255, 75, 75, 0.3);
-    }
-
-    @keyframes slideInRight {
-      from {
-        transform: translateX(100%);
-        opacity: 0;
-      }
-      to {
-        transform: translateX(0);
-        opacity: 1;
-      }
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 80px 20px;
-      grid-column: 1 / -1;
-    }
-
-    .empty-icon {
-      font-size: 64px;
-      margin-bottom: 20px;
-      opacity: 0.3;
-    }
-
-    .empty-title {
-      font-size: 24px;
-      font-weight: 600;
-      color: #888;
-      margin-bottom: 10px;
-    }
-
-    .empty-text {
-      font-size: 14px;
-      color: #666;
-    }
-
-    .remove-section-btn {
-      background: rgba(255, 75, 75, 0.2);
-      border: 1px solid rgba(255, 75, 75, 0.3);
-      color: #ff4b4b;
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 12px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .remove-section-btn:hover {
-      background: rgba(255, 75, 75, 0.3);
-      border-color: #ff4b4b;
-    }
-
-    .custom-select-container {
-      position: relative;
-      width: 100%;
-    }
-
-    .select-header {
-      background: rgba(40, 40, 40, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 75, 75, 0.08);
+      border: 1px solid rgba(255, 75, 75, 0.2);
+      border-left: 3px solid #ff4b4b;
+      color: #ff6b6b;
+      padding: 12px 16px;
       border-radius: 10px;
-      padding: 14px 16px;
-      color: #ffffff;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .select-header:hover {
-      background: rgba(40, 40, 40, 0.8);
-    }
-
-    .select-header-content {
-      display: flex;
+      font-size: 13px;
+      margin-top: 10px;
+      display: none;
       align-items: center;
       gap: 10px;
     }
 
-    .selected-icon {
+    .error-message.show {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 24px;
-      height: 24px;
+      animation: errorShake 0.4s ease;
     }
 
-    .select-dropdown {
-      position: absolute;
-      top: calc(100% + 5px);
-      left: 0;
-      width: 100%;
-      background: #151515;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-      max-height: 300px;
-      overflow-y: auto;
-      z-index: 10;
-      display: none;
-      padding: 10px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    .error-message svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
     }
 
-    .select-dropdown.show {
-      display: block;
-      animation: fadeIn 0.2s ease;
+    @keyframes errorShake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-5px); }
+      40% { transform: translateX(5px); }
+      60% { transform: translateX(-3px); }
+      80% { transform: translateX(3px); }
     }
 
-    .select-search {
-      background: rgba(40, 40, 40, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-      padding: 10px;
-      color: #ffffff;
-      font-size: 14px;
-      width: 100%;
-      margin-bottom: 10px;
-    }
-
-    .select-options {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-      gap: 8px;
-    }
-
-    .select-option {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      padding: 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      text-align: center;
-    }
-
-    .select-option:hover {
-      background: rgba(114, 9, 183, 0.2);
-    }
-
-    .select-option.selected {
-      background: rgba(114, 9, 183, 0.3);
-      border: 1px solid rgba(114, 9, 183, 0.5);
-    }
-
-    .option-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 24px;
-      height: 24px;
-    }
-
-    .option-label {
-      font-size: 12px;
-      color: #ccc;
-      max-width: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
+    .form-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+      margin: 32px 0;
     }
 
     .countdown {
@@ -1122,6 +1451,64 @@
       height: 20px;
     }
 
+    .toast {
+      position: fixed;
+      top: 100px;
+      right: 20px;
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+      color: white;
+      padding: 16px 24px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(34, 197, 94, 0.3);
+      display: none;
+      animation: slideInRight 0.5s ease;
+      z-index: 2000;
+    }
+
+    .toast.show {
+      display: block;
+    }
+
+    .toast.error {
+      background: linear-gradient(135deg, #ff4b4b 0%, #c62828 100%);
+      box-shadow: 0 10px 30px rgba(255, 75, 75, 0.3);
+    }
+
+    @keyframes slideInRight {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 80px 20px;
+      grid-column: 1 / -1;
+    }
+
+    .empty-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+      opacity: 0.3;
+    }
+
+    .empty-title {
+      font-size: 24px;
+      font-weight: 600;
+      color: #888;
+      margin-bottom: 10px;
+    }
+
+    .empty-text {
+      font-size: 14px;
+      color: #666;
+    }
+
     @media (max-width: 768px) {
       .navbar {
         top: 25px;
@@ -1155,12 +1542,46 @@
         grid-template-columns: 1fr;
       }
 
+      .modal-content {
+        width: 95%;
+        max-height: 90vh;
+        border-radius: 20px;
+      }
+
+      .modal-header {
+        padding: 24px 20px 20px;
+      }
+
+      .modal-body {
+        padding: 20px;
+      }
+
+      .modal-title {
+        font-size: 22px;
+      }
+
+      .section-header {
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .section-name-wrapper {
+        margin-right: 0;
+        width: 100%;
+      }
+
+      .remove-section-btn {
+        width: 100%;
+        justify-content: center;
+      }
+
       .bypass-input-group {
         flex-direction: column;
       }
 
       .add-bypass-btn {
         width: 100%;
+        justify-content: center;
       }
 
       .footer-content {
@@ -1241,76 +1662,150 @@
     </div>
   </div>
 
-<div class="modal" id="createModal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h2 class="modal-title" id="modalTitle">Create New Plugin</h2>
-      <button class="close-modal" onclick="closeCreateModal()">×</button>
-    </div>
-    <div class="modal-body">
-      <form id="pluginForm">
-        <input type="hidden" id="editingPluginId" value="">
-        
-        <div class="form-group" id="nameFormGroup">
-          <label>Plugin Name <span class="required">*</span></label>
-          <div class="input-wrapper">
-            <input type="text" id="pluginName" placeholder="My Awesome Plugin" maxlength="25" required class="has-counter">
-            <span class="char-counter" id="nameCounter">0/25</span>
-          </div>
-          <div class="error-message" id="nameError">Plugin name is required</div>
-        </div>
-
-        <div class="form-group" id="authorFormGroup">
-          <label>Author <span class="optional">(optional)</span></label>
-          <div class="input-wrapper">
-            <input type="text" id="pluginAuthor" placeholder="Anonymous" maxlength="20" class="has-counter">
-            <span class="char-counter" id="authorCounter">0/20</span>
-          </div>
-          <div class="error-message" id="authorError">Only letters and numbers allowed</div>
-        </div>
-
-        <div class="form-group" id="descriptionFormGroup">
-          <label>Description <span class="optional">(optional)</span></label>
-          <textarea id="pluginDescription" placeholder="Describe what your plugin does..." maxlength="200"></textarea>
-        </div>
-
-        <div class="form-group">
-          <label>Tab Icon <span class="optional">(optional)</span></label>
-          <input type="hidden" id="pluginIcon" value="package">
-          <div class="custom-select-container" id="iconSelectContainer">
-            <div class="select-header" id="selectHeader">
-              <div class="select-header-content">
-                <div class="selected-icon" id="selectedIcon"></div>
-                <span id="selectedIconName">Loading icons...</span>
-              </div>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M7 10l5 5 5-5z"></path>
-              </svg>
-            </div>
-            <div class="select-dropdown" id="selectDropdown">
-              <input type="text" class="select-search" id="iconSearch" placeholder="Search icons...">
-              <div class="select-options" id="iconOptions"></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>Sections & Bypasses <span class="required">*</span></label>
-          <div id="sectionsContainer"></div>
-          <button type="button" class="add-section-btn" onclick="addSection()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+  <!-- IMPROVED MODAL -->
+  <div class="modal" id="createModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title-container">
+          <div class="modal-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7m0-18H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7m0-18v18"/>
+              <path d="M12 8l4 4-4 4"/>
             </svg>
-            Add Section
-          </button>
-          <div class="error-message" id="sectionsError">At least one section with bypasses is required</div>
+          </div>
+          <div>
+            <h2 class="modal-title" id="modalTitle">Create New Plugin</h2>
+            <p class="modal-subtitle">Share your bypass collection with the community</p>
+          </div>
         </div>
+        <button class="close-modal" onclick="closeCreateModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <form id="pluginForm">
+          <input type="hidden" id="editingPluginId" value="">
+          
+          <!-- Plugin Name -->
+          <div class="form-group" id="nameFormGroup">
+            <label>
+              <svg class="label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
+              Plugin Name <span class="required">*</span>
+            </label>
+            <div class="input-wrapper">
+              <input type="text" id="pluginName" placeholder="My Awesome Plugin" maxlength="25" required class="has-counter">
+              <span class="char-counter" id="nameCounter">0/25</span>
+            </div>
+            <div class="error-message" id="nameError">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+              Plugin name is required
+            </div>
+          </div>
 
-        <button type="submit" class="submit-btn" id="submitBtn">Create Plugin</button>
-      </form>
+          <!-- Author -->
+          <div class="form-group" id="authorFormGroup">
+            <label>
+              <svg class="label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              Author <span class="optional">optional</span>
+            </label>
+            <div class="input-wrapper">
+              <input type="text" id="pluginAuthor" placeholder="Anonymous" maxlength="20" class="has-counter">
+              <span class="char-counter" id="authorCounter">0/20</span>
+            </div>
+            <div class="error-message" id="authorError">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+              Only letters and numbers allowed
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="form-group" id="descriptionFormGroup">
+            <label>
+              <svg class="label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+              </svg>
+              Description <span class="optional">optional</span>
+            </label>
+            <textarea id="pluginDescription" placeholder="Describe what your plugin does and what bypasses it includes..." maxlength="200"></textarea>
+          </div>
+
+          <!-- Icon Selector -->
+          <div class="form-group">
+            <label>
+              <svg class="label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <polyline points="21 15 16 10 5 21"/>
+              </svg>
+              Tab Icon <span class="optional">optional</span>
+            </label>
+            <input type="hidden" id="pluginIcon" value="package">
+            <div class="custom-select-container" id="iconSelectContainer">
+              <div class="select-header" id="selectHeader">
+                <div class="select-header-content">
+                  <div class="selected-icon" id="selectedIcon"></div>
+                  <span id="selectedIconName">Loading icons...</span>
+                </div>
+                <svg class="select-arrow" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M7 10l5 5 5-5z"></path>
+                </svg>
+              </div>
+              <div class="select-dropdown" id="selectDropdown">
+                <input type="text" class="select-search" id="iconSearch" placeholder="Search icons...">
+                <div class="select-options" id="iconOptions"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-divider"></div>
+
+          <!-- Sections & Bypasses -->
+          <div class="form-group">
+            <div class="sections-label">
+              <label>
+                <svg class="label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                </svg>
+                Sections & Bypasses <span class="required">*</span>
+              </label>
+              <span class="sections-count" id="sectionsCount">0 sections</span>
+            </div>
+            
+            <div id="sectionsContainer"></div>
+            
+            <button type="button" class="add-section-btn" onclick="addSection()">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+              </svg>
+              Add New Section
+            </button>
+            <div class="error-message" id="sectionsError">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+              At least one section with bypasses is required
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn" id="submitBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+            <span>Create Plugin</span>
+          </button>
+        </form>
+      </div>
     </div>
   </div>
-</div>
 
   <div class="footer">
     <div class="footer-content">
@@ -1330,7 +1825,8 @@
     </div>
   </div>
 
-<div class="toast" id="toast">Plugin created successfully!</div>
+  <div class="toast" id="toast">Plugin created successfully!</div>
+  
   <script>
     let plugins = [];
     let sections = {};
@@ -1342,31 +1838,30 @@
     let isOwnerMode = false;
     let icons = {};
     
-async function loadIconsFromGitHub() {
-  try {
-    const response = await fetch('https://cdn.jsdelivr.net/gh/vqmpjayZ/Vadrifts@main/icons.js');
-    let code = await response.text();
-    
-    console.log('Code fetched, first 100 chars:', code.substring(0, 100));
-    
-    code = code.replace('const ICONS', 'window.ICONS');
-    code = code.replace('const ICON_LABELS', 'window.ICON_LABELS');
+    async function loadIconsFromGitHub() {
+      try {
+        const response = await fetch('https://cdn.jsdelivr.net/gh/vqmpjayZ/Vadrifts@main/icons.js');
+        let code = await response.text();
+        
+        code = code.replace('const ICONS', 'window.ICONS');
+        code = code.replace('const ICON_LABELS', 'window.ICON_LABELS');
 
-    eval(code);
-  
-    if (window.ICONS) {
-      icons = window.ICONS;
-      console.log('Icons loaded successfully!', Object.keys(icons).length);
-      initIconSelect();
-    } else {
-      throw new Error('ICONS not found after eval');
+        eval(code);
+      
+        if (window.ICONS) {
+          icons = window.ICONS;
+          console.log('Icons loaded successfully!', Object.keys(icons).length);
+          initIconSelect();
+        } else {
+          throw new Error('ICONS not found after eval');
+        }
+        
+      } catch (error) {
+        console.error('Failed to load icons:', error);
+        document.getElementById('selectedIconName').textContent = 'Failed to load icons';
+      }
     }
     
-  } catch (error) {
-    console.error('Failed to load icons:', error);
-    document.getElementById('selectedIconName').textContent = 'Failed to load icons';
-  }
-}
     async function init() {
       await loadIconsFromGitHub();
       createParticles();
@@ -1386,25 +1881,25 @@ async function loadIconsFromGitHub() {
     }
 
     function initIconSelect() {
-  const optionsContainer = document.getElementById('iconOptions');
-  optionsContainer.innerHTML = '';
-  
-  Object.entries(icons).forEach(([key, svg]) => {
-    const option = document.createElement('div');
-    option.className = 'select-option' + (key === 'package' ? ' selected' : '');
-    option.setAttribute('data-value', key);
-    option.onclick = () => selectIcon(key);
-    option.innerHTML = `
-      <div class="option-icon">${svg}</div>
-      <div class="option-label">${formatIconName(key)}</div>
-    `;
-    optionsContainer.appendChild(option);
-  });
-  
-  if (icons.package) {
-    selectIcon('package');
-  }
-}
+      const optionsContainer = document.getElementById('iconOptions');
+      optionsContainer.innerHTML = '';
+      
+      Object.entries(icons).forEach(([key, svg]) => {
+        const option = document.createElement('div');
+        option.className = 'select-option' + (key === 'package' ? ' selected' : '');
+        option.setAttribute('data-value', key);
+        option.onclick = () => selectIcon(key);
+        option.innerHTML = `
+          <div class="option-icon">${svg}</div>
+          <div class="option-label">${formatIconName(key)}</div>
+        `;
+        optionsContainer.appendChild(option);
+      });
+      
+      if (icons.package) {
+        selectIcon('package');
+      }
+    }
 
     function checkOwnerMode() {
       isOwnerMode = window.location.search.includes('owner=true');
@@ -1441,12 +1936,18 @@ async function loadIconsFromGitHub() {
         const header = document.getElementById('selectHeader');
         if (!header.contains(e.target) && !dropdown.contains(e.target)) {
           dropdown.classList.remove('show');
+          header.classList.remove('open');
         }
       });
       
       document.getElementById('selectHeader').addEventListener('click', function() {
-        document.getElementById('selectDropdown').classList.toggle('show');
-        document.getElementById('iconSearch').focus();
+        const dropdown = document.getElementById('selectDropdown');
+        const isOpen = dropdown.classList.contains('show');
+        dropdown.classList.toggle('show');
+        this.classList.toggle('open');
+        if (!isOpen) {
+          document.getElementById('iconSearch').focus();
+        }
       });
       
       document.getElementById('iconSearch').addEventListener('input', function(e) {
@@ -1467,7 +1968,7 @@ async function loadIconsFromGitHub() {
       
       options.forEach(option => {
         const iconName = option.getAttribute('data-value');
-        const label = document.querySelector(`[data-value="${iconName}"] .option-label`).textContent.toLowerCase();
+        const label = option.querySelector('.option-label').textContent.toLowerCase();
         
         if (query === '' || label.includes(query) || iconName.includes(query)) {
           option.style.display = 'flex';
@@ -1477,40 +1978,36 @@ async function loadIconsFromGitHub() {
         }
       });
       
+      const noResults = document.getElementById('noIconResults');
       if (visibleCount === 0) {
-        const container = document.getElementById('iconOptions');
-        const noResults = document.getElementById('noIconResults');
-        
         if (!noResults) {
           const message = document.createElement('div');
           message.id = 'noIconResults';
-          message.style.textAlign = 'center';
-          message.style.padding = '15px';
-          message.style.color = '#888';
+          message.style.cssText = 'text-align: center; padding: 20px; color: #666; grid-column: 1 / -1;';
           message.textContent = 'No icons found';
-          container.appendChild(message);
+          document.getElementById('iconOptions').appendChild(message);
         }
-      } else {
-        const noResults = document.getElementById('noIconResults');
-        if (noResults) noResults.remove();
+      } else if (noResults) {
+        noResults.remove();
       }
     }
 
     function selectIcon(iconName) {
       document.getElementById('pluginIcon').value = iconName;
-      
-      const selectedIconName = document.getElementById('selectedIconName');
-      selectedIconName.textContent = formatIconName(iconName);
+      document.getElementById('selectedIconName').textContent = formatIconName(iconName);
       
       const selectedIcon = document.getElementById('selectedIcon');
-      selectedIcon.innerHTML = document.querySelector(`.select-option[data-value="${iconName}"] .option-icon`).innerHTML;
+      const optionIcon = document.querySelector(`.select-option[data-value="${iconName}"] .option-icon`);
+      if (optionIcon) {
+        selectedIcon.innerHTML = optionIcon.innerHTML;
+      }
       
       document.getElementById('selectDropdown').classList.remove('show');
+      document.getElementById('selectHeader').classList.remove('open');
       
       document.querySelectorAll('.select-option').forEach(option => {
-        option.classList.remove('selected');
+        option.classList.toggle('selected', option.getAttribute('data-value') === iconName);
       });
-      document.querySelector(`.select-option[data-value="${iconName}"]`).classList.add('selected');
     }
 
     function formatIconName(iconName) {
@@ -1528,14 +2025,12 @@ async function loadIconsFromGitHub() {
       const max = input.maxLength;
       
       counter.textContent = `${current}/${max}`;
+      counter.classList.remove('warning', 'error');
       
       if (current === max) {
         counter.classList.add('error');
       } else if (current > max * 0.8) {
         counter.classList.add('warning');
-        counter.classList.remove('error');
-      } else {
-        counter.classList.remove('warning', 'error');
       }
     }
 
@@ -1614,7 +2109,7 @@ async function loadIconsFromGitHub() {
             ${canEdit ? `
               <div class="plugin-actions">
                 <button class="action-btn edit-btn" onclick="event.stopPropagation(); editPlugin('${plugin.id}')">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                   </svg>
@@ -1649,22 +2144,18 @@ async function loadIconsFromGitHub() {
       }).join('');
     }
 
-function getIconSvg(iconName) {
-  if (icons && icons[iconName]) {
-    return icons[iconName];
-  }
+    function getIconSvg(iconName) {
+      if (icons && icons[iconName]) {
+        return icons[iconName];
+      }
+      
+      if (icons && icons.package) {
+        return icons.package;
+      }
+      
+      return '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>';
+    }
 
-  const iconElement = document.querySelector(`.select-option[data-value="${iconName}"] .option-icon`);
-  if (iconElement) {
-    return iconElement.innerHTML;
-  }
-  
-  if (icons && icons.package) {
-    return icons.package;
-  }
-  
-  return '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>';
-}
     function handleSearch(e) {
       const query = e.target.value.toLowerCase();
       
@@ -1684,64 +2175,75 @@ function getIconSvg(iconName) {
       displayPlugins(filtered);
     }
 
-function openCreateModal() {
-  const now = Date.now();
+    function openCreateModal() {
+      const now = Date.now();
 
-  if (timeoutEndTime > now) {
-    const remainingSeconds = Math.ceil((timeoutEndTime - now) / 1000);
-    showToast(`You're creating plugins too fast! Wait <span class="countdown">${remainingSeconds}</span> seconds`, 'error');
-    
-    if (countdownInterval) clearInterval(countdownInterval);
-    
-    countdownInterval = setInterval(() => {
-      const remaining = Math.ceil((timeoutEndTime - Date.now()) / 1000);
-      if (remaining <= 0) {
-        clearInterval(countdownInterval);
-        timeoutEndTime = 0;
-        localStorage.removeItem('pluginTimeout');
-        const toast = document.getElementById('toast');
-        if (toast.classList.contains('show')) {
-          toast.classList.remove('show');
-        }
-      } else {
-        const countdownElement = document.querySelector('.countdown');
-        if (countdownElement) {
-          countdownElement.textContent = remaining;
-        }
+      if (timeoutEndTime > now) {
+        const remainingSeconds = Math.ceil((timeoutEndTime - now) / 1000);
+        showToast(`You're creating plugins too fast! Wait <span class="countdown">${remainingSeconds}</span> seconds`, 'error');
+        
+        if (countdownInterval) clearInterval(countdownInterval);
+        
+        countdownInterval = setInterval(() => {
+          const remaining = Math.ceil((timeoutEndTime - Date.now()) / 1000);
+          if (remaining <= 0) {
+            clearInterval(countdownInterval);
+            timeoutEndTime = 0;
+            localStorage.removeItem('pluginTimeout');
+            const toast = document.getElementById('toast');
+            if (toast.classList.contains('show')) {
+              toast.classList.remove('show');
+            }
+          } else {
+            const countdownElement = document.querySelector('.countdown');
+            if (countdownElement) {
+              countdownElement.textContent = remaining;
+            }
+          }
+        }, 1000);
+        return;
       }
-    }, 1000);
-    return;
-  }
-  
-  resetForm();
-  document.getElementById('modalTitle').textContent = 'Create New Plugin';
-  document.getElementById('submitBtn').textContent = 'Create Plugin';
-  document.getElementById('createModal').classList.add('active');
-}
+      
+      resetForm();
+      document.getElementById('modalTitle').textContent = 'Create New Plugin';
+      document.getElementById('submitBtn').innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+        <span>Create Plugin</span>
+      `;
+      document.getElementById('createModal').classList.add('active');
+    }
 
     function closeCreateModal() {
       document.getElementById('createModal').classList.remove('active');
       resetForm();
     }
 
-function resetForm() {
-  document.getElementById('pluginForm').reset();
-  document.getElementById('editingPluginId').value = '';
-  sections = {};
-  sectionIdCounter = 0;
-  document.getElementById('sectionsContainer').innerHTML = '';
-  document.getElementById('nameCounter').textContent = '0/25';
-  document.getElementById('authorCounter').textContent = '0/20';
-  hideAllErrors();
+    function resetForm() {
+      document.getElementById('pluginForm').reset();
+      document.getElementById('editingPluginId').value = '';
+      sections = {};
+      sectionIdCounter = 0;
+      document.getElementById('sectionsContainer').innerHTML = '';
+      document.getElementById('nameCounter').textContent = '0/25';
+      document.getElementById('authorCounter').textContent = '0/20';
+      updateSectionsCount();
+      hideAllErrors();
 
-  if (icons && Object.keys(icons).length > 0) {
-    selectIcon('package');
-  }
-  
-  document.getElementById('nameFormGroup').style.display = 'block';
-  document.getElementById('authorFormGroup').style.display = 'block';
-  document.getElementById('descriptionFormGroup').style.display = 'block';
-}
+      if (icons && Object.keys(icons).length > 0) {
+        selectIcon('package');
+      }
+      
+      document.getElementById('nameFormGroup').style.display = 'block';
+      document.getElementById('authorFormGroup').style.display = 'block';
+      document.getElementById('descriptionFormGroup').style.display = 'block';
+    }
+
+    function updateSectionsCount() {
+      const count = Object.keys(sections).length;
+      document.getElementById('sectionsCount').textContent = `${count} section${count !== 1 ? 's' : ''}`;
+    }
 
     function addSection() {
       const sectionId = `section_${sectionIdCounter++}`;
@@ -1751,6 +2253,7 @@ function resetForm() {
       };
       
       renderSection(sectionId);
+      updateSectionsCount();
     }
 
     function renderSection(sectionId) {
@@ -1759,30 +2262,57 @@ function resetForm() {
       sectionDiv.className = 'section-builder';
       sectionDiv.id = sectionId;
       
+      const sectionNumber = Object.keys(sections).indexOf(sectionId) + 1;
+      
       sectionDiv.innerHTML = `
+        <span class="section-number">Section ${sectionNumber}</span>
         <div class="section-header">
-          <input type="text" 
-                 class="section-name-input" 
-                 value="${sections[sectionId].name}" 
-                 placeholder="Section name"
-                 onchange="updateSectionName('${sectionId}', this.value)">
+          <div class="section-name-wrapper">
+            <input type="text" 
+                   class="section-name-input" 
+                   value="${sections[sectionId].name}" 
+                   placeholder="Enter section name..."
+                   onchange="updateSectionName('${sectionId}', this.value)">
+          </div>
           <button type="button" class="remove-section-btn" onclick="removeSection('${sectionId}')">
-            Remove Section
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+            </svg>
+            Remove
           </button>
         </div>
         
+        <div class="bypasses-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 11 12 14 22 4"/>
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+          </svg>
+          Bypasses in this section
+        </div>
+        
         <div class="bypasses-container" id="bypasses_${sectionId}">
-          ${sections[sectionId].bypasses.length === 0 ? '<span style="color: #666; font-size: 13px;">No bypasses yet</span>' : ''}
+          <span class="bypasses-empty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M8 12h8"/>
+            </svg>
+            No bypasses added yet
+          </span>
         </div>
         
         <div class="bypass-input-group">
-          <input type="text" 
-                 class="bypass-input" 
-                 id="bypassInput_${sectionId}"
-                 placeholder="Enter bypass text..."
-                 onkeypress="if(event.key === 'Enter') { event.preventDefault(); addBypass('${sectionId}'); }">
+          <div class="bypass-input-wrapper">
+            <input type="text" 
+                   class="bypass-input" 
+                   id="bypassInput_${sectionId}"
+                   placeholder="Enter bypass text..."
+                   onkeypress="if(event.key === 'Enter') { event.preventDefault(); addBypass('${sectionId}'); }">
+          </div>
           <button type="button" class="add-bypass-btn" onclick="addBypass('${sectionId}')">
-            Add Bypass
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+            </svg>
+            Add
           </button>
         </div>
       `;
@@ -1798,6 +2328,14 @@ function resetForm() {
     function removeSection(sectionId) {
       delete sections[sectionId];
       document.getElementById(sectionId).remove();
+      updateSectionsCount();
+      
+      document.querySelectorAll('.section-builder').forEach((section, index) => {
+        const numberSpan = section.querySelector('.section-number');
+        if (numberSpan) {
+          numberSpan.textContent = `Section ${index + 1}`;
+        }
+      });
     }
 
     function addBypass(sectionId) {
@@ -1827,7 +2365,15 @@ function resetForm() {
       const bypasses = sections[sectionId].bypasses;
       
       if (bypasses.length === 0) {
-        container.innerHTML = '<span style="color: #666; font-size: 13px;">No bypasses yet</span>';
+        container.innerHTML = `
+          <span class="bypasses-empty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M8 12h8"/>
+            </svg>
+            No bypasses added yet
+          </span>
+        `;
         return;
       }
       
@@ -1851,7 +2397,14 @@ function resetForm() {
       resetForm();
       
       document.getElementById('modalTitle').textContent = 'Edit Plugin';
-      document.getElementById('submitBtn').textContent = 'Save Changes';
+      document.getElementById('submitBtn').innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+          <polyline points="17 21 17 13 7 13 7 21"/>
+          <polyline points="7 3 7 8 15 8"/>
+        </svg>
+        <span>Save Changes</span>
+      `;
       document.getElementById('editingPluginId').value = pluginId;
 
       if (!isOwnerMode) {
@@ -1878,6 +2431,7 @@ function resetForm() {
         renderSection(sectionId);
       });
       
+      updateSectionsCount();
       document.getElementById('createModal').classList.add('active');
     }
 
@@ -1920,7 +2474,12 @@ function resetForm() {
       const isEditing = document.getElementById('editingPluginId').value;
       
       submitBtn.disabled = true;
-      submitBtn.textContent = isEditing ? 'Saving...' : 'Creating...';
+      submitBtn.innerHTML = `
+        <svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;">
+          <path d="M21 12a9 9 0 11-6.219-8.56"/>
+        </svg>
+        <span>${isEditing ? 'Saving...' : 'Creating...'}</span>
+      `;
       
       const pluginData = {
         name: document.getElementById('pluginName').value.trim(),
@@ -1929,8 +2488,6 @@ function resetForm() {
         icon: document.getElementById('pluginIcon').value || 'package',
         sections: {}
       };
-
-      console.log('Selected icon:', pluginData.icon);
       
       Object.values(sections).forEach(section => {
         if (section.bypasses.length > 0) {
@@ -1983,7 +2540,19 @@ function resetForm() {
         showToast(error.message || 'Failed to save plugin. Please try again.', 'error');
       } finally {
         submitBtn.disabled = false;
-        submitBtn.textContent = isEditing ? 'Save Changes' : 'Create Plugin';
+        submitBtn.innerHTML = isEditing ? `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/>
+            <polyline points="7 3 7 8 15 8"/>
+          </svg>
+          <span>Save Changes</span>
+        ` : `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 5v14M5 12h14"/>
+          </svg>
+          <span>Create Plugin</span>
+        `;
       }
     }
 
@@ -2006,9 +2575,9 @@ function resetForm() {
       return isValid;
     }
 
-function viewPlugin(pluginId) {
-  window.location.href = `/plugin-details?id=${pluginId}`;
-}
+    function viewPlugin(pluginId) {
+      window.location.href = `/plugin-details?id=${pluginId}`;
+    }
 
     function hideAllErrors() {
       document.querySelectorAll('.error-message').forEach(el => {
@@ -2055,6 +2624,15 @@ function viewPlugin(pluginId) {
       
       lastScrollTop = scrollTop;
     });
+
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+    `;
+    document.head.appendChild(style);
 
     document.addEventListener('DOMContentLoaded', init);
   </script>
