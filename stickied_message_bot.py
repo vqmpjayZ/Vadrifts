@@ -9,6 +9,8 @@ GUILD_ID = 1241797935100989594
 
 intents = discord.Intents.default()
 intents.message_content = True
+intents.guilds = True
+intents.webhooks = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 stickied_messages = {}
@@ -60,14 +62,27 @@ def create_embed_from_data(data):
     
     return embed
 
+async def get_or_create_webhook(channel):
+    webhooks = await channel.webhooks()
+    webhook = discord.utils.get(webhooks, name="Stickied Bot")
+    
+    if webhook is None:
+        webhook = await channel.create_webhook(name="Stickied Bot")
+    
+    return webhook
+
 @bot.tree.command(name="setstickied", description="Set a stickied text message.", guild=discord.Object(id=GUILD_ID))
 async def setstickied(
     interaction: discord.Interaction, 
     message_text: str,
     channel: discord.TextChannel = None,
-    send_now: bool = False,
-    cooldown: int = 0
+    cooldown: int = 0,
+    use_webhook: bool = False,
+    webhook_name: str = None,
+    webhook_avatar: str = None
 ):
+    await interaction.response.defer(ephemeral=True)
+    
     target_channel = channel or interaction.channel
     channel_id = str(target_channel.id)
     
@@ -76,20 +91,32 @@ async def setstickied(
         "embed": None, 
         "last_message": None,
         "cooldown": cooldown,
-        "last_sent": 0
+        "last_sent": 0,
+        "use_webhook": use_webhook,
+        "webhook_name": webhook_name,
+        "webhook_avatar": webhook_avatar
     }
     save_data()
     
-    if send_now:
-        msg = await target_channel.send(message_text)
+    try:
+        if use_webhook:
+            webhook = await get_or_create_webhook(target_channel)
+            msg = await webhook.send(
+                content=message_text,
+                username=webhook_name or "Stickied Message",
+                avatar_url=webhook_avatar,
+                wait=True
+            )
+        else:
+            msg = await target_channel.send(message_text)
+        
         stickied_messages[channel_id]["last_message"] = msg.id
         stickied_messages[channel_id]["last_sent"] = time.time()
         save_data()
-    
-    await interaction.response.send_message(
-        f"✅ Stickied message set in {target_channel.mention}" + (" and sent!" if send_now else ""),
-        ephemeral=True
-    )
+        
+        await interaction.followup.send(f"✅ Stickied message set and sent in {target_channel.mention}!")
+    except Exception as e:
+        await interaction.followup.send(f"❌ Error: {str(e)}")
 
 @bot.tree.command(name="setstickiedembed", description="Set a stickied embed message.", guild=discord.Object(id=GUILD_ID))
 async def setstickiedembed(
@@ -97,13 +124,17 @@ async def setstickiedembed(
     title: str, 
     description: str,
     channel: discord.TextChannel = None,
-    send_now: bool = False,
     cooldown: int = 0,
     color: str = None,
     footer: str = None,
     image_url: str = None,
-    thumbnail_url: str = None
+    thumbnail_url: str = None,
+    use_webhook: bool = False,
+    webhook_name: str = None,
+    webhook_avatar: str = None
 ):
+    await interaction.response.defer(ephemeral=True)
+    
     target_channel = channel or interaction.channel
     channel_id = str(target_channel.id)
     
@@ -121,24 +152,39 @@ async def setstickiedembed(
         "embed": embed_data, 
         "last_message": None,
         "cooldown": cooldown,
-        "last_sent": 0
+        "last_sent": 0,
+        "use_webhook": use_webhook,
+        "webhook_name": webhook_name,
+        "webhook_avatar": webhook_avatar
     }
     save_data()
     
-    if send_now:
+    try:
         embed = create_embed_from_data(embed_data)
-        msg = await target_channel.send(embed=embed)
+        
+        if use_webhook:
+            webhook = await get_or_create_webhook(target_channel)
+            msg = await webhook.send(
+                embed=embed,
+                username=webhook_name or "Stickied Message",
+                avatar_url=webhook_avatar,
+                wait=True
+            )
+        else:
+            msg = await target_channel.send(embed=embed)
+        
         stickied_messages[channel_id]["last_message"] = msg.id
         stickied_messages[channel_id]["last_sent"] = time.time()
         save_data()
-    
-    await interaction.response.send_message(
-        f"✅ Stickied embed set in {target_channel.mention}" + (" and sent!" if send_now else ""),
-        ephemeral=True
-    )
+        
+        await interaction.followup.send(f"✅ Stickied embed set and sent in {target_channel.mention}!")
+    except Exception as e:
+        await interaction.followup.send(f"❌ Error: {str(e)}")
 
 @bot.tree.command(name="removestickied", description="Remove stickied message from a channel.", guild=discord.Object(id=GUILD_ID))
 async def removestickied(interaction: discord.Interaction, channel: discord.TextChannel = None):
+    await interaction.response.defer(ephemeral=True)
+    
     target_channel = channel or interaction.channel
     channel_id = str(target_channel.id)
     
@@ -152,14 +198,16 @@ async def removestickied(interaction: discord.Interaction, channel: discord.Text
         
         del stickied_messages[channel_id]
         save_data()
-        await interaction.response.send_message(f"✅ Stickied message removed from {target_channel.mention}.", ephemeral=True)
+        await interaction.followup.send(f"✅ Stickied message removed from {target_channel.mention}.")
     else:
-        await interaction.response.send_message(f"❌ No stickied message set in {target_channel.mention}.", ephemeral=True)
+        await interaction.followup.send(f"❌ No stickied message set in {target_channel.mention}.")
 
 @bot.tree.command(name="liststickied", description="List all active stickied messages in the server.", guild=discord.Object(id=GUILD_ID))
 async def liststickied(interaction: discord.Interaction):
+    await interaction.response.defer(ephemeral=True)
+    
     if not stickied_messages:
-        await interaction.response.send_message("No stickied messages set.", ephemeral=True)
+        await interaction.followup.send("No stickied messages set.")
         return
     
     embed = Embed(
@@ -176,14 +224,15 @@ async def liststickied(interaction: discord.Interaction):
                 content_preview = content_preview[:50] + "..."
             
             cooldown_text = f" • {data['cooldown']}s cooldown" if data.get('cooldown', 0) > 0 else ""
+            webhook_text = " • Via Webhook" if data.get('use_webhook') else ""
             embed.add_field(
                 name=f"#{channel.name}",
-                value=f"`{content_preview}`{cooldown_text}",
+                value=f"`{content_preview}`{cooldown_text}{webhook_text}",
                 inline=False
             )
     
     embed.set_footer(text="Use /removestickied to remove them")
-    await interaction.response.send_message(embed=embed, ephemeral=True)
+    await interaction.followup.send(embed=embed)
 
 @bot.tree.command(name="stickiedhelp", description="Show stickied bot help and commands.", guild=discord.Object(id=GUILD_ID))
 async def stickiedhelp(interaction: discord.Interaction):
@@ -199,8 +248,10 @@ async def stickiedhelp(interaction: discord.Interaction):
             "**Set a text stickied message**\n"
             "`message_text` - Your message\n"
             "`channel` - Where to stick (optional)\n"
-            "`send_now` - Send immediately (optional)\n"
-            "`cooldown` - Seconds delay between re-sticks (optional)"
+            "`cooldown` - Seconds delay between re-sticks (optional)\n"
+            "`use_webhook` - Send via webhook (optional)\n"
+            "`webhook_name` - Custom name (optional)\n"
+            "`webhook_avatar` - Custom avatar URL (optional)"
         ),
         inline=False
     )
@@ -212,12 +263,14 @@ async def stickiedhelp(interaction: discord.Interaction):
             "`title` - Embed title\n"
             "`description` - Embed description\n"
             "`channel` - Where to stick (optional)\n"
-            "`send_now` - Send immediately (optional)\n"
             "`cooldown` - Seconds delay (optional)\n"
             "`color` - Hex color like #9c88ff (optional)\n"
             "`footer` - Footer text (optional)\n"
             "`image_url` - Full image URL (optional)\n"
-            "`thumbnail_url` - Small thumbnail URL (optional)"
+            "`thumbnail_url` - Small thumbnail URL (optional)\n"
+            "`use_webhook` - Send via webhook (optional)\n"
+            "`webhook_name` - Custom name (optional)\n"
+            "`webhook_avatar` - Custom avatar URL (optional)"
         ),
         inline=False
     )
@@ -238,8 +291,9 @@ async def stickiedhelp(interaction: discord.Interaction):
         name="💡 Pro Tips",
         value=(
             "• Use `cooldown` to prevent spam (e.g. 10 = only re-stick every 10 seconds)\n"
-            "• Use `send_now=True` to test your stickied message instantly\n"
-            "• Embed colors use hex codes without # (e.g. 9c88ff for purple)"
+            "• Webhooks let you customize the name/avatar of stickied messages\n"
+            "• Messages are sent instantly when you set them\n"
+            "• Embed colors use hex codes (e.g. 9c88ff for purple)"
         ),
         inline=False
     )
@@ -270,15 +324,37 @@ async def on_message(message):
             except:
                 pass
         
-        if data["embed"]:
-            embed = create_embed_from_data(data["embed"])
-            new_msg = await message.channel.send(embed=embed)
-        else:
-            new_msg = await message.channel.send(data["content"])
-        
-        stickied_messages[channel_id]["last_message"] = new_msg.id
-        stickied_messages[channel_id]["last_sent"] = time.time()
-        save_data()
+        try:
+            if data.get("use_webhook"):
+                webhook = await get_or_create_webhook(message.channel)
+                
+                if data["embed"]:
+                    embed = create_embed_from_data(data["embed"])
+                    new_msg = await webhook.send(
+                        embed=embed,
+                        username=data.get("webhook_name") or "Stickied Message",
+                        avatar_url=data.get("webhook_avatar"),
+                        wait=True
+                    )
+                else:
+                    new_msg = await webhook.send(
+                        content=data["content"],
+                        username=data.get("webhook_name") or "Stickied Message",
+                        avatar_url=data.get("webhook_avatar"),
+                        wait=True
+                    )
+            else:
+                if data["embed"]:
+                    embed = create_embed_from_data(data["embed"])
+                    new_msg = await message.channel.send(embed=embed)
+                else:
+                    new_msg = await message.channel.send(data["content"])
+            
+            stickied_messages[channel_id]["last_message"] = new_msg.id
+            stickied_messages[channel_id]["last_sent"] = time.time()
+            save_data()
+        except Exception as e:
+            print(f"Error sending stickied message: {e}")
     
     await bot.process_commands(message)
 
