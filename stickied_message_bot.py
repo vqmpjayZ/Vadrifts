@@ -73,11 +73,11 @@ async def get_or_create_webhook(channel):
 def get_channel_key(guild_id, channel_id):
     return f"{guild_id}_{channel_id}"
 
-@bot.tree.command(name="setstickied", description="Set a stickied text message.")
+@bot.tree.command(name="stick", description="Set a stickied text message.")
 @app_commands.default_permissions(manage_messages=True)
-async def setstickied(
+async def stick(
     interaction: discord.Interaction, 
-    message_text: str,
+    message: str,
     channel: discord.TextChannel = None,
     cooldown: int = 0,
     use_webhook: bool = False,
@@ -90,7 +90,7 @@ async def setstickied(
     channel_key = get_channel_key(interaction.guild_id, target_channel.id)
     
     stickied_messages[channel_key] = {
-        "content": message_text, 
+        "content": message, 
         "embed": None, 
         "last_message": None,
         "cooldown": cooldown,
@@ -105,25 +105,25 @@ async def setstickied(
         if use_webhook:
             webhook = await get_or_create_webhook(target_channel)
             msg = await webhook.send(
-                content=message_text,
+                content=message,
                 username=webhook_name or "Stickied Message",
                 avatar_url=webhook_avatar,
                 wait=True
             )
         else:
-            msg = await target_channel.send(message_text)
+            msg = await target_channel.send(message)
         
         stickied_messages[channel_key]["last_message"] = msg.id
         stickied_messages[channel_key]["last_sent"] = time.time()
         save_data()
         
-        await interaction.followup.send(f"✅ Stickied message set and sent in {target_channel.mention}!")
+        await interaction.followup.send(f"✅ Stickied message set in {target_channel.mention}!")
     except Exception as e:
         await interaction.followup.send(f"❌ Error: {str(e)}")
 
-@bot.tree.command(name="setstickiedembed", description="Set a stickied embed message.")
+@bot.tree.command(name="stickembed", description="Set a stickied embed message.")
 @app_commands.default_permissions(manage_messages=True)
-async def setstickiedembed(
+async def stickembed(
     interaction: discord.Interaction, 
     title: str, 
     description: str,
@@ -181,13 +181,13 @@ async def setstickiedembed(
         stickied_messages[channel_key]["last_sent"] = time.time()
         save_data()
         
-        await interaction.followup.send(f"✅ Stickied embed set and sent in {target_channel.mention}!")
+        await interaction.followup.send(f"✅ Stickied embed set in {target_channel.mention}!")
     except Exception as e:
         await interaction.followup.send(f"❌ Error: {str(e)}")
 
-@bot.tree.command(name="removestickied", description="Remove stickied message from a channel.")
+@bot.tree.command(name="unstick", description="Remove stickied message from a channel.")
 @app_commands.default_permissions(manage_messages=True)
-async def removestickied(interaction: discord.Interaction, channel: discord.TextChannel = None):
+async def unstick(interaction: discord.Interaction, channel: discord.TextChannel = None):
     await interaction.response.defer(ephemeral=True)
     
     target_channel = channel or interaction.channel
@@ -205,11 +205,11 @@ async def removestickied(interaction: discord.Interaction, channel: discord.Text
         save_data()
         await interaction.followup.send(f"✅ Stickied message removed from {target_channel.mention}.")
     else:
-        await interaction.followup.send(f"❌ No stickied message set in {target_channel.mention}.")
+        await interaction.followup.send(f"❌ No stickied message in {target_channel.mention}.")
 
-@bot.tree.command(name="liststickied", description="List all active stickied messages in this server.")
+@bot.tree.command(name="list", description="List all active stickied messages in this server.")
 @app_commands.default_permissions(manage_messages=True)
-async def liststickied(interaction: discord.Interaction):
+async def list_stickied(interaction: discord.Interaction):
     await interaction.response.defer(ephemeral=True)
     
     server_stickied = {k: v for k, v in stickied_messages.items() if k.startswith(f"{interaction.guild_id}_")}
@@ -220,7 +220,7 @@ async def liststickied(interaction: discord.Interaction):
     
     embed = Embed(
         title="📌 Active Stickied Messages",
-        description=f"Total: {len(server_stickied)} channel(s) in this server",
+        description=f"Total: {len(server_stickied)} channel(s)",
         color=0x9c88ff
     )
     
@@ -233,32 +233,32 @@ async def liststickied(interaction: discord.Interaction):
                 content_preview = content_preview[:50] + "..."
             
             cooldown_text = f" • {data['cooldown']}s cooldown" if data.get('cooldown', 0) > 0 else ""
-            webhook_text = " • Via Webhook" if data.get('use_webhook') else ""
+            webhook_text = " • Webhook" if data.get('use_webhook') else ""
             embed.add_field(
                 name=f"#{channel.name}",
                 value=f"`{content_preview}`{cooldown_text}{webhook_text}",
                 inline=False
             )
     
-    embed.set_footer(text="Use /removestickied to remove them")
+    embed.set_footer(text="Use /unstick to remove")
     await interaction.followup.send(embed=embed)
 
-@bot.tree.command(name="stickiedhelp", description="Show stickied bot help and commands.")
-async def stickiedhelp(interaction: discord.Interaction):
+@bot.tree.command(name="help", description="Show bot commands and info.")
+async def help_command(interaction: discord.Interaction):
     embed = Embed(
-        title="📌 Stickied Message Bot",
-        description="Keep important messages pinned at the bottom of your channels automatically!",
+        title="📌 Stickied Bot",
+        description="Keep important messages pinned at the bottom of your channels!",
         color=0x9c88ff
     )
     
     embed.add_field(
-        name="📝 /setstickied",
+        name="📝 /stick",
         value=(
             "**Set a text stickied message**\n"
-            "`message_text` - Your message\n"
-            "`channel` - Where to stick (optional)\n"
-            "`cooldown` - Seconds delay between re-sticks (optional)\n"
-            "`use_webhook` - Send via webhook (optional)\n"
+            "`message` - Your message\n"
+            "`channel` - Target channel (optional)\n"
+            "`cooldown` - Seconds between re-sticks (optional)\n"
+            "`use_webhook` - Custom appearance (optional)\n"
             "`webhook_name` - Custom name (optional)\n"
             "`webhook_avatar` - Custom avatar URL (optional)"
         ),
@@ -266,18 +266,18 @@ async def stickiedhelp(interaction: discord.Interaction):
     )
     
     embed.add_field(
-        name="✨ /setstickiedembed",
+        name="✨ /stickembed",
         value=(
             "**Set an embed stickied message**\n"
             "`title` - Embed title\n"
             "`description` - Embed description\n"
-            "`channel` - Where to stick (optional)\n"
-            "`cooldown` - Seconds delay (optional)\n"
+            "`channel` - Target channel (optional)\n"
+            "`cooldown` - Seconds between re-sticks (optional)\n"
             "`color` - Hex color like #9c88ff (optional)\n"
             "`footer` - Footer text (optional)\n"
-            "`image_url` - Full image URL (optional)\n"
-            "`thumbnail_url` - Small thumbnail URL (optional)\n"
-            "`use_webhook` - Send via webhook (optional)\n"
+            "`image_url` - Large image (optional)\n"
+            "`thumbnail_url` - Small image (optional)\n"
+            "`use_webhook` - Custom appearance (optional)\n"
             "`webhook_name` - Custom name (optional)\n"
             "`webhook_avatar` - Custom avatar URL (optional)"
         ),
@@ -285,35 +285,38 @@ async def stickiedhelp(interaction: discord.Interaction):
     )
     
     embed.add_field(
-        name="🗑️ /removestickied",
-        value="**Remove a stickied message**\n`channel` - Channel to remove from (optional)",
+        name="🗑️ /unstick",
+        value="**Remove a stickied message**\n`channel` - Target channel (optional)",
         inline=False
     )
     
     embed.add_field(
-        name="📋 /liststickied",
-        value="**View all active stickied messages** in this server",
+        name="📋 /list",
+        value="**View all stickied messages** in this server",
         inline=False
     )
     
     embed.add_field(
-        name="💡 Pro Tips",
+        name="💡 Tips",
         value=(
-            "• Use `cooldown` to prevent spam (e.g. 10 = only re-stick every 10 seconds)\n"
-            "• Webhooks let you customize the name/avatar of stickied messages\n"
-            "• Messages are sent instantly when you set them\n"
-            "• Embed colors use hex codes (e.g. 9c88ff for purple)"
+            "• `cooldown` prevents spam (10 = wait 10s before re-sticking)\n"
+            "• Webhooks let you customize name & avatar\n"
+            "• Messages send instantly when set\n"
+            "• Colors use hex codes without # (e.g. 9c88ff)"
         ),
         inline=False
     )
     
-    embed.set_footer(text="Made with 💜 by Vadrifts • Requires Manage Messages permission")
+    embed.set_footer(text="Made with 💜 by Vadrifts • Requires Manage Messages")
     
     await interaction.response.send_message(embed=embed)
 
 @bot.event
 async def on_message(message):
     if message.author.bot:
+        return
+    
+    if not message.guild:
         return
     
     channel_key = get_channel_key(message.guild.id, message.channel.id)
