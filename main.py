@@ -473,11 +473,6 @@ def find_channels():
     usernames = data.get('usernames', [])
     return youtube_finder.find_multiple_channels(usernames)
 
-from bypass_dashboard import BypassDashboard
-
-bypass_dashboard = BypassDashboard()
-bypass_dashboard.register_routes(app)
-
 if __name__ == '__main__':
     import threading
 
