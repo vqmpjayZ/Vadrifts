@@ -4,8 +4,6 @@ from discord.ext import commands
 import asyncio
 import random
 import re
-import json
-import aiohttp
 from datetime import datetime, timedelta
 from config import DISCORD_TOKEN
 
@@ -18,9 +16,6 @@ CO_OWNER_ID = 1144213765424947251
 GUILD_ID = 1241797935100989594
 DELAY_SECONDS = 1
 BOOST_TEST_CHANNEL_ID = 1270301984897110148
-
-WEBSITE_URL = "https://vadrifts.onrender.com"
-API_SECRET = "vadriftsisalwaysinseason"
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -40,136 +35,6 @@ async def send_good_boy_after_delay(user_id, channel):
         await channel.send(f"<@{user_id}> good boy")
         recent_boosts.pop(user_id, None)
         pending_tasks.pop(user_id, None)
-
-def parse_bypass_mappings(code_text):
-    try:
-        print("Starting to parse bypass mappings...")
-        
-        us_char_match = re.search(r'local US_CHAR = "([^"]*)"', code_text)
-        us_char = us_char_match.group(1) if us_char_match else ""
-        print(f"Found US_CHAR: '{us_char}'")
-        
-        auto_start = code_text.find('if currentMethod == "auto" then')
-        if auto_start == -1:
-            print("Could not find auto method section")
-            return None
-        
-        logic_start = code_text.find('local bypassLogic = {', auto_start)
-        if logic_start == -1:
-            print("Could not find bypassLogic table")
-            return None
-        
-        brace_count = 0
-        pos = logic_start + len('local bypassLogic = {')
-        start_pos = pos
-        
-        while pos < len(code_text):
-            if code_text[pos] == '{':
-                brace_count += 1
-            elif code_text[pos] == '}':
-                if brace_count == 0:
-                    break
-                brace_count -= 1
-            pos += 1
-        
-        if pos >= len(code_text):
-            print("Could not find closing brace for bypassLogic")
-            return None
-        
-        table_content = code_text[start_pos:pos]
-        print(f"Extracted table content length: {len(table_content)}")
-        
-        methods = {}
-        
-        i = 0
-        while i < len(table_content):
-            match = re.search(r'\[(\d+)\]\s*=\s*\{', table_content[i:])
-            if not match:
-                break
-            method_num = int(match.group(1))
-            start = i + match.start()
-            
-            brace_start = i + match.end() - 1
-            brace_count = 1
-            pos = brace_start + 1
-            
-            while pos < len(table_content) and brace_count > 0:
-                if table_content[pos] == '{':
-                    brace_count += 1
-                elif table_content[pos] == '}':
-                    brace_count -= 1
-                pos += 1
-            
-            if brace_count == 0:
-                method_content = table_content[brace_start + 1:pos - 1]
-                
-                mappings = {}
-                char_pattern = r'(\w+)="([^"]*)"'
-                for char_match in re.finditer(char_pattern, method_content):
-                    key = char_match.group(1)
-                    value = char_match.group(2)
-                    mappings[key] = value
-                
-                if '[" "]=US_CHAR' in method_content:
-                    mappings[" "] = us_char
-                
-                methods[str(method_num)] = mappings
-                print(f"Method {method_num}: found {len(mappings)} mappings")
-                
-                i = pos
-            else:
-                i += match.end()
-        
-        if not methods:
-            print("No methods found!")
-            return None
-        
-        priority_pattern = r'priorityOrder\s*=\s*\{([^}]+)\}'
-        priority_match = re.search(priority_pattern, code_text)
-        priority_order = [7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6]
-        
-        if priority_match:
-            priority_str = priority_match.group(1)
-            priority_nums = re.findall(r'\d+', priority_str)
-            if priority_nums:
-                priority_order = [int(x) for x in priority_nums]
-                print(f"Found priority order: {priority_order}")
-        
-        result = {
-            "us_char": us_char,
-            "methods": methods,
-            "priority_order": priority_order,
-            "timestamp": datetime.utcnow().isoformat()
-        }
-        
-        print(f"Successfully parsed {len(methods)} methods")
-        return result
-        
-    except Exception as e:
-        print(f"Error parsing bypass mappings: {e}")
-        import traceback
-        traceback.print_exc()
-        return None
-        
-async def update_bypass_data(data):
-    try:
-        print(f"Attempting to update bypass data to {WEBSITE_URL}/api/update_bypass")
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
-                f'{WEBSITE_URL}/api/update_bypass',
-                json=data,
-                headers={'Authorization': API_SECRET}
-            ) as resp:
-                response_text = await resp.text()
-                print(f"Server response: {resp.status} - {response_text}")
-                return resp.status == 200
-    except Exception as e:
-        print(f"Error updating bypass data: {e}")
-        return False
-
-def validate_bypass_code(content):
-    required_markers = ["bypassLogic", "local US_CHAR", "currentMethod"]
-    return all(marker in content for marker in required_markers)
 
 class HWIDModal(discord.ui.Modal, title="Enter Your HWID"):
     hwid = discord.ui.TextInput(label="Paste your HWID here", style=discord.TextStyle.short, placeholder="Example: ABCDEFGH-1234-IJKL-5678-MNOPQRSTUVW", required=True)
@@ -299,40 +164,6 @@ async def on_message(message):
 
     if message.author == bot.user:
         return
-
-    if isinstance(message.channel, discord.DMChannel) and message.author.id == OWNER_ID:
-        content = ""
-        
-        if message.content:
-            content = message.content
-        elif message.attachments:
-            for attachment in message.attachments:
-                if attachment.filename.endswith(('.lua', '.txt')):
-                    try:
-                        file_content = await attachment.read()
-                        content = file_content.decode('utf-8')
-                        break
-                    except:
-                        await message.channel.send("❌ Could not read file")
-                        return
-        
-        if content and validate_bypass_code(content):
-            try:
-                extracted_data = parse_bypass_mappings(content)
-                
-                if extracted_data:
-                    success = await update_bypass_data(extracted_data)
-                    
-                    if success:
-                        await message.channel.send("✅ Bypass mappings updated successfully!")
-                    else:
-                        await message.channel.send("❌ Failed to update mappings on server")
-                else:
-                    await message.channel.send("❌ Could not extract mappings from code")
-            except Exception as e:
-                await message.channel.send(f"❌ Error processing code: {str(e)}")
-                print(f"Error in bypass update: {e}")
-            return
 
     words = re.findall(r'\bmeow\b', message.content or "", flags=re.IGNORECASE)
     if words:
