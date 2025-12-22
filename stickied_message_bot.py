@@ -2,6 +2,7 @@ import os
 import json
 import time
 import discord
+import asyncio
 from discord.ext import commands
 from discord import Embed, app_commands
 
@@ -31,8 +32,14 @@ async def on_ready():
     print(f'Stickied bot logged in as {bot.user}')
     print(f'Bot is in {len(bot.guilds)} servers')
     try:
+        await asyncio.sleep(3)
         synced = await bot.tree.sync()
         print(f"Synced {len(synced)} global commands")
+    except discord.HTTPException as e:
+        if e.status == 429:
+            print("⚠️ Rate limited - commands already synced, skipping")
+        else:
+            print(f"Command sync error: {e}")
     except Exception as e:
         print(f"Slash command sync failed: {e}")
 
@@ -153,6 +160,30 @@ async def stick_prefix(ctx, *, message: str):
         await confirm.delete(delay=3)
     except Exception as e:
         await ctx.send(f"❌ Error: {str(e)}")
+
+@bot.command(name="cooldown")
+@commands.has_permissions(manage_messages=True)
+async def set_cooldown(ctx, seconds: int):
+    channel_key = get_channel_key(ctx.guild.id, ctx.channel.id)
+    
+    if channel_key not in stickied_messages:
+        await ctx.send("❌ No stickied message in this channel. Use `?stick` first.")
+        return
+    
+    if seconds < 0:
+        await ctx.send("❌ Cooldown must be 0 or greater.")
+        return
+    
+    stickied_messages[channel_key]["cooldown"] = seconds
+    save_data()
+    
+    try:
+        await ctx.message.delete()
+    except:
+        pass
+    
+    confirm = await ctx.send(f"✅ Cooldown set to {seconds} seconds!")
+    await confirm.delete(delay=3)
 
 @bot.command(name="stickwh")
 @commands.has_permissions(manage_messages=True)
@@ -364,6 +395,7 @@ async def help_command(interaction: discord.Interaction):
         value=(
             "`?stick <message>` - Set text stickied with line breaks\n"
             "`?stickwh <name> <message>` - Same but with webhook name\n"
+            "`?cooldown <seconds>` - Update cooldown for current channel\n"
             "`?unstick` - Remove stickied"
         ),
         inline=False
@@ -389,6 +421,7 @@ async def help_command(interaction: discord.Interaction):
         name="💡 Tips",
         value=(
             "• Use `?stick` for multi-line messages\n"
+            "• Use `?cooldown` to adjust cooldown after sticking\n"
             "• `cooldown` prevents spam\n"
             "• Messages send instantly when set\n"
             "• Colors use hex codes (e.g. 9c88ff)"
@@ -468,7 +501,10 @@ def start_stickied_bot():
     if not token:
         print("ERROR: STICKIED_TOKEN environment variable not set!")
         return
-    bot.run(token)
+    try:
+        bot.run(token)
+    except Exception as e:
+        print(f"Stickied bot error: {e}")
 
 if __name__ == "__main__":
     start_stickied_bot()
