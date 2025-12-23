@@ -30,7 +30,6 @@ def load_data():
 async def on_ready():
     load_data()
     print(f'Stickied bot logged in as {bot.user}')
-    print(f'Bot is in {len(bot.guilds)} servers')
     try:
         await asyncio.sleep(3)
         synced = await bot.tree.sync()
