@@ -153,7 +153,6 @@ async def on_message(message):
 @bot.event
 async def on_ready():
     print(f'Main bot logged in as {bot.user}')
-    print(f'Bot is in {len(bot.guilds)} guilds')
     try:
         await asyncio.sleep(2)
         synced = await bot.tree.sync(guild=discord.Object(id=GUILD_ID))
