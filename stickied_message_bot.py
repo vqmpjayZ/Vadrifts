@@ -31,17 +31,6 @@ async def on_ready():
     load_data()
     print(f'Stickied bot logged in as {bot.user}')
     print(f'Bot is in {len(bot.guilds)} servers')
-    try:
-        await asyncio.sleep(3)
-        synced = await bot.tree.sync()
-        print(f"Synced {len(synced)} global commands")
-    except discord.HTTPException as e:
-        if e.status == 429:
-            print("⚠️ Rate limited - commands already synced, skipping")
-        else:
-            print(f"Command sync error: {e}")
-    except Exception as e:
-        print(f"Slash command sync failed: {e}")
 
 def create_embed_from_data(data):
     embed = Embed(
