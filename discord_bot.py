@@ -153,17 +153,6 @@ async def on_message(message):
 @bot.event
 async def on_ready():
     print(f'Main bot logged in as {bot.user}')
-    try:
-        await asyncio.sleep(2)
-        synced = await bot.tree.sync(guild=discord.Object(id=GUILD_ID))
-        print(f"Synced {len(synced)} guild commands")
-    except discord.HTTPException as e:
-        if e.status == 429:
-            print("⚠️ Rate limited - commands already synced, skipping")
-        else:
-            print(f"Command sync error: {e}")
-    except Exception as e:
-        print(f"Command sync failed: {e}")
 
 def start_bot():
     try:
