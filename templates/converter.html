@@ -5,127 +5,139 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Image Converter</title>
+  <link rel="icon" href="https://i.imgur.com/ePueN25.png" />
   <style>
     body {
-      background: #0b0b10;
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(1200px 600px at 20% 10%, #1b1635, #07070c);
       color: #fff;
       font-family: Inter, system-ui, sans-serif;
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      margin: 0;
     }
 
 ```
-.box {
-  width: 420px;
-  background: #12121a;
-  border: 1px solid #222234;
-  border-radius: 14px;
-  padding: 24px;
+.card {
+  width: 520px;
+  max-width: 92vw;
+  background: rgba(15, 15, 25, 0.75);
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  border-radius: 18px;
+  padding: 28px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+  backdrop-filter: blur(14px);
 }
 
 h1 {
-  margin: 0 0 18px;
-  font-size: 22px;
-  font-weight: 700;
-  text-align: center;
+  margin: 0 0 20px;
+  font-size: 26px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #fff, #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 label {
-  display: block;
   font-size: 13px;
   color: #cbd5e1;
+  display: block;
   margin-bottom: 6px;
 }
 
-input[type="url"] {
+input[type=url] {
   width: 100%;
-  padding: 12px 14px;
-  background: #0f0f16;
-  border: 1px solid #2a2a40;
-  border-radius: 10px;
+  padding: 13px 15px;
+  background: rgba(0,0,0,.35);
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  border-radius: 12px;
   color: #fff;
-  margin-bottom: 14px;
+  outline: none;
+  margin-bottom: 16px;
 }
 
-.row {
+.options {
   display: flex;
-  gap: 10px;
+  gap: 14px;
   margin-bottom: 14px;
-  font-size: 13px;
+  flex-wrap: wrap;
 }
 
-.row label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: 0;
+.option {
+  flex: 1;
+  min-width: 140px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  background: rgba(0,0,0,.25);
   cursor: pointer;
+  font-size: 13px;
+  color: #e5e7eb;
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
+
+.option input { accent-color: #8b5cf6; }
 
 button {
   width: 100%;
-  padding: 12px;
+  padding: 14px;
+  border-radius: 14px;
   border: none;
-  border-radius: 10px;
-  background: #7c5cff;
+  background: linear-gradient(135deg, #8b5cf6, #6366f1);
   color: #fff;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
+  margin-top: 6px;
 }
 
-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+button:disabled { opacity: .6; cursor: not-allowed; }
 
 .status {
   margin-top: 14px;
   font-size: 13px;
-  color: #94a3b8;
+  color: #a1a1aa;
 }
 
 .preview {
-  margin-top: 16px;
+  margin-top: 18px;
   display: grid;
   grid-template-columns: repeat(32, 1fr);
   gap: 1px;
   justify-content: center;
+  max-width: 320px;
 }
 
 .pixel {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 ```
 
   </style>
 </head>
 <body>
-  <div class="box">
+  <div class="card">
     <h1>Image Converter</h1>
 
 ```
 <label>Image URL</label>
 <input id="imageUrl" type="url" placeholder="https://example.com/image.png" />
 
-<div class="row">
-  <label>
-    <input type="radio" name="crop" value="true" checked />
-    Smart crop
+<div class="options">
+  <label class="option">
+    <input type="radio" name="crop" value="true" checked /> Smart crop
   </label>
-  <label>
-    <input type="radio" name="crop" value="false" />
-    Stretch
+  <label class="option">
+    <input type="radio" name="crop" value="false" /> Stretch
   </label>
 </div>
 
-<div class="row">
-  <label>
-    <input type="checkbox" id="simpleMode" />
-    Simple pixel mode
+<div class="options">
+  <label class="option">
+    <input type="checkbox" id="simpleMode" /> Simple pixel mode
   </label>
 </div>
 
@@ -144,7 +156,7 @@ button:disabled {
 
     btn.onclick = async () => {
       const url = document.getElementById('imageUrl').value.trim();
-      const crop = document.querySelector('input[name="crop"]:checked').value;
+      const crop = document.querySelector('input[name=crop]:checked').value;
       const simple = document.getElementById('simpleMode').checked;
 
       if (!url) {
@@ -156,12 +168,11 @@ button:disabled {
       statusEl.textContent = 'Processing…';
       preview.innerHTML = '';
 
-      const api = `/convert-image?url=${encodeURIComponent(url)}&crop=${crop}${simple ? '&simple=true' : ''}`;
+      const api = `${location.origin}/convert-image?url=${encodeURIComponent(url)}&crop=${crop}${simple ? '&simple=true' : ''}`;
 
       try {
         const res = await fetch(api);
         const data = await res.json();
-
         if (!res.ok) throw new Error(data.error || 'Error');
 
         data.pixels.forEach(p => {
