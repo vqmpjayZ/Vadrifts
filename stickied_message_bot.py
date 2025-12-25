@@ -497,14 +497,13 @@ async def on_message(message):
             print(f"Error sending stickied message: {e}")
 
 def start_stickied_bot():
-    token = os.getenv("STICKIED_TOKEN")
-    if not token:
+    if not STICKIED_TOKEN:
         print("ERROR: STICKIED_TOKEN environment variable not set!")
         return
     try:
-        bot.run(token)
+        bot.run(STICKIED_TOKEN)
     except Exception as e:
         print(f"Stickied bot error: {e}")
-
+        
 if __name__ == "__main__":
     start_stickied_bot()
