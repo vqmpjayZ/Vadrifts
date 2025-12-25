@@ -1,1256 +1,184 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Image Converter - Vadrifts</title>
-  <link rel="icon" href="https://i.imgur.com/ePueN25.png" type="image/png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Image Converter</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-    
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
     body {
-      background: #0a0a0f;
-      color: #ffffff;
-      font-family: 'Inter', sans-serif;
+      background: #0b0b10;
+      color: #fff;
+      font-family: Inter, system-ui, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       min-height: 100vh;
-      overflow-x: hidden;
-      position: relative;
-    }
-
-    .bg-lights {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      z-index: 1;
-    }
-
-    .light {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(140px);
-      opacity: 0.4;
-      animation-duration: 20s;
-      animation-iteration-count: infinite;
-      animation-timing-function: ease-in-out;
-    }
-
-    .light-1 {
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(99, 102, 241, 0.4) 0%, transparent 70%);
-      top: -10%;
-      left: -5%;
-      animation-name: float1;
-    }
-
-    .light-2 {
-      width: 500px;
-      height: 500px;
-      background: radial-gradient(circle, rgba(168, 85, 247, 0.35) 0%, transparent 70%);
-      top: 20%;
-      right: -5%;
-      animation-name: float2;
-      animation-delay: -5s;
-    }
-
-    .light-3 {
-      width: 550px;
-      height: 550px;
-      background: radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, transparent 70%);
-      bottom: 10%;
-      left: 5%;
-      animation-name: float3;
-      animation-delay: -10s;
-    }
-
-    .light-4 {
-      width: 450px;
-      height: 450px;
-      background: radial-gradient(circle, rgba(139, 92, 246, 0.35) 0%, transparent 70%);
-      bottom: 30%;
-      right: 10%;
-      animation-name: float4;
-      animation-delay: -15s;
-    }
-
-    @keyframes float1 {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(100px, -60px) scale(1.15); }
-      66% { transform: translate(-60px, 100px) scale(0.9); }
-    }
-
-    @keyframes float2 {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(-80px, 70px) scale(1.2); }
-      66% { transform: translate(120px, -80px) scale(0.85); }
-    }
-
-    @keyframes float3 {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(70px, -100px) scale(0.95); }
-      66% { transform: translate(-100px, -70px) scale(1.1); }
-    }
-
-    @keyframes float4 {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(-70px, -80px) scale(1.25); }
-      66% { transform: translate(80px, 110px) scale(0.8); }
-    }
-
-    .particles {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 2;
-      pointer-events: none;
-    }
-
-    .particle {
-      position: absolute;
-      width: 2px;
-      height: 2px;
-      background: rgba(139, 92, 246, 0.6);
-      border-radius: 50%;
-      opacity: 0.4;
-      box-shadow: 0 0 10px rgba(139, 92, 246, 0.4);
-      animation: floatUp 240s linear infinite;
-    }
-
-    @keyframes floatUp {
-      0% {
-        transform: translateY(100vh) translateX(0);
-        opacity: 0.4;
-      }
-      50% {
-        transform: translateY(50vh) translateX(30px);
-        opacity: 0.6;
-      }
-      100% {
-        transform: translateY(-200px) translateX(60px);
-        opacity: 0;
-      }
-    }
-
-    .navbar {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 100;
-      background: rgba(15, 15, 25, 0.7);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(139, 92, 246, 0.2);
-      border-radius: 20px;
-      padding: 24px 32px;
-      animation: slideInDown 0.8s ease-out;
-      max-width: 1000px;
-      width: 90%;
-      transition: all 0.3s ease;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    }
-
-    .navbar.scrolled {
-      top: 15px;
-    }
-
-    .navbar.scrolled:hover {
-      top: 20px;
-    }
-
-    .navbar:hover {
-      background: rgba(15, 15, 25, 0.85);
-      border-color: rgba(139, 92, 246, 0.4);
-      transform: translateX(-50%) translateY(0);
-    }
-
-    @keyframes slideInDown {
-      from {
-        opacity: 0;
-        transform: translateX(-50%) translateY(-50px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
-      }
-    }
-
-    @keyframes slideInDownMobile {
-      from {
-        opacity: 0;
-        transform: translateY(-50px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .nav-content {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 100%;
-    }
-
-    .nav-logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 24px;
-      font-weight: 700;
-      background: linear-gradient(135deg, #ffffff 0%, #a78bfa 100%);
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-decoration: none;
-      transition: all 0.3s ease;
-    }
-
-    .nav-logo:hover {
-      transform: translateY(-3px);
-      filter: drop-shadow(0 0 15px rgba(139, 92, 246, 0.6));
-    }
-
-    .nav-logo-img {
-      width: 28px;
-      height: 28px;
-      flex-shrink: 0;
-      transition: none;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 30px;
-      align-items: center;
-      height: 100%;
-    }
-
-    .nav-link {
-      color: #9ca3af;
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 14px;
-      transition: all 0.3s ease;
-      padding: 8px 12px;
-      display: flex;
-      align-items: center;
-      height: 100%;
-      position: relative;
-    }
-
-    .nav-link:hover {
-      color: #ffffff;
-      text-shadow: 0 0 8px rgba(139, 92, 246, 0.6);
-    }
-
-    .nav-link.active {
-      color: #ffffff;
-    }
-
-    .nav-link.active::after {
-      content: '';
-      position: absolute;
-      bottom: -4px;
-      left: 12px;
-      right: 12px;
-      height: 2px;
-      background: linear-gradient(90deg, #8b5cf6, #6366f1);
-      box-shadow: 0 0 10px rgba(139, 92, 246, 0.8);
-      border-radius: 2px;
-    }
-
-    .header {
-      position: relative;
-      z-index: 10;
-      text-align: center;
-      padding: 140px 20px 80px;
-      animation: fadeInUp 1s ease-out;
-    }
-
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    h1 {
-      font-size: 80px;
-      font-weight: 900;
-      background: linear-gradient(135deg, 
-        #ffffff 0%, 
-        #e0e7ff 30%,
-        #c7d2fe 50%, 
-        #a78bfa 70%,
-        #8b5cf6 100%
-      );
-      background-size: 200% 100%;
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 20px;
-      letter-spacing: -3px;
-      animation: gradientShift 8s ease infinite;
-      filter: drop-shadow(0 0 40px rgba(139, 92, 246, 0.3));
-    }
-
-    @keyframes gradientShift {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-    }
-
-    .tagline {
-      font-size: 22px;
-      color: #cbd5e1;
-      margin-bottom: 24px;
-      font-weight: 500;
-      animation: fadeInUp 1s ease-out 0.2s both;
-    }
-
-    .description {
-      font-size: 17px;
-      color: #94a3b8;
-      max-width: 680px;
-      margin: 0 auto;
-      line-height: 1.8;
-      font-weight: 400;
-      animation: fadeInUp 1s ease-out 0.4s both;
-    }
-
-    .description .highlight {
-      color: #a78bfa;
-      font-weight: 600;
-    }
-
-    .converter-section {
-      position: relative;
-      z-index: 10;
-      display: flex;
-      justify-content: center;
-      padding: 40px 20px 60px;
-      animation: fadeInUp 1s ease-out 0.6s both;
-    }
-
-    .converter-box {
-      background: rgba(15, 15, 25, 0.6);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(139, 92, 246, 0.2);
-      padding: 50px;
-      border-radius: 24px;
-      box-shadow: 
-        0 20px 60px rgba(0, 0, 0, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.05);
-      width: 650px;
-      max-width: 90vw;
-      position: relative;
-      z-index: 101;
-    }
-
-    .converter-title {
-      font-size: 32px;
-      font-weight: 800;
-      text-align: center;
-      margin-bottom: 35px;
-      background: linear-gradient(135deg, #ffffff 0%, #a78bfa 100%);
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .input-group {
-      position: relative;
-      margin-bottom: 28px;
-    }
-
-    .input-label {
-      display: block;
-      margin-bottom: 10px;
-      color: #cbd5e1;
-      font-weight: 600;
-      font-size: 14px;
-      letter-spacing: 0.3px;
-    }
-
-    input[type="url"] {
-      width: 100%;
-      padding: 16px 20px;
-      font-size: 15px;
-      background: rgba(15, 15, 25, 0.5);
-      border: 2px solid rgba(139, 92, 246, 0.2);
-      border-radius: 14px;
-      color: #ffffff;
-      outline: none;
-      transition: all 0.3s ease;
-      font-family: 'Inter', sans-serif;
-    }
-
-    input[type="url"]:focus {
-      border-color: #8b5cf6;
-      background: rgba(15, 15, 25, 0.8);
-      box-shadow: 
-        0 0 0 4px rgba(139, 92, 246, 0.15),
-        0 8px 24px rgba(139, 92, 246, 0.2);
-      transform: translateY(-1px);
-    }
-
-    input[type="url"]::placeholder {
-      color: #64748b;
-    }
-
-    .crop-mode-group {
-      margin-bottom: 28px;
-      position: relative;
-      z-index: 102;
-    }
-
-    .radio-group {
-      display: flex;
-      gap: 16px;
-      margin-top: 10px;
-      position: relative;
-      z-index: 102;
-    }
-
-    .radio-option {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      cursor: pointer;
-      padding: 16px;
-      border-radius: 14px;
-      background: rgba(15, 15, 25, 0.4);
-      border: 2px solid rgba(139, 92, 246, 0.15);
-      transition: all 0.3s ease;
-      flex: 1;
-      position: relative;
-      z-index: 103;
-      pointer-events: all;
-    }
-
-    .radio-option:hover {
-      border-color: rgba(139, 92, 246, 0.4);
-      background: rgba(139, 92, 246, 0.08);
-      transform: translateY(-2px);
-    }
-
-    .radio-option.selected {
-      border-color: #8b5cf6;
-      background: rgba(139, 92, 246, 0.12);
-      box-shadow: 0 4px 16px rgba(139, 92, 246, 0.2);
-    }
-
-    .radio-option input[type="radio"] {
-      margin: 2px 0 0 0;
-      accent-color: #8b5cf6;
-      pointer-events: all;
-      position: relative;
-      z-index: 104;
-      width: 18px;
-      height: 18px;
-    }
-
-    .radio-content {
-      flex: 1;
-    }
-
-    .radio-title {
-      font-weight: 600;
-      color: #ffffff;
-      margin-bottom: 6px;
-      font-size: 14px;
-    }
-
-    .radio-description {
-      font-size: 12px;
-      color: #94a3b8;
-      line-height: 1.5;
-    }
-
-    .convert-btn {
-      width: 100%;
-      padding: 18px;
-      background: linear-gradient(135deg, #8b5cf6, #6366f1);
-      border: none;
-      border-radius: 14px;
-      color: white;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-      text-transform: uppercase;
-      letter-spacing: 1.2px;
-      box-shadow: 
-        0 10px 30px rgba(139, 92, 246, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-      margin-bottom: 28px;
-      font-family: 'Inter', sans-serif;
-    }
-
-    .convert-btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-      transition: left 0.5s ease;
-    }
-
-    .convert-btn:hover::before {
-      left: 100%;
-    }
-
-    .convert-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 
-        0 15px 40px rgba(139, 92, 246, 0.5),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
-    }
-
-    .convert-btn:active {
-      transform: translateY(0);
-    }
-
-    .convert-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .result-section {
-      margin-top: 30px;
-      padding: 24px;
-      background: rgba(15, 15, 25, 0.4);
-      border-radius: 14px;
-      border: 1px solid rgba(139, 92, 246, 0.15);
-      display: none;
-      position: relative;
-      z-index: 102;
-      pointer-events: all;
-    }
-
-    .result-section.show {
-      display: block;
-      animation: fadeInUpResult 0.4s ease;
-    }
-
-    @keyframes fadeInUpResult {
-      from {
-        opacity: 0;
-        transform: translateY(15px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .result-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 18px;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .result-title {
-      font-size: 18px;
-      font-weight: 700;
-      background: linear-gradient(135deg, #6ee7b7, #34d399);
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .result-info {
-      font-size: 12px;
-      color: #94a3b8;
-      text-align: right;
-    }
-
-    .pixel-preview {
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 18px;
-      max-height: 220px;
-      overflow-y: auto;
-      border: 1px solid rgba(139, 92, 246, 0.1);
-      position: relative;
-      z-index: 103;
-      pointer-events: all;
-    }
-
-    .pixel-grid {
-      display: grid;
-      grid-template-columns: repeat(32, 1fr);
-      gap: 1px;
-      max-width: 320px;
-      margin: 0 auto;
-    }
-
-    .pixel {
-      width: 8px;
-      height: 8px;
-      border-radius: 1px;
-      transition: transform 0.2s ease;
-    }
-
-    .pixel:hover {
-      transform: scale(1.3);
-      z-index: 10;
-      position: relative;
-    }
-
-    .copy-btn {
-      width: 100%;
-      padding: 14px;
-      background: rgba(52, 211, 153, 0.15);
-      border: 2px solid rgba(52, 211, 153, 0.4);
-      border-radius: 12px;
-      color: #6ee7b7;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      position: relative;
-      z-index: 103;
-      pointer-events: all;
-      font-family: 'Inter', sans-serif;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .copy-btn:hover {
-      background: rgba(52, 211, 153, 0.25);
-      border-color: #6ee7b7;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(52, 211, 153, 0.3);
-    }
-
-    .status {
-      margin-top: 20px;
-      padding: 16px 20px;
-      border-radius: 12px;
-      font-size: 14px;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      display: none;
-      backdrop-filter: blur(10px);
-      border: 1px solid;
-    }
-
-    .status.show {
-      display: block;
-      animation: fadeIn 0.3s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    .status.loading {
-      background: rgba(251, 191, 36, 0.1);
-      color: #fbbf24;
-      border-color: rgba(251, 191, 36, 0.3);
-      box-shadow: 0 4px 20px rgba(251, 191, 36, 0.15);
-    }
-
-    .status.error {
-      background: rgba(239, 68, 68, 0.1);
-      color: #f87171;
-      border-color: rgba(239, 68, 68, 0.3);
-      box-shadow: 0 4px 20px rgba(239, 68, 68, 0.15);
-    }
-
-    .status.success {
-      background: rgba(52, 211, 153, 0.1);
-      color: #6ee7b7;
-      border-color: rgba(52, 211, 153, 0.3);
-      box-shadow: 0 4px 20px rgba(52, 211, 153, 0.15);
-    }
-
-    .loading-spinner {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      border-radius: 50%;
-      border-top: 2px solid currentColor;
-      animation: spin 0.8s linear infinite;
-      margin-right: 10px;
-      vertical-align: middle;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .footer {
-      position: relative;
-      z-index: 10;
-      padding: 80px 20px 40px;
-      color: #64748b;
-      border-top: 1px solid rgba(139, 92, 246, 0.1);
-      margin-top: 60px;
-      animation: fadeInUp 1s ease-out 1.2s both;
-    }
+      margin: 0;
+    }
+
+```
+.box {
+  width: 420px;
+  background: #12121a;
+  border: 1px solid #222234;
+  border-radius: 14px;
+  padding: 24px;
+}
+
+h1 {
+  margin: 0 0 18px;
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+}
+
+label {
+  display: block;
+  font-size: 13px;
+  color: #cbd5e1;
+  margin-bottom: 6px;
+}
+
+input[type="url"] {
+  width: 100%;
+  padding: 12px 14px;
+  background: #0f0f16;
+  border: 1px solid #2a2a40;
+  border-radius: 10px;
+  color: #fff;
+  margin-bottom: 14px;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+  font-size: 13px;
+}
+
+.row label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  cursor: pointer;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: #7c5cff;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.status {
+  margin-top: 14px;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.preview {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(32, 1fr);
+  gap: 1px;
+  justify-content: center;
+}
+
+.pixel {
+  width: 6px;
+  height: 6px;
+}
+```
 
-    .footer-content {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .footer-left {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
-    .footer-logo {
-      display: flex;
-      align-items: center;
-      text-decoration: none;
-      transition: all 0.3s ease;
-    }
-
-    .footer-logo:hover {
-      transform: scale(1.05);
-      filter: drop-shadow(0 0 12px rgba(139, 92, 246, 0.5));
-    }
-
-    .footer-logo-img {
-      width: 24px;
-      height: 24px;
-      transition: none;
-    }
-
-    .footer-copyright {
-      color: #64748b;
-      font-size: 14px;
-    }
-
-    .footer-discord {
-      display: flex;
-      align-items: center;
-    }
-
-    .footer-discord-link {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 44px;
-      height: 44px;
-      background: rgba(139, 92, 246, 0.1);
-      border: 1px solid rgba(139, 92, 246, 0.2);
-      border-radius: 12px;
-      text-decoration: none;
-      transition: all 0.3s ease;
-    }
-
-    .footer-discord-link:hover {
-      background: rgba(139, 92, 246, 0.2);
-      border-color: rgba(139, 92, 246, 0.4);
-      transform: translateY(-3px);
-      box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3);
-    }
-
-    .footer-discord-icon {
-      width: 20px;
-      height: 20px;
-    }
-
-    .api-info {
-      background: rgba(15, 15, 25, 0.5);
-      border: 1px solid rgba(139, 92, 246, 0.2);
-      border-radius: 16px;
-      padding: 28px;
-      margin: 0 auto 50px;
-      max-width: 550px;
-      backdrop-filter: blur(10px);
-    }
-
-    .api-info h3 {
-      color: #cbd5e1;
-      margin-bottom: 18px;
-      font-size: 20px;
-    }
-
-    .api-info p {
-      color: #94a3b8;
-      line-height: 1.6;
-    }
-
-    .api-endpoint {
-      font-family: 'Consolas', 'Monaco', monospace;
-      background: rgba(0, 0, 0, 0.4);
-      padding: 12px 16px;
-      border-radius: 8px;
-      margin: 12px 0;
-      border-left: 3px solid #8b5cf6;
-      color: #c7d2fe;
-      font-size: 13px;
-      overflow-x: auto;
-    }
-
-    @media (max-width: 768px) {
-      .navbar {
-        top: 25px;
-        left: 10px;
-        right: 10px;
-        width: auto;
-        transform: none;
-        padding: 16px 18px;
-        animation: slideInDownMobile 0.8s ease-out;
-      }
-
-      .navbar.scrolled {
-        top: 20px;
-      }
-
-      .navbar.scrolled:hover {
-        top: 20px;
-      }
-
-      .navbar:hover {
-        background: rgba(15, 15, 25, 0.85);
-        border-color: rgba(139, 92, 246, 0.4);
-        transform: none;
-      }
-
-      .nav-content {
-        justify-content: space-between;
-        gap: 15px;
-      }
-
-      .nav-links {
-        gap: 12px;
-      }
-
-      .nav-link {
-        font-size: 11px;
-        padding: 6px 8px;
-      }
-
-      .nav-logo {
-        font-size: 20px;
-        gap: 8px;
-      }
-
-      .nav-logo-img {
-        width: 24px;
-        height: 24px;
-      }
-
-      h1 {
-        font-size: 52px;
-        letter-spacing: -1.5px;
-      }
-      
-      .converter-box {
-        padding: 30px 25px;
-        width: 95vw;
-      }
-
-      .pixel {
-        width: 6px;
-        height: 6px;
-      }
-
-      .pixel-grid {
-        max-width: 240px;
-      }
-
-      .radio-group {
-        flex-direction: column;
-        gap: 12px;
-      }
-
-      .result-header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .result-info {
-        text-align: left;
-      }
-
-      .tagline {
-        font-size: 19px;
-      }
-
-      .description {
-        font-size: 15px;
-      }
-
-      .footer-content {
-        flex-direction: column;
-        gap: 24px;
-        text-align: center;
-      }
-
-      .footer-left {
-        flex-direction: column;
-        gap: 12px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .nav-links {
-        gap: 8px;
-      }
-
-      .nav-link {
-        font-size: 10px;
-        padding: 5px 6px;
-      }
-
-      .navbar {
-        left: 10px;
-        right: 10px;
-        padding: 12px 14px;
-        top: 30px;
-      }
-
-      .navbar.scrolled {
-        top: 25px;
-      }
-
-      .navbar.scrolled:hover {
-        top: 25px;
-      }
-
-      h1 {
-        font-size: 42px;
-      }
-    }
   </style>
 </head>
 <body>
-  <div class="bg-lights">
-    <div class="light light-1"></div>
-    <div class="light light-2"></div>
-    <div class="light light-3"></div>
-    <div class="light light-4"></div>
-  </div>
-
-  <div class="particles" id="particles"></div>
-
-  <nav class="navbar">
-    <div class="nav-content">
-      <a href="/" class="nav-logo">
-        <img src="https://i.imgur.com/ePueN25.png" alt="Vadrifts Logo" class="nav-logo-img">
-        Vadrifts
-      </a>
-      <div class="nav-links">
-        <a href="/scripts" class="nav-link">Scripts</a>
-        <a href="https://vadrifts.onrender.com/plugins" class="nav-link">Plugins</a>
-        <a href="/converter" class="nav-link active">Image Converter</a>
-      </div>
-    </div>
-  </nav>
-
-  <div class="header">
+  <div class="box">
     <h1>Image Converter</h1>
-    <p class="tagline">Convert images to pixel data with style</p>
-    <p class="description">
-      Transform any image into a <span class="highlight">32×32 pixel array</span> with RGB values. Perfect for <span class="highlight">game development</span>, 
-      pixel art analysis, or creating custom <span class="highlight">image effects</span>.
-    </p>
-  </div>
 
-  <div class="converter-section">
-    <div class="converter-box">
-      <h2 class="converter-title">Convert Your Image</h2>
-      
-      <div class="input-group">
-        <label class="input-label" for="imageUrl">Image URL</label>
-        <input 
-          type="url" 
-          id="imageUrl" 
-          placeholder="https://example.com/image.jpg or rbxassetid://123456789" 
-          required
-        />
-      </div>
+```
+<label>Image URL</label>
+<input id="imageUrl" type="url" placeholder="https://example.com/image.png" />
 
-      <div class="crop-mode-group">
-        <label class="input-label">Conversion Mode</label>
-        <div class="radio-group">
-            <label class="radio-option selected" for="cropTrue">
-              <input type="radio" id="cropTrue" name="cropMode" value="true" checked>
-              <div class="radio-content">
-                <div class="radio-title">Smart Crop</div>
-                <div class="radio-description">Maintains aspect ratio, crops excess. Best quality but may lose edges.</div>
-              </div>
-            </label>
-            <label class="radio-option" for="cropFalse">
-              <input type="radio" id="cropFalse" name="cropMode" value="false">
-              <div class="radio-content">
-                <div class="radio-title">Simple Resize</div>
-                <div class="radio-description">Stretches to fit 32×32 exactly. May look squished but shows full image.</div>
-              </div>
-            </label>
-        </div>
-      </div>
-      
-      <button class="convert-btn" onclick="convertImage()" id="convertBtn">
-        Convert Image
-      </button>
-      
-      <div class="status" id="status"></div>
-      
-      <div class="result-section" id="resultSection">
-        <div class="result-header">
-          <span class="result-title">Conversion Result</span>
-          <div class="result-info">
-            <div id="processingTime"></div>
-            <div id="conversionInfo"></div>
-          </div>
-        </div>
-        
-        <div class="pixel-preview">
-          <div class="pixel-grid" id="pixelGrid"></div>
-        </div>
-        
-        <button class="copy-btn" onclick="copyPixelData()">
-          Copy Pixel Data JSON
-        </button>
-      </div>
-    </div>
-  </div>
+<div class="row">
+  <label>
+    <input type="radio" name="crop" value="true" checked />
+    Smart crop
+  </label>
+  <label>
+    <input type="radio" name="crop" value="false" />
+    Stretch
+  </label>
+</div>
 
-  <div class="footer">
-    <div class="api-info">
-      <h3>API Information</h3>
-      <p style="margin-bottom: 10px;">Use the API directly with crop options:</p>
-      <div class="api-endpoint">
-        GET /convert-image?url=YOUR_IMAGE_URL&crop=true
-      </div>
-      <div class="api-endpoint">
-        GET /convert-image?url=YOUR_IMAGE_URL&crop=false
-      </div>
-      <p style="font-size: 12px; margin-top: 15px;">
-        • crop=true: Smart crop (default) - maintains aspect ratio<br>
-        • crop=false: Simple resize - stretches to fit exactly<br>
-        Remember to remove the /converter part while doing this!
-      </p>
-    </div>
-    
-    <div class="footer-content">
-      <div class="footer-left">
-        <a href="/" class="footer-logo">
-          <img src="https://i.imgur.com/ePueN25.png" alt="Vadrifts Logo" class="footer-logo-img">
-        </a>
-        <div class="footer-copyright">
-          © 2025 Vadrifts. All Rights Reserved
-        </div>
-      </div>
-      <div class="footer-discord">
-        <a href="https://discord.com/invite/WDbJ5wE2cR" class="footer-discord-link" target="_blank">
-          <img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/discord-white-icon.png" alt="Discord" class="footer-discord-icon">
-        </a>
-      </div>
-    </div>
+<div class="row">
+  <label>
+    <input type="checkbox" id="simpleMode" />
+    Simple pixel mode
+  </label>
+</div>
+
+<button id="convertBtn">Convert</button>
+
+<div class="status" id="status"></div>
+<div class="preview" id="preview"></div>
+```
+
   </div>
 
   <script>
-    let currentPixelData = null;
+    const btn = document.getElementById('convertBtn');
+    const statusEl = document.getElementById('status');
+    const preview = document.getElementById('preview');
 
-    function createParticles() {
-      const particlesContainer = document.getElementById('particles');
-      const particleCount = 20;
-
-      for (let i = 0; i < particleCount; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        particle.style.left = Math.random() * 100 + '%';
-        particle.style.animationDelay = -Math.random() * 15 + 's';
-        particle.style.animationDuration = (15 + Math.random() * 5) + 's';
-        particlesContainer.appendChild(particle);
-      }
-    }
-
-    function setupRadioButtons() {
-      const radioOptions = document.querySelectorAll('.radio-option');
-      const radioInputs = document.querySelectorAll('input[name="cropMode"]');
-      
-      radioInputs.forEach(radio => {
-        radio.addEventListener('change', function() {
-          radioOptions.forEach(opt => opt.classList.remove('selected'));
-          this.closest('.radio-option').classList.add('selected');
-        });
-      });
-      
-      radioOptions.forEach(option => {
-        option.addEventListener('click', function(e) {
-          if (e.target.type !== 'radio') {
-            const radio = this.querySelector('input[type="radio"]');
-            radio.checked = true;
-            const event = new Event('change', { bubbles: true });
-            radio.dispatchEvent(event);
-          }
-        });
-      });
-    }
-
-    function showStatus(message, type = '') {
-      const statusEl = document.getElementById('status');
-      statusEl.className = `status show ${type}`;
-      statusEl.innerHTML = message;
-    }
-
-    function hideStatus() {
-      const statusEl = document.getElementById('status');
-      statusEl.classList.remove('show');
-    }
-
-    function showResult() {
-      const resultEl = document.getElementById('resultSection');
-      resultEl.classList.add('show');
-    }
-
-    function hideResult() {
-      const resultEl = document.getElementById('resultSection');
-      resultEl.classList.remove('show');
-    }
-
-    function createPixelGrid(pixels) {
-      const grid = document.getElementById('pixelGrid');
-      grid.innerHTML = '';
-      
-      pixels.forEach(pixel => {
-        const pixelDiv = document.createElement('div');
-        pixelDiv.className = 'pixel';
-        pixelDiv.style.backgroundColor = `rgb(${pixel.R}, ${pixel.G}, ${pixel.B})`;
-        pixelDiv.title = `RGB(${pixel.R}, ${pixel.G}, ${pixel.B})`;
-        grid.appendChild(pixelDiv);
-      });
-    }
-
-    async function convertImage() {
+    btn.onclick = async () => {
       const url = document.getElementById('imageUrl').value.trim();
-      const cropMode = document.querySelector('input[name="cropMode"]:checked').value;
-      const btn = document.getElementById('convertBtn');
-      
-      if (!url) {
-        showStatus('Please enter an image URL', 'error');
-        return;
-      }
+      const crop = document.querySelector('input[name="crop"]:checked').value;
+      const simple = document.getElementById('simpleMode').checked;
 
-      if (!url.startsWith('http') && !url.startsWith('rbxassetid://') && !url.match(/^\d+$/)) {
-        showStatus('Please enter a valid URL or Roblox asset ID', 'error');
+      if (!url) {
+        statusEl.textContent = 'Enter an image URL';
         return;
       }
 
       btn.disabled = true;
-      btn.innerHTML = '<div class="loading-spinner"></div>Converting...';
-      hideResult();
-      showStatus('<div class="loading-spinner"></div>Processing your image...', 'loading');
+      statusEl.textContent = 'Processing…';
+      preview.innerHTML = '';
+
+      const api = `/convert-image?url=${encodeURIComponent(url)}&crop=${crop}${simple ? '&simple=true' : ''}`;
 
       try {
-        const apiUrl = `/convert-image?url=${encodeURIComponent(url)}&crop=${cropMode}`;
-        const response = await fetch(apiUrl);
-        const data = await response.json();
+        const res = await fetch(api);
+        const data = await res.json();
 
-        if (response.ok) {
-          currentPixelData = data.pixels;
-          createPixelGrid(data.pixels);
-          
-          document.getElementById('processingTime').textContent = 
-            `Processed in ${data.processing_time.toFixed(2)}s`;
-          
-          const cropText = data.crop_mode ? 'Smart Crop' : 'Simple Resize';
-          const originalSize = data.original_size ? `${data.original_size[0]}×${data.original_size[1]}` : 'unknown';
-          
-          document.getElementById('conversionInfo').innerHTML = 
-            `${originalSize} → 32×32 • ${cropText}`;
-          
-          showStatus(`Successfully converted image! ${data.pixels.length} pixels processed using ${cropText.toLowerCase()}.`, 'success');
-          showResult();
-        } else {
-          showStatus(`Error: ${data.error}`, 'error');
-        }
-      } catch (error) {
-        console.error('Conversion error:', error);
-        showStatus('Network error. Please check your connection and try again.', 'error');
+        if (!res.ok) throw new Error(data.error || 'Error');
+
+        data.pixels.forEach(p => {
+          const d = document.createElement('div');
+          d.className = 'pixel';
+          d.style.background = `rgb(${p.R},${p.G},${p.B})`;
+          preview.appendChild(d);
+        });
+
+        statusEl.textContent = `Done • ${data.resize_method}`;
+      } catch (e) {
+        statusEl.textContent = e.message;
       } finally {
         btn.disabled = false;
-        btn.innerHTML = 'Convert Image';
       }
-    }
-
-    function copyPixelData() {
-      if (!currentPixelData) return;
-
-      const jsonData = JSON.stringify(currentPixelData, null, 2);
-      navigator.clipboard.writeText(jsonData).then(() => {
-        const btn = event.target;
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '✓ Copied!';
-        btn.style.borderColor = '#6ee7b7';
-        btn.style.background = 'rgba(52, 211, 153, 0.25)';
-        
-        setTimeout(() => {
-          btn.innerHTML = originalText;
-          btn.style.borderColor = '';
-          btn.style.background = '';
-        }, 2000);
-      }).catch(err => {
-        console.error('Failed to copy:', err);
-        showStatus('Failed to copy data', 'error');
-      });
-    }
-
-    document.getElementById('imageUrl').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        convertImage();
-      }
-    });
-
-    document.getElementById('imageUrl').addEventListener('input', () => {
-      hideStatus();
-    });
-
-    let lastScrollTop = 0;
-    window.addEventListener('scroll', function() {
-      let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      const navbar = document.querySelector('.navbar');
-      
-      if (scrollTop > 100) {
-        navbar.classList.add('scrolled');
-      } else {
-        navbar.classList.remove('scrolled');
-      }
-      
-      lastScrollTop = scrollTop;
-    });
-
-    createParticles();
-    setupRadioButtons();
+    };
   </script>
+
 </body>
 </html>
