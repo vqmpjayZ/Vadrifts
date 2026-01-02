@@ -61,59 +61,6 @@ def require_api_key(f):
             return jsonify({"error": "Unauthorized"}), 401
         return f(*args, **kwargs)
     return decorated_function
-
-@app.route('/api/update_bypass', methods=['POST'])
-@require_api_key
-def update_bypass():
-    try:
-        data = request.get_json()
-        
-        with open('bypass_mappings.json', 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
-        
-        logger.info(f"Bypass mappings updated at {data.get('timestamp')}")
-        return jsonify({"success": True, "message": "Mappings updated"})
-    except Exception as e:
-        logger.error(f"Error updating bypass mappings: {e}")
-        return jsonify({"error": str(e)}), 500
-
-@app.route('/api/bypass_mappings', methods=['GET'])
-def get_bypass_mappings():
-    try:
-        with open('bypass_mappings.json', 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        
-        lua_output = f'''local US_CHAR = "{data.get('us_char', '')}"
-local bypassLogic = {{
-'''
-        
-        for method_num, mappings in sorted(data.get('methods', {}).items(), key=lambda x: int(x[0])):
-            lua_output += f"    [{int(method_num)}] = {{"
-            
-            for key, value in mappings.items():
-                if key == " ":
-                    lua_output += f'[" "]=US_CHAR,'
-                else:
-                    lua_output += f'{key}="{value}",'
-            
-            lua_output += f'["/"]="⁄"}},\n'
-        
-        priority_order = data.get('priority_order', [7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6])
-        priority_str = '{' + ','.join(map(str, priority_order)) + '}'
-        
-        lua_output += f'''}}
-
-local priorityOrder = {priority_str}
-
-return {{US_CHAR=US_CHAR, bypassLogic=bypassLogic, priorityOrder=priorityOrder}}'''
-        
-        return lua_output, 200, {'Content-Type': 'text/plain; charset=utf-8'}
-    
-    except FileNotFoundError:
-        return "-- No mappings available yet", 404
-    except Exception as e:
-        logger.error(f"Error serving bypass mappings: {e}")
-        return f"-- Error: {str(e)}", 500
         
 @app.route('/plugins')
 def plugins_page():
