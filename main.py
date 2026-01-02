@@ -67,17 +67,17 @@ def require_key_system_auth(f):
             data = request.get_json() or {}
             hwid = data.get('hwid')
         
-        if not referer or '/verify' not in referer:
-            logger.warning(f"Unauthorized key system request from {request.remote_addr}")
+        if not token or not timestamp:
+            logger.warning(f"Missing token/timestamp from {request.remote_addr}")
             return jsonify({"error": "Unauthorized"}), 401
         
-        if not token or not timestamp:
-            logger.warning(f"Missing token/timestamp")
-            return jsonify({"error": "Missing authentication parameters"}), 401
+        if not referer or 'vadrifts.onrender.com/verify' not in referer:
+            logger.warning(f"Invalid referer: {referer} from {request.remote_addr}")
+            return jsonify({"error": "Unauthorized"}), 401
         
         if not verify_request_token(hwid or '', timestamp, token):
-            logger.warning(f"Invalid token")
-            return jsonify({"error": "Invalid request"}), 401
+            logger.warning(f"Invalid token from {request.remote_addr}")
+            return jsonify({"error": "Unauthorized"}), 401
         
         return f(*args, **kwargs)
     return decorated_function
@@ -274,7 +274,6 @@ def raw_key(key):
     return response
 
 @app.route('/create')
-@require_key_system_auth
 def create_key():
     hwid = request.args.get('hwid')
     if not hwid:
@@ -285,15 +284,12 @@ def create_key():
         host = request.headers.get('host', 'vadrifts.onrender.com')
         
         logger.info(f"Created key slug for HWID: {hwid[:8]}...")
-        return jsonify({
-            "redirect": f"https://{host}/getkey/{slug}"
-        })
+        return f"https://{host}/getkey/{slug}"
     except Exception as e:
         logger.error(f"Error creating slug: {str(e)}", exc_info=True)
         return jsonify({"error": f"Failed to create slug: {str(e)}"}), 500
 
 @app.route('/getkey/<slug>')
-@require_key_system_auth
 def get_key(slug):
     try:
         hwid = key_system.get_hwid_from_slug(slug)
@@ -306,7 +302,9 @@ def get_key(slug):
         key = key_system.generate_key(hwid)
         
         logger.info(f"Key generated for HWID: {hwid[:8]}... Key: {key}")
-        return jsonify({"key": key})
+        response = make_response(key)
+        response.headers['Content-Type'] = 'text/plain; charset=utf-8'
+        return response
     except Exception as e:
         logger.error(f"Error generating key: {str(e)}", exc_info=True)
         return jsonify({"error": f"Failed to generate key: {str(e)}"}), 500
