@@ -290,14 +290,14 @@ def create_key():
         host = request.headers.get('host', 'vadrifts.onrender.com')
         
         logger.info(f"Created key slug for HWID: {hwid[:8]}...")
-        return f"https://{host}/getkey/{slug}"
+        return f"https://{host}/getkey/{slug}?token={token}"
     except Exception as e:
         logger.error(f"Error creating slug: {str(e)}", exc_info=True)
         return jsonify({"error": f"Failed to create slug: {str(e)}"}), 500
 
 @app.route('/getkey/<slug>')
 def get_key(slug):
-    token = request.headers.get('X-Key-Token')
+    token = request.args.get('token') or request.headers.get('X-Key-Token')
     
     if not token:
         logger.warning(f"Missing token for getkey attempt from {request.remote_addr}")
