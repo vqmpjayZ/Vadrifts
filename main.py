@@ -48,7 +48,6 @@ def require_key_system_auth(f):
     def decorated_function(*args, **kwargs):
         referer = request.headers.get('Referer', '')
         token = request.headers.get('X-Key-Token')
-        timestamp = request.headers.get('X-Key-Timestamp')
         
         hwid = None
         if request.method == 'GET':
@@ -57,15 +56,15 @@ def require_key_system_auth(f):
             data = request.get_json() or {}
             hwid = data.get('hwid')
         
-        if not token or not timestamp:
-            logger.warning(f"Missing token/timestamp from {request.remote_addr}")
+        if not token:
+            logger.warning(f"Missing token from {request.remote_addr}")
             return jsonify({"error": "Unauthorized"}), 401
         
         if not referer or 'vadrifts.onrender.com/verify' not in referer:
             logger.warning(f"Invalid referer: {referer} from {request.remote_addr}")
             return jsonify({"error": "Unauthorized"}), 401
         
-        if not verify_request_token(hwid or '', timestamp, token):
+        if not verify_request_token(hwid or '', token):
             logger.warning(f"Invalid token from {request.remote_addr}")
             return jsonify({"error": "Unauthorized"}), 401
         
@@ -152,10 +151,7 @@ def get_plugin_raw(plugin_id):
         
         sections_code = ',\n'.join(sections)
         
-        lua_code = f'''-- {escape_lua_string(plugin['name'])} by {escape_lua_string(plugin.get('author', 'Anonymous'))}
--- {escape_lua_string(plugin.get('description', 'No description'))}
-
-local Plugin = {{
+        lua_code = f'''local Plugin = {{
     Name = "{escape_lua_string(plugin['name'])}",
     Author = "{escape_lua_string(plugin.get('author', 'Anonymous'))}",
     Description = "{escape_lua_string(plugin.get('description', 'No description'))}",
