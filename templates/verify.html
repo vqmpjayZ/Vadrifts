@@ -814,15 +814,19 @@
         });
 
         if (!tokenRes.ok) {
-          setStatus('✗ Failed to get authorization', 'error');
+          const errData = await tokenRes.json().catch(() => ({}));
+          setStatus(`✗ Failed to get authorization: ${errData.error || 'Unknown error'}`, 'error');
           btn.disabled = false;
           btn.innerHTML = 'Generate Access Key';
+          console.error('Token error:', errData);
           return;
         }
 
         const tokenData = await tokenRes.json();
         const token = tokenData.token;
         const tokenTimestamp = tokenData.timestamp;
+
+        console.log('Got token:', { token, tokenTimestamp, hwid: hwid.substring(0, 8) });
 
         setStatus('<div class="loading-spinner"></div>Creating key slug...', 'loading');
 
@@ -857,9 +861,11 @@
         });
 
         if (!keyRes.ok) {
-          setStatus('✗ Failed to generate key', 'error');
+          const errData = await keyRes.json().catch(() => ({}));
+          setStatus(`✗ Failed to generate key: ${errData.error || 'Unknown error'}`, 'error');
           btn.disabled = false;
           btn.innerHTML = 'Generate Access Key';
+          console.error('Key response:', errData);
           return;
         }
 
