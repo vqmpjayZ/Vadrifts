@@ -4,6 +4,9 @@ import json
 from functools import wraps
 from flask import Flask, request, jsonify, send_file, redirect, send_from_directory, make_response
 from datetime import datetime
+import secrets
+import hmac
+import hashlib
 
 from config import *
 from discord_bot import start_bot
@@ -29,6 +32,48 @@ plugins_manager = PluginsManager()
 key_system = KeySystemManager()
 
 API_SECRET = "vadriftsisalwaysinseason"
+KEY_SYSTEM_SECRET = os.environ.get("KEY_SYSTEM_SECRET", secrets.token_urlsafe(32))
+
+def generate_request_token(hwid, timestamp):
+    message = f"{hwid}:{timestamp}".encode()
+    token = hmac.new(KEY_SYSTEM_SECRET.encode(), message, hashlib.sha256).hexdigest()
+    return token
+
+def verify_request_token(hwid, timestamp, provided_token, max_age=300):
+    try:
+        timestamp_int = int(timestamp)
+        current_time = int(datetime.now().timestamp())
+        
+        if abs(current_time - timestamp_int) > max_age:
+            logger.warning(f"Token expired for HWID: {hwid[:8]}...")
+            return False
+        
+        expected_token = generate_request_token(hwid, timestamp)
+        return hmac.compare_digest(expected_token, provided_token)
+    except (ValueError, TypeError):
+        return False
+
+def require_key_system_auth(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        referer = request.headers.get('Referer', '')
+        token = request.headers.get('X-Key-Token')
+        timestamp = request.headers.get('X-Key-Timestamp')
+        hwid = request.args.get('hwid') or request.get_json().get('hwid') if request.is_json else None
+        
+        if not referer or '/verify' not in referer:
+            logger.warning(f"Unauthorized key system request from {request.remote_addr}")
+            return jsonify({"error": "Unauthorized"}), 401
+        
+        if not hwid or not token or not timestamp:
+            return jsonify({"error": "Missing authentication parameters"}), 401
+        
+        if not verify_request_token(hwid, timestamp, token):
+            logger.warning(f"Invalid token for HWID: {hwid[:8]}...")
+            return jsonify({"error": "Invalid request"}), 401
+        
+        return f(*args, **kwargs)
+    return decorated_function
 
 @app.route('/')
 def home():
@@ -191,7 +236,32 @@ def verify_page():
         logger.error("verify.html template not found")
         return jsonify({"error": "Verify page not found"}), 404
 
+@app.route('/api/key-token', methods=['POST'])
+def get_key_token():
+    if not request.is_json:
+        return jsonify({"error": "Invalid request"}), 400
+    
+    referer = request.headers.get('Referer', '')
+    hwid = request.get_json().get('hwid')
+    
+    if not referer or '/verify' not in referer:
+        logger.warning(f"Unauthorized token request from {request.remote_addr}")
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    if not hwid or len(hwid) < 8:
+        return jsonify({"error": "Invalid HWID"}), 400
+    
+    timestamp = str(int(datetime.now().timestamp()))
+    token = generate_request_token(hwid, timestamp)
+    
+    logger.info(f"Issued key token for HWID: {hwid[:8]}...")
+    return jsonify({
+        "token": token,
+        "timestamp": timestamp
+    })
+
 @app.route('/create')
+@require_key_system_auth
 def create_key():
     hwid = request.args.get('hwid')
     if not hwid:
@@ -201,9 +271,12 @@ def create_key():
     host = request.headers.get('host', 'vadrifts.onrender.com')
     
     logger.info(f"Created key slug for HWID: {hwid[:8]}...")
-    return f"https://{host}/getkey/{slug}"
+    return jsonify({
+        "redirect": f"https://{host}/getkey/{slug}"
+    })
 
 @app.route('/getkey/<slug>')
+@require_key_system_auth
 def get_key(slug):
     hwid = key_system.get_hwid_from_slug(slug)
     
@@ -215,7 +288,7 @@ def get_key(slug):
     key = key_system.generate_key(hwid)
     
     logger.info(f"Key generated for HWID: {hwid[:8]}... Key: {key}")
-    return key
+    return jsonify({"key": key})
 
 @app.route('/plugin/<plugin_id>')
 def plugin_detail(plugin_id):
