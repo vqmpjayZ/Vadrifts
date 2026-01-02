@@ -265,30 +265,38 @@ def get_key_token():
 def create_key():
     hwid = request.args.get('hwid')
     if not hwid:
-        return "Missing HWID", 400
+        return jsonify({"error": "Missing HWID"}), 400
     
-    slug = key_system.create_slug(hwid)
-    host = request.headers.get('host', 'vadrifts.onrender.com')
-    
-    logger.info(f"Created key slug for HWID: {hwid[:8]}...")
-    return jsonify({
-        "redirect": f"https://{host}/getkey/{slug}"
-    })
+    try:
+        slug = key_system.create_slug(hwid)
+        host = request.headers.get('host', 'vadrifts.onrender.com')
+        
+        logger.info(f"Created key slug for HWID: {hwid[:8]}...")
+        return jsonify({
+            "redirect": f"https://{host}/getkey/{slug}"
+        })
+    except Exception as e:
+        logger.error(f"Error creating slug: {str(e)}", exc_info=True)
+        return jsonify({"error": f"Failed to create slug: {str(e)}"}), 500
 
 @app.route('/getkey/<slug>')
 @require_key_system_auth
 def get_key(slug):
-    hwid = key_system.get_hwid_from_slug(slug)
-    
-    if not hwid:
-        logger.warning(f"Invalid or expired slug attempted: {slug}")
-        return "Invalid or expired key link", 404
-    
-    key_system.consume_slug(slug)
-    key = key_system.generate_key(hwid)
-    
-    logger.info(f"Key generated for HWID: {hwid[:8]}... Key: {key}")
-    return jsonify({"key": key})
+    try:
+        hwid = key_system.get_hwid_from_slug(slug)
+        
+        if not hwid:
+            logger.warning(f"Invalid or expired slug attempted: {slug}")
+            return jsonify({"error": "Invalid or expired key link"}), 404
+        
+        key_system.consume_slug(slug)
+        key = key_system.generate_key(hwid)
+        
+        logger.info(f"Key generated for HWID: {hwid[:8]}... Key: {key}")
+        return jsonify({"key": key})
+    except Exception as e:
+        logger.error(f"Error generating key: {str(e)}", exc_info=True)
+        return jsonify({"error": f"Failed to generate key: {str(e)}"}), 500
 
 @app.route('/plugin/<plugin_id>')
 def plugin_detail(plugin_id):
