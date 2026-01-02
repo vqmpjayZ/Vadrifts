@@ -852,7 +852,7 @@
 
         setStatus('<div class="loading-spinner"></div>Generating key...', 'loading');
 
-        const keyRes = await fetch(`/getkey/${slug}`, {
+        const keyRes = await fetch(`/getkey/${slug}?hwid=${encodeURIComponent(hwid)}`, {
           method: 'GET',
           headers: {
             'X-Key-Token': token,
