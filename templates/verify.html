@@ -835,9 +835,11 @@
         });
 
         if (!createRes.ok) {
-          setStatus('✗ Failed to create key slug', 'error');
+          const errData = await createRes.json().catch(() => ({}));
+          setStatus(`✗ Failed to create key slug: ${errData.error || 'Unknown error'}`, 'error');
           btn.disabled = false;
           btn.innerHTML = 'Generate Access Key';
+          console.error('Create response:', errData);
           return;
         }
 
