@@ -870,17 +870,11 @@
         }
 
         const keyData = await keyRes.json();
-        setStatus('✓ Access key generated successfully!', 'success');
+        setStatus('✓ Access key generated successfully! Redirecting...', 'success');
         
         setTimeout(() => {
-          const key = keyData.key;
-          alert(`Your key: ${key}\n\nKey copied. You can now use it in your script.`);
-          document.getElementById("hwidInput").value = '';
-          updateHwidIndicator();
-          btn.disabled = false;
-          btn.innerHTML = 'Generate Access Key';
-          setStatus('', '');
-        }, 800);
+          window.location.href = `/raw-key/${keyData.key}`;
+        }, 1000);
 
       } catch (err) {
         console.error('Generation error:', err);
