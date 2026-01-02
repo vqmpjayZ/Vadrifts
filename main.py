@@ -4,9 +4,6 @@ import json
 from functools import wraps
 from flask import Flask, request, jsonify, send_file, redirect, send_from_directory, make_response
 from datetime import datetime
-import secrets
-import hmac
-import hashlib
 
 from config import *
 from discord_bot import start_bot
@@ -32,44 +29,6 @@ plugins_manager = PluginsManager()
 key_system = KeySystemManager()
 
 API_SECRET = "vadriftsisalwaysinseason"
-KEY_SYSTEM_SECRET = os.environ.get("KEY_SYSTEM_SECRET", secrets.token_urlsafe(32))
-
-def generate_request_token(hwid):
-    message = hwid.encode()
-    token = hmac.new(KEY_SYSTEM_SECRET.encode(), message, hashlib.sha256).hexdigest()
-    return token
-
-def verify_request_token(hwid, provided_token):
-    expected_token = generate_request_token(hwid)
-    return hmac.compare_digest(expected_token, provided_token)
-
-def require_key_system_auth(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        referer = request.headers.get('Referer', '')
-        token = request.headers.get('X-Key-Token')
-        
-        hwid = None
-        if request.method == 'GET':
-            hwid = request.args.get('hwid')
-        elif request.is_json:
-            data = request.get_json() or {}
-            hwid = data.get('hwid')
-        
-        if not token:
-            logger.warning(f"Missing token from {request.remote_addr}")
-            return jsonify({"error": "Unauthorized"}), 401
-        
-        if not referer or 'vadrifts.onrender.com/verify' not in referer:
-            logger.warning(f"Invalid referer: {referer} from {request.remote_addr}")
-            return jsonify({"error": "Unauthorized"}), 401
-        
-        if not verify_request_token(hwid or '', token):
-            logger.warning(f"Invalid token from {request.remote_addr}")
-            return jsonify({"error": "Unauthorized"}), 401
-        
-        return f(*args, **kwargs)
-    return decorated_function
 
 @app.route('/')
 def home():
@@ -151,7 +110,10 @@ def get_plugin_raw(plugin_id):
         
         sections_code = ',\n'.join(sections)
         
-        lua_code = f'''local Plugin = {{
+        lua_code = f'''-- {escape_lua_string(plugin['name'])} by {escape_lua_string(plugin.get('author', 'Anonymous'))}
+-- {escape_lua_string(plugin.get('description', 'No description'))}
+
+local Plugin = {{
     Name = "{escape_lua_string(plugin['name'])}",
     Author = "{escape_lua_string(plugin.get('author', 'Anonymous'))}",
     Description = "{escape_lua_string(plugin.get('description', 'No description'))}",
@@ -229,89 +191,31 @@ def verify_page():
         logger.error("verify.html template not found")
         return jsonify({"error": "Verify page not found"}), 404
 
-@app.route('/api/key-token', methods=['POST'])
-def get_key_token():
-    if not request.is_json:
-        return jsonify({"error": "Invalid request"}), 400
-    
-    referer = request.headers.get('Referer', '')
-    hwid = request.get_json().get('hwid')
-    
-    if not referer or '/verify' not in referer:
-        logger.warning(f"Unauthorized token request from {request.remote_addr}")
-        return jsonify({"error": "Unauthorized"}), 401
-    
-    if not hwid or len(hwid) < 8:
-        return jsonify({"error": "Invalid HWID"}), 400
-    
-    token = generate_request_token(hwid)
-    
-    logger.info(f"Issued key token for HWID: {hwid[:8]}...")
-    return jsonify({
-        "token": token
-    })
-
-@app.route('/raw-key/<key>')
-def raw_key(key):
-    response = make_response(key)
-    response.headers['Content-Type'] = 'text/plain; charset=utf-8'
-    return response
-
 @app.route('/create')
 def create_key():
     hwid = request.args.get('hwid')
-    token = request.headers.get('X-Key-Token')
-    
     if not hwid:
-        return jsonify({"error": "Missing HWID"}), 400
+        return "Missing HWID", 400
     
-    if not token:
-        logger.warning(f"Missing token for create from {request.remote_addr}")
-        return jsonify({"error": "Unauthorized"}), 401
+    slug = key_system.create_slug(hwid)
+    host = request.headers.get('host', 'vadrifts.onrender.com')
     
-    if not verify_request_token(hwid, token):
-        logger.warning(f"Invalid token for create from {request.remote_addr}")
-        return jsonify({"error": "Unauthorized"}), 401
-    
-    try:
-        slug = key_system.create_slug(hwid)
-        host = request.headers.get('host', 'vadrifts.onrender.com')
-        
-        logger.info(f"Created key slug for HWID: {hwid[:8]}...")
-        return f"https://{host}/getkey/{slug}?token={token}"
-    except Exception as e:
-        logger.error(f"Error creating slug: {str(e)}", exc_info=True)
-        return jsonify({"error": f"Failed to create slug: {str(e)}"}), 500
+    logger.info(f"Created key slug for HWID: {hwid[:8]}...")
+    return f"https://{host}/getkey/{slug}"
 
 @app.route('/getkey/<slug>')
 def get_key(slug):
-    token = request.args.get('token') or request.headers.get('X-Key-Token')
+    hwid = key_system.get_hwid_from_slug(slug)
     
-    if not token:
-        logger.warning(f"Missing token for getkey attempt from {request.remote_addr}")
-        return jsonify({"error": "Unauthorized"}), 401
+    if not hwid:
+        logger.warning(f"Invalid or expired slug attempted: {slug}")
+        return "Invalid or expired key link", 404
     
-    try:
-        hwid = key_system.get_hwid_from_slug(slug)
-        
-        if not hwid:
-            logger.warning(f"Invalid or expired slug attempted: {slug}")
-            return jsonify({"error": "Invalid or expired key link"}), 404
-        
-        if not verify_request_token(hwid, token):
-            logger.warning(f"Invalid token for getkey from {request.remote_addr}")
-            return jsonify({"error": "Unauthorized"}), 401
-        
-        key_system.consume_slug(slug)
-        key = key_system.generate_key(hwid)
-        
-        logger.info(f"Key generated for HWID: {hwid[:8]}... Key: {key}")
-        response = make_response(key)
-        response.headers['Content-Type'] = 'text/plain; charset=utf-8'
-        return response
-    except Exception as e:
-        logger.error(f"Error generating key: {str(e)}", exc_info=True)
-        return jsonify({"error": f"Failed to generate key: {str(e)}"}), 500
+    key_system.consume_slug(slug)
+    key = key_system.generate_key(hwid)
+    
+    logger.info(f"Key generated for HWID: {hwid[:8]}... Key: {key}")
+    return key
 
 @app.route('/plugin/<plugin_id>')
 def plugin_detail(plugin_id):
