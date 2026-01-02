@@ -805,7 +805,31 @@
       try {
         setStatus('<div class="loading-spinner"></div>Generating your access key...', 'loading');
 
-        const res = await fetch(`/create?hwid=${encodeURIComponent(hwid)}`);
+        const timestamp = Math.floor(Date.now() / 1000).toString();
+        
+        const tokenRes = await fetch('/api/key-token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ hwid })
+        });
+
+        if (!tokenRes.ok) {
+          setStatus('✗ Failed to get authorization', 'error');
+          btn.disabled = false;
+          btn.innerHTML = 'Generate Access Key';
+          return;
+        }
+
+        const tokenData = await tokenRes.json();
+        const token = tokenData.token;
+
+        const res = await fetch(`/create?hwid=${encodeURIComponent(hwid)}`, {
+          headers: {
+            'X-Key-Token': token
+          }
+        });
         const link = await res.text();
         
         if (res.ok) {
@@ -814,7 +838,7 @@
             window.location.href = link;
           }, 1000);
         } else {
-          setStatus(`✗ Failed to generate key: ${link}`, 'error');
+          setStatus(`✗ Failed to generate key`, 'error');
           btn.disabled = false;
           btn.innerHTML = 'Generate Access Key';
         }
