@@ -803,79 +803,21 @@
       setStatus('<div class="loading-spinner"></div>Getting authorization...', "loading");
 
       try {
-        const timestamp = Math.floor(Date.now() / 1000);
+        setStatus('<div class="loading-spinner"></div>Generating your access key...', 'loading');
+
+        const res = await fetch(`/create?hwid=${encodeURIComponent(hwid)}`);
+        const link = await res.text();
         
-        const tokenRes = await fetch('/api/key-token', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ hwid })
-        });
-
-        if (!tokenRes.ok) {
-          const errData = await tokenRes.json().catch(() => ({}));
-          setStatus(`✗ Failed to get authorization: ${errData.error || 'Unknown error'}`, 'error');
+        if (res.ok) {
+          setStatus('✓ Access key generated successfully! Redirecting...', 'success');
+          setTimeout(() => {
+            window.location.href = link;
+          }, 1000);
+        } else {
+          setStatus(`✗ Failed to generate key: ${link}`, 'error');
           btn.disabled = false;
           btn.innerHTML = 'Generate Access Key';
-          console.error('Token error:', errData);
-          return;
         }
-
-        const tokenData = await tokenRes.json();
-        const token = tokenData.token;
-        const tokenTimestamp = tokenData.timestamp;
-
-        console.log('Got token:', { token, tokenTimestamp, hwid: hwid.substring(0, 8) });
-
-        setStatus('<div class="loading-spinner"></div>Creating key slug...', 'loading');
-
-        const createRes = await fetch(`/create?hwid=${encodeURIComponent(hwid)}`, {
-          method: 'GET',
-          headers: {
-            'X-Key-Token': token,
-            'X-Key-Timestamp': tokenTimestamp
-          }
-        });
-
-        if (!createRes.ok) {
-          const errData = await createRes.json().catch(() => ({}));
-          setStatus(`✗ Failed to create key slug: ${errData.error || 'Unknown error'}`, 'error');
-          btn.disabled = false;
-          btn.innerHTML = 'Generate Access Key';
-          console.error('Create response:', errData);
-          return;
-        }
-
-        const createData = await createRes.json();
-        const slug = createData.redirect.split('/getkey/')[1];
-
-        setStatus('<div class="loading-spinner"></div>Generating key...', 'loading');
-
-        const keyRes = await fetch(`/getkey/${slug}?hwid=${encodeURIComponent(hwid)}`, {
-          method: 'GET',
-          headers: {
-            'X-Key-Token': token,
-            'X-Key-Timestamp': tokenTimestamp
-          }
-        });
-
-        if (!keyRes.ok) {
-          const errData = await keyRes.json().catch(() => ({}));
-          setStatus(`✗ Failed to generate key: ${errData.error || 'Unknown error'}`, 'error');
-          btn.disabled = false;
-          btn.innerHTML = 'Generate Access Key';
-          console.error('Key response:', errData);
-          return;
-        }
-
-        const keyData = await keyRes.json();
-        setStatus('✓ Access key generated successfully! Redirecting...', 'success');
-        
-        setTimeout(() => {
-          window.location.href = `/raw-key/${keyData.key}`;
-        }, 1000);
-
       } catch (err) {
         console.error('Generation error:', err);
         setStatus('✗ Network error. Please check your connection and try again.', 'error');
