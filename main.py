@@ -59,17 +59,24 @@ def require_key_system_auth(f):
         referer = request.headers.get('Referer', '')
         token = request.headers.get('X-Key-Token')
         timestamp = request.headers.get('X-Key-Timestamp')
-        hwid = request.args.get('hwid') or request.get_json().get('hwid') if request.is_json else None
+        
+        hwid = None
+        if request.method == 'GET':
+            hwid = request.args.get('hwid')
+        elif request.is_json:
+            data = request.get_json() or {}
+            hwid = data.get('hwid')
         
         if not referer or '/verify' not in referer:
             logger.warning(f"Unauthorized key system request from {request.remote_addr}")
             return jsonify({"error": "Unauthorized"}), 401
         
-        if not hwid or not token or not timestamp:
+        if not token or not timestamp:
+            logger.warning(f"Missing token/timestamp")
             return jsonify({"error": "Missing authentication parameters"}), 401
         
-        if not verify_request_token(hwid, timestamp, token):
-            logger.warning(f"Invalid token for HWID: {hwid[:8]}...")
+        if not verify_request_token(hwid or '', timestamp, token):
+            logger.warning(f"Invalid token")
             return jsonify({"error": "Invalid request"}), 401
         
         return f(*args, **kwargs)
