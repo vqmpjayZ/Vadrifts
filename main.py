@@ -267,6 +267,12 @@ def get_key_token():
         "timestamp": timestamp
     })
 
+@app.route('/raw-key/<key>')
+def raw_key(key):
+    response = make_response(key)
+    response.headers['Content-Type'] = 'text/plain; charset=utf-8'
+    return response
+
 @app.route('/create')
 @require_key_system_auth
 def create_key():
