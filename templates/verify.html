@@ -800,25 +800,83 @@
 
       btn.disabled = true;
       btn.innerHTML = '<div class="loading-spinner"></div>Generating Key...';
-      setStatus('<div class="loading-spinner"></div>Generating your access key...', "loading");
+      setStatus('<div class="loading-spinner"></div>Getting authorization...', "loading");
 
       try {
-        const res = await fetch(`/create?hwid=${encodeURIComponent(hwid)}`);
-        const link = await res.text();
+        const timestamp = Math.floor(Date.now() / 1000);
         
-        if (res.ok) {
-          setStatus("✓ Access key generated successfully! Redirecting...", "success");
-          setTimeout(() => {
-            window.location.href = link;
-          }, 1500);
-        } else {
-          setStatus(`✗ Failed to generate key: ${link}`, "error");
+        const tokenRes = await fetch('/api/key-token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ hwid })
+        });
+
+        if (!tokenRes.ok) {
+          setStatus('✗ Failed to get authorization', 'error');
           btn.disabled = false;
           btn.innerHTML = 'Generate Access Key';
+          return;
         }
+
+        const tokenData = await tokenRes.json();
+        const token = tokenData.token;
+        const tokenTimestamp = tokenData.timestamp;
+
+        setStatus('<div class="loading-spinner"></div>Creating key slug...', 'loading');
+
+        const createRes = await fetch(`/create?hwid=${encodeURIComponent(hwid)}`, {
+          method: 'GET',
+          headers: {
+            'X-Key-Token': token,
+            'X-Key-Timestamp': tokenTimestamp
+          }
+        });
+
+        if (!createRes.ok) {
+          setStatus('✗ Failed to create key slug', 'error');
+          btn.disabled = false;
+          btn.innerHTML = 'Generate Access Key';
+          return;
+        }
+
+        const createData = await createRes.json();
+        const slug = createData.redirect.split('/getkey/')[1];
+
+        setStatus('<div class="loading-spinner"></div>Generating key...', 'loading');
+
+        const keyRes = await fetch(`/getkey/${slug}`, {
+          method: 'GET',
+          headers: {
+            'X-Key-Token': token,
+            'X-Key-Timestamp': tokenTimestamp
+          }
+        });
+
+        if (!keyRes.ok) {
+          setStatus('✗ Failed to generate key', 'error');
+          btn.disabled = false;
+          btn.innerHTML = 'Generate Access Key';
+          return;
+        }
+
+        const keyData = await keyRes.json();
+        setStatus('✓ Access key generated successfully!', 'success');
+        
+        setTimeout(() => {
+          const key = keyData.key;
+          alert(`Your key: ${key}\n\nKey copied. You can now use it in your script.`);
+          document.getElementById("hwidInput").value = '';
+          updateHwidIndicator();
+          btn.disabled = false;
+          btn.innerHTML = 'Generate Access Key';
+          setStatus('', '');
+        }, 800);
+
       } catch (err) {
         console.error('Generation error:', err);
-        setStatus("✗ Network error. Please check your connection and try again.", "error");
+        setStatus('✗ Network error. Please check your connection and try again.', 'error');
         btn.disabled = false;
         btn.innerHTML = 'Generate Access Key';
       }
