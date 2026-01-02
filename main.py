@@ -39,7 +39,7 @@ def generate_request_token(hwid, timestamp):
     token = hmac.new(KEY_SYSTEM_SECRET.encode(), message, hashlib.sha256).hexdigest()
     return token
 
-def verify_request_token(hwid, timestamp, provided_token, max_age=300):
+def verify_request_token(hwid, timestamp, provided_token, max_age=600):
     try:
         timestamp_int = int(timestamp)
         current_time = int(datetime.now().timestamp())
@@ -49,8 +49,14 @@ def verify_request_token(hwid, timestamp, provided_token, max_age=300):
             return False
         
         expected_token = generate_request_token(hwid, timestamp)
-        return hmac.compare_digest(expected_token, provided_token)
-    except (ValueError, TypeError):
+        is_valid = hmac.compare_digest(expected_token, provided_token)
+        
+        if not is_valid:
+            logger.warning(f"Token mismatch - expected: {expected_token[:8]}... got: {provided_token[:8]}...")
+        
+        return is_valid
+    except (ValueError, TypeError) as e:
+        logger.error(f"Token verification error: {str(e)}")
         return False
 
 def require_key_system_auth(f):
@@ -281,8 +287,21 @@ def create_key():
     if not hwid:
         return jsonify({"error": "Missing HWID"}), 400
     
-    if not token or not verify_request_token(hwid, str(int(datetime.now().timestamp())), token):
-        logger.warning(f"Unauthorized create attempt from {request.remote_addr}")
+    if not token:
+        logger.warning(f"Missing token for create from {request.remote_addr}")
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    current_time = int(datetime.now().timestamp())
+    token_valid = False
+    
+    for time_offset in range(-10, 11):
+        test_timestamp = str(current_time + time_offset)
+        if verify_request_token(hwid, test_timestamp, token):
+            token_valid = True
+            break
+    
+    if not token_valid:
+        logger.warning(f"Invalid token for create from {request.remote_addr}")
         return jsonify({"error": "Unauthorized"}), 401
     
     try:
@@ -310,7 +329,16 @@ def get_key(slug):
             logger.warning(f"Invalid or expired slug attempted: {slug}")
             return jsonify({"error": "Invalid or expired key link"}), 404
         
-        if not verify_request_token(hwid, str(int(datetime.now().timestamp())), token):
+        current_time = int(datetime.now().timestamp())
+        token_valid = False
+        
+        for time_offset in range(-10, 11):
+            test_timestamp = str(current_time + time_offset)
+            if verify_request_token(hwid, test_timestamp, token):
+                token_valid = True
+                break
+        
+        if not token_valid:
             logger.warning(f"Invalid token for getkey from {request.remote_addr}")
             return jsonify({"error": "Unauthorized"}), 401
         
