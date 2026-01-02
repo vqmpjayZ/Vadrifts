@@ -657,7 +657,7 @@
 
   <script>
     let isValidHwid = false;
-    let verificationToken = null;
+    const allowedReferrers = ['work.ink', 'www.work.ink', 'lootdest.org', 'lootlabs.gg', 'www.lootlabs.gg'];
 
     function createParticles() {
       const particlesContainer = document.getElementById('particles');
@@ -673,15 +673,14 @@
       }
     }
 
-    function getTokenFromURL() {
-      const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get('token');
-    }
-
     function checkAccess() {
-      verificationToken = getTokenFromURL();
+      const referrer = document.referrer;
 
-      if (!verificationToken) {
+      const hasValidReferrer = referrer && allowedReferrers.some(domain => 
+        referrer.includes(domain)
+      );
+
+      if (!hasValidReferrer) {
         showAccessDenied();
         return false;
       }
@@ -799,17 +798,12 @@
         return;
       }
 
-      if (!verificationToken) {
-        setStatus("⛔ Missing verification token. Please go through the proper key system flow.", "error");
-        return;
-      }
-
       btn.disabled = true;
       btn.innerHTML = '<div class="loading-spinner"></div>Generating Key...';
       setStatus('<div class="loading-spinner"></div>Generating your access key...', "loading");
 
       try {
-        const res = await fetch(`/create?hwid=${encodeURIComponent(hwid)}&token=${encodeURIComponent(verificationToken)}`);
+        const res = await fetch(`/create?hwid=${encodeURIComponent(hwid)}`);
         const link = await res.text();
         
         if (res.ok) {
