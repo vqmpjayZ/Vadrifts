@@ -34,30 +34,14 @@ key_system = KeySystemManager()
 API_SECRET = "vadriftsisalwaysinseason"
 KEY_SYSTEM_SECRET = os.environ.get("KEY_SYSTEM_SECRET", secrets.token_urlsafe(32))
 
-def generate_request_token(hwid, timestamp):
-    message = f"{hwid}:{timestamp}".encode()
+def generate_request_token(hwid):
+    message = hwid.encode()
     token = hmac.new(KEY_SYSTEM_SECRET.encode(), message, hashlib.sha256).hexdigest()
     return token
 
-def verify_request_token(hwid, timestamp, provided_token, max_age=600):
-    try:
-        timestamp_int = int(timestamp)
-        current_time = int(datetime.now().timestamp())
-        
-        if abs(current_time - timestamp_int) > max_age:
-            logger.warning(f"Token expired for HWID: {hwid[:8]}...")
-            return False
-        
-        expected_token = generate_request_token(hwid, timestamp)
-        is_valid = hmac.compare_digest(expected_token, provided_token)
-        
-        if not is_valid:
-            logger.warning(f"Token mismatch - expected: {expected_token[:8]}... got: {provided_token[:8]}...")
-        
-        return is_valid
-    except (ValueError, TypeError) as e:
-        logger.error(f"Token verification error: {str(e)}")
-        return False
+def verify_request_token(hwid, provided_token):
+    expected_token = generate_request_token(hwid)
+    return hmac.compare_digest(expected_token, provided_token)
 
 def require_key_system_auth(f):
     @wraps(f)
@@ -264,13 +248,11 @@ def get_key_token():
     if not hwid or len(hwid) < 8:
         return jsonify({"error": "Invalid HWID"}), 400
     
-    timestamp = str(int(datetime.now().timestamp()))
-    token = generate_request_token(hwid, timestamp)
+    token = generate_request_token(hwid)
     
     logger.info(f"Issued key token for HWID: {hwid[:8]}...")
     return jsonify({
-        "token": token,
-        "timestamp": timestamp
+        "token": token
     })
 
 @app.route('/raw-key/<key>')
@@ -291,16 +273,7 @@ def create_key():
         logger.warning(f"Missing token for create from {request.remote_addr}")
         return jsonify({"error": "Unauthorized"}), 401
     
-    current_time = int(datetime.now().timestamp())
-    token_valid = False
-    
-    for time_offset in range(-10, 11):
-        test_timestamp = str(current_time + time_offset)
-        if verify_request_token(hwid, test_timestamp, token):
-            token_valid = True
-            break
-    
-    if not token_valid:
+    if not verify_request_token(hwid, token):
         logger.warning(f"Invalid token for create from {request.remote_addr}")
         return jsonify({"error": "Unauthorized"}), 401
     
@@ -329,16 +302,7 @@ def get_key(slug):
             logger.warning(f"Invalid or expired slug attempted: {slug}")
             return jsonify({"error": "Invalid or expired key link"}), 404
         
-        current_time = int(datetime.now().timestamp())
-        token_valid = False
-        
-        for time_offset in range(-10, 11):
-            test_timestamp = str(current_time + time_offset)
-            if verify_request_token(hwid, test_timestamp, token):
-                token_valid = True
-                break
-        
-        if not token_valid:
+        if not verify_request_token(hwid, token):
             logger.warning(f"Invalid token for getkey from {request.remote_addr}")
             return jsonify({"error": "Unauthorized"}), 401
         
