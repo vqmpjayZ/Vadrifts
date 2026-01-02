@@ -276,8 +276,14 @@ def raw_key(key):
 @app.route('/create')
 def create_key():
     hwid = request.args.get('hwid')
+    token = request.headers.get('X-Key-Token')
+    
     if not hwid:
         return jsonify({"error": "Missing HWID"}), 400
+    
+    if not token or not verify_request_token(hwid, str(int(datetime.now().timestamp())), token):
+        logger.warning(f"Unauthorized create attempt from {request.remote_addr}")
+        return jsonify({"error": "Unauthorized"}), 401
     
     try:
         slug = key_system.create_slug(hwid)
@@ -291,12 +297,22 @@ def create_key():
 
 @app.route('/getkey/<slug>')
 def get_key(slug):
+    token = request.headers.get('X-Key-Token')
+    
+    if not token:
+        logger.warning(f"Missing token for getkey attempt from {request.remote_addr}")
+        return jsonify({"error": "Unauthorized"}), 401
+    
     try:
         hwid = key_system.get_hwid_from_slug(slug)
         
         if not hwid:
             logger.warning(f"Invalid or expired slug attempted: {slug}")
             return jsonify({"error": "Invalid or expired key link"}), 404
+        
+        if not verify_request_token(hwid, str(int(datetime.now().timestamp())), token):
+            logger.warning(f"Invalid token for getkey from {request.remote_addr}")
+            return jsonify({"error": "Unauthorized"}), 401
         
         key_system.consume_slug(slug)
         key = key_system.generate_key(hwid)
