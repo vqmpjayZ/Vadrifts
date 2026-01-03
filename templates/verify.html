@@ -535,14 +535,14 @@
       25% { transform: translateX(-10px); }
       75% { transform: translateX(10px); }
     }
-
+    
     .captcha-container {
-      min-height: 65px;
       width: 100%;
       display: flex;
       justify-content: center;
       align-items: center;
-      margin-bottom: 10px;
+      min-height: 70px;
+      margin-bottom: 20px;
       transition: opacity 0.3s ease;
     }
 
@@ -623,7 +623,7 @@
       <div class="logo-wrapper">🔐</div>
       <h2>HWID Verification</h2>
       <p class="subtitle">
-        To generate your access key, enter your <strong>Hardware ID (HWID)</strong> below.
+        To generate your access key, <strong>complete the captcha</strong> and enter your <strong>Hardware ID (HWID)</strong>.
       </p>
 
       <div class="instruction-box">
@@ -638,28 +638,30 @@
           <li>Paste it in the field below</li>
         </ol>
       </div>
-      
-      <div class="input-group">
-        <label class="input-label" for="hwidInput">Hardware ID</label>
-        <div id="captchaContainer" class="captcha-container">
-          <div class="cf-turnstile" data-sitekey="YOUR_SITE_KEY_HERE" data-callback="onCaptchaSuccess" data-theme="dark"></div>
-        </div>
-        <input 
-          id="hwidInput" 
-          type="text" 
-          placeholder="Paste your HWID here..." 
-          autocomplete="off"
-          spellcheck="false"
-          style="display: none;"
-        />
-        <div class="hwid-indicator" id="hwidIndicator" style="display: none;"></div>
-      </div>
 
-      <div class="status" id="validationStatus"></div>
+      <div id="captchaContainer" class="captcha-container">
+        <div class="cf-turnstile" data-sitekey="YOUR_SITE_KEY_HERE" data-callback="onCaptchaSuccess" data-theme="dark"></div>
+      </div>
       
-      <button class="verify-btn" onclick="getKey()" id="verifyBtn" disabled>
-        Generate Access Key
-      </button>
+      <div id="hwidSection" style="opacity: 0; transition: opacity 0.3s ease;">
+        <div class="input-group">
+          <label class="input-label" for="hwidInput">Hardware ID</label>
+          <input 
+            id="hwidInput" 
+            type="text" 
+            placeholder="Paste your HWID here..." 
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <div class="hwid-indicator" id="hwidIndicator"></div>
+        </div>
+
+        <div class="status" id="validationStatus"></div>
+        
+        <button class="verify-btn" onclick="getKey()" id="verifyBtn" disabled>
+          Generate Access Key
+        </button>
+      </div>
       
       <div class="status" id="status"></div>
 
@@ -685,7 +687,6 @@
     let isCaptchaVerified = false;
     let captchaToken = null;
     let verificationToken = null;
-    let accessAllowed = false;
 
     function createParticles() {
       const particlesContainer = document.getElementById('particles');
@@ -701,52 +702,21 @@
       }
     }
 
-    async function checkAccess() {
-      try {
-        const referrer = document.referrer;
-        const validReferrers = ['work.ink', 'loot-link.com', 'loot-links.com', 'lootdest.com'];
-        const hasValidReferrer = validReferrers.some(domain => referrer.includes(domain));
-        
-        if (!hasValidReferrer) {
-          showAccessDenied();
-          return false;
-        }
-
-        const res = await fetch('/check-verification');
-        const data = await res.json();
-
-        if (!data.valid) {
-          let message = "Verification failed. Please try again.";
-          
-          switch(data.reason) {
-            case 'no_timer':
-              message = "No verification session found. Please start from the key system page.";
-              break;
-            case 'already_verified':
-              message = "This verification session has already been used.";
-              break;
-            case 'time_not_elapsed':
-              const remaining = Math.ceil(data.required - data.elapsed);
-              message = `Please wait ${remaining} more seconds before continuing.`;
-              break;
-          }
-          
-          showAccessDenied(message);
-          return false;
-        }
-
-        accessAllowed = true;
-        verificationToken = data.token || 'valid';
-        
-        return true;
-      } catch (err) {
-        console.error('Access check error:', err);
-        showAccessDenied("Failed to verify access. Please try again.");
+    function checkAccess() {
+      if (typeof accessDenied !== 'undefined' && accessDenied) {
+        showAccessDenied();
         return false;
       }
+      
+      if (!verificationToken) {
+        showAccessDenied();
+        return false;
+      }
+      
+      return true;
     }
 
-    function showAccessDenied(customMessage) {
+    function showAccessDenied() {
       const box = document.querySelector('.box');
       box.classList.add('access-denied');
       box.style.borderColor = 'rgba(239, 68, 68, 0.3)';
@@ -770,7 +740,7 @@
         </div>
         <div class="status error show" style="margin-top: 30px;">
           <strong>⛔ Unauthorized Access Detected</strong><br>
-          ${customMessage || "You must complete the key system first."}
+          You must complete the key system first.
         </div>
       `;
     }
@@ -779,21 +749,19 @@
       captchaToken = token;
       isCaptchaVerified = true;
       
-      const captchaContainer = document.getElementById('captchaContainer');
-      const hwidInput = document.getElementById('hwidInput');
-      const hwidIndicator = document.getElementById('hwidIndicator');
-      
-      captchaContainer.style.opacity = '0';
+      const hwidSection = document.getElementById('hwidSection');
+      hwidSection.style.opacity = '1';
       
       setTimeout(() => {
-        captchaContainer.style.display = 'none';
-        hwidInput.style.display = 'block';
-        hwidIndicator.style.display = 'block';
-        
-        setTimeout(() => {
-          hwidInput.focus();
-        }, 50);
+        document.getElementById('hwidInput').focus();
       }, 300);
+      
+      updateButtonState();
+    }
+
+    function updateButtonState() {
+      const btn = document.getElementById('verifyBtn');
+      btn.disabled = !(isValidHwid && isCaptchaVerified);
     }
 
     function validateHwid(hwid) {
@@ -823,14 +791,13 @@
       const indicator = document.getElementById("hwidIndicator");
       const input = document.getElementById("hwidInput");
       const validationStatus = document.getElementById("validationStatus");
-      const verifyBtn = document.getElementById("verifyBtn");
       
       if (!hwid) {
         indicator.classList.remove("valid");
         input.classList.remove("valid", "error");
         validationStatus.classList.remove("show");
         isValidHwid = false;
-        verifyBtn.disabled = true;
+        updateButtonState();
         return;
       }
 
@@ -842,7 +809,6 @@
         input.classList.remove("error");
         validationStatus.classList.remove("show");
         isValidHwid = true;
-        verifyBtn.disabled = false;
       } else {
         indicator.classList.remove("valid");
         input.classList.add("error");
@@ -850,8 +816,9 @@
         validationStatus.className = "status error show";
         validationStatus.innerHTML = `<strong>❌ Invalid HWID:</strong><br>${validation.errors.join('<br>')}`;
         isValidHwid = false;
-        verifyBtn.disabled = true;
       }
+      
+      updateButtonState();
     }
 
     function setStatus(message, type = '') {
@@ -867,11 +834,6 @@
     }
 
     async function getKey() {
-      if (!accessAllowed) {
-        setStatus("⚠️ Access denied. Please start from the key system page.", "error");
-        return;
-      }
-
       const hwid = document.getElementById("hwidInput").value.trim();
       const btn = document.getElementById("verifyBtn");
       
@@ -886,7 +848,7 @@
       }
 
       if (!verificationToken) {
-        setStatus("⚠️ Session expired or invalid. Please refresh and try again.", "error");
+        setStatus("⚠️ Session expired or invalid. Please complete the key system again.", "error");
         return;
       }
 
@@ -924,25 +886,23 @@
       }
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', () => {
       createParticles();
       
-      checkAccess().then(allowed => {
-        if (allowed) {
-          const hwidInput = document.getElementById('hwidInput');
-          hwidInput.addEventListener("input", updateHwidIndicator);
-          
-          hwidInput.addEventListener("keypress", (e) => {
-            if (e.key === "Enter" && isValidHwid) {
-              getKey();
-            }
-          });
-          
-          hwidInput.addEventListener("paste", (e) => {
-            setTimeout(updateHwidIndicator, 10);
-          });
-        }
-      });
+      if (checkAccess()) {
+        const hwidInput = document.getElementById("hwidInput");
+        hwidInput.addEventListener("input", updateHwidIndicator);
+        
+        hwidInput.addEventListener("keypress", (e) => {
+          if (e.key === "Enter" && isValidHwid && isCaptchaVerified) {
+            getKey();
+          }
+        });
+
+        hwidInput.addEventListener("paste", (e) => {
+          setTimeout(updateHwidIndicator, 10);
+        });
+      }
     });
   </script>
 </body>
