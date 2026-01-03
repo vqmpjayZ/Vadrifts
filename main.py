@@ -1,6 +1,8 @@
 import os
 import logging
 import json
+import secrets
+import time
 from functools import wraps
 from flask import Flask, request, jsonify, send_file, redirect, send_from_directory, make_response
 from datetime import datetime
@@ -14,6 +16,7 @@ from plugins_manager import PluginsManager
 from scripts_data import scripts_data, process_script_data
 from utils import inject_meta_tags, server_pinger
 from key_system import KeySystemManager
+from verification_timer import VerificationTimer
 
 logging.basicConfig(
     level=logging.INFO,
@@ -27,8 +30,20 @@ app = Flask(__name__)
 youtube_finder = YouTubeChannelFinder()
 plugins_manager = PluginsManager()
 key_system = KeySystemManager()
+verification_timer = VerificationTimer(min_verification_time=75)
+verification_tokens = {}
 
 API_SECRET = "vadriftsisalwaysinseason"
+
+def get_client_ip():
+    client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    if client_ip and ',' in client_ip:
+        client_ip = client_ip.split(',')[0].strip()
+    return client_ip
+
+def is_valid_referrer(referer):
+    allowed_referrers = ['work.ink', 'www.work.ink', 'lootdest.org', 'lootlabs.gg', 'www.lootlabs.gg']
+    return any(domain in referer for domain in allowed_referrers)
 
 @app.route('/')
 def home():
@@ -61,6 +76,17 @@ def require_api_key(f):
             return jsonify({"error": "Unauthorized"}), 401
         return f(*args, **kwargs)
     return decorated_function
+
+@app.route('/start-verification')
+def start_verification():
+    client_ip = get_client_ip()
+    timer_token = verification_timer.create_timer(client_ip)
+    logger.info(f"Verification timer started for IP: {client_ip}")
+    
+    return jsonify({
+        "redirect_url": None,
+        "timer_token": timer_token
+    })
         
 @app.route('/plugins')
 def plugins_page():
@@ -185,17 +211,95 @@ def key_system_page():
 
 @app.route('/verify')
 def verify_page():
+    client_ip = get_client_ip()
+    timer_token = request.args.get('timer')
+    referer = request.headers.get('Referer', '')
+    
     try:
-        return send_file('templates/verify.html')
+        with open('templates/verify.html', 'r', encoding='utf-8') as f:
+            html_content = f.read()
     except FileNotFoundError:
         logger.error("verify.html template not found")
         return jsonify({"error": "Verify page not found"}), 404
+    
+    html_content = html_content.replace(
+        'let verificationToken = null;',
+        'let verificationToken = null;'
+    )
+    
+    if not timer_token:
+        logger.warning(f"No timer token from IP: {client_ip}")
+        return html_content
+    
+    timer_check = verification_timer.check_timer(timer_token, client_ip)
+    
+    if not timer_check['valid']:
+        reason = timer_check.get('reason')
+        if reason == 'time_not_elapsed':
+            elapsed = timer_check.get('elapsed', 0)
+            required = timer_check.get('required', 75)
+            logger.warning(f"Timer bypass attempt from IP: {client_ip}. Only {elapsed:.1f}s elapsed (need {required}s)")
+        elif reason == 'token_used':
+            logger.warning(f"Reused timer token from IP: {client_ip}")
+        elif reason == 'ip_mismatch':
+            logger.warning(f"IP mismatch for timer token from IP: {client_ip}")
+        else:
+            logger.warning(f"Invalid timer token from IP: {client_ip}")
+        return html_content
+    
+    if not is_valid_referrer(referer):
+        logger.warning(f"Invalid referer from IP: {client_ip}. Referer: {referer}")
+        return html_content
+    
+    verification_timer.mark_used(timer_token)
+    
+    token = secrets.token_urlsafe(32)
+    
+    verification_tokens[token] = {
+        'ip': client_ip,
+        'expires': time.time() + 300,
+        'used': False
+    }
+    
+    html_content = html_content.replace(
+        'let verificationToken = null;',
+        f'let verificationToken = "{token}";'
+    )
+    
+    logger.info(f"Verification token created for IP: {client_ip} after {timer_check['elapsed']:.1f}s")
+    return html_content
 
 @app.route('/create')
 def create_key():
     hwid = request.args.get('hwid')
+    token = request.args.get('token')
+    
     if not hwid:
         return "Missing HWID", 400
+    
+    if not token:
+        logger.warning(f"Create attempt without token for HWID: {hwid[:8]}...")
+        return "Missing verification token", 403
+    
+    token_data = verification_tokens.get(token)
+    if not token_data:
+        logger.warning(f"Invalid token attempt for HWID: {hwid[:8]}...")
+        return "Invalid or expired token", 403
+    
+    if token_data['used']:
+        logger.warning(f"Reused token attempt for HWID: {hwid[:8]}...")
+        return "Token already used", 403
+    
+    if time.time() > token_data['expires']:
+        del verification_tokens[token]
+        return "Token expired", 403
+    
+    client_ip = get_client_ip()
+    if token_data['ip'] != client_ip:
+        logger.warning(f"Token IP mismatch for HWID: {hwid[:8]}... Expected {token_data['ip']}, got {client_ip}")
+        return "Session mismatch", 403
+    
+    verification_tokens[token]['used'] = True
     
     slug = key_system.create_slug(hwid)
     host = request.headers.get('host', 'vadrifts.onrender.com')
@@ -216,6 +320,17 @@ def get_key(slug):
     
     logger.info(f"Key generated for HWID: {hwid[:8]}... Key: {key}")
     return key
+
+@app.route('/validate')
+def validate_key_route():
+    hwid = request.args.get('hwid')
+    key = request.args.get('key')
+    
+    if not hwid or not key:
+        return "false"
+    
+    is_valid = key_system.validate_key(hwid, key)
+    return "true" if is_valid else "false"
 
 @app.route('/plugin/<plugin_id>')
 def plugin_detail(plugin_id):
