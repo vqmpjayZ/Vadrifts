@@ -1099,13 +1099,11 @@ async function startVerification(provider) {
 
     if (response.ok && data.timer_token) {
       showStatus('Redirecting to verification partner...', 'loading');
-
-      let redirectUrl = provider.link;
-      const separator = redirectUrl.includes('?') ? '&' : '?';
-      redirectUrl += `${separator}timer=${data.timer_token}`;
+      
+      localStorage.setItem('vadrifts_timer_token', data.timer_token);
 
       setTimeout(() => {
-        window.location.href = redirectUrl;
+        window.location.href = provider.link;
       }, 800);
     } else {
       throw new Error('Failed to start verification');
@@ -1116,7 +1114,7 @@ async function startVerification(provider) {
     btns.forEach(btn => btn.disabled = false);
   }
 }
-
+  
 function showStatus(message, type) {
   const statusEl = document.getElementById('statusMsg');
   statusEl.className = `status-msg show ${type}`;
