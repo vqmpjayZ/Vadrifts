@@ -37,3 +37,7 @@ class KeySystemManager:
         """Remove slug after use"""
         if slug in self.active_slugs:
             del self.active_slugs[slug]
+
+    def validate_key(self, hwid, key):
+        expected_key = self.generate_key(hwid)
+        return key == expected_key
