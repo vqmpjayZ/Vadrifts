@@ -20,8 +20,9 @@ scripts_data = [
             "Chat tools AND MORE!!",
         ],
         "script": '''loadstring(game:HttpGet("https://raw.githubusercontent.com/vqmpjayZ/Bypass/main/vadrifts.lua"))()''',
-        "key_type": "discord",
-        "key_link": "https://discord.com/invite/WDbJ5wE2cR"
+        "key_type": "work.ink",
+        "key_link": "https://work.ink/20yd/vadrifts.byp",
+        "lootlabs_link": None
     },
     {
         "id": 8916037983,
