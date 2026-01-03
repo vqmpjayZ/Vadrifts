@@ -251,65 +251,37 @@
       font-weight: 600;
     }
 
-    .subtitle .highlight {
-      color: #aaa;
-      font-weight: 500;
-    }
-
     .captcha-section {
       display: flex;
       flex-direction: column;
       align-items: center;
+      min-height: 65px;
       margin-bottom: 30px;
+      opacity: 1;
+      transition: opacity 0.3s ease;
     }
 
-    .captcha-title {
-      color: #10b981;
-      font-size: 13px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    .captcha-section.hiding {
+      opacity: 0;
     }
 
     .cf-turnstile {
       margin: 0 auto;
     }
 
-    .captcha-verified {
-      display: none;
-      align-items: center;
-      gap: 10px;
-      padding: 15px 25px;
-      background: rgba(16, 185, 129, 0.15);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      border-radius: 12px;
-      color: #10b981;
-      font-weight: 600;
-      font-size: 14px;
-      animation: slideIn 0.3s ease;
-    }
-
-    .captcha-verified.show {
-      display: flex;
-    }
-
     .hwid-section {
       display: none;
-      animation: slideIn 0.5s ease;
+      animation: fadeIn 0.4s ease;
     }
 
     .hwid-section.show {
       display: block;
     }
 
-    @keyframes slideIn {
+    @keyframes fadeIn {
       from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(10px);
       }
       to {
         opacity: 1;
@@ -520,6 +492,17 @@
       display: block;
     }
 
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     .status.loading {
       background: rgba(251, 191, 36, 0.15);
       color: #fbbf24;
@@ -663,19 +646,11 @@
       <div class="logo-wrapper">🔐</div>
       <h2>HWID Verification</h2>
       <p class="subtitle">
-        Complete the captcha below to verify you're human, then enter your <strong>HWID</strong>.
+        To generate your access key, enter your <strong>Hardware ID (HWID)</strong> below.
       </p>
 
       <div class="captcha-section" id="captchaSection">
-        <div class="captcha-title">
-          <span>🤖</span>
-          <span>Verify you're human:</span>
-        </div>
         <div class="cf-turnstile" data-sitekey="YOUR_SITE_KEY_HERE" data-callback="onCaptchaSuccess" data-theme="dark"></div>
-        <div class="captcha-verified" id="captchaVerified">
-          <span>✓</span>
-          <span>Verification complete!</span>
-        </div>
       </div>
 
       <div class="hwid-section" id="hwidSection">
@@ -744,13 +719,14 @@
       captchaToken = token;
       isCaptchaVerified = true;
       
-      document.querySelector('.cf-turnstile').style.display = 'none';
-      document.getElementById('captchaVerified').classList.add('show');
+      const captchaSection = document.getElementById('captchaSection');
+      captchaSection.classList.add('hiding');
       
       setTimeout(() => {
+        captchaSection.style.display = 'none';
         document.getElementById('hwidSection').classList.add('show');
         document.getElementById("hwidInput").focus();
-      }, 500);
+      }, 300);
     }
 
     function validateHwid(hwid) {
