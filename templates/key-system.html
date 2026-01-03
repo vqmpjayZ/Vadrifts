@@ -1097,11 +1097,9 @@ async function startVerification(provider) {
     const response = await fetch('/start-verification');
     const data = await response.json();
 
-    if (response.ok && data.timer_token) {
+    if (response.ok) {
       showStatus('Redirecting to verification partner...', 'loading');
       
-      localStorage.setItem('vadrifts_timer_token', data.timer_token);
-
       setTimeout(() => {
         window.location.href = provider.link;
       }, 800);
