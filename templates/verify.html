@@ -655,9 +655,9 @@
     </div>
   </div>
 
-  <script>
+<script>
     let isValidHwid = false;
-    const allowedReferrers = ['work.ink', 'www.work.ink', 'lootdest.org', 'lootlabs.gg', 'www.lootlabs.gg'];
+    let verificationToken = null;
 
     function createParticles() {
       const particlesContainer = document.getElementById('particles');
@@ -674,16 +674,16 @@
     }
 
     function checkAccess() {
-      const referrer = document.referrer;
-
-      const hasValidReferrer = referrer && allowedReferrers.some(domain => 
-        referrer.includes(domain)
-      );
-
-      if (!hasValidReferrer) {
+      if (typeof accessDenied !== 'undefined' && accessDenied) {
         showAccessDenied();
         return false;
       }
+      
+      if (!verificationToken) {
+        showAccessDenied();
+        return false;
+      }
+      
       return true;
     }
 
@@ -791,6 +791,11 @@
         return;
       }
 
+      if (!verificationToken) {
+        setStatus("⚠️ Session expired or invalid. Please complete the key system again.", "error");
+        return;
+      }
+
       const validation = validateHwid(hwid);
       
       if (!validation.isValid) {
@@ -803,16 +808,17 @@
       setStatus('<div class="loading-spinner"></div>Generating your access key...', "loading");
 
       try {
-        const res = await fetch(`/create?hwid=${encodeURIComponent(hwid)}`);
+        const res = await fetch(`/create?hwid=${encodeURIComponent(hwid)}&token=${encodeURIComponent(verificationToken)}`);
         const link = await res.text();
         
         if (res.ok) {
+          verificationToken = null;
           setStatus("✓ Access key generated successfully! Redirecting...", "success");
           setTimeout(() => {
             window.location.href = link;
           }, 1500);
         } else {
-          setStatus(`✗ Failed to generate key: ${link}`, "error");
+          setStatus(`✗ ${link}`, "error");
           btn.disabled = false;
           btn.innerHTML = 'Generate Access Key';
         }
