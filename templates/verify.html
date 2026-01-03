@@ -292,9 +292,10 @@
       margin-bottom: 0;
     }
 
-    .input-group {
+    .input-container {
       position: relative;
       margin-bottom: 20px;
+      min-height: 90px;
     }
 
     .input-label {
@@ -306,6 +307,23 @@
       font-size: 13px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+    }
+
+    .captcha-wrapper {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .hwid-wrapper {
+      opacity: 0;
+      position: absolute;
+      top: 32px;
+      left: 0;
+      width: 100%;
+      transition: opacity 0.3s ease;
+      display: none;
     }
 
     input {
@@ -535,16 +553,6 @@
       25% { transform: translateX(-10px); }
       75% { transform: translateX(10px); }
     }
-    
-    .captcha-container {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 70px;
-      margin-bottom: 20px;
-      transition: opacity 0.3s ease;
-    }
 
     @media (max-width: 768px) {
       .box {
@@ -639,13 +647,14 @@
         </ol>
       </div>
 
-      <div id="captchaContainer" class="captcha-container">
-        <div class="cf-turnstile" data-sitekey="YOUR_SITE_KEY_HERE" data-callback="onCaptchaSuccess" data-theme="dark"></div>
-      </div>
-      
-      <div id="hwidSection" style="opacity: 0; transition: opacity 0.3s ease;">
-        <div class="input-group">
-          <label class="input-label" for="hwidInput">Hardware ID</label>
+      <div class="input-container">
+        <label class="input-label" for="hwidInput">Hardware ID</label>
+        
+        <div id="captchaWrapper" class="captcha-wrapper">
+          <div class="cf-turnstile" data-sitekey="YOUR_SITE_KEY_HERE" data-callback="onCaptchaSuccess" data-theme="dark"></div>
+        </div>
+        
+        <div id="hwidWrapper" class="hwid-wrapper">
           <input 
             id="hwidInput" 
             type="text" 
@@ -655,13 +664,13 @@
           />
           <div class="hwid-indicator" id="hwidIndicator"></div>
         </div>
-
-        <div class="status" id="validationStatus"></div>
-        
-        <button class="verify-btn" onclick="getKey()" id="verifyBtn" disabled>
-          Generate Access Key
-        </button>
       </div>
+
+      <div class="status" id="validationStatus"></div>
+      
+      <button class="verify-btn" onclick="getKey()" id="verifyBtn" disabled>
+        Generate Access Key
+      </button>
       
       <div class="status" id="status"></div>
 
@@ -727,183 +736,4 @@
           Direct access to this verification page is <strong style="color: #ef4444;">not permitted</strong>.<br>
           Please access through the authorized <span class="highlight">key system portal</span>.
         </p>
-        <div class="instruction-box" style="background: rgba(239, 68, 68, 0.05); border-color: rgba(239, 68, 68, 0.15);">
-          <div class="instruction-title" style="color: #ef4444;">
-            <span>⚠️</span>
-            <span>Proper Access Route:</span>
-          </div>
-          <ol class="instruction-steps">
-            <li>Complete the key system challenge (Work.ink or LootLabs)</li>
-            <li>You'll be automatically redirected here</li>
-            <li>Enter your HWID to generate the key</li>
-          </ol>
-        </div>
-        <div class="status error show" style="margin-top: 30px;">
-          <strong>⛔ Unauthorized Access Detected</strong><br>
-          You must complete the key system first.
-        </div>
-      `;
-    }
-
-    function onCaptchaSuccess(token) {
-      captchaToken = token;
-      isCaptchaVerified = true;
-      
-      const hwidSection = document.getElementById('hwidSection');
-      hwidSection.style.opacity = '1';
-      
-      setTimeout(() => {
-        document.getElementById('hwidInput').focus();
-      }, 300);
-      
-      updateButtonState();
-    }
-
-    function updateButtonState() {
-      const btn = document.getElementById('verifyBtn');
-      btn.disabled = !(isValidHwid && isCaptchaVerified);
-    }
-
-    function validateHwid(hwid) {
-      const validPattern = /^[a-zA-Z0-9_-]+$/;
-      const errors = [];
-
-      if (hwid.length < 35) {
-        errors.push('HWID must be at least 35 characters');
-      }
-
-      if (hwid.includes(' ')) {
-        errors.push('HWID cannot contain spaces');
-      }
-
-      if (!validPattern.test(hwid)) {
-        errors.push('HWID can only contain letters, numbers, hyphens (-), and underscores (_)');
-      }
-
-      return {
-        isValid: errors.length === 0,
-        errors: errors
-      };
-    }
-
-    function updateHwidIndicator() {
-      const hwid = document.getElementById("hwidInput").value.trim();
-      const indicator = document.getElementById("hwidIndicator");
-      const input = document.getElementById("hwidInput");
-      const validationStatus = document.getElementById("validationStatus");
-      
-      if (!hwid) {
-        indicator.classList.remove("valid");
-        input.classList.remove("valid", "error");
-        validationStatus.classList.remove("show");
-        isValidHwid = false;
-        updateButtonState();
-        return;
-      }
-
-      const validation = validateHwid(hwid);
-      
-      if (validation.isValid) {
-        indicator.classList.add("valid");
-        input.classList.add("valid");
-        input.classList.remove("error");
-        validationStatus.classList.remove("show");
-        isValidHwid = true;
-      } else {
-        indicator.classList.remove("valid");
-        input.classList.add("error");
-        input.classList.remove("valid");
-        validationStatus.className = "status error show";
-        validationStatus.innerHTML = `<strong>❌ Invalid HWID:</strong><br>${validation.errors.join('<br>')}`;
-        isValidHwid = false;
-      }
-      
-      updateButtonState();
-    }
-
-    function setStatus(message, type = '') {
-      const statusEl = document.getElementById("status");
-      statusEl.className = `status ${type}`;
-      statusEl.innerHTML = message;
-      
-      if (type) {
-        statusEl.classList.add('show');
-      } else {
-        statusEl.classList.remove('show');
-      }
-    }
-
-    async function getKey() {
-      const hwid = document.getElementById("hwidInput").value.trim();
-      const btn = document.getElementById("verifyBtn");
-      
-      if (!isCaptchaVerified || !captchaToken) {
-        setStatus("⚠️ Please complete the captcha first", "error");
-        return;
-      }
-      
-      if (!hwid) {
-        setStatus("⚠️ Please enter your HWID", "error");
-        return;
-      }
-
-      if (!verificationToken) {
-        setStatus("⚠️ Session expired or invalid. Please complete the key system again.", "error");
-        return;
-      }
-
-      const validation = validateHwid(hwid);
-      
-      if (!validation.isValid) {
-        setStatus(`<strong>❌ Invalid HWID:</strong><br>${validation.errors.join('<br>')}`, "error");
-        return;
-      }
-
-      btn.disabled = true;
-      btn.innerHTML = '<div class="loading-spinner"></div>Generating Key...';
-      setStatus('<div class="loading-spinner"></div>Generating your access key...', "loading");
-
-      try {
-        const res = await fetch(`/create?hwid=${encodeURIComponent(hwid)}&token=${encodeURIComponent(verificationToken)}&captcha=${encodeURIComponent(captchaToken)}`);
-        const link = await res.text();
-        
-        if (res.ok) {
-          verificationToken = null;
-          setStatus("✓ Access key generated successfully! Redirecting...", "success");
-          setTimeout(() => {
-            window.location.href = link;
-          }, 1500);
-        } else {
-          setStatus(`✗ ${link}`, "error");
-          btn.disabled = false;
-          btn.innerHTML = 'Generate Access Key';
-        }
-      } catch (err) {
-        console.error('Generation error:', err);
-        setStatus("✗ Network error. Please check your connection and try again.", "error");
-        btn.disabled = false;
-        btn.innerHTML = 'Generate Access Key';
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      createParticles();
-      
-      if (checkAccess()) {
-        const hwidInput = document.getElementById("hwidInput");
-        hwidInput.addEventListener("input", updateHwidIndicator);
-        
-        hwidInput.addEventListener("keypress", (e) => {
-          if (e.key === "Enter" && isValidHwid && isCaptchaVerified) {
-            getKey();
-          }
-        });
-
-        hwidInput.addEventListener("paste", (e) => {
-          setTimeout(updateHwidIndicator, 10);
-        });
-      }
-    });
-  </script>
-</body>
-</html>
+        <div class="instruction-box" style="background: rgba(239, 68, 68, 
