@@ -76,17 +76,6 @@ def require_api_key(f):
             return jsonify({"error": "Unauthorized"}), 401
         return f(*args, **kwargs)
     return decorated_function
-
-@app.route('/start-verification')
-def start_verification():
-    client_ip = get_client_ip()
-    timer_token = verification_timer.create_timer(client_ip)
-    logger.info(f"Verification timer started for IP: {client_ip}")
-    
-    return jsonify({
-        "redirect_url": None,
-        "timer_token": timer_token
-    })
         
 @app.route('/plugins')
 def plugins_page():
@@ -209,10 +198,20 @@ def key_system_page():
         logger.error("key-system.html template not found")
         return jsonify({"error": "Key system page not found"}), 404
 
+@app.route('/start-verification')
+def start_verification():
+    client_ip = get_client_ip()
+    verification_timer.start_timer(client_ip)
+    logger.info(f"Verification timer started for IP: {client_ip}")
+    
+    return jsonify({
+        "success": True,
+        "message": "Timer started"
+    })
+
 @app.route('/verify')
 def verify_page():
     client_ip = get_client_ip()
-    timer_token = request.args.get('timer')
     referer = request.headers.get('Referer', '')
     
     try:
@@ -227,11 +226,7 @@ def verify_page():
         'let verificationToken = null;'
     )
     
-    if not timer_token:
-        logger.warning(f"No timer token from IP: {client_ip}")
-        return html_content
-    
-    timer_check = verification_timer.check_timer(timer_token, client_ip)
+    timer_check = verification_timer.check_timer(client_ip)
     
     if not timer_check['valid']:
         reason = timer_check.get('reason')
@@ -239,19 +234,17 @@ def verify_page():
             elapsed = timer_check.get('elapsed', 0)
             required = timer_check.get('required', 25)
             logger.warning(f"Timer bypass attempt from IP: {client_ip}. Only {elapsed:.1f}s elapsed (need {required}s)")
-        elif reason == 'token_used':
-            logger.warning(f"Reused timer token from IP: {client_ip}")
-        elif reason == 'ip_mismatch':
-            logger.warning(f"IP mismatch for timer token from IP: {client_ip}")
+        elif reason == 'already_verified':
+            logger.warning(f"Already verified IP trying again: {client_ip}")
         else:
-            logger.warning(f"Invalid timer token from IP: {client_ip}")
+            logger.warning(f"No timer found for IP: {client_ip}")
         return html_content
     
     if not is_valid_referrer(referer):
         logger.warning(f"Invalid referer from IP: {client_ip}. Referer: {referer}")
         return html_content
     
-    verification_timer.mark_used(timer_token)
+    verification_timer.mark_verified(client_ip)
     
     token = secrets.token_urlsafe(32)
     
