@@ -30,7 +30,7 @@ app = Flask(__name__)
 youtube_finder = YouTubeChannelFinder()
 plugins_manager = PluginsManager()
 key_system = KeySystemManager()
-verification_timer = VerificationTimer(min_verification_time=75)
+verification_timer = VerificationTimer(min_verification_time=25)
 verification_tokens = {}
 
 API_SECRET = "vadriftsisalwaysinseason"
@@ -237,7 +237,7 @@ def verify_page():
         reason = timer_check.get('reason')
         if reason == 'time_not_elapsed':
             elapsed = timer_check.get('elapsed', 0)
-            required = timer_check.get('required', 75)
+            required = timer_check.get('required', 25)
             logger.warning(f"Timer bypass attempt from IP: {client_ip}. Only {elapsed:.1f}s elapsed (need {required}s)")
         elif reason == 'token_used':
             logger.warning(f"Reused timer token from IP: {client_ip}")
