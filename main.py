@@ -3,6 +3,7 @@ import logging
 import json
 import secrets
 import time
+import requests
 from functools import wraps
 from flask import Flask, request, jsonify, send_file, redirect, send_from_directory, make_response
 from datetime import datetime
@@ -34,6 +35,8 @@ verification_timer = VerificationTimer(min_verification_time=25)
 verification_tokens = {}
 
 API_SECRET = "vadriftsisalwaysinseason"
+TURNSTILE_SITE_KEY = os.environ.get("TURNSTILE_SITE_KEY")
+TURNSTILE_SECRET_KEY = os.environ.get("TURNSTILE_SECRET_KEY")
 
 def get_client_ip():
     client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
@@ -44,6 +47,19 @@ def get_client_ip():
 def is_valid_referrer(referer):
     allowed_referrers = ['work.ink', 'www.work.ink', 'lootdest.org', 'lootlabs.gg', 'www.lootlabs.gg']
     return any(domain in referer for domain in allowed_referrers)
+
+def verify_turnstile(token, ip):
+    try:
+        response = requests.post('https://challenges.cloudflare.com/turnstile/v0/siteverify', data={
+            'secret': TURNSTILE_SECRET_KEY,
+            'response': token,
+            'remoteip': ip
+        })
+        result = response.json()
+        return result.get('success', False)
+    except Exception as e:
+        logger.error(f"Turnstile verification error: {str(e)}")
+        return False
 
 @app.route('/')
 def home():
@@ -76,6 +92,17 @@ def require_api_key(f):
             return jsonify({"error": "Unauthorized"}), 401
         return f(*args, **kwargs)
     return decorated_function
+
+@app.route('/start-verification')
+def start_verification():
+    client_ip = get_client_ip()
+    verification_timer.start_timer(client_ip)
+    logger.info(f"Verification timer started for IP: {client_ip}")
+    
+    return jsonify({
+        "success": True,
+        "message": "Timer started"
+    })
         
 @app.route('/plugins')
 def plugins_page():
@@ -198,17 +225,6 @@ def key_system_page():
         logger.error("key-system.html template not found")
         return jsonify({"error": "Key system page not found"}), 404
 
-@app.route('/start-verification')
-def start_verification():
-    client_ip = get_client_ip()
-    verification_timer.start_timer(client_ip)
-    logger.info(f"Verification timer started for IP: {client_ip}")
-    
-    return jsonify({
-        "success": True,
-        "message": "Timer started"
-    })
-
 @app.route('/verify')
 def verify_page():
     client_ip = get_client_ip()
@@ -220,6 +236,8 @@ def verify_page():
     except FileNotFoundError:
         logger.error("verify.html template not found")
         return jsonify({"error": "Verify page not found"}), 404
+    
+    html_content = html_content.replace('YOUR_SITE_KEY_HERE', TURNSTILE_SITE_KEY or '')
     
     html_content = html_content.replace(
         'let verificationToken = null;',
@@ -266,6 +284,7 @@ def verify_page():
 def create_key():
     hwid = request.args.get('hwid')
     token = request.args.get('token')
+    captcha = request.args.get('captcha')
     
     if not hwid:
         return "Missing HWID", 400
@@ -273,6 +292,16 @@ def create_key():
     if not token:
         logger.warning(f"Create attempt without token for HWID: {hwid[:8]}...")
         return "Missing verification token", 403
+    
+    if not captcha:
+        logger.warning(f"Create attempt without captcha for HWID: {hwid[:8]}...")
+        return "Missing captcha token", 403
+    
+    client_ip = get_client_ip()
+    
+    if not verify_turnstile(captcha, client_ip):
+        logger.warning(f"Invalid captcha for HWID: {hwid[:8]}... from IP: {client_ip}")
+        return "Captcha verification failed", 403
     
     token_data = verification_tokens.get(token)
     if not token_data:
@@ -287,7 +316,6 @@ def create_key():
         del verification_tokens[token]
         return "Token expired", 403
     
-    client_ip = get_client_ip()
     if token_data['ip'] != client_ip:
         logger.warning(f"Token IP mismatch for HWID: {hwid[:8]}... Expected {token_data['ip']}, got {client_ip}")
         return "Session mismatch", 403
