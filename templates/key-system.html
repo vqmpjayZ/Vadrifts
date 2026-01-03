@@ -1,796 +1,1156 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Key System - Vadrifts</title>
-    <link rel="icon" href="https://i.imgur.com/ePueN25.png" type="image/png">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: #000000;
-            color: #ffffff;
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            overflow-x: hidden;
-            position: relative;
-        }
-
-        .bg-lights {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            z-index: 1;
-        }
-
-        .light {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(150px);
-            opacity: 0.6;
-            animation-duration: 15s;
-            animation-iteration-count: infinite;
-            animation-timing-function: ease-in-out;
-        }
-
-        .light-1 {
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, #0a4d68 0%, transparent 70%);
-            top: 2%;
-            left: 2%;
-            animation-name: float1;
-        }
-
-        .light-2 {
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, #088395 0%, transparent 70%);
-            top: 15%;
-            right: 8%;
-            animation-name: float2;
-            animation-delay: -3s;
-        }
-
-        .light-3 {
-            width: 450px;
-            height: 450px;
-            background: radial-gradient(circle, #05bfdb 0%, transparent 70%);
-            bottom: 20%;
-            left: 10%;
-            animation-name: float3;
-            animation-delay: -6s;
-        }
-
-        .light-4 {
-            width: 350px;
-            height: 350px;
-            background: radial-gradient(circle, #00d9ff 0%, transparent 70%);
-            bottom: 15%;
-            right: 12%;
-            animation-name: float4;
-            animation-delay: -9s;
-        }
-
-        .light-5 {
-            width: 280px;
-            height: 280px;
-            background: radial-gradient(circle, #0891b2 0%, transparent 70%);
-            top: 45%;
-            left: 45%;
-            animation-name: float5;
-            animation-delay: -12s;
-        }
-
-        @keyframes float1 {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(120px, -80px) scale(1.1); }
-            66% { transform: translate(-80px, 120px) scale(0.9); }
-        }
-
-        @keyframes float2 {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(-100px, 90px) scale(1.2); }
-            66% { transform: translate(150px, -100px) scale(0.8); }
-        }
-
-        @keyframes float3 {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(90px, -120px) scale(0.95); }
-            66% { transform: translate(-120px, -90px) scale(1.05); }
-        }
-
-        @keyframes float4 {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(-90px, -100px) scale(1.3); }
-            66% { transform: translate(100px, 130px) scale(0.7); }
-        }
-
-        @keyframes float5 {
-            0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
-            50% { transform: translate(-30px, -50px) scale(1.1) rotate(180deg); }
-        }
-
-        .particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 2;
-            pointer-events: none;
-        }
-
-        .particle {
-            position: absolute;
-            width: 3px;
-            height: 3px;
-            background: #06b6d4;
-            border-radius: 50%;
-            opacity: 0.5;
-            box-shadow: 0 0 8px #06b6d4;
-            animation: floatUp 240s linear infinite;
-        }
-
-        @keyframes floatUp {
-            0% {
-                transform: translateY(100vh) translateX(0);
-                opacity: 0.5;
-            }
-            50% {
-                transform: translateY(50vh) translateX(20px);
-                opacity: 0.4;
-            }
-            100% {
-                transform: translateY(-200px) translateX(40px);
-                opacity: 0.3;
-            }
-        }
-
-        .back-btn {
-            position: fixed;
-            top: 30px;
-            left: 30px;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(20px);
-            color: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 12px 24px;
-            border-radius: 12px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
-        }
-
-        .back-btn:hover {
-            background: rgba(0, 0, 0, 0.6);
-            border-color: rgba(6, 182, 212, 0.5);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(6, 182, 212, 0.2);
-        }
-
-        .back-arrow {
-            font-size: 18px;
-            transition: transform 0.3s ease;
-        }
-
-        .back-btn:hover .back-arrow {
-            transform: translateX(-4px);
-        }
-
-        .container {
-            text-align: center;
-            z-index: 10;
-            position: relative;
-            animation: fadeInUp 1s ease-out;
-            padding: 40px 20px;
-            max-width: 1200px;
-            width: 100%;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .header-section {
-            margin-bottom: 60px;
-            animation: fadeInUp 1s ease-out 0.2s both;
-        }
-
-        .key-icon {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 30px;
-            background: linear-gradient(135deg, #06b6d4, #0891b2);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            box-shadow: 
-                0 20px 40px rgba(6, 182, 212, 0.3),
-                0 0 60px rgba(6, 182, 212, 0.2);
-            animation: floatIcon 3s ease-in-out infinite;
-        }
-
-        @keyframes floatIcon {
-            0%, 100% { 
-                transform: translateY(0) rotate(0deg);
-            }
-            50% { 
-                transform: translateY(-10px) rotate(5deg);
-            }
-        }
-
-        .main-title {
-            font-size: 64px;
-            font-weight: 900;
-            background: linear-gradient(135deg, #ffffff 0%, #06b6d4 50%, #0891b2 100%);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 20px;
-            letter-spacing: -2px;
-            line-height: 1.1;
-        }
-
-        .subtitle {
-            font-size: 20px;
-            color: #888;
-            font-weight: 400;
-            max-width: 600px;
-            margin: 0 auto;
-            line-height: 1.6;
-        }
-
-        .script-info {
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 30px 40px;
-            margin: 0 auto 50px;
-            max-width: 700px;
-            animation: fadeInUp 1s ease-out 0.4s both;
-            display: none;
-        }
-
-        .script-info.show {
-            display: block;
-        }
-
-        .script-name {
-            font-size: 28px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #06b6d4, #0891b2);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 12px;
-        }
-
-        .script-desc {
-            color: #aaa;
-            font-size: 16px;
-            line-height: 1.6;
-        }
-
-        .options-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 30px;
-            max-width: 900px;
-            margin: 0 auto;
-            animation: fadeInUp 1s ease-out 0.6s both;
-        }
-
-        .option-card {
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
-            padding: 40px 30px;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
-
-        .option-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.05), transparent);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-
-        .option-card:hover::before {
-            opacity: 1;
-        }
-
-        .option-card:hover {
-            transform: translateY(-8px);
-            border-color: rgba(255, 255, 255, 0.2);
-            box-shadow: 
-                0 20px 60px rgba(0, 0, 0, 0.4),
-                0 0 100px rgba(6, 182, 212, 0.1);
-        }
-
-        .option-card:active {
-            transform: translateY(-4px) scale(0.98);
-        }
-
-        .option-logo-wrapper {
-            width: 100px;
-            height: 100px;
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            transition: all 0.4s ease;
-            position: relative;
-        }
-
-        .option-card:hover .option-logo-wrapper {
-            transform: scale(1.1) rotate(5deg);
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        .option-logo {
-            width: 60px;
-            height: 60px;
-            object-fit: contain;
-            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
-        }
-
-        .option-title {
-            font-size: 24px;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 12px;
-            transition: all 0.3s ease;
-        }
-
-        .option-card:hover .option-title {
-            color: #06b6d4;
-        }
-
-        .option-description {
-            color: #888;
-            font-size: 14px;
-            line-height: 1.6;
-            transition: all 0.3s ease;
-        }
-
-        .option-card:hover .option-description {
-            color: #aaa;
-        }
-
-        .option-badge {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            background: linear-gradient(135deg, #06b6d4, #0891b2);
-            color: white;
-            font-size: 11px;
-            font-weight: 700;
-            padding: 6px 12px;
-            border-radius: 20px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
-        }
-
-        .work-ink {
-            border-color: rgba(74, 222, 128, 0.2);
-        }
-
-        .work-ink:hover {
-            box-shadow: 
-                0 20px 60px rgba(0, 0, 0, 0.4),
-                0 0 100px rgba(74, 222, 128, 0.15);
-        }
-
-        .work-ink:hover .option-title {
-            color: #4ade80;
-        }
-
-        .lootlabs {
-            border-color: rgba(139, 92, 246, 0.2);
-        }
-
-        .lootlabs:hover {
-            box-shadow: 
-                0 20px 60px rgba(0, 0, 0, 0.4),
-                0 0 100px rgba(139, 92, 246, 0.15);
-        }
-
-        .lootlabs:hover .option-title {
-            color: #8b5cf6;
-        }
-
-        .discord-option {
-            border-color: rgba(88, 101, 242, 0.2);
-        }
-
-        .discord-option:hover {
-            box-shadow: 
-                0 20px 60px rgba(0, 0, 0, 0.4),
-                0 0 100px rgba(88, 101, 242, 0.15);
-        }
-
-        .discord-option:hover .option-title {
-            color: #5865f2;
-        }
-
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .loading-overlay.active {
-            display: flex;
-        }
-
-        .loading-content {
-            text-align: center;
-        }
-
-        .loading-spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-top: 4px solid #06b6d4;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            color: #ffffff;
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .footer {
-            position: fixed;
-            bottom: 30px;
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 14px;
-            z-index: 10;
-            text-align: center;
-            animation: fadeIn 2s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 0.4; }
-        }
-
-        @media (max-width: 768px) {
-            .back-btn {
-                top: 20px;
-                left: 20px;
-                padding: 10px 18px;
-                font-size: 13px;
-            }
-
-            .main-title {
-                font-size: 42px;
-            }
-
-            .subtitle {
-                font-size: 16px;
-            }
-
-            .options-container {
-                grid-template-columns: 1fr;
-                max-width: 400px;
-                gap: 20px;
-            }
-
-            .option-card {
-                padding: 35px 25px;
-            }
-
-            .script-info {
-                padding: 25px 30px;
-                margin: 0 20px 40px;
-            }
-
-            .key-icon {
-                width: 60px;
-                height: 60px;
-                font-size: 30px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .main-title {
-                font-size: 32px;
-            }
-
-            .option-logo-wrapper {
-                width: 80px;
-                height: 80px;
-            }
-
-            .option-logo {
-                width: 48px;
-                height: 48px;
-            }
-
-            .option-title {
-                font-size: 20px;
-            }
-
-            .footer {
-                bottom: 20px;
-                font-size: 12px;
-                padding: 0 20px;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="pageTitle">Get Key - Vadrifts</title>
+<link rel="icon" href="https://i.imgur.com/ePueN25.png" type="image/png">
+<script defer src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --gradient-primary: linear-gradient(90deg, #ffffff 0%, #7209b7 100%);
+  --gradient-button: linear-gradient(135deg, #7209b7 0%, #9c88ff 100%);
+  --accent-color: #7209b7;
+  --accent-color-rgba: rgba(114, 9, 183, 0.9);
+  --box-shadow-primary: 0 10px 25px rgba(114, 9, 183, 0.35);
+  --box-shadow-primary-hover: 0 15px 40px rgba(114, 9, 183, 0.55);
+  --accent-glow: rgba(114, 9, 183, 0.5);
+  --particle-color: #a45cff;
+}
+
+body {
+  background: #000000;
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+.bg-lights {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.main-light {
+  position: absolute;
+  width: 1400px;
+  height: 1400px;
+  border-radius: 50%;
+  filter: blur(160px);
+  opacity: 0;
+  background: radial-gradient(circle, #6a00ff 0%, #3d008a 25%, transparent 65%);
+  animation: slowPulse 18s ease-in-out infinite;
+  transition: opacity 1.2s ease;
+}
+
+#mainLight1 {
+  top: -200px;
+  left: -200px;
+  animation-delay: 0s;
+}
+
+#mainLight2 {
+  bottom: -300px;
+  right: -300px;
+  width: 1600px;
+  height: 1600px;
+  animation-delay: -9s;
+}
+
+#accentLight {
+  position: absolute;
+  width: 800px;
+  height: 800px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0;
+  background: radial-gradient(circle, #7209b7 0%, transparent 60%);
+  animation: slowPulse 22s ease-in-out infinite;
+  animation-delay: -5s;
+  transition: opacity 1.2s ease;
+}
+
+@keyframes slowPulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.15); }
+}
+
+.particles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+}
+
+.particles.visible {
+  opacity: 1;
+}
+
+.particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: var(--particle-color);
+  border-radius: 50%;
+  opacity: 0.7;
+  box-shadow: 0 0 12px var(--particle-color), 0 0 6px var(--particle-color);
+  animation: floatParticle 25s linear infinite;
+}
+
+@keyframes floatParticle {
+  0% { 
+    transform: translateY(100vh) translateX(0) scale(0); 
+    opacity: 0; 
+  }
+  5% { 
+    opacity: 0.7; 
+    transform: translateY(95vh) translateX(10px) scale(1);
+  }
+  95% { 
+    opacity: 0.5; 
+    transform: translateY(5vh) translateX(60px) scale(0.8);
+  }
+  100% { 
+    transform: translateY(-5vh) translateX(80px) scale(0); 
+    opacity: 0; 
+  }
+}
+
+.navbar {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 20px;
+  padding: 24px 32px;
+  animation: slideInDown 0.8s ease-out;
+  max-width: 1000px;
+  width: 90%;
+  transition: all 0.3s ease;
+}
+
+.navbar.scrolled { top: 15px; }
+.navbar.scrolled:hover { top: 20px; }
+
+.navbar:hover {
+  background: rgba(0,0,0,0.65);
+  border-color: rgba(255,255,255,0.25);
+  transform: translateX(-50%) translateY(0);
+}
+
+@keyframes slideInDown {
+  from { opacity: 0; transform: translateX(-50%) translateY(-50px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.nav-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 24px;
+  font-weight: 700;
+  background: var(--gradient-primary);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-decoration: none;
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.nav-logo:hover {
+  transform: translateY(-3px);
+  filter: drop-shadow(0 0 15px var(--accent-glow));
+}
+
+.nav-logo-img { width: 28px; height: 28px; flex-shrink: 0; }
+
+.nav-links {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+  height: 100%;
+}
+
+.nav-link {
+  color: #ccc;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.nav-link:hover {
+  color: #ffffff;
+  text-shadow: 0 0 8px rgba(255,255,255,0.6);
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 120px 20px 40px;
+  position: relative;
+  z-index: 10;
+}
+
+.back-to-script {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #999;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 14px;
+  margin-bottom: 30px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  transition: all 0.3s ease;
+}
+
+.back-to-script:hover {
+  color: #ffffff;
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.15);
+  transform: translateX(-5px);
+}
+
+.back-to-script i {
+  width: 16px;
+  height: 16px;
+}
+
+.key-system-layout {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 40px;
+  align-items: start;
+  animation: fadeInUp 1.2s ease-out;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(50px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.script-preview {
+  position: sticky;
+  top: 120px;
+}
+
+.script-image-container {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  box-shadow: 0 15px 50px rgba(0,0,0,0.5), 0 0 80px var(--accent-glow);
+  transition: box-shadow 0.8s ease;
+}
+
+.script-image {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+  display: block;
+}
+
+.script-info-card {
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+
+.script-game-tag {
+  font-size: 12px;
+  color: var(--accent-color);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  text-shadow: 0 0 20px var(--accent-glow);
+}
+
+.script-name {
+  font-size: 26px;
+  font-weight: 800;
+  background: var(--gradient-primary);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 12px;
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+}
+
+.script-desc {
+  font-size: 14px;
+  color: #999;
+  line-height: 1.6;
+}
+
+.key-content {
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+
+.key-header {
+  margin-bottom: 30px;
+}
+
+.key-title {
+  font-size: 36px;
+  font-weight: 800;
+  background: var(--gradient-primary);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 10px;
+  letter-spacing: -1px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.key-title-icon {
+  width: 36px;
+  height: 36px;
+  color: var(--accent-color);
+  filter: drop-shadow(0 0 10px var(--accent-glow));
+}
+
+.key-subtitle {
+  color: #888;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.instruction-box {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0.03) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 30px;
+}
+
+.instruction-title {
+  color: #10b981;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.instruction-title i {
+  width: 18px;
+  height: 18px;
+}
+
+.instruction-steps {
+  color: #bbb;
+  font-size: 14px;
+  line-height: 1.9;
+  list-style: none;
+  counter-reset: step-counter;
+}
+
+.instruction-steps li {
+  counter-increment: step-counter;
+  position: relative;
+  padding-left: 38px;
+  margin-bottom: 10px;
+}
+
+.instruction-steps li:last-child {
+  margin-bottom: 0;
+}
+
+.instruction-steps li::before {
+  content: counter(step-counter);
+  position: absolute;
+  left: 0;
+  top: 1px;
+  width: 24px;
+  height: 24px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #10b981;
+}
+
+.key-options {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 25px;
+}
+
+.provider-logo {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  margin-right: 3px;
+}
+
+.key-provider-btn {
+  width: 100%;
+  padding: 18px 24px;
+  border: none;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: 20px;
+  gap: 12px;
+  color: white;
+}
+
+.key-provider-btn .provider-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.key-provider-btn i {
+  width: 20px;
+  height: 20px;
+}
+
+.key-provider-btn.workink {
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.35);
+}
+
+.key-provider-btn.workink:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 40px rgba(37, 99, 235, 0.5);
+}
+
+.key-provider-btn.lootlabs {
+  background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
+  box-shadow: 0 10px 30px rgba(124, 58, 237, 0.35);
+}
+
+.key-provider-btn.lootlabs:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 40px rgba(124, 58, 237, 0.5);
+}
+
+.key-provider-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+  transition: left 0.5s ease;
+}
+
+.key-provider-btn:hover::before {
+  left: 100%;
+}
+
+.key-provider-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.provider-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.provider-name {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.provider-tag {
+  font-size: 11px;
+  font-weight: 500;
+  opacity: 0.8;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.status-msg {
+  padding: 16px 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  display: none;
+  animation: slideIn 0.3s ease;
+}
+
+.status-msg.show {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-msg.loading {
+  background: rgba(251, 191, 36, 0.12);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.25);
+}
+
+.status-msg.error {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.status-msg.success {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  border-top: 2px solid currentColor;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.info-badges {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.info-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  color: #888;
+  font-weight: 500;
+}
+
+.info-badge i {
+  width: 16px;
+  height: 16px;
+}
+
+.loading-state {
+  text-align: center;
+  padding: 80px 20px;
+  color: #888;
+}
+
+.loading-state .loading-spinner {
+  width: 40px;
+  height: 40px;
+  border-width: 4px;
+  margin-bottom: 20px;
+}
+
+.error-state {
+  text-align: center;
+  padding: 80px 20px;
+  color: #888;
+}
+
+.error-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 20px;
+  opacity: 0.5;
+  color: #ff6b6b;
+}
+
+.back-btn {
+  background: rgba(114,9,183,0.2);
+  color: #9c88ff;
+  border: 1px solid rgba(114,9,183,0.3);
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: inline-block;
+  font-family: 'Inter', sans-serif;
+}
+
+.back-btn:hover {
+  background: rgba(114,9,183,0.3);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 900px) {
+  .key-system-layout {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  
+  .script-preview {
+    position: static;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    top: 25px;
+    left: 10px;
+    right: 10px;
+    width: auto;
+    transform: none;
+    padding: 16px 18px;
+  }
+  
+  .nav-content { justify-content: space-between; gap: 15px; }
+  .nav-links { gap: 15px; }
+  .nav-link { font-size: 12px; padding: 6px 10px; }
+  .nav-logo { font-size: 20px; gap: 8px; }
+  .nav-logo-img { width: 24px; height: 24px; }
+  
+  .container {
+    padding: 100px 15px 30px;
+  }
+  
+  .key-content {
+    padding: 30px 20px;
+  }
+  
+  .key-title {
+    font-size: 28px;
+  }
+  
+  .script-name {
+    font-size: 22px;
+  }
+  
+  .info-badges {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-links { gap: 10px; }
+  .nav-link { font-size: 11px; padding: 5px 8px; }
+  .navbar { left: 10px; right: 10px; padding: 10px 15px; top: 30px; }
+}
+</style>
 </head>
+
 <body>
-    <div class="bg-lights">
-        <div class="light light-1"></div>
-        <div class="light light-2"></div>
-        <div class="light light-3"></div>
-        <div class="light light-4"></div>
-        <div class="light light-5"></div>
+<div class="bg-lights">
+  <div id="mainLight1" class="main-light"></div>
+  <div id="mainLight2" class="main-light"></div>
+  <div id="accentLight"></div>
+</div>
+
+<div class="particles" id="particles"></div>
+
+<nav class="navbar">
+  <div class="nav-content">
+    <a href="/" class="nav-logo">
+      <img src="https://i.imgur.com/ePueN25.png" alt="Vadrifts Logo" class="nav-logo-img"> Vadrifts
+    </a>
+    <div class="nav-links">
+      <a href="/scripts" class="nav-link">Scripts</a>
+      <a href="/plugins" class="nav-link">Plugins</a>
     </div>
+  </div>
+</nav>
 
-    <div class="particles" id="particles"></div>
+<div class="container">
+  <div id="loadingState" class="loading-state">
+    <div class="loading-spinner"></div>
+    <p>Loading script details...</p>
+  </div>
 
-    <a href="/" class="back-btn">
-        <span class="back-arrow">←</span>
-        <span>Back to Scripts</span>
+  <div id="errorState" class="error-state" style="display: none;">
+    <i data-lucide="triangle-alert" class="error-icon"></i>
+    <h3>Script not found</h3>
+    <p>The script you're looking for doesn't exist or has been removed.</p>
+    <br>
+    <a href="/scripts" class="back-btn">← Back to Scripts</a>
+  </div>
+
+  <div id="mainContent" style="display: none;">
+    <a href="#" class="back-to-script" id="backBtn">
+      <i data-lucide="arrow-left"></i> Back to Script
     </a>
 
-    <div class="container">
-        <div class="header-section">
-            <div class="key-icon">🔐</div>
-            <h1 class="main-title">Key System</h1>
-            <p class="subtitle">Choose your preferred verification method to get started</p>
+    <div class="key-system-layout">
+      <div class="script-preview">
+        <div class="script-image-container">
+          <img id="scriptImage" class="script-image" src="" alt="Script Thumbnail">
         </div>
-        
-        <div class="script-info" id="scriptInfo">
-            <h2 class="script-name" id="scriptName"></h2>
-            <p class="script-desc" id="scriptDesc"></p>
+        <div class="script-info-card">
+          <div class="script-game-tag" id="scriptGame"></div>
+          <div class="script-name" id="scriptTitle"></div>
+          <div class="script-desc" id="scriptDesc"></div>
         </div>
-        
-        <div class="options-container">
-            <div class="option-card work-ink" onclick="selectKeySystem('work_ink')">
-                <span class="option-badge">Popular</span>
-                <div class="option-logo-wrapper">
-                    <img src="https://s3-eu-west-1.amazonaws.com/tpd/logos/60f32c3fa0f0500001ab7c87/0x0.png" alt="Work.ink" class="option-logo">
-                </div>
-                <h3 class="option-title">Work.ink</h3>
-                <p class="option-description">Fast and reliable key verification with a streamlined interface</p>
-            </div>
-            
-            <div class="option-card lootlabs" onclick="selectKeySystem('lootlabs')">
-                <span class="option-badge">Secure</span>
-                <div class="option-logo-wrapper">
-                    <img src="https://i.imgur.com/DmPISjf.png" alt="LootLabs" class="option-logo">
-                </div>
-                <h3 class="option-title">LootLabs</h3>
-                <p class="option-description">Advanced verification system with enhanced security features</p>
-            </div>
+      </div>
 
-            <div class="option-card discord-option" id="discordOption" style="display: none;" onclick="selectKeySystem('discord')">
-                <span class="option-badge">Free</span>
-                <div class="option-logo-wrapper">
-                    <img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/discord-white-icon.png" alt="Discord" class="option-logo">
-                </div>
-                <h3 class="option-title">Discord</h3>
-                <p class="option-description">Join our community for instant free key access</p>
-            </div>
+      <div class="key-content">
+        <div class="key-header">
+          <h1 class="key-title">
+            <i data-lucide="key" class="key-title-icon"></i>
+            Get Your Access Key
+          </h1>
+          <p class="key-subtitle">Complete a quick verification to unlock this script. Choose your preferred method below.</p>
         </div>
+
+        <div class="instruction-box">
+          <div class="instruction-title">
+            <i data-lucide="list-ordered"></i>
+            <span>How to get your key:</span>
+          </div>
+          <ol class="instruction-steps">
+            <li>Click a verification button below</li>
+            <li>Complete the quick task (~2 minutes)</li>
+            <li>Copy your <strong>HWID</strong> from the Roblox script</li>
+            <li>Paste your HWID on the verification page</li>
+            <li>Copy the generated key and paste it in the script</li>
+          </ol>
+        </div>
+
+        <div class="status-msg" id="statusMsg"></div>
+
+        <div class="key-options" id="keyOptions"></div>
+
+        <div class="info-badges">
+          <div class="info-badge">
+            <i data-lucide="clock"></i>
+            <span>Takes ~2 minutes</span>
+          </div>
+          <div class="info-badge">
+            <i data-lucide="shield-check"></i>
+            <span>Secure verification</span>
+          </div>
+          <div class="info-badge">
+            <i data-lucide="refresh-cw"></i>
+            <span>Key lasts 24-48 hours</span>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
+</div>
 
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-content">
-            <div class="loading-spinner"></div>
-            <div class="loading-text">Redirecting...</div>
-        </div>
-    </div>
+<script>
+let currentScript = null;
+let colorsApplied = false;
 
-    <div class="footer">
-        Vadrifts © 2025 • Secure Key Verification
-    </div>
+function initLucideIcons() {
+  if (window.lucide && lucide.createIcons) {
+    lucide.createIcons();
+  } else {
+    setTimeout(initLucideIcons, 50);
+  }
+}
 
-    <script>
-        let currentScript = null;
+function createParticles() {
+  const particlesContainer = document.getElementById('particles');
+  const particleCount = 25;
+  for (let i = 0; i < particleCount; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'particle';
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.animationDelay = -Math.random() * 25 + 's';
+    particle.style.animationDuration = (20 + Math.random() * 10) + 's';
+    const size = 2 + Math.random() * 3;
+    particle.style.width = size + 'px';
+    particle.style.height = size + 'px';
+    particlesContainer.appendChild(particle);
+  }
+}
 
-        function createParticles() {
-            const particlesContainer = document.getElementById('particles');
-            const particleCount = 15;
+function rgbToHex(r, g, b) {
+  return '#' + [r, g, b].map(x => {
+    const hex = x.toString(16);
+    return hex.length === 1 ? '0' + hex : hex;
+  }).join('');
+}
 
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.animationDelay = -Math.random() * 15 + 's';
-                particle.style.animationDuration = (15 + Math.random() * 5) + 's';
-                particlesContainer.appendChild(particle);
-            }
-        }
+function hexToRgb(hex) {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
+}
 
-        async function loadScriptInfo() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const scriptId = urlParams.get('script');
-    
-            if (!scriptId) return;
-    
-            try {
-                const response = await fetch(`/api/scripts/${scriptId}`);
-                if (!response.ok) throw new Error('Script not found');
-        
-                currentScript = await response.json();
-        
-                if (currentScript.key_type === 'discord' && currentScript.key_link) {
-                    showLoading();
-                    setTimeout(() => {
-                        window.location.href = currentScript.key_link;
-                    }, 800);
-                    return;
-                }
-        
-                document.getElementById('scriptInfo').classList.add('show');
-                document.getElementById('scriptName').textContent = currentScript.title;
-                document.getElementById('scriptDesc').textContent = currentScript.description;
-        
-            } catch (error) {
-                console.error('Failed to load script info:', error);
-            }
-        }
+function adjustColor(hex, percent) {
+  const rgb = hexToRgb(hex);
+  if (!rgb) return hex;
+  const adjust = (color) => {
+    const adjusted = color + Math.round((255 - color) * (percent / 100));
+    return Math.min(255, Math.max(0, adjusted));
+  };
+  return rgbToHex(adjust(rgb.r), adjust(rgb.g), adjust(rgb.b));
+}
 
-        function showLoading() {
-            document.getElementById('loadingOverlay').classList.add('active');
-        }
+function extractAndApplyColors(imageUrl) {
+  const img = new Image();
+  img.crossOrigin = 'Anonymous';
+  img.src = imageUrl || '';
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    const size = 120;
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, size, size);
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const pixels = imageData.data;
+    const colorMap = {};
+    const skip = 10;
+    for (let i = 0; i < pixels.length; i += skip * 4) {
+      const r = pixels[i];
+      const g = pixels[i + 1];
+      const b = pixels[i + 2];
+      const brightness = (r * 0.299 + g * 0.587 + b * 0.114);
+      if (brightness < 25 || brightness > 235) continue;
+      const saturation = Math.max(r, g, b) - Math.min(r, g, b);
+      if (saturation < 15) continue;
+      const key = `${Math.floor(r / 25) * 25},${Math.floor(g / 25) * 25},${Math.floor(b / 25) * 25}`;
+      colorMap[key] = (colorMap[key] || 0) + 1;
+    }
+    const sortedColors = Object.entries(colorMap)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(entry => {
+        const parts = entry[0].split(',').map(Number);
+        return rgbToHex(parts[0], parts[1], parts[2]);
+      });
+    if (sortedColors.length >= 2) {
+      applyColorScheme(sortedColors[0], sortedColors[1]);
+    } else if (sortedColors.length === 1) {
+      const color2 = adjustColor(sortedColors[0], 25);
+      applyColorScheme(sortedColors[0], color2);
+    } else {
+      applyColorScheme('#7209b7', '#9c88ff');
+    }
+  };
+  img.onerror = () => {
+    applyColorScheme('#7209b7', '#9c88ff');
+  };
+}
 
-        function selectKeySystem(system) {
-            const selectedCard = event.currentTarget;
-            
-            selectedCard.style.transform = 'scale(0.96)';
-            selectedCard.style.opacity = '0.7';
-            
-            showLoading();
-            
-            setTimeout(() => {
-                if (currentScript && currentScript.key_system && currentScript.key_system[system]) {
-                    window.location.href = currentScript.key_system[system];
-                } else {
-                    const defaultLinks = {
-                        'work_ink': 'https://workink.net/20yd/vadrifts',
-                        'lootlabs': 'https://lootdest.org/s?vadrifts',
-                        'discord': 'https://discord.com/invite/WDbJ5wE2cR'
-                    };
-                    
-                    window.location.href = defaultLinks[system] || '/verify';
-                }
-            }, 600);
-        }
+function applyColorScheme(color1, color2) {
+  if (colorsApplied) return;
+  colorsApplied = true;
 
-        let mouseX = 0;
-        let mouseY = 0;
-        let currentX = 0;
-        let currentY = 0;
+  const root = document.documentElement;
+  const light1 = document.getElementById('mainLight1');
+  const light2 = document.getElementById('mainLight2');
+  const accentLight = document.getElementById('accentLight');
+  const particles = document.getElementById('particles');
 
-        document.addEventListener('mousemove', (e) => {
-            mouseX = (e.clientX / window.innerWidth) - 0.5;
-            mouseY = (e.clientY / window.innerHeight) - 0.5;
-        });
+  light1.style.background = `radial-gradient(circle, ${color1} 0%, ${color1}cc 15%, ${color1}88 30%, ${color1}44 50%, transparent 65%)`;
+  light2.style.background = `radial-gradient(circle, ${color2} 0%, ${color2}cc 15%, ${color2}88 30%, ${color2}44 50%, transparent 65%)`;
+  accentLight.style.background = `radial-gradient(circle, ${color1}33 0%, ${color2}22 40%, transparent 60%)`;
 
-        function animate() {
-            currentX += (mouseX - currentX) * 0.1;
-            currentY += (mouseY - currentY) * 0.1;
-            
-            document.querySelectorAll('.light').forEach((light, index) => {
-                const intensity = (index + 1) * 15;
-                const x = currentX * intensity;
-                const y = currentY * intensity;
-                light.style.transform = `translate(${x}px, ${y}px)`;
-            });
+  const gradient = `linear-gradient(90deg, #ffffff 0%, ${color1} 50%, ${color2} 100%)`;
+  const gradientButton = `linear-gradient(135deg, ${color1} 0%, ${color2} 100%)`;
+  root.style.setProperty('--gradient-primary', gradient);
+  root.style.setProperty('--gradient-button', gradientButton);
+  root.style.setProperty('--accent-color', color1);
 
-            requestAnimationFrame(animate);
-        }
+  const rgb1 = hexToRgb(color1);
+  if (rgb1) {
+    root.style.setProperty('--accent-color-rgba', `rgba(${rgb1.r}, ${rgb1.g}, ${rgb1.b}, 0.9)`);
+    root.style.setProperty('--box-shadow-primary', `0 10px 25px rgba(${rgb1.r}, ${rgb1.g}, ${rgb1.b}, 0.35)`);
+    root.style.setProperty('--box-shadow-primary-hover', `0 15px 40px rgba(${rgb1.r}, ${rgb1.g}, ${rgb1.b}, 0.55)`);
+    root.style.setProperty('--accent-glow', `rgba(${rgb1.r}, ${rgb1.g}, ${rgb1.b}, 0.5)`);
+  }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            createParticles();
-            loadScriptInfo();
-            animate();
-        });
+  const particleElements = document.querySelectorAll('.particle');
+  particleElements.forEach((particle, index) => {
+    const particleColor = index % 2 === 0 ? color1 : color2;
+    particle.style.background = particleColor;
+    particle.style.boxShadow = `0 0 12px ${particleColor}, 0 0 6px ${particleColor}`;
+  });
 
-        document.querySelectorAll('.option-card').forEach(card => {
-            card.addEventListener('click', function(e) {
-                const ripple = document.createElement('div');
-                const rect = this.getBoundingClientRect();
-                const size = Math.max(rect.width, rect.height);
-                const x = e.clientX - rect.left - size / 2;
-                const y = e.clientY - rect.top - size / 2;
-                
-                ripple.style.cssText = `
-                    position: absolute;
-                    width: ${size}px;
-                    height: ${size}px;
-                    left: ${x}px;
-                    top: ${y}px;
-                    border-radius: 50%;
-                    background: rgba(255, 255, 255, 0.3);
-                    transform: scale(0);
-                    animation: ripple 0.6s ease-out;
-                    pointer-events: none;
-                `;
-                
-                this.appendChild(ripple);
-                
-                setTimeout(() => ripple.remove(), 600);
-            });
-        });
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      light1.style.opacity = '0.35';
+      light2.style.opacity = '0.3';
+      accentLight.style.opacity = '0.15';
+      particles.classList.add('visible');
+    }, 50);
+  });
+}
 
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes ripple {
-                to {
-                    transform: scale(4);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(style);
-    </script>
+function showDefaultLights() {
+  const light1 = document.getElementById('mainLight1');
+  const light2 = document.getElementById('mainLight2');
+  const accentLight = document.getElementById('accentLight');
+  const particles = document.getElementById('particles');
+  light1.style.opacity = '0.35';
+  light2.style.opacity = '0.3';
+  accentLight.style.opacity = '0.15';
+  particles.classList.add('visible');
+}
+
+function getScriptIdFromURL() {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get('script');
+}
+
+async function loadScript() {
+  const scriptId = getScriptIdFromURL();
+  
+  if (!scriptId) {
+    showError();
+    showDefaultLights();
+    return;
+  }
+
+  try {
+    const response = await fetch(`/api/scripts/${scriptId}`);
+    if (!response.ok) {
+      throw new Error('Script not found');
+    }
+    currentScript = await response.json();
+    displayScript(currentScript, scriptId);
+  } catch (error) {
+    showError();
+    showDefaultLights();
+  }
+}
+
+function displayScript(script, scriptId) {
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('mainContent').style.display = 'block';
+
+  document.getElementById('pageTitle').textContent = `Get Key - ${script.title} - Vadrifts`;
+  document.getElementById('scriptImage').src = script.thumbnail || '';
+  document.getElementById('scriptGame').textContent = script.game || '';
+  document.getElementById('scriptTitle').textContent = script.title || '';
+  document.getElementById('scriptDesc').textContent = script.description || '';
+  document.getElementById('backBtn').href = `/script/${scriptId}`;
+
+  setupKeyOptions(script);
+  extractAndApplyColors(script.thumbnail);
+  initLucideIcons();
+}
+
+function setupKeyOptions(script) {
+  const container = document.getElementById('keyOptions');
+  container.innerHTML = '';
+
+  const options = [];
+
+  if (script.key_link && script.key_link.includes('work.ink')) {
+    options.push({
+      type: 'workink',
+      name: 'Work.ink',
+      tag: 'Recommended',
+      link: script.key_link,
+      icon: 'external-link',
+      logo: 'https://s3-eu-west-1.amazonaws.com/tpd/logos/60f32c3fa0f0500001ab7c87/0x0.png'
+    });
+  }
+
+  if (script.lootlabs_link) {
+    options.push({
+      type: 'lootlabs',
+      name: 'LootLabs',
+      tag: 'Alternative',
+      link: script.lootlabs_link,
+      icon: 'external-link',
+      logo: 'https://i.imgur.com/DmPISjf.png'
+    });
+  }
+
+  if (script.key_type === 'work.ink' && options.length === 0) {
+    options.push({
+      type: 'workink',
+      name: 'Work.ink',
+      tag: 'Recommended',
+      link: script.key_link,
+      icon: 'external-link',
+      logo: 'https://s3-eu-west-1.amazonaws.com/tpd/logos/60f32c3fa0f0500001ab7c87/0x0.png'
+    });
+  }
+
+  if (options.length === 0 && script.key_link) {
+    options.push({
+      type: 'workink',
+      name: 'Get Key',
+      tag: '',
+      link: script.key_link,
+      icon: 'external-link',
+      logo: 'https://s3-eu-west-1.amazonaws.com/tpd/logos/60f32c3fa0f0500001ab7c87/0x0.png'
+    });
+  }
+
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = `key-provider-btn ${opt.type}`;
+    btn.innerHTML = `
+      ${opt.logo ? `<img src="${opt.logo}" class="provider-logo" alt="${opt.name} logo">` : `<i data-lucide="${opt.icon}"></i>`}
+      <div class="provider-info">
+        <span class="provider-name">${opt.name}</span>
+        ${opt.tag ? `<span class="provider-tag">${opt.tag}</span>` : ''}
+      </div>
+    `;
+    btn.onclick = () => startVerification(opt);
+    container.appendChild(btn);
+  });
+
+  initLucideIcons();
+}
+
+async function startVerification(provider) {
+  const btns = document.querySelectorAll('.key-provider-btn');
+  btns.forEach(btn => btn.disabled = true);
+
+  showStatus('Starting verification...', 'loading');
+
+  try {
+    const response = await fetch('/start-verification');
+    const data = await response.json();
+
+    if (response.ok && data.timer_token) {
+      showStatus('Redirecting to verification partner...', 'loading');
+
+      let redirectUrl = provider.link;
+      const separator = redirectUrl.includes('?') ? '&' : '?';
+      redirectUrl += `${separator}timer=${data.timer_token}`;
+
+      setTimeout(() => {
+        window.location.href = redirectUrl;
+      }, 800);
+    } else {
+      throw new Error('Failed to start verification');
+    }
+  } catch (error) {
+    console.error('Verification error:', error);
+    showStatus('Failed to start verification. Please try again.', 'error');
+    btns.forEach(btn => btn.disabled = false);
+  }
+}
+
+function showStatus(message, type) {
+  const statusEl = document.getElementById('statusMsg');
+  statusEl.className = `status-msg show ${type}`;
+  if (type === 'loading') {
+    statusEl.innerHTML = `<span class="loading-spinner"></span> ${message}`;
+  } else {
+    statusEl.textContent = message;
+  }
+}
+
+function showError() {
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('errorState').style.display = 'block';
+  initLucideIcons();
+}
+
+let lastScrollTop = 0;
+window.addEventListener('scroll', function() {
+  let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+  const navbar = document.querySelector('.navbar');
+  if (scrollTop > 100) {
+    navbar.classList.add('scrolled');
+  } else {
+    navbar.classList.remove('scrolled');
+  }
+  lastScrollTop = scrollTop;
+});
+
+createParticles();
+window.addEventListener('load', () => {
+  loadScript();
+  initLucideIcons();
+});
+</script>
+
 </body>
 </html>
