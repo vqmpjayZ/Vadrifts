@@ -251,42 +251,9 @@
       font-weight: 600;
     }
 
-    .captcha-section {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 65px;
-      margin-bottom: 30px;
-      opacity: 1;
-      transition: opacity 0.3s ease;
-    }
-
-    .captcha-section.hiding {
-      opacity: 0;
-    }
-
-    .cf-turnstile {
-      margin: 0 auto;
-    }
-
-    .hwid-section {
-      display: none;
-      animation: fadeIn 0.4s ease;
-    }
-
-    .hwid-section.show {
-      display: block;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    .subtitle .highlight {
+      color: #aaa;
+      font-weight: 500;
     }
 
     .instruction-box {
@@ -569,6 +536,16 @@
       75% { transform: translateX(10px); }
     }
 
+    .captcha-container {
+      min-height: 65px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 10px;
+      transition: opacity 0.3s ease;
+    }
+
     @media (max-width: 768px) {
       .box {
         padding: 40px 30px;
@@ -649,53 +626,61 @@
         To generate your access key, enter your <strong>Hardware ID (HWID)</strong> below.
       </p>
 
-      <div class="captcha-section" id="captchaSection">
-        <div class="cf-turnstile" data-sitekey="YOUR_SITE_KEY_HERE" data-callback="onCaptchaSuccess" data-theme="dark"></div>
+      <div class="instruction-box">
+        <div class="instruction-title">
+          <span>📋</span>
+          <span>How to get your HWID:</span>
+        </div>
+        <ol class="instruction-steps">
+          <li>Execute the <span class="highlight">Roblox script hub</span></li>
+          <li>The <span class="highlight">key system popup</span> will appear</li>
+          <li>Click <span class="highlight">"Copy HWID"</span> button in the script</li>
+          <li>Paste it in the field below</li>
+        </ol>
+      </div>
+      
+      <div class="input-group">
+        <label class="input-label" for="hwidInput">Hardware ID</label>
+        <div id="captchaContainer" class="captcha-container">
+          <div class="cf-turnstile" data-sitekey="YOUR_SITE_KEY_HERE" data-callback="onCaptchaSuccess" data-theme="dark"></div>
+        </div>
+        <input 
+          id="hwidInput" 
+          type="text" 
+          placeholder="Paste your HWID here..." 
+          autocomplete="off"
+          spellcheck="false"
+          style="display: none;"
+        />
+        <div class="hwid-indicator" id="hwidIndicator" style="display: none;"></div>
       </div>
 
-      <div class="hwid-section" id="hwidSection">
-        <div class="instruction-box">
-          <div class="instruction-title">
-            <span>📋</span>
-            <span>How to get your HWID:</span>
-          </div>
-          <ol class="instruction-steps">
-            <li>Execute the <span class="highlight">Roblox script hub</span></li>
-            <li>The <span class="highlight">key system popup</span> will appear</li>
-            <li>Click <span class="highlight">"Copy HWID"</span> button in the script</li>
-            <li>Paste it in the field below</li>
-          </ol>
-        </div>
-        
-        <div class="input-group">
-          <label class="input-label" for="hwidInput">Hardware ID</label>
-          <input 
-            id="hwidInput" 
-            type="text" 
-            placeholder="Paste your HWID here..." 
-            autocomplete="off"
-            spellcheck="false"
-          />
-          <div class="hwid-indicator" id="hwidIndicator"></div>
-        </div>
+      <div class="status" id="validationStatus"></div>
+      
+      <button class="verify-btn" onclick="getKey()" id="verifyBtn" disabled>
+        Generate Access Key
+      </button>
+      
+      <div class="status" id="status"></div>
 
-        <div class="status" id="validationStatus"></div>
-        
-        <button class="verify-btn" onclick="getKey()" id="verifyBtn">
-          Generate Access Key
-        </button>
-        
-        <div class="status" id="status"></div>
-
-        <div class="info-badge">
-          <span class="info-icon">🛡️</span>
-          <span>Secure verification system</span>
-        </div>
+      <div class="info-badge">
+        <span class="info-icon">🛡️</span>
+        <span>Secure verification system</span>
       </div>
     </div>
   </div>
 
-<script>
+  <script>
+    let savedTimerToken = localStorage.getItem('vadrifts_timer_token');
+    if (savedTimerToken) {
+      if (!window.location.href.includes('timer=')) {
+        const url = new URL(window.location.href);
+        url.searchParams.append('timer', savedTimerToken);
+        window.history.replaceState({}, '', url.toString());
+        localStorage.removeItem('vadrifts_timer_token');
+      }
+    }
+
     let isValidHwid = false;
     let isCaptchaVerified = false;
     let captchaToken = null;
@@ -717,16 +702,13 @@
     }
 
     async function checkAccess() {
-      const captchaSection = document.getElementById('captchaSection');
-      const hwidSection = document.getElementById('hwidSection');
-      
       try {
         const referrer = document.referrer;
         const validReferrers = ['work.ink', 'loot-link.com', 'loot-links.com', 'lootdest.com'];
         const hasValidReferrer = validReferrers.some(domain => referrer.includes(domain));
         
         if (!hasValidReferrer) {
-          showAccessDenied("Access denied. Please use the official key system.");
+          showAccessDenied();
           return false;
         }
 
@@ -734,47 +716,27 @@
         const data = await res.json();
 
         if (!data.valid) {
+          let message = "Verification failed. Please try again.";
+          
           switch(data.reason) {
             case 'no_timer':
-              showAccessDenied("No verification session found. Please start from the key system page.");
+              message = "No verification session found. Please start from the key system page.";
               break;
             case 'already_verified':
-              showAccessDenied("This verification session has already been used.");
+              message = "This verification session has already been used.";
               break;
             case 'time_not_elapsed':
               const remaining = Math.ceil(data.required - data.elapsed);
-              showAccessDenied(`Please wait ${remaining} more seconds before continuing.`);
+              message = `Please wait ${remaining} more seconds before continuing.`;
               break;
-            default:
-              showAccessDenied("Verification failed. Please try again.");
           }
+          
+          showAccessDenied(message);
           return false;
         }
 
         accessAllowed = true;
         verificationToken = data.token || 'valid';
-        
-        captchaSection.style.display = 'none';
-        hwidSection.style.display = 'block';
-        hwidSection.classList.add('show');
-        
-        const inputGroup = document.querySelector('.input-group');
-        const captchaContainer = document.createElement('div');
-        captchaContainer.id = 'captchaContainer';
-        captchaContainer.innerHTML = `<div class="cf-turnstile" data-sitekey="YOUR_SITE_KEY_HERE" data-callback="onCaptchaSuccess" data-theme="dark"></div>`;
-        
-        const hwidInput = document.getElementById('hwidInput');
-        const hwidIndicator = document.getElementById('hwidIndicator');
-        hwidInput.style.display = 'none';
-        hwidIndicator.style.display = 'none';
-        
-        inputGroup.insertBefore(captchaContainer, inputGroup.firstChild);
-        
-        document.getElementById('verifyBtn').disabled = true;
-        
-        if (window.turnstile) {
-          window.turnstile.render('.cf-turnstile');
-        }
         
         return true;
       } catch (err) {
@@ -784,16 +746,31 @@
       }
     }
 
-    function showAccessDenied(message) {
-      const container = document.querySelector('.container');
-      container.innerHTML = `
-        <div class="box access-denied">
-          <div class="logo-wrapper">❌</div>
-          <h2>Access Denied</h2>
-          <p class="subtitle">${message}</p>
-          <button class="verify-btn" onclick="window.location.href='/'">
-            Return to Home
-          </button>
+    function showAccessDenied(customMessage) {
+      const box = document.querySelector('.box');
+      box.classList.add('access-denied');
+      box.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+      box.innerHTML = `
+        <div class="logo-wrapper" style="background: linear-gradient(135deg, #dc2626, #ef4444); box-shadow: 0 20px 40px rgba(239, 68, 68, 0.3), 0 0 60px rgba(239, 68, 68, 0.2);">🚫</div>
+        <h2 style="background: linear-gradient(135deg, #ef4444, #f87171); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Access Denied</h2>
+        <p class="subtitle">
+          Direct access to this verification page is <strong style="color: #ef4444;">not permitted</strong>.<br>
+          Please access through the authorized <span class="highlight">key system portal</span>.
+        </p>
+        <div class="instruction-box" style="background: rgba(239, 68, 68, 0.05); border-color: rgba(239, 68, 68, 0.15);">
+          <div class="instruction-title" style="color: #ef4444;">
+            <span>⚠️</span>
+            <span>Proper Access Route:</span>
+          </div>
+          <ol class="instruction-steps">
+            <li>Complete the key system challenge (Work.ink or LootLabs)</li>
+            <li>You'll be automatically redirected here</li>
+            <li>Enter your HWID to generate the key</li>
+          </ol>
+        </div>
+        <div class="status error show" style="margin-top: 30px;">
+          <strong>⛔ Unauthorized Access Detected</strong><br>
+          ${customMessage || "You must complete the key system first."}
         </div>
       `;
     }
@@ -807,28 +784,16 @@
       const hwidIndicator = document.getElementById('hwidIndicator');
       
       captchaContainer.style.opacity = '0';
-      captchaContainer.style.transition = 'opacity 0.3s ease';
       
       setTimeout(() => {
-        captchaContainer.remove();
+        captchaContainer.style.display = 'none';
         hwidInput.style.display = 'block';
         hwidIndicator.style.display = 'block';
-        hwidInput.style.opacity = '0';
         
         setTimeout(() => {
-          hwidInput.style.transition = 'opacity 0.3s ease';
-          hwidInput.style.opacity = '1';
           hwidInput.focus();
-          updateButtonState();
-        }, 10);
+        }, 50);
       }, 300);
-    }
-
-    function updateButtonState() {
-      const btn = document.getElementById('verifyBtn');
-      if (btn) {
-        btn.disabled = !(isCaptchaVerified && isValidHwid);
-      }
     }
 
     function validateHwid(hwid) {
@@ -858,13 +823,14 @@
       const indicator = document.getElementById("hwidIndicator");
       const input = document.getElementById("hwidInput");
       const validationStatus = document.getElementById("validationStatus");
+      const verifyBtn = document.getElementById("verifyBtn");
       
       if (!hwid) {
         indicator.classList.remove("valid");
         input.classList.remove("valid", "error");
         validationStatus.classList.remove("show");
         isValidHwid = false;
-        updateButtonState();
+        verifyBtn.disabled = true;
         return;
       }
 
@@ -876,6 +842,7 @@
         input.classList.remove("error");
         validationStatus.classList.remove("show");
         isValidHwid = true;
+        verifyBtn.disabled = false;
       } else {
         indicator.classList.remove("valid");
         input.classList.add("error");
@@ -883,9 +850,8 @@
         validationStatus.className = "status error show";
         validationStatus.innerHTML = `<strong>❌ Invalid HWID:</strong><br>${validation.errors.join('<br>')}`;
         isValidHwid = false;
+        verifyBtn.disabled = true;
       }
-      
-      updateButtonState();
     }
 
     function setStatus(message, type = '') {
@@ -958,26 +924,25 @@
       }
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', function() {
       createParticles();
-      checkAccess();
-    });
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const hwidInput = document.getElementById("hwidInput");
-      if (hwidInput) {
-        hwidInput.addEventListener("input", updateHwidIndicator);
-        
-        hwidInput.addEventListener("keypress", (e) => {
-          if (e.key === "Enter" && isValidHwid && isCaptchaVerified) {
-            getKey();
-          }
-        });
-
-        hwidInput.addEventListener("paste", (e) => {
-          setTimeout(updateHwidIndicator, 10);
-        });
-      }
+      
+      checkAccess().then(allowed => {
+        if (allowed) {
+          const hwidInput = document.getElementById('hwidInput');
+          hwidInput.addEventListener("input", updateHwidIndicator);
+          
+          hwidInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter" && isValidHwid) {
+              getKey();
+            }
+          });
+          
+          hwidInput.addEventListener("paste", (e) => {
+            setTimeout(updateHwidIndicator, 10);
+          });
+        }
+      });
     });
   </script>
 </body>
