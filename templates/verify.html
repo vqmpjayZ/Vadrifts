@@ -695,11 +695,12 @@
     </div>
   </div>
 
-  <script>
+<script>
     let isValidHwid = false;
     let isCaptchaVerified = false;
     let captchaToken = null;
     let verificationToken = null;
+    let accessAllowed = false;
 
     function createParticles() {
       const particlesContainer = document.getElementById('particles');
@@ -715,18 +716,119 @@
       }
     }
 
+    async function checkAccess() {
+      const captchaSection = document.getElementById('captchaSection');
+      const hwidSection = document.getElementById('hwidSection');
+      
+      try {
+        const referrer = document.referrer;
+        const validReferrers = ['work.ink', 'loot-link.com', 'loot-links.com', 'lootdest.com'];
+        const hasValidReferrer = validReferrers.some(domain => referrer.includes(domain));
+        
+        if (!hasValidReferrer) {
+          showAccessDenied("Access denied. Please use the official key system.");
+          return false;
+        }
+
+        const res = await fetch('/check-verification');
+        const data = await res.json();
+
+        if (!data.valid) {
+          switch(data.reason) {
+            case 'no_timer':
+              showAccessDenied("No verification session found. Please start from the key system page.");
+              break;
+            case 'already_verified':
+              showAccessDenied("This verification session has already been used.");
+              break;
+            case 'time_not_elapsed':
+              const remaining = Math.ceil(data.required - data.elapsed);
+              showAccessDenied(`Please wait ${remaining} more seconds before continuing.`);
+              break;
+            default:
+              showAccessDenied("Verification failed. Please try again.");
+          }
+          return false;
+        }
+
+        accessAllowed = true;
+        verificationToken = data.token || 'valid';
+        
+        captchaSection.style.display = 'none';
+        hwidSection.style.display = 'block';
+        hwidSection.classList.add('show');
+        
+        const inputGroup = document.querySelector('.input-group');
+        const captchaContainer = document.createElement('div');
+        captchaContainer.id = 'captchaContainer';
+        captchaContainer.innerHTML = `<div class="cf-turnstile" data-sitekey="YOUR_SITE_KEY_HERE" data-callback="onCaptchaSuccess" data-theme="dark"></div>`;
+        
+        const hwidInput = document.getElementById('hwidInput');
+        const hwidIndicator = document.getElementById('hwidIndicator');
+        hwidInput.style.display = 'none';
+        hwidIndicator.style.display = 'none';
+        
+        inputGroup.insertBefore(captchaContainer, inputGroup.firstChild);
+        
+        document.getElementById('verifyBtn').disabled = true;
+        
+        if (window.turnstile) {
+          window.turnstile.render('.cf-turnstile');
+        }
+        
+        return true;
+      } catch (err) {
+        console.error('Access check error:', err);
+        showAccessDenied("Failed to verify access. Please try again.");
+        return false;
+      }
+    }
+
+    function showAccessDenied(message) {
+      const container = document.querySelector('.container');
+      container.innerHTML = `
+        <div class="box access-denied">
+          <div class="logo-wrapper">❌</div>
+          <h2>Access Denied</h2>
+          <p class="subtitle">${message}</p>
+          <button class="verify-btn" onclick="window.location.href='/'">
+            Return to Home
+          </button>
+        </div>
+      `;
+    }
+
     function onCaptchaSuccess(token) {
       captchaToken = token;
       isCaptchaVerified = true;
       
-      const captchaSection = document.getElementById('captchaSection');
-      captchaSection.classList.add('hiding');
+      const captchaContainer = document.getElementById('captchaContainer');
+      const hwidInput = document.getElementById('hwidInput');
+      const hwidIndicator = document.getElementById('hwidIndicator');
+      
+      captchaContainer.style.opacity = '0';
+      captchaContainer.style.transition = 'opacity 0.3s ease';
       
       setTimeout(() => {
-        captchaSection.style.display = 'none';
-        document.getElementById('hwidSection').classList.add('show');
-        document.getElementById("hwidInput").focus();
+        captchaContainer.remove();
+        hwidInput.style.display = 'block';
+        hwidIndicator.style.display = 'block';
+        hwidInput.style.opacity = '0';
+        
+        setTimeout(() => {
+          hwidInput.style.transition = 'opacity 0.3s ease';
+          hwidInput.style.opacity = '1';
+          hwidInput.focus();
+          updateButtonState();
+        }, 10);
       }, 300);
+    }
+
+    function updateButtonState() {
+      const btn = document.getElementById('verifyBtn');
+      if (btn) {
+        btn.disabled = !(isCaptchaVerified && isValidHwid);
+      }
     }
 
     function validateHwid(hwid) {
@@ -762,6 +864,7 @@
         input.classList.remove("valid", "error");
         validationStatus.classList.remove("show");
         isValidHwid = false;
+        updateButtonState();
         return;
       }
 
@@ -781,6 +884,8 @@
         validationStatus.innerHTML = `<strong>❌ Invalid HWID:</strong><br>${validation.errors.join('<br>')}`;
         isValidHwid = false;
       }
+      
+      updateButtonState();
     }
 
     function setStatus(message, type = '') {
@@ -796,6 +901,11 @@
     }
 
     async function getKey() {
+      if (!accessAllowed) {
+        setStatus("⚠️ Access denied. Please start from the key system page.", "error");
+        return;
+      }
+
       const hwid = document.getElementById("hwidInput").value.trim();
       const btn = document.getElementById("verifyBtn");
       
@@ -848,19 +958,27 @@
       }
     }
 
-    document.getElementById("hwidInput").addEventListener("input", updateHwidIndicator);
-    
-    document.getElementById("hwidInput").addEventListener("keypress", (e) => {
-      if (e.key === "Enter" && isValidHwid) {
-        getKey();
+    window.addEventListener('DOMContentLoaded', () => {
+      createParticles();
+      checkAccess();
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const hwidInput = document.getElementById("hwidInput");
+      if (hwidInput) {
+        hwidInput.addEventListener("input", updateHwidIndicator);
+        
+        hwidInput.addEventListener("keypress", (e) => {
+          if (e.key === "Enter" && isValidHwid && isCaptchaVerified) {
+            getKey();
+          }
+        });
+
+        hwidInput.addEventListener("paste", (e) => {
+          setTimeout(updateHwidIndicator, 10);
+        });
       }
     });
-
-    document.getElementById("hwidInput").addEventListener("paste", (e) => {
-      setTimeout(updateHwidIndicator, 10);
-    });
-
-    createParticles();
   </script>
 </body>
 </html>
