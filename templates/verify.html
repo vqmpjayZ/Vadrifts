@@ -656,6 +656,15 @@
   </div>
 
 <script>
+  let savedTimerToken = localStorage.getItem('vadrifts_timer_token');
+if (savedTimerToken) {
+  if (!window.location.href.includes('timer=')) {
+    const url = new URL(window.location.href);
+    url.searchParams.append('timer', savedTimerToken);
+    window.history.replaceState({}, '', url.toString());
+    localStorage.removeItem('vadrifts_timer_token');
+  }
+}
     let isValidHwid = false;
     let verificationToken = null;
 
