@@ -131,22 +131,30 @@ async def on_message(message):
         await message.reply(("meow "*meow_count).strip()+punctuation+(" "+symbol if symbol else ""), mention_author=False)
 
     boost_channels = {TARGET_CHANNEL_ID, BOOST_TEST_CHANNEL_ID}
-    if message.channel.id in boost_channels:
-        content_lower = content.lower()
-        is_text_boost = ("boosted the server" in content_lower or "just boosted" in content_lower)
-        is_system_boost = message.type in BOOST_TYPES
-        if is_text_boost or is_system_boost:
-            if not message.author:
-                return
-            user_id = message.author.id
-            if user_id not in recent_boosts:
-                recent_boosts[user_id] = True
-                if user_id in pending_tasks:
-                    try:
-                        pending_tasks[user_id].cancel()
-                    except:
-                        pass
-                pending_tasks[user_id] = bot.loop.create_task(send_good_boy_after_delay(user_id, message.channel))
+if message.channel.id in boost_channels:
+    is_system_boost = message.type == discord.MessageType.premium_guild_subscription
+
+    content = message.content or ""
+    is_text_boost = bool(re.match(r"^.+\sjust boosted the server", content, re.IGNORECASE))
+
+    if is_system_boost or is_text_boost:
+        if not message.author:
+            return
+
+        user_id = message.author.id
+
+        if user_id not in recent_boosts:
+            recent_boosts[user_id] = True
+
+            if user_id in pending_tasks:
+                try:
+                    pending_tasks[user_id].cancel()
+                except:
+                    pass
+
+            pending_tasks[user_id] = bot.loop.create_task(
+                send_good_boy_after_delay(user_id, message.channel)
+            )
 
     await bot.process_commands(message)
 
