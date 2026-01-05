@@ -46,8 +46,9 @@ scripts_data = [
             "Supports All executors",
         ],
         "script": '''loadstring(game:HttpGet("https://raw.githubusercontent.com/vqmpjayZ/Vadrifts-Hub/refs/heads/main/Games/Starving-Artists/source.lua"))()''',
-        "key_type": "discord",
-        "key_link": "https://discord.com/invite/WDbJ5wE2cR"
+        "key_type": "work.ink",
+        "key_link": "https://work.ink/20yd/Vadrifts-StarvingArtists",
+        "lootlabs_link": None
     },
     {
         "id": 4580204640,
