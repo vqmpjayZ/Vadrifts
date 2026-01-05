@@ -217,6 +217,38 @@ def converter():
         logger.error("converter.html template not found")
         return jsonify({"error": "Converter page not found"}), 404
 
+usage_data = {}
+
+@app.route('/check-usage', methods=['GET'])
+def check_usage():
+    hwid = request.args.get('hwid')
+    if not hwid:
+        return jsonify({"error": "No HWID provided"}), 400
+    
+    today = datetime.now().strftime("%Y-%m-%d")
+    
+    if hwid in usage_data:
+        if usage_data[hwid]['date'] != today:
+            usage_data[hwid] = {'used': 0, 'date': today}
+    else:
+        usage_data[hwid] = {'used': 0, 'date': today}
+    
+    return jsonify(usage_data[hwid])
+
+@app.route('/update-usage', methods=['POST'])
+def update_usage():
+    data = request.get_json()
+    hwid = data.get('hwid')
+    used = data.get('used', 0)
+    
+    if not hwid:
+        return jsonify({"error": "No HWID provided"}), 400
+    
+    today = datetime.now().strftime("%Y-%m-%d")
+    usage_data[hwid] = {'used': used, 'date': today}
+    
+    return jsonify({"success": True})
+    
 @app.route('/key-system')
 def key_system_page():
     try:
