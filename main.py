@@ -219,7 +219,7 @@ def converter():
 
 usage_data = {}
 
-@app.route('/check-usage', methods=['GET'])
+@@app.route('/check-usage', methods=['GET'])
 def check_usage():
     hwid = request.args.get('hwid')
     if not hwid:
@@ -235,17 +235,16 @@ def check_usage():
     
     return jsonify(usage_data[hwid])
 
-@app.route('/update-usage', methods=['POST'])
+@app.route('/update-usage', methods=['GET'])
 def update_usage():
-    data = request.get_json()
-    hwid = data.get('hwid')
-    used = data.get('used', 0)
+    hwid = request.args.get('hwid')
+    used = request.args.get('used', 0)
     
     if not hwid:
         return jsonify({"error": "No HWID provided"}), 400
     
     today = datetime.now().strftime("%Y-%m-%d")
-    usage_data[hwid] = {'used': used, 'date': today}
+    usage_data[hwid] = {'used': int(used), 'date': today}
     
     return jsonify({"success": True})
     
