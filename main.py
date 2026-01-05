@@ -218,6 +218,7 @@ def converter():
         return jsonify({"error": "Converter page not found"}), 404
 
 usage_data = {}
+copy_usage_data = {}
 
 @app.route('/check-usage', methods=['GET'])
 def check_usage():
@@ -245,6 +246,36 @@ def update_usage():
     
     today = datetime.now().strftime("%Y-%m-%d")
     usage_data[hwid] = {'used': int(used), 'date': today}
+    
+    return jsonify({"success": True})
+
+@app.route('/check-copy-usage', methods=['GET'])
+def check_copy_usage():
+    hwid = request.args.get('hwid')
+    if not hwid:
+        return jsonify({"error": "No HWID provided"}), 400
+    
+    today = datetime.now().strftime("%Y-%m-%d")
+    
+    if hwid in copy_usage_data:
+        if copy_usage_data[hwid]['date'] != today:
+            copy_usage_data[hwid] = {'texture': 0, 'normal': 0, 'date': today}
+    else:
+        copy_usage_data[hwid] = {'texture': 0, 'normal': 0, 'date': today}
+    
+    return jsonify(copy_usage_data[hwid])
+
+@app.route('/update-copy-usage', methods=['GET'])
+def update_copy_usage():
+    hwid = request.args.get('hwid')
+    texture = request.args.get('texture', 0)
+    normal = request.args.get('normal', 0)
+    
+    if not hwid:
+        return jsonify({"error": "No HWID provided"}), 400
+    
+    today = datetime.now().strftime("%Y-%m-%d")
+    copy_usage_data[hwid] = {'texture': int(texture), 'normal': int(normal), 'date': today}
     
     return jsonify({"success": True})
     
