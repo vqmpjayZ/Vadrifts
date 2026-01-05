@@ -219,7 +219,7 @@ def converter():
 
 usage_data = {}
 
-@@app.route('/check-usage', methods=['GET'])
+@app.route('/check-usage', methods=['GET'])
 def check_usage():
     hwid = request.args.get('hwid')
     if not hwid:
