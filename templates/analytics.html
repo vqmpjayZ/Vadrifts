@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0f;
+            color: #fff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .floating-shape {
+            position: absolute;
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            filter: blur(60px);
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .shape1 {
+            width: 500px;
+            height: 500px;
+            top: -10%;
+            left: -10%;
+            animation-delay: 0s;
+        }
+
+        .shape2 {
+            width: 400px;
+            height: 400px;
+            bottom: -10%;
+            right: -10%;
+            animation-delay: 7s;
+            background: linear-gradient(135deg, rgba(237, 76, 103, 0.1), rgba(246, 148, 79, 0.1));
+        }
+
+        .shape3 {
+            width: 350px;
+            height: 350px;
+            top: 50%;
+            left: 50%;
+            animation-delay: 14s;
+            background: linear-gradient(135deg, rgba(67, 233, 123, 0.1), rgba(56, 249, 215, 0.1));
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) rotate(0deg) scale(1);
+            }
+            33% {
+                transform: translate(100px, -100px) rotate(120deg) scale(1.1);
+            }
+            66% {
+                transform: translate(-50px, 100px) rotate(240deg) scale(0.9);
+            }
+        }
+
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(102, 126, 234, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(102, 126, 234, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 40px;
+        }
+
+        .header h1 {
+            font-size: 3.5em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb, #4facfe);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 8s ease infinite;
+            margin-bottom: 15px;
+            letter-spacing: -2px;
+            text-shadow: 0 0 80px rgba(102, 126, 234, 0.5);
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .header p {
+            color: #888;
+            font-size: 1.2em;
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+
+        .stat-card {
+            background: rgba(15, 15, 25, 0.6);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .stat-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .stat-card:hover::after {
+            opacity: 1;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(102, 126, 234, 0.3);
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.4),
+                0 0 40px rgba(102, 126, 234, 0.2),
+                inset 0 0 20px rgba(102, 126, 234, 0.05);
+        }
+
+        .stat-card h3 {
+            color: #666;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .stat-card .value {
+            font-size: 3em;
+            font-weight: 900;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+            margin-bottom: 8px;
+            filter: drop-shadow(0 0 20px rgba(102, 126, 234, 0.3));
+        }
+
+        .stat-card .label {
+            color: #555;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .chart-container {
+            background: rgba(15, 15, 25, 0.6);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 50px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.03), rgba(118, 75, 162, 0.03));
+            pointer-events: none;
+        }
+
+        .chart-container h2 {
+            margin-bottom: 30px;
+            font-size: 1.8em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff, #aaa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+        }
+
+        .script-breakdown {
+            background: rgba(15, 15, 25, 0.6);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .script-breakdown h2 {
+            margin-bottom: 30px;
+            font-size: 1.8em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff, #aaa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .script-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 15px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .script-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.1), transparent);
+            transition: width 0.4s ease;
+        }
+
+        .script-item:hover::before {
+            width: 100%;
+        }
+
+        .script-item:hover {
+            transform: translateX(10px);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .script-name {
+            font-weight: 700;
+            font-size: 1.15em;
+            letter-spacing: 0.5px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .script-count {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 1.1em;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        .script-item:hover .script-count {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            margin: 30px auto;
+            display: block;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 1px;
+        }
+
+        .refresh-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .refresh-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.6);
+        }
+
+        .refresh-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            font-size: 1.3em;
+            color: #666;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2.5em;
+            }
+
+            .chart-container, .script-breakdown {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation">
+        <div class="floating-shape shape1"></div>
+        <div class="floating-shape shape2"></div>
+        <div class="floating-shape shape3"></div>
+    </div>
+    <div class="grid-overlay"></div>
+
+    <div class="container">
+        <div class="header">
+            <h1>Analytics Dashboard</h1>
+            <p>Execution Metrics</p>
+        </div>
+
+        <div class="stats-grid" id="statsGrid">
+            <div class="loading">Loading analytics...</div>
+        </div>
+
+        <div class="chart-container">
+            <h2>30-Day Execution Trend</h2>
+            <canvas id="executionsChart"></canvas>
+        </div>
+
+        <div class="script-breakdown">
+            <h2>Script Breakdown</h2>
+            <div id="scriptList"></div>
+        </div>
+
+        <button class="refresh-btn" onclick="loadAnalytics()">
+            <span style="position: relative; z-index: 1;">Refresh Data</span>
+        </button>
+    </div>
+
+    <script>
+        let chart;
+
+        async function loadAnalytics() {
+            try {
+                const response = await fetch('/analytics-data');
+                const data = await response.json();
+
+                document.getElementById('statsGrid').innerHTML = `
+                    <div class="stat-card">
+                        <h3>Total Executions</h3>
+                        <div class="value">${data.total_executions.toLocaleString()}</div>
+                        <div class="label">All time</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>This Week</h3>
+                        <div class="value">${data.week_executions.toLocaleString()}</div>
+                        <div class="label">${data.unique_users_week} unique users</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>This Month</h3>
+                        <div class="value">${data.month_executions.toLocaleString()}</div>
+                        <div class="label">${data.unique_users_month} unique users</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Daily Average</h3>
+                        <div class="value">${Math.round(data.month_executions / 30).toLocaleString()}</div>
+                        <div class="label">Last 30 days</div>
+                    </div>
+                `;
+
+                let scriptHtml = '';
+                const scripts = Object.entries(data.script_breakdown).sort((a, b) => b[1] - a[1]);
+                for (const [script, count] of scripts) {
+                    scriptHtml += `
+                        <div class="script-item">
+                            <span class="script-name">${script}</span>
+                            <span class="script-count">${count.toLocaleString()}</span>
+                        </div>
+                    `;
+                }
+                document.getElementById('scriptList').innerHTML = scriptHtml || '<p style="color: #666; text-align: center;">No data yet</p>';
+
+                if (chart) {
+                    chart.destroy();
+                }
+
+                const ctx = document.getElementById('executionsChart').getContext('2d');
+                
+                const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                gradient.addColorStop(0, 'rgba(102, 126, 234, 0.4)');
+                gradient.addColorStop(1, 'rgba(102, 126, 234, 0)');
+
+                chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.chart_labels.map(date => {
+                            const d = new Date(date);
+                            return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                        }),
+                        datasets: [{
+                            label: 'Executions',
+                            data: data.chart_data,
+                            borderColor: '#667eea',
+                            backgroundColor: gradient,
+                            tension: 0.4,
+                            fill: true,
+                            pointBackgroundColor: '#667eea',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 3,
+                            pointRadius: 5,
+                            pointHoverRadius: 8,
+                            pointHoverBackgroundColor: '#764ba2',
+                            pointHoverBorderWidth: 4,
+                            borderWidth: 3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(10, 10, 15, 0.95)',
+                                padding: 15,
+                                titleColor: '#fff',
+                                bodyColor: '#aaa',
+                                borderColor: '#667eea',
+                                borderWidth: 2,
+                                cornerRadius: 10,
+                                displayColors: false,
+                                titleFont: {
+                                    size: 14,
+                                    weight: 'bold'
+                                },
+                                bodyFont: {
+                                    size: 16,
+                                    weight: 'bold'
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.05)',
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    color: '#666',
+                                    font: {
+                                        size: 12,
+                                        weight: '600'
+                                    }
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.02)',
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    color: '#666',
+                                    maxRotation: 45,
+                                    minRotation: 45,
+                                    font: {
+                                        size: 11,
+                                        weight: '600'
+                                    }
+                                }
+                            }
+                        },
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+                document.getElementById('statsGrid').innerHTML = '<div class="loading">Error loading data. Please refresh.</div>';
+            }
+        }
+
+        loadAnalytics();
+        setInterval(loadAnalytics, 60000);
+    </script>
+</body>
+</html>
