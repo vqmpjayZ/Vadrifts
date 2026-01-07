@@ -16,6 +16,7 @@ from image_converter import convert_image_endpoint
 from plugins_manager import PluginsManager
 from scripts_data import scripts_data, process_script_data
 from utils import inject_meta_tags, server_pinger
+from collections import defaultdict
 from key_system import KeySystemManager
 from verification_timer import VerificationTimer
 
@@ -219,6 +220,7 @@ def converter():
 
 usage_data = {}
 copy_usage_data = {}
+execution_logs = []
 
 @app.route('/check-usage', methods=['GET'])
 def check_usage():
@@ -278,7 +280,75 @@ def update_copy_usage():
     copy_usage_data[hwid] = {'texture': int(texture), 'normal': int(normal), 'date': today}
     
     return jsonify({"success": True})
+
+@app.route('/log-execution', methods=['GET'])
+def log_execution():
+    hwid = request.args.get('hwid')
+    script = request.args.get('script', 'Unknown')
     
+    if hwid:
+        execution_logs.append({
+            'hwid': hwid,
+            'script': script,
+            'timestamp': datetime.now().isoformat()
+        })
+        
+        if len(execution_logs) > 10000:
+            execution_logs.pop(0)
+    
+    return jsonify({"success": True})
+
+@app.route('/analytics-data', methods=['GET'])
+def analytics_data():
+    now = datetime.now()
+    week_ago = now - timedelta(days=7)
+    month_ago = now - timedelta(days=30)
+    
+    week_execs = []
+    month_execs = []
+    script_counts = defaultdict(int)
+    unique_users_week = set()
+    unique_users_month = set()
+    
+    daily_data = defaultdict(int)
+    
+    for log in execution_logs:
+        timestamp = datetime.fromisoformat(log['timestamp'])
+        script_counts[log['script']] += 1
+        
+        day_key = timestamp.strftime('%Y-%m-%d')
+        daily_data[day_key] += 1
+        
+        if timestamp >= week_ago:
+            week_execs.append(log)
+            unique_users_week.add(log['hwid'])
+        
+        if timestamp >= month_ago:
+            month_execs.append(log)
+            unique_users_month.add(log['hwid'])
+    
+    last_30_days = [(now - timedelta(days=i)).strftime('%Y-%m-%d') for i in range(29, -1, -1)]
+    chart_data = [daily_data.get(day, 0) for day in last_30_days]
+    
+    return jsonify({
+        'total_executions': len(execution_logs),
+        'week_executions': len(week_execs),
+        'month_executions': len(month_execs),
+        'unique_users_week': len(unique_users_week),
+        'unique_users_month': len(unique_users_month),
+        'script_breakdown': dict(script_counts),
+        'chart_labels': last_30_days,
+        'chart_data': chart_data
+    })
+
+@app.route('/analytics')
+def analytics_page():
+    try:
+        return send_file('templates/analytics.html')
+    except FileNotFoundError:
+        logger.error("analytics.html template not found")
+        return jsonify({"error": "Analytics page not found"}), 404
+        
 @app.route('/key-system')
 def key_system_page():
     try:
