@@ -4,9 +4,13 @@ import json
 import secrets
 import time
 import requests
+import io
+import base64
+import hashlib
 from functools import wraps
 from flask import Flask, request, jsonify, send_file, redirect, send_from_directory, make_response
 from datetime import datetime, timedelta
+from PIL import Image
 
 from config import *
 from discord_bot import start_bot
@@ -39,6 +43,98 @@ API_SECRET = "vadriftsisalwaysinseason"
 TURNSTILE_SITE_KEY = os.environ.get("TURNSTILE_SITE_KEY")
 TURNSTILE_SECRET_KEY = os.environ.get("TURNSTILE_SECRET_KEY")
 
+GIF_CACHE_DIR = "gif_cache"
+if not os.path.exists(GIF_CACHE_DIR):
+    os.makedirs(GIF_CACHE_DIR)
+
+@app.route('/api/split-gif', methods=['POST'])
+def split_gif():
+    try:
+        data = request.get_json()
+        gif_url = data.get('url')
+        
+        if not gif_url:
+            return jsonify({'error': 'No URL provided', 'success': False}), 400
+        
+        url_hash = hashlib.md5(gif_url.encode()).hexdigest()
+        cache_file = os.path.join(GIF_CACHE_DIR, f"{url_hash}.json")
+        
+        if os.path.exists(cache_file):
+            with open(cache_file, 'r') as f:
+                cached_data = json.load(f)
+                logger.info(f"Serving cached GIF frames for: {gif_url[:50]}...")
+                return jsonify(cached_data)
+        
+        response = requests.get(gif_url, timeout=15, headers={
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        })
+        
+        if response.status_code != 200:
+            return jsonify({'error': 'Failed to download gif', 'success': False}), 400
+        
+        gif_data = io.BytesIO(response.content)
+        
+        try:
+            img = Image.open(gif_data)
+        except Exception as e:
+            return jsonify({'error': f'Invalid image: {str(e)}', 'success': False}), 400
+        
+        if not getattr(img, 'is_animated', False):
+            img = img.convert('RGBA')
+            buffer = io.BytesIO()
+            img.save(buffer, format='PNG')
+            frame_b64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+            
+            result = {
+                'success': True,
+                'frame_count': 1,
+                'frames': [frame_b64]
+            }
+            
+            with open(cache_file, 'w') as f:
+                json.dump(result, f)
+            
+            return jsonify(result)
+        
+        frames = []
+        frame_count = 0
+        
+        try:
+            while True:
+                img.seek(frame_count)
+                frame = img.convert('RGBA')
+                buffer = io.BytesIO()
+                frame.save(buffer, format='PNG', optimize=True)
+                frame_b64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+                frames.append(frame_b64)
+                frame_count += 1
+                
+                if frame_count > 500:
+                    break
+        except EOFError:
+            pass
+        
+        if len(frames) == 0:
+            return jsonify({'error': 'No frames extracted', 'success': False}), 400
+        
+        result = {
+            'success': True,
+            'frame_count': len(frames),
+            'frames': frames
+        }
+        
+        with open(cache_file, 'w') as f:
+            json.dump(result, f)
+        
+        logger.info(f"Split GIF into {len(frames)} frames: {gif_url[:50]}...")
+        return jsonify(result)
+        
+    except requests.Timeout:
+        return jsonify({'error': 'Timeout downloading gif', 'success': False}), 408
+    except Exception as e:
+        logger.error(f"Error splitting GIF: {str(e)}", exc_info=True)
+        return jsonify({'error': str(e), 'success': False}), 500
+        
 def get_client_ip():
     client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
     if client_ip and ',' in client_ip:
