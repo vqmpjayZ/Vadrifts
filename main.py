@@ -47,14 +47,23 @@ GIF_CACHE_DIR = "gif_cache"
 if not os.path.exists(GIF_CACHE_DIR):
     os.makedirs(GIF_CACHE_DIR)
 
-@app.route('/api/split-gif', methods=['POST'])
+@app.route('/api/split-gif', methods=['POST', 'OPTIONS'])
 def split_gif():
+    if request.method == 'OPTIONS':
+        response = make_response()
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+        return response
+        
     try:
         data = request.get_json()
         gif_url = data.get('url')
         
         if not gif_url:
-            return jsonify({'error': 'No URL provided', 'success': False}), 400
+            response = jsonify({'error': 'No URL provided', 'success': False})
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            return response, 400
         
         url_hash = hashlib.md5(gif_url.encode()).hexdigest()
         cache_file = os.path.join(GIF_CACHE_DIR, f"{url_hash}.json")
@@ -63,7 +72,9 @@ def split_gif():
             with open(cache_file, 'r') as f:
                 cached_data = json.load(f)
                 logger.info(f"Serving cached GIF frames for: {gif_url[:50]}...")
-                return jsonify(cached_data)
+                response = jsonify(cached_data)
+                response.headers['Access-Control-Allow-Origin'] = '*'
+                return response
         
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -72,34 +83,41 @@ def split_gif():
             'Referer': 'https://tenor.com/'
         }
         
-        response = requests.get(gif_url, timeout=15, headers=headers, allow_redirects=True)
+        dl_response = requests.get(gif_url, timeout=15, headers=headers, allow_redirects=True)
         
-        if response.status_code != 200:
-            logger.error(f"Failed to download gif, status: {response.status_code}")
-            return jsonify({'error': f'Failed to download gif: {response.status_code}', 'success': False}), 400
+        if dl_response.status_code != 200:
+            logger.error(f"Failed to download gif, status: {dl_response.status_code}")
+            response = jsonify({'error': f'Failed to download gif: {dl_response.status_code}', 'success': False})
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            return response, 400
         
-        content_type = response.headers.get('Content-Type', '')
-        logger.info(f"Downloaded content type: {content_type}, size: {len(response.content)}")
+        content_type = dl_response.headers.get('Content-Type', '')
+        logger.info(f"Downloaded content type: {content_type}, size: {len(dl_response.content)}")
         
         if 'text/html' in content_type:
             logger.error(f"Received HTML instead of image from: {gif_url}")
-            return jsonify({'error': 'URL returned HTML, not an image', 'success': False}), 400
+            response = jsonify({'error': 'URL returned HTML, not an image', 'success': False})
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            return response, 400
         
-        if len(response.content) < 100:
-            logger.error(f"Content too small: {len(response.content)} bytes")
-            return jsonify({'error': 'Downloaded content too small', 'success': False}), 400
+        if len(dl_response.content) < 100:
+            logger.error(f"Content too small: {len(dl_response.content)} bytes")
+            response = jsonify({'error': 'Downloaded content too small', 'success': False})
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            return response, 400
         
-        gif_data = io.BytesIO(response.content)
+        gif_data = io.BytesIO(dl_response.content)
         
         try:
             img = Image.open(gif_data)
             img.load()
         except Exception as e:
-            logger.error(f"PIL cannot open image: {str(e)}, first 100 bytes: {response.content[:100]}")
-            return jsonify({'error': f'Invalid image format: {str(e)}', 'success': False}), 400
+            logger.error(f"PIL cannot open image: {str(e)}")
+            response = jsonify({'error': f'Invalid image format: {str(e)}', 'success': False})
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            return response, 400
         
         frames = []
-        frame_count = 0
         
         is_animated = hasattr(img, 'n_frames') and img.n_frames > 1
         
@@ -119,26 +137,27 @@ def split_gif():
                 json.dump(result, f)
             
             logger.info(f"Static image processed: {gif_url[:50]}...")
-            return jsonify(result)
+            response = jsonify(result)
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            return response
         
         try:
-            for frame_num in range(img.n_frames):
+            for frame_num in range(min(img.n_frames, 100)):
                 img.seek(frame_num)
                 frame = img.convert('RGBA')
                 buffer = io.BytesIO()
                 frame.save(buffer, format='PNG', optimize=True)
                 frame_b64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
                 frames.append(frame_b64)
-                
-                if frame_num > 500:
-                    break
         except EOFError:
             pass
         except Exception as e:
             logger.error(f"Error extracting frames: {str(e)}")
         
         if len(frames) == 0:
-            return jsonify({'error': 'No frames extracted', 'success': False}), 400
+            response = jsonify({'error': 'No frames extracted', 'success': False})
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            return response, 400
         
         result = {
             'success': True,
@@ -150,14 +169,20 @@ def split_gif():
             json.dump(result, f)
         
         logger.info(f"Split GIF into {len(frames)} frames: {gif_url[:50]}...")
-        return jsonify(result)
+        response = jsonify(result)
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
         
     except requests.Timeout:
-        logger.error(f"Timeout downloading gif: {gif_url}")
-        return jsonify({'error': 'Timeout downloading gif', 'success': False}), 408
+        logger.error(f"Timeout downloading gif")
+        response = jsonify({'error': 'Timeout downloading gif', 'success': False})
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response, 408
     except Exception as e:
         logger.error(f"Error splitting GIF: {str(e)}", exc_info=True)
-        return jsonify({'error': str(e), 'success': False}), 500
+        response = jsonify({'error': str(e), 'success': False})
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response, 500
 
 @app.route('/')
 def home():
