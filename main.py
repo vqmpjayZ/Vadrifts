@@ -65,24 +65,48 @@ def split_gif():
                 logger.info(f"Serving cached GIF frames for: {gif_url[:50]}...")
                 return jsonify(cached_data)
         
-        response = requests.get(gif_url, timeout=15, headers={
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-        })
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'image/gif,image/webp,image/apng,image/*,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Referer': 'https://tenor.com/'
+        }
+        
+        response = requests.get(gif_url, timeout=15, headers=headers, allow_redirects=True)
         
         if response.status_code != 200:
-            return jsonify({'error': 'Failed to download gif', 'success': False}), 400
+            logger.error(f"Failed to download gif, status: {response.status_code}")
+            return jsonify({'error': f'Failed to download gif: {response.status_code}', 'success': False}), 400
+        
+        content_type = response.headers.get('Content-Type', '')
+        logger.info(f"Downloaded content type: {content_type}, size: {len(response.content)}")
+        
+        if 'text/html' in content_type:
+            logger.error(f"Received HTML instead of image from: {gif_url}")
+            return jsonify({'error': 'URL returned HTML, not an image', 'success': False}), 400
+        
+        if len(response.content) < 100:
+            logger.error(f"Content too small: {len(response.content)} bytes")
+            return jsonify({'error': 'Downloaded content too small', 'success': False}), 400
         
         gif_data = io.BytesIO(response.content)
         
         try:
             img = Image.open(gif_data)
+            img.load()
         except Exception as e:
-            return jsonify({'error': f'Invalid image: {str(e)}', 'success': False}), 400
+            logger.error(f"PIL cannot open image: {str(e)}, first 100 bytes: {response.content[:100]}")
+            return jsonify({'error': f'Invalid image format: {str(e)}', 'success': False}), 400
         
-        if not getattr(img, 'is_animated', False):
-            img = img.convert('RGBA')
+        frames = []
+        frame_count = 0
+        
+        is_animated = hasattr(img, 'n_frames') and img.n_frames > 1
+        
+        if not is_animated:
+            frame = img.convert('RGBA')
             buffer = io.BytesIO()
-            img.save(buffer, format='PNG')
+            frame.save(buffer, format='PNG')
             frame_b64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
             
             result = {
@@ -94,25 +118,24 @@ def split_gif():
             with open(cache_file, 'w') as f:
                 json.dump(result, f)
             
+            logger.info(f"Static image processed: {gif_url[:50]}...")
             return jsonify(result)
         
-        frames = []
-        frame_count = 0
-        
         try:
-            while True:
-                img.seek(frame_count)
+            for frame_num in range(img.n_frames):
+                img.seek(frame_num)
                 frame = img.convert('RGBA')
                 buffer = io.BytesIO()
                 frame.save(buffer, format='PNG', optimize=True)
                 frame_b64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
                 frames.append(frame_b64)
-                frame_count += 1
                 
-                if frame_count > 500:
+                if frame_num > 500:
                     break
         except EOFError:
             pass
+        except Exception as e:
+            logger.error(f"Error extracting frames: {str(e)}")
         
         if len(frames) == 0:
             return jsonify({'error': 'No frames extracted', 'success': False}), 400
@@ -130,33 +153,11 @@ def split_gif():
         return jsonify(result)
         
     except requests.Timeout:
+        logger.error(f"Timeout downloading gif: {gif_url}")
         return jsonify({'error': 'Timeout downloading gif', 'success': False}), 408
     except Exception as e:
         logger.error(f"Error splitting GIF: {str(e)}", exc_info=True)
         return jsonify({'error': str(e), 'success': False}), 500
-        
-def get_client_ip():
-    client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
-    if client_ip and ',' in client_ip:
-        client_ip = client_ip.split(',')[0].strip()
-    return client_ip
-
-def is_valid_referrer(referer):
-    allowed_referrers = ['work.ink', 'www.work.ink', 'lootdest.org', 'lootlabs.gg', 'www.lootlabs.gg']
-    return any(domain in referer for domain in allowed_referrers)
-
-def verify_turnstile(token, ip):
-    try:
-        response = requests.post('https://challenges.cloudflare.com/turnstile/v0/siteverify', data={
-            'secret': TURNSTILE_SECRET_KEY,
-            'response': token,
-            'remoteip': ip
-        })
-        result = response.json()
-        return result.get('success', False)
-    except Exception as e:
-        logger.error(f"Turnstile verification error: {str(e)}")
-        return False
 
 @app.route('/')
 def home():
