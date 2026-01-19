@@ -4,13 +4,9 @@ import json
 import secrets
 import time
 import requests
-import io
-import base64
-import hashlib
 from functools import wraps
 from flask import Flask, request, jsonify, send_file, redirect, send_from_directory, make_response
 from datetime import datetime, timedelta
-from PIL import Image
 
 from config import *
 from discord_bot import start_bot
@@ -43,146 +39,28 @@ API_SECRET = "vadriftsisalwaysinseason"
 TURNSTILE_SITE_KEY = os.environ.get("TURNSTILE_SITE_KEY")
 TURNSTILE_SECRET_KEY = os.environ.get("TURNSTILE_SECRET_KEY")
 
-GIF_CACHE_DIR = "gif_cache"
-if not os.path.exists(GIF_CACHE_DIR):
-    os.makedirs(GIF_CACHE_DIR)
+def get_client_ip():
+    client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    if client_ip and ',' in client_ip:
+        client_ip = client_ip.split(',')[0].strip()
+    return client_ip
 
-@app.route('/api/split-gif', methods=['POST', 'OPTIONS'])
-def split_gif():
-    if request.method == 'OPTIONS':
-        response = make_response()
-        response.headers['Access-Control-Allow-Origin'] = '*'
-        response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
-        response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
-        return response
-        
+def is_valid_referrer(referer):
+    allowed_referrers = ['work.ink', 'www.work.ink', 'lootdest.org', 'lootlabs.gg', 'www.lootlabs.gg']
+    return any(domain in referer for domain in allowed_referrers)
+
+def verify_turnstile(token, ip):
     try:
-        data = request.get_json()
-        gif_url = data.get('url')
-        
-        if not gif_url:
-            response = jsonify({'error': 'No URL provided', 'success': False})
-            response.headers['Access-Control-Allow-Origin'] = '*'
-            return response, 400
-        
-        url_hash = hashlib.md5(gif_url.encode()).hexdigest()
-        cache_file = os.path.join(GIF_CACHE_DIR, f"{url_hash}.json")
-        
-        if os.path.exists(cache_file):
-            with open(cache_file, 'r') as f:
-                cached_data = json.load(f)
-                logger.info(f"Serving cached GIF frames for: {gif_url[:50]}...")
-                response = jsonify(cached_data)
-                response.headers['Access-Control-Allow-Origin'] = '*'
-                return response
-        
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Accept': 'image/gif,image/webp,image/apng,image/*,*/*;q=0.8',
-            'Accept-Language': 'en-US,en;q=0.9',
-            'Referer': 'https://tenor.com/'
-        }
-        
-        dl_response = requests.get(gif_url, timeout=15, headers=headers, allow_redirects=True)
-        
-        if dl_response.status_code != 200:
-            logger.error(f"Failed to download gif, status: {dl_response.status_code}")
-            response = jsonify({'error': f'Failed to download gif: {dl_response.status_code}', 'success': False})
-            response.headers['Access-Control-Allow-Origin'] = '*'
-            return response, 400
-        
-        content_type = dl_response.headers.get('Content-Type', '')
-        logger.info(f"Downloaded content type: {content_type}, size: {len(dl_response.content)}")
-        
-        if 'text/html' in content_type:
-            logger.error(f"Received HTML instead of image from: {gif_url}")
-            response = jsonify({'error': 'URL returned HTML, not an image', 'success': False})
-            response.headers['Access-Control-Allow-Origin'] = '*'
-            return response, 400
-        
-        if len(dl_response.content) < 100:
-            logger.error(f"Content too small: {len(dl_response.content)} bytes")
-            response = jsonify({'error': 'Downloaded content too small', 'success': False})
-            response.headers['Access-Control-Allow-Origin'] = '*'
-            return response, 400
-        
-        gif_data = io.BytesIO(dl_response.content)
-        
-        try:
-            img = Image.open(gif_data)
-            img.load()
-        except Exception as e:
-            logger.error(f"PIL cannot open image: {str(e)}")
-            response = jsonify({'error': f'Invalid image format: {str(e)}', 'success': False})
-            response.headers['Access-Control-Allow-Origin'] = '*'
-            return response, 400
-        
-        frames = []
-        
-        is_animated = hasattr(img, 'n_frames') and img.n_frames > 1
-        
-        if not is_animated:
-            frame = img.convert('RGBA')
-            buffer = io.BytesIO()
-            frame.save(buffer, format='PNG')
-            frame_b64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
-            
-            result = {
-                'success': True,
-                'frame_count': 1,
-                'frames': [frame_b64]
-            }
-            
-            with open(cache_file, 'w') as f:
-                json.dump(result, f)
-            
-            logger.info(f"Static image processed: {gif_url[:50]}...")
-            response = jsonify(result)
-            response.headers['Access-Control-Allow-Origin'] = '*'
-            return response
-        
-        try:
-            for frame_num in range(min(img.n_frames, 100)):
-                img.seek(frame_num)
-                frame = img.convert('RGBA')
-                buffer = io.BytesIO()
-                frame.save(buffer, format='PNG', optimize=True)
-                frame_b64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
-                frames.append(frame_b64)
-        except EOFError:
-            pass
-        except Exception as e:
-            logger.error(f"Error extracting frames: {str(e)}")
-        
-        if len(frames) == 0:
-            response = jsonify({'error': 'No frames extracted', 'success': False})
-            response.headers['Access-Control-Allow-Origin'] = '*'
-            return response, 400
-        
-        result = {
-            'success': True,
-            'frame_count': len(frames),
-            'frames': frames
-        }
-        
-        with open(cache_file, 'w') as f:
-            json.dump(result, f)
-        
-        logger.info(f"Split GIF into {len(frames)} frames: {gif_url[:50]}...")
-        response = jsonify(result)
-        response.headers['Access-Control-Allow-Origin'] = '*'
-        return response
-        
-    except requests.Timeout:
-        logger.error(f"Timeout downloading gif")
-        response = jsonify({'error': 'Timeout downloading gif', 'success': False})
-        response.headers['Access-Control-Allow-Origin'] = '*'
-        return response, 408
+        response = requests.post('https://challenges.cloudflare.com/turnstile/v0/siteverify', data={
+            'secret': TURNSTILE_SECRET_KEY,
+            'response': token,
+            'remoteip': ip
+        })
+        result = response.json()
+        return result.get('success', False)
     except Exception as e:
-        logger.error(f"Error splitting GIF: {str(e)}", exc_info=True)
-        response = jsonify({'error': str(e), 'success': False})
-        response.headers['Access-Control-Allow-Origin'] = '*'
-        return response, 500
+        logger.error(f"Turnstile verification error: {str(e)}")
+        return False
 
 @app.route('/')
 def home():
