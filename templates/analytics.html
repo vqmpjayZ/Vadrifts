@@ -6,7 +6,7 @@
     <title>Analytics Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
@@ -16,224 +16,137 @@
         }
 
         body {
-            font-family: 'Space Grotesk', sans-serif;
-            background: #050508;
-            color: #e0e0e0;
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #0c0c14 0%, #1a1a2e 50%, #0c0c14 100%);
             min-height: 100vh;
+            color: #fff;
             overflow-x: hidden;
         }
 
-        .noise {
+        .bg-grid {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(123, 97, 255, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(59, 130, 246, 0.03) 0%, transparent 50%);
             pointer-events: none;
-            z-index: 1000;
-            opacity: 0.03;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-        }
-
-        .glow-orb {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.5;
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        .orb-1 {
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, transparent 70%);
-            top: -200px;
-            left: -200px;
-            animation: orbFloat1 25s ease-in-out infinite;
-        }
-
-        .orb-2 {
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(6, 182, 212, 0.25) 0%, transparent 70%);
-            bottom: -150px;
-            right: -150px;
-            animation: orbFloat2 30s ease-in-out infinite;
-        }
-
-        .orb-3 {
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(236, 72, 153, 0.2) 0%, transparent 70%);
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            animation: orbFloat3 20s ease-in-out infinite;
-        }
-
-        @keyframes orbFloat1 {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(100px, 80px); }
-        }
-
-        @keyframes orbFloat2 {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(-80px, -60px); }
-        }
-
-        @keyframes orbFloat3 {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(1.2); }
+            z-index: 0;
         }
 
         .container {
-            max-width: 1300px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 50px 30px;
+            padding: 60px 24px;
             position: relative;
             z-index: 1;
         }
 
         .header {
-            margin-bottom: 50px;
-        }
-
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            flex-wrap: wrap;
-            gap: 20px;
+            text-align: center;
+            margin-bottom: 60px;
         }
 
         .header h1 {
-            font-size: 2.8em;
-            font-weight: 700;
-            color: #fff;
-            letter-spacing: -1px;
-            line-height: 1.1;
-        }
-
-        .header h1 span {
-            background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+            font-size: 3.2em;
+            font-weight: 800;
+            letter-spacing: -2px;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #fff 0%, #a78bfa 50%, #60a5fa 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        .status-pill {
-            display: flex;
+        .header .subtitle {
+            font-size: 1.1em;
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: 400;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .status-badge {
+            display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 10px 18px;
+            margin-top: 20px;
+            padding: 8px 16px;
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 50px;
+            border-radius: 100px;
             font-size: 0.85em;
-            color: #888;
-            backdrop-filter: blur(10px);
+            color: rgba(255, 255, 255, 0.5);
         }
 
-        .status-pill .dot {
-            width: 8px;
-            height: 8px;
+        .status-badge .dot {
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
-            background: #10b981;
-            box-shadow: 0 0 10px #10b981;
-            animation: pulse 2s infinite;
+            background: #22c55e;
+            box-shadow: 0 0 8px #22c55e;
+            animation: blink 2s infinite;
         }
 
-        .status-pill.error .dot {
+        .status-badge.error .dot {
             background: #ef4444;
-            box-shadow: 0 0 10px #ef4444;
+            box-shadow: 0 0 8px #ef4444;
             animation: none;
         }
 
-        .status-pill.syncing .dot {
-            background: #f59e0b;
-            box-shadow: 0 0 10px #f59e0b;
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.6; transform: scale(0.9); }
-        }
-
-        .stats-row {
+        .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
+            gap: 16px;
             margin-bottom: 40px;
         }
 
-        @media (max-width: 1000px) {
-            .stats-row { grid-template-columns: repeat(2, 1fr); }
-        }
-
-        @media (max-width: 600px) {
-            .stats-row { grid-template-columns: 1fr; }
-        }
-
         .stat-card {
-            background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.01) 100%);
+            background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 16px;
-            padding: 24px;
+            border-radius: 20px;
+            padding: 28px;
             position: relative;
             overflow: hidden;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .stat-card::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.5), transparent);
+            inset: 0;
+            background: linear-gradient(135deg, rgba(123, 97, 255, 0.1) 0%, transparent 60%);
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.4s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(123, 97, 255, 0.2);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
         }
 
         .stat-card:hover::before {
             opacity: 1;
         }
 
-        .stat-card:hover {
-            border-color: rgba(139, 92, 246, 0.2);
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .stat-card .icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2em;
-            margin-bottom: 16px;
-        }
-
-        .stat-card:nth-child(1) .icon { background: rgba(139, 92, 246, 0.15); }
-        .stat-card:nth-child(2) .icon { background: rgba(6, 182, 212, 0.15); }
-        .stat-card:nth-child(3) .icon { background: rgba(236, 72, 153, 0.15); }
-        .stat-card:nth-child(4) .icon { background: rgba(16, 185, 129, 0.15); }
-
         .stat-card .label {
-            font-size: 0.8em;
-            color: #666;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.35);
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            margin-bottom: 8px;
-            font-weight: 500;
+            margin-bottom: 12px;
         }
 
         .stat-card .value {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 2.2em;
+            font-size: 2.4em;
             font-weight: 700;
             color: #fff;
             line-height: 1;
@@ -241,51 +154,45 @@
         }
 
         .stat-card .sub {
-            font-size: 0.8em;
-            color: #555;
+            font-size: 0.85em;
+            color: rgba(255, 255, 255, 0.3);
         }
 
-        .section {
-            background: linear-gradient(135deg, rgba(255,255,255,0.015) 0%, rgba(255,255,255,0.005) 100%);
+        .card {
+            background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
+            border-radius: 24px;
+            padding: 32px;
+            margin-bottom: 24px;
         }
 
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-
-        .section-title {
-            font-size: 1.3em;
-            font-weight: 600;
+        .card-title {
+            font-size: 1.4em;
+            font-weight: 700;
             color: #fff;
+            margin-bottom: 24px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
-        .section-title::before {
+        .card-title::before {
             content: '';
             width: 4px;
-            height: 20px;
-            background: linear-gradient(180deg, #8b5cf6, #06b6d4);
-            border-radius: 2px;
+            height: 24px;
+            background: linear-gradient(180deg, #7b61ff, #60a5fa);
+            border-radius: 4px;
         }
 
-        .chart-wrapper {
+        .chart-container {
+            height: 320px;
             position: relative;
-            height: 300px;
         }
 
         .script-list {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
 
         .script-row {
@@ -296,180 +203,189 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 16px 20px;
-            background: rgba(255, 255, 255, 0.02);
+            padding: 18px 24px;
+            background: rgba(255, 255, 255, 0.015);
             border: 1px solid rgba(255, 255, 255, 0.03);
-            border-radius: 12px;
+            border-radius: 16px;
             cursor: pointer;
-            transition: all 0.25s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             z-index: 2;
         }
 
-        .script-item:hover {
-            background: rgba(139, 92, 246, 0.08);
-            border-color: rgba(139, 92, 246, 0.2);
+        .script-item:hover,
+        .script-row.active .script-item {
+            background: linear-gradient(135deg, rgba(123, 97, 255, 0.08) 0%, rgba(96, 165, 250, 0.04) 100%);
+            border-color: rgba(123, 97, 255, 0.15);
+            transform: translateX(8px);
+            box-shadow: 0 0 30px -5px rgba(123, 97, 255, 0.2);
         }
 
-        .script-row:hover .script-item {
-            border-radius: 12px 12px 0 0;
+        .script-row.active .script-item {
+            border-radius: 16px 16px 0 0;
+            border-bottom-color: transparent;
         }
 
-        .script-info {
+        .script-left {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 16px;
         }
 
         .script-rank {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75em;
-            color: #555;
-            width: 24px;
+            font-size: 0.8em;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.25);
+            min-width: 28px;
         }
 
         .script-name {
+            font-size: 1em;
             font-weight: 500;
-            color: #e0e0e0;
-            font-size: 0.95em;
+            color: rgba(255, 255, 255, 0.85);
         }
 
-        .script-arrow {
-            color: #555;
-            font-size: 0.7em;
-            transition: transform 0.3s ease, color 0.3s ease;
-        }
-
-        .script-row:hover .script-arrow {
-            transform: rotate(180deg);
-            color: #8b5cf6;
+        .script-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
 
         .script-count {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.9em;
+            font-size: 0.95em;
             font-weight: 600;
-            color: #8b5cf6;
-            background: rgba(139, 92, 246, 0.1);
-            padding: 6px 14px;
-            border-radius: 8px;
+            color: #a78bfa;
+            background: rgba(167, 139, 250, 0.1);
+            padding: 6px 16px;
+            border-radius: 10px;
+        }
+
+        .script-chevron {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .script-chevron svg {
+            width: 16px;
+            height: 16px;
+            transition: transform 0.3s ease;
+        }
+
+        .script-item:hover .script-chevron,
+        .script-row.active .script-chevron {
+            color: #a78bfa;
+        }
+
+        .script-row.active .script-chevron svg {
+            transform: rotate(180deg);
         }
 
         .script-dropdown {
             max-height: 0;
             overflow: hidden;
-            background: rgba(10, 10, 15, 0.95);
+            background: rgba(10, 10, 20, 0.8);
             border: 1px solid transparent;
             border-top: none;
-            border-radius: 0 0 12px 12px;
+            border-radius: 0 0 16px 16px;
             margin-top: -1px;
-            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
             opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .script-row:hover .script-dropdown {
-            max-height: 280px;
-            padding: 20px;
-            border-color: rgba(139, 92, 246, 0.2);
+        .script-row.active .script-dropdown {
+            max-height: 400px;
+            padding: 24px;
+            border-color: rgba(123, 97, 255, 0.15);
+            border-top-color: rgba(123, 97, 255, 0.08);
             opacity: 1;
+            box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.4);
         }
 
-        .dropdown-content {
-            display: flex;
-            gap: 20px;
-            align-items: flex-start;
+        .dropdown-inner {
+            display: grid;
+            grid-template-columns: 1fr 220px;
+            gap: 24px;
+            align-items: start;
         }
 
         .dropdown-chart {
-            flex: 1;
-            height: 120px;
+            height: 180px;
         }
 
         .dropdown-stats {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            min-width: 200px;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
         }
 
         .mini-stat {
             background: rgba(255, 255, 255, 0.03);
-            padding: 12px;
-            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 16px;
+            border-radius: 12px;
             text-align: center;
         }
 
         .mini-stat .num {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 1.1em;
+            font-size: 1.3em;
             font-weight: 700;
-            color: #06b6d4;
+            color: #60a5fa;
+            margin-bottom: 4px;
         }
 
         .mini-stat .txt {
-            font-size: 0.65em;
-            color: #555;
+            font-size: 0.7em;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.3);
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-top: 4px;
         }
 
-        .btn-group {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-top: 20px;
-        }
-
-        .btn {
-            padding: 14px 28px;
-            border-radius: 12px;
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 0.9em;
+        .refresh-btn {
+            display: block;
+            margin: 40px auto 0;
+            padding: 16px 48px;
+            background: linear-gradient(135deg, #7b61ff 0%, #60a5fa 100%);
+            border: none;
+            border-radius: 14px;
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1em;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.25s ease;
-            border: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px -8px rgba(123, 97, 255, 0.5);
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-            color: #fff;
-            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
-        }
-
-        .btn-primary:hover {
+        .refresh-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.4);
+            box-shadow: 0 12px 32px -8px rgba(123, 97, 255, 0.6);
         }
 
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.03);
-            color: #888;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.06);
-            color: #fff;
-            border-color: rgba(255, 255, 255, 0.1);
+        .refresh-btn:active {
+            transform: translateY(0);
         }
 
         .toast {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
+            bottom: 24px;
+            right: 24px;
             padding: 16px 24px;
-            background: rgba(15, 15, 20, 0.95);
-            border: 1px solid rgba(139, 92, 246, 0.3);
-            border-radius: 12px;
-            color: #e0e0e0;
+            background: rgba(15, 15, 25, 0.95);
+            border: 1px solid rgba(123, 97, 255, 0.2);
+            border-radius: 14px;
+            color: #fff;
             font-size: 0.9em;
             backdrop-filter: blur(20px);
             transform: translateY(100px);
             opacity: 0;
             transition: all 0.3s ease;
-            z-index: 1001;
+            z-index: 1000;
         }
 
         .toast.show {
@@ -477,106 +393,136 @@
             opacity: 1;
         }
 
-        .toast.success { border-color: rgba(16, 185, 129, 0.5); }
-        .toast.error { border-color: rgba(239, 68, 68, 0.5); }
-
         .loading {
             text-align: center;
-            padding: 60px;
-            color: #555;
-            font-size: 1.1em;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.3);
         }
 
-        .loading::after {
-            content: '';
-            animation: dots 1.5s infinite;
+        .loading-spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid rgba(123, 97, 255, 0.2);
+            border-top-color: #7b61ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
         }
 
-        @keyframes dots {
-            0%, 20% { content: '.'; }
-            40% { content: '..'; }
-            60%, 100% { content: '...'; }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
-        .empty-state {
+        .empty {
             text-align: center;
             padding: 40px;
-            color: #444;
+            color: rgba(255, 255, 255, 0.25);
         }
 
-        @media (max-width: 768px) {
-            .container { padding: 30px 20px; }
-            .header h1 { font-size: 2em; }
-            .section { padding: 20px; }
-            .dropdown-content { flex-direction: column; }
-            .dropdown-stats { min-width: 100%; }
-            .btn-group { flex-direction: column; }
-            .btn { width: 100%; text-align: center; }
+        @media (max-width: 900px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .dropdown-inner {
+                grid-template-columns: 1fr;
+            }
+            .dropdown-stats {
+                order: -1;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 40px 16px;
+            }
+            .header h1 {
+                font-size: 2.2em;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            .stat-card {
+                padding: 20px;
+            }
+            .stat-card .value {
+                font-size: 2em;
+            }
+            .card {
+                padding: 20px;
+                border-radius: 18px;
+            }
+            .script-item {
+                padding: 14px 18px;
+            }
+            .script-row.active .script-dropdown {
+                padding: 16px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="noise"></div>
-    <div class="glow-orb orb-1"></div>
-    <div class="glow-orb orb-2"></div>
-    <div class="glow-orb orb-3"></div>
+    <div class="bg-grid"></div>
 
     <div class="container">
         <div class="header">
-            <div class="header-top">
-                <h1>Analytics <span>Dashboard</span></h1>
-                <div class="status-pill" id="syncStatus">
-                    <span class="dot"></span>
-                    <span class="text">Connecting</span>
-                </div>
+            <h1>Analytics</h1>
+            <div class="subtitle">Execution Metrics</div>
+            <div class="status-badge" id="syncStatus">
+                <span class="dot"></span>
+                <span class="text">Connecting</span>
             </div>
         </div>
 
-        <div class="stats-row" id="statsGrid">
-            <div class="loading">Loading</div>
+        <div class="stats-grid" id="statsGrid">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                Loading
+            </div>
         </div>
 
-        <div class="section">
-            <div class="section-header">
-                <div class="section-title">Execution Trend</div>
-            </div>
-            <div class="chart-wrapper">
+        <div class="card">
+            <div class="card-title">Execution Trend</div>
+            <div class="chart-container">
                 <canvas id="executionsChart"></canvas>
             </div>
         </div>
 
-        <div class="section">
-            <div class="section-header">
-                <div class="section-title">Scripts</div>
-            </div>
+        <div class="card">
+            <div class="card-title">Scripts</div>
             <div class="script-list" id="scriptList">
-                <div class="loading">Loading</div>
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    Loading
+                </div>
             </div>
         </div>
 
-        <div class="btn-group">
-            <button class="btn btn-primary" onclick="loadAnalytics(true)">Refresh</button>
-            <button class="btn btn-secondary" onclick="forceSyncToCloud()">Sync to Cloud</button>
-        </div>
+        <button class="refresh-btn" onclick="loadAnalytics(true)">Refresh Data</button>
     </div>
 
     <div class="toast" id="toast"></div>
 
     <script>
-        let chart;
+        let mainChart;
         let currentData = null;
         let chartInstances = {};
+        let isMobile = window.innerWidth <= 900;
 
-        function showToast(message, type = 'success') {
+        window.addEventListener('resize', () => {
+            isMobile = window.innerWidth <= 900;
+        });
+
+        function showToast(message) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
-            toast.className = `toast ${type} show`;
+            toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
         function updateSyncStatus(status, message) {
             const el = document.getElementById('syncStatus');
-            el.className = `status-pill ${status}`;
+            el.className = `status-badge ${status}`;
             el.querySelector('.text').textContent = message;
         }
 
@@ -601,9 +547,9 @@
             const chartKey = script.replace(/[^a-zA-Z0-9]/g, '_');
             if (chartInstances[chartKey]) chartInstances[chartKey].destroy();
 
-            const gradient = ctx.createLinearGradient(0, 0, 0, 120);
-            gradient.addColorStop(0, 'rgba(6, 182, 212, 0.3)');
-            gradient.addColorStop(1, 'rgba(6, 182, 212, 0)');
+            const gradient = ctx.createLinearGradient(0, 0, 0, 180);
+            gradient.addColorStop(0, 'rgba(123, 97, 255, 0.3)');
+            gradient.addColorStop(1, 'rgba(123, 97, 255, 0)');
 
             chartInstances[chartKey] = new Chart(ctx, {
                 type: 'line',
@@ -611,23 +557,46 @@
                     labels: labels.map(date => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
                     datasets: [{
                         data: data,
-                        borderColor: '#06b6d4',
+                        borderColor: '#7b61ff',
                         backgroundColor: gradient,
                         tension: 0.4,
                         fill: true,
-                        pointRadius: 0,
-                        pointHoverRadius: 4,
-                        borderWidth: 2
+                        pointBackgroundColor: '#7b61ff',
+                        pointBorderColor: 'rgba(10, 10, 20, 0.9)',
+                        pointBorderWidth: 2,
+                        pointRadius: 3,
+                        pointHoverRadius: 6,
+                        borderWidth: 2.5
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(10, 10, 20, 0.95)',
+                            padding: 12,
+                            titleColor: '#fff',
+                            bodyColor: '#a78bfa',
+                            borderColor: 'rgba(123, 97, 255, 0.3)',
+                            borderWidth: 1,
+                            cornerRadius: 10,
+                            displayColors: false
+                        }
+                    },
                     scales: {
-                        y: { display: false },
-                        x: { display: false }
-                    }
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255, 255, 255, 0.03)', drawBorder: false },
+                            ticks: { color: 'rgba(255, 255, 255, 0.25)', font: { size: 10 } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: 'rgba(255, 255, 255, 0.25)', maxRotation: 0, font: { size: 9 }, maxTicksLimit: 7 }
+                        }
+                    },
+                    interaction: { intersect: false, mode: 'index' }
                 }
             });
 
@@ -640,44 +609,57 @@
             if (statsEl) {
                 statsEl.innerHTML = `
                     <div class="mini-stat"><div class="num">${total.toLocaleString()}</div><div class="txt">Total</div></div>
-                    <div class="mini-stat"><div class="num">${avg.toLocaleString()}</div><div class="txt">Avg/Day</div></div>
+                    <div class="mini-stat"><div class="num">${avg.toLocaleString()}</div><div class="txt">Daily Avg</div></div>
                     <div class="mini-stat"><div class="num">${max.toLocaleString()}</div><div class="txt">Peak</div></div>
-                    <div class="mini-stat"><div class="num">${min.toLocaleString()}</div><div class="txt">Low</div></div>
+                    <div class="mini-stat"><div class="num">${min.toLocaleString()}</div><div class="txt">Lowest</div></div>
                 `;
             }
         }
 
-        function initScriptCharts() {
-            if (!currentData || !currentData.script_daily_data) return;
+        function setupScriptInteractions() {
             document.querySelectorAll('.script-row').forEach(row => {
-                const script = row.dataset.script;
-                const dropdown = row.querySelector('.script-dropdown');
-                if (currentData.script_daily_data[script]) {
-                    createScriptChart(script, dropdown, currentData.script_daily_data[script], currentData.chart_labels);
+                const item = row.querySelector('.script-item');
+                let hoverTimeout;
+
+                if (isMobile) {
+                    item.addEventListener('click', () => {
+                        const wasActive = row.classList.contains('active');
+                        document.querySelectorAll('.script-row.active').forEach(r => r.classList.remove('active'));
+                        if (!wasActive) {
+                            row.classList.add('active');
+                            initChartForRow(row);
+                        }
+                    });
+                } else {
+                    row.addEventListener('mouseenter', () => {
+                        hoverTimeout = setTimeout(() => {
+                            document.querySelectorAll('.script-row.active').forEach(r => r.classList.remove('active'));
+                            row.classList.add('active');
+                            initChartForRow(row);
+                        }, 100);
+                    });
+
+                    row.addEventListener('mouseleave', () => {
+                        clearTimeout(hoverTimeout);
+                        row.classList.remove('active');
+                    });
                 }
             });
         }
 
-        async function forceSyncToCloud() {
-            updateSyncStatus('syncing', 'Syncing');
-            try {
-                const response = await fetch('/analytics-sync', { method: 'POST' });
-                const result = await response.json();
-                if (result.success) {
-                    updateSyncStatus('', 'Synced');
-                    showToast('Synced to cloud');
-                } else {
-                    throw new Error(result.error || 'Sync failed');
-                }
-            } catch (error) {
-                updateSyncStatus('error', 'Failed');
-                showToast('Sync failed: ' + error.message, 'error');
+        function initChartForRow(row) {
+            const script = row.dataset.script;
+            const dropdown = row.querySelector('.script-dropdown');
+            if (currentData && currentData.script_daily_data && currentData.script_daily_data[script]) {
+                setTimeout(() => {
+                    createScriptChart(script, dropdown, currentData.script_daily_data[script], currentData.chart_labels);
+                }, 50);
             }
         }
 
         async function loadAnalytics(forceRefresh = false) {
             try {
-                updateSyncStatus('syncing', 'Loading');
+                updateSyncStatus('', 'Loading');
                 const response = await fetch('/analytics-data');
                 const data = await response.json();
 
@@ -687,37 +669,33 @@
 
                 currentData = data;
                 updateSyncStatus('', 'Live');
-                if (forceRefresh) showToast('Refreshed');
+                if (forceRefresh) showToast('Data refreshed');
                 renderData(data);
             } catch (error) {
                 console.error('Error:', error);
                 updateSyncStatus('error', 'Offline');
-                document.getElementById('statsGrid').innerHTML = '<div class="loading">Connection failed</div>';
+                document.getElementById('statsGrid').innerHTML = '<div class="loading">Failed to connect</div>';
             }
         }
 
         function renderData(data) {
             document.getElementById('statsGrid').innerHTML = `
                 <div class="stat-card">
-                    <div class="icon">📊</div>
                     <div class="label">Total Executions</div>
                     <div class="value">${data.total_executions.toLocaleString()}</div>
                     <div class="sub">All time</div>
                 </div>
                 <div class="stat-card">
-                    <div class="icon">📅</div>
                     <div class="label">This Week</div>
                     <div class="value">${data.week_executions.toLocaleString()}</div>
                     <div class="sub">${data.unique_users_week} users</div>
                 </div>
                 <div class="stat-card">
-                    <div class="icon">📈</div>
                     <div class="label">This Month</div>
                     <div class="value">${data.month_executions.toLocaleString()}</div>
                     <div class="sub">${data.unique_users_month} users</div>
                 </div>
                 <div class="stat-card">
-                    <div class="icon">⚡</div>
                     <div class="label">Daily Average</div>
                     <div class="value">${Math.round(data.month_executions / 30).toLocaleString()}</div>
                     <div class="sub">Last 30 days</div>
@@ -730,15 +708,21 @@
                 scriptHtml += `
                     <div class="script-row" data-script="${script}">
                         <div class="script-item">
-                            <div class="script-info">
+                            <div class="script-left">
                                 <span class="script-rank">#${index + 1}</span>
                                 <span class="script-name">${script}</span>
-                                <span class="script-arrow">▼</span>
                             </div>
-                            <span class="script-count">${count.toLocaleString()}</span>
+                            <div class="script-right">
+                                <span class="script-count">${count.toLocaleString()}</span>
+                                <span class="script-chevron">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </span>
+                            </div>
                         </div>
                         <div class="script-dropdown">
-                            <div class="dropdown-content">
+                            <div class="dropdown-inner">
                                 <div class="dropdown-chart"><canvas></canvas></div>
                                 <div class="dropdown-stats"></div>
                             </div>
@@ -746,34 +730,36 @@
                     </div>
                 `;
             });
-            document.getElementById('scriptList').innerHTML = scriptHtml || '<div class="empty-state">No scripts yet</div>';
+            document.getElementById('scriptList').innerHTML = scriptHtml || '<div class="empty">No scripts yet</div>';
 
-            setTimeout(initScriptCharts, 100);
+            setupScriptInteractions();
 
-            if (chart) chart.destroy();
+            if (mainChart) mainChart.destroy();
 
             const ctx = document.getElementById('executionsChart').getContext('2d');
-            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-            gradient.addColorStop(0, 'rgba(139, 92, 246, 0.25)');
-            gradient.addColorStop(1, 'rgba(139, 92, 246, 0)');
+            const gradient = ctx.createLinearGradient(0, 0, 0, 320);
+            gradient.addColorStop(0, 'rgba(123, 97, 255, 0.35)');
+            gradient.addColorStop(0.5, 'rgba(96, 165, 250, 0.15)');
+            gradient.addColorStop(1, 'rgba(96, 165, 250, 0)');
 
-            chart = new Chart(ctx, {
+            mainChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: data.chart_labels.map(date => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
                     datasets: [{
                         label: 'Executions',
                         data: data.chart_data,
-                        borderColor: '#8b5cf6',
+                        borderColor: '#7b61ff',
                         backgroundColor: gradient,
                         tension: 0.4,
                         fill: true,
-                        pointBackgroundColor: '#8b5cf6',
-                        pointBorderColor: '#0a0a0f',
-                        pointBorderWidth: 2,
+                        pointBackgroundColor: '#7b61ff',
+                        pointBorderColor: '#0c0c14',
+                        pointBorderWidth: 3,
                         pointRadius: 4,
-                        pointHoverRadius: 7,
-                        borderWidth: 2.5
+                        pointHoverRadius: 8,
+                        pointHoverBackgroundColor: '#60a5fa',
+                        borderWidth: 3
                     }]
                 },
                 options: {
@@ -782,27 +768,27 @@
                     plugins: {
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: 'rgba(10, 10, 15, 0.95)',
-                            padding: 12,
+                            backgroundColor: 'rgba(10, 10, 20, 0.95)',
+                            padding: 14,
                             titleColor: '#fff',
-                            bodyColor: '#8b5cf6',
-                            borderColor: 'rgba(139, 92, 246, 0.3)',
+                            titleFont: { size: 13, weight: '600' },
+                            bodyColor: '#a78bfa',
+                            bodyFont: { size: 18, weight: '700' },
+                            borderColor: 'rgba(123, 97, 255, 0.3)',
                             borderWidth: 1,
-                            cornerRadius: 8,
-                            displayColors: false,
-                            titleFont: { size: 12, weight: '600' },
-                            bodyFont: { size: 14, weight: '700', family: 'JetBrains Mono' }
+                            cornerRadius: 12,
+                            displayColors: false
                         }
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
                             grid: { color: 'rgba(255, 255, 255, 0.03)', drawBorder: false },
-                            ticks: { color: '#444', font: { size: 11 } }
+                            ticks: { color: 'rgba(255, 255, 255, 0.3)', font: { size: 11, weight: '500' } }
                         },
                         x: {
                             grid: { display: false },
-                            ticks: { color: '#444', maxRotation: 45, minRotation: 45, font: { size: 10 } }
+                            ticks: { color: 'rgba(255, 255, 255, 0.3)', maxRotation: 45, minRotation: 45, font: { size: 10, weight: '500' } }
                         }
                     },
                     interaction: { intersect: false, mode: 'index' }
