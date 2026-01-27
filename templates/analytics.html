@@ -129,7 +129,7 @@
             text-transform: uppercase;
         }
 
-        .cache-status {
+        .sync-status {
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -141,14 +141,25 @@
             color: #888;
         }
 
-        .cache-status .dot {
+        .sync-status .dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
             background: #43e97b;
+            animation: pulse-dot 2s infinite;
         }
 
-        .cache-status.stale .dot {
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .sync-status.error .dot {
+            background: #ed4c67;
+            animation: none;
+        }
+
+        .sync-status.syncing .dot {
             background: #f6944f;
         }
 
@@ -289,11 +300,9 @@
             -webkit-text-fill-color: transparent;
         }
 
-        .script-breakdown .hint {
-            color: #555;
-            font-size: 0.9em;
-            margin-bottom: 20px;
-            font-style: italic;
+        .script-item-wrapper {
+            position: relative;
+            margin-bottom: 15px;
         }
 
         .script-item {
@@ -301,7 +310,6 @@
             justify-content: space-between;
             align-items: center;
             padding: 20px;
-            margin-bottom: 15px;
             background: rgba(255, 255, 255, 0.02);
             border-radius: 15px;
             border-left: 4px solid #667eea;
@@ -375,30 +383,36 @@
             box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
         }
 
-        /* Script detail chart popup */
         .script-detail-chart {
-            display: none;
-            margin-top: 15px;
-            padding: 20px;
+            max-height: 0;
+            overflow: hidden;
+            margin-top: 0;
+            padding: 0 20px;
             background: rgba(10, 10, 15, 0.9);
-            border-radius: 15px;
-            border: 1px solid rgba(102, 126, 234, 0.3);
-            animation: slideDown 0.3s ease;
+            border-radius: 0 0 15px 15px;
+            border: 1px solid transparent;
+            border-top: none;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
         }
 
+        .script-item-wrapper:hover .script-detail-chart,
         .script-detail-chart.show {
-            display: block;
+            max-height: 350px;
+            padding: 20px;
+            margin-top: -5px;
+            border-color: rgba(102, 126, 234, 0.3);
+            opacity: 1;
         }
 
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .script-item-wrapper:hover .script-item {
+            border-left-color: #f093fb;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 15px 15px 0 0;
+        }
+
+        .script-item-wrapper:hover .script-item .expand-icon {
+            transform: rotate(180deg);
         }
 
         .script-detail-chart h4 {
@@ -409,12 +423,12 @@
         }
 
         .script-detail-chart canvas {
-            max-height: 200px;
+            max-height: 150px;
         }
 
         .script-chart-stats {
             display: flex;
-            gap: 20px;
+            gap: 15px;
             margin-top: 15px;
             flex-wrap: wrap;
         }
@@ -423,17 +437,19 @@
             background: rgba(255, 255, 255, 0.05);
             padding: 10px 15px;
             border-radius: 10px;
+            flex: 1;
+            min-width: 80px;
         }
 
         .script-chart-stat .label {
-            font-size: 0.75em;
+            font-size: 0.7em;
             color: #666;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
 
         .script-chart-stat .value {
-            font-size: 1.2em;
+            font-size: 1.1em;
             font-weight: 700;
             color: #667eea;
         }
@@ -448,8 +464,6 @@
             font-size: 1.1em;
             font-weight: 700;
             transition: all 0.3s ease;
-            margin: 30px auto;
-            display: block;
             box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
             position: relative;
             overflow: hidden;
@@ -525,7 +539,6 @@
             50% { opacity: 0.5; }
         }
 
-        /* Toast notification */
         .toast {
             position: fixed;
             bottom: 30px;
@@ -571,6 +584,15 @@
                 flex-direction: column;
                 align-items: center;
             }
+
+            .script-chart-stats {
+                gap: 10px;
+            }
+
+            .script-chart-stat {
+                min-width: 70px;
+                padding: 8px 10px;
+            }
         }
     </style>
 </head>
@@ -586,9 +608,9 @@
         <div class="header">
             <h1>Analytics Dashboard</h1>
             <p>Execution Metrics</p>
-            <div class="cache-status" id="cacheStatus">
+            <div class="sync-status" id="syncStatus">
                 <span class="dot"></span>
-                <span class="text">Checking cache...</span>
+                <span class="text">Connecting...</span>
             </div>
         </div>
 
@@ -603,7 +625,6 @@
 
         <div class="script-breakdown">
             <h2>Script Breakdown</h2>
-            <p class="hint">👆 Click on a script to view its individual execution trend</p>
             <div id="scriptList"></div>
         </div>
 
@@ -611,8 +632,7 @@
             <button class="refresh-btn" onclick="loadAnalytics(true)">
                 <span style="position: relative; z-index: 1;">Refresh Data</span>
             </button>
-            <button class="secondary-btn" onclick="exportData()">📥 Export Data</button>
-            <button class="secondary-btn" onclick="clearCache()">🗑️ Clear Cache</button>
+            <button class="secondary-btn" onclick="forceSyncToCloud()">☁️ Sync to Cloud</button>
         </div>
     </div>
 
@@ -622,10 +642,7 @@
         let chart;
         let scriptCharts = {};
         let currentData = null;
-        let activeScript = null;
-
-        const CACHE_KEY = 'analytics_data';
-        const CACHE_DURATION = 1000 * 60 * 60; // 1 hour cache
+        let chartInstances = {};
 
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
@@ -636,80 +653,10 @@
             }, 3000);
         }
 
-        function saveToCache(data) {
-            const cacheData = {
-                data: data,
-                timestamp: Date.now(),
-                month: new Date().toISOString().slice(0, 7)
-            };
-            
-            let monthlyData = JSON.parse(localStorage.getItem('analytics_monthly') || '{}');
-            monthlyData[cacheData.month] = cacheData;
-            localStorage.setItem('analytics_monthly', JSON.stringify(monthlyData));
-            
-            localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
-            updateCacheStatus(true, new Date());
-        }
-
-        function loadFromCache() {
-            const cached = localStorage.getItem(CACHE_KEY);
-            if (cached) {
-                const cacheData = JSON.parse(cached);
-                const age = Date.now() - cacheData.timestamp;
-                const isStale = age > CACHE_DURATION;
-                updateCacheStatus(!isStale, new Date(cacheData.timestamp));
-                return { data: cacheData.data, isStale };
-            }
-            return null;
-        }
-
-        // Update cache status indicator
-        function updateCacheStatus(fresh, timestamp) {
-            const status = document.getElementById('cacheStatus');
-            const timeStr = timestamp.toLocaleTimeString();
-            if (fresh) {
-                status.className = 'cache-status';
-                status.innerHTML = `<span class="dot"></span><span class="text">Data cached at ${timeStr}</span>`;
-            } else {
-                status.className = 'cache-status stale';
-                status.innerHTML = `<span class="dot"></span><span class="text">Stale cache from ${timeStr} - refreshing...</span>`;
-            }
-        }
-
-        function exportData() {
-            const monthlyData = localStorage.getItem('analytics_monthly');
-            if (monthlyData) {
-                const blob = new Blob([monthlyData], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `analytics_backup_${new Date().toISOString().slice(0, 10)}.json`;
-                a.click();
-                URL.revokeObjectURL(url);
-                showToast('Data exported successfully!');
-            } else {
-                showToast('No data to export', 'error');
-            }
-        }
-
-        function clearCache() {
-            if (confirm('Are you sure you want to clear all cached data?')) {
-                localStorage.removeItem(CACHE_KEY);
-                localStorage.removeItem('analytics_monthly');
-                showToast('Cache cleared');
-                loadAnalytics(true);
-            }
-        }
-
-        function importData(jsonString) {
-            try {
-                const data = JSON.parse(jsonString);
-                localStorage.setItem('analytics_monthly', JSON.stringify(data));
-                showToast('Data imported successfully!');
-                loadAnalytics();
-            } catch (e) {
-                showToast('Invalid data format', 'error');
-            }
+        function updateSyncStatus(status, message) {
+            const el = document.getElementById('syncStatus');
+            el.className = `sync-status ${status}`;
+            el.querySelector('.text').textContent = message;
         }
 
         function generateScriptDailyData(scriptBreakdown, totalDailyData, chartLabels) {
@@ -728,22 +675,20 @@
             return scriptDailyData;
         }
 
-        function createScriptChart(script, containerId, data, labels) {
-            const container = document.getElementById(containerId);
-            if (!container) return;
-            
+        function createScriptChart(script, container, data, labels) {
             const canvas = container.querySelector('canvas');
             const ctx = canvas.getContext('2d');
-
-            if (scriptCharts[script]) {
-                scriptCharts[script].destroy();
+            
+            const chartKey = script.replace(/[^a-zA-Z0-9]/g, '_');
+            if (chartInstances[chartKey]) {
+                chartInstances[chartKey].destroy();
             }
             
-            const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+            const gradient = ctx.createLinearGradient(0, 0, 0, 150);
             gradient.addColorStop(0, 'rgba(240, 147, 251, 0.4)');
             gradient.addColorStop(1, 'rgba(240, 147, 251, 0)');
             
-            scriptCharts[script] = new Chart(ctx, {
+            chartInstances[chartKey] = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels.map(date => {
@@ -760,8 +705,8 @@
                         pointBackgroundColor: '#f093fb',
                         pointBorderColor: '#fff',
                         pointBorderWidth: 2,
-                        pointRadius: 3,
-                        pointHoverRadius: 6,
+                        pointRadius: 2,
+                        pointHoverRadius: 5,
                         borderWidth: 2
                     }]
                 },
@@ -772,7 +717,7 @@
                         legend: { display: false },
                         tooltip: {
                             backgroundColor: 'rgba(10, 10, 15, 0.95)',
-                            padding: 12,
+                            padding: 10,
                             titleColor: '#fff',
                             bodyColor: '#f093fb',
                             borderColor: '#f093fb',
@@ -784,20 +729,20 @@
                         y: {
                             beginAtZero: true,
                             grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                            ticks: { color: '#666', font: { size: 10 } }
+                            ticks: { color: '#666', font: { size: 9 } }
                         },
                         x: {
                             grid: { display: false },
                             ticks: { 
                                 color: '#666', 
-                                font: { size: 9 },
-                                maxTicksLimit: 7
+                                font: { size: 8 },
+                                maxTicksLimit: 6
                             }
                         }
                     }
                 }
             });
-
+            
             const max = Math.max(...data);
             const min = Math.min(...data);
             const avg = Math.round(data.reduce((a, b) => a + b, 0) / data.length);
@@ -805,11 +750,11 @@
             
             container.querySelector('.script-chart-stats').innerHTML = `
                 <div class="script-chart-stat">
-                    <div class="label">Total (30d)</div>
+                    <div class="label">Total</div>
                     <div class="value">${total.toLocaleString()}</div>
                 </div>
                 <div class="script-chart-stat">
-                    <div class="label">Daily Avg</div>
+                    <div class="label">Avg</div>
                     <div class="value">${avg.toLocaleString()}</div>
                 </div>
                 <div class="script-chart-stat">
@@ -817,54 +762,54 @@
                     <div class="value">${max.toLocaleString()}</div>
                 </div>
                 <div class="script-chart-stat">
-                    <div class="label">Lowest</div>
+                    <div class="label">Low</div>
                     <div class="value">${min.toLocaleString()}</div>
                 </div>
             `;
         }
 
-        function toggleScriptChart(script, element) {
-            const allItems = document.querySelectorAll('.script-item');
-            const allCharts = document.querySelectorAll('.script-detail-chart');
-            const chartId = `chart-${script.replace(/[^a-zA-Z0-9]/g, '_')}`;
-            const chartContainer = document.getElementById(chartId);
+        function initScriptCharts() {
+            if (!currentData || !currentData.script_daily_data) return;
             
-            if (activeScript === script) {
-                element.classList.remove('active');
-                chartContainer.classList.remove('show');
-                activeScript = null;
-            } else {
-                allItems.forEach(item => item.classList.remove('active'));
-                allCharts.forEach(chart => chart.classList.remove('show'));
-
-                element.classList.add('active');
-                chartContainer.classList.add('show');
-                activeScript = script;
-
-                if (currentData && currentData.script_daily_data && currentData.script_daily_data[script]) {
+            document.querySelectorAll('.script-item-wrapper').forEach(wrapper => {
+                const script = wrapper.dataset.script;
+                const chartContainer = wrapper.querySelector('.script-detail-chart');
+                
+                if (currentData.script_daily_data[script]) {
                     createScriptChart(
-                        script, 
-                        chartId, 
-                        currentData.script_daily_data[script], 
+                        script,
+                        chartContainer,
+                        currentData.script_daily_data[script],
                         currentData.chart_labels
                     );
                 }
+            });
+        }
+
+        async function forceSyncToCloud() {
+            updateSyncStatus('syncing', 'Syncing to cloud...');
+            try {
+                const response = await fetch('/analytics-sync', { method: 'POST' });
+                const result = await response.json();
+                if (result.success) {
+                    updateSyncStatus('', 'Synced to cloud');
+                    showToast('Data synced to cloud!');
+                } else {
+                    throw new Error(result.error || 'Sync failed');
+                }
+            } catch (error) {
+                updateSyncStatus('error', 'Sync failed');
+                showToast('Failed to sync: ' + error.message, 'error');
             }
         }
 
         async function loadAnalytics(forceRefresh = false) {
             try {
-                if (!forceRefresh) {
-                    const cached = loadFromCache();
-                    if (cached && !cached.isStale) {
-                        renderData(cached.data);
-                        return;
-                    }
-                }
-
+                updateSyncStatus('syncing', 'Loading...');
+                
                 const response = await fetch('/analytics-data');
                 const data = await response.json();
-
+                
                 if (!data.script_daily_data && data.script_breakdown && data.chart_data) {
                     data.script_daily_data = generateScriptDailyData(
                         data.script_breakdown, 
@@ -872,27 +817,23 @@
                         data.chart_labels
                     );
                 }
-
-                saveToCache(data);
-                showToast('Data refreshed from server');
+                
+                currentData = data;
+                updateSyncStatus('', 'Connected');
+                
+                if (forceRefresh) {
+                    showToast('Data refreshed!');
+                }
                 
                 renderData(data);
             } catch (error) {
                 console.error('Error loading analytics:', error);
-
-                const cached = loadFromCache();
-                if (cached) {
-                    showToast('Using cached data (server unavailable)', 'error');
-                    renderData(cached.data);
-                } else {
-                    document.getElementById('statsGrid').innerHTML = '<div class="loading">Error loading data. Please refresh.</div>';
-                }
+                updateSyncStatus('error', 'Connection failed');
+                document.getElementById('statsGrid').innerHTML = '<div class="loading">Error loading data. Please refresh.</div>';
             }
         }
 
         function renderData(data) {
-            currentData = data;
-
             document.getElementById('statsGrid').innerHTML = `
                 <div class="stat-card">
                     <h3>Total Executions</h3>
@@ -921,23 +862,26 @@
             for (const [script, count] of scripts) {
                 const chartId = `chart-${script.replace(/[^a-zA-Z0-9]/g, '_')}`;
                 scriptHtml += `
-                    <div class="script-item" onclick="toggleScriptChart('${script}', this)">
-                        <span class="script-name">
-                            <span class="expand-icon">▼</span>
-                            ${script}
-                        </span>
-                        <span class="script-count">${count.toLocaleString()}</span>
-                    </div>
-                    <div class="script-detail-chart" id="${chartId}">
-                        <h4>📊 30-Day Trend for ${script}</h4>
-                        <canvas></canvas>
-                        <div class="script-chart-stats"></div>
+                    <div class="script-item-wrapper" data-script="${script}">
+                        <div class="script-item">
+                            <span class="script-name">
+                                <span class="expand-icon">▼</span>
+                                ${script}
+                            </span>
+                            <span class="script-count">${count.toLocaleString()}</span>
+                        </div>
+                        <div class="script-detail-chart" id="${chartId}">
+                            <h4>📊 30-Day Trend</h4>
+                            <canvas></canvas>
+                            <div class="script-chart-stats"></div>
+                        </div>
                     </div>
                 `;
             }
             document.getElementById('scriptList').innerHTML = scriptHtml || '<p style="color: #666; text-align: center;">No data yet</p>';
 
-            // Main chart
+            setTimeout(initScriptCharts, 100);
+
             if (chart) {
                 chart.destroy();
             }
@@ -1038,7 +982,6 @@
         }
 
         loadAnalytics();
-
         setInterval(() => loadAnalytics(false), 60000);
     </script>
 </body>
