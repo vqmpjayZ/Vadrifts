@@ -42,6 +42,79 @@ TURNSTILE_SECRET_KEY = os.environ.get("TURNSTILE_SECRET_KEY")
 JSONBIN_API_KEY = os.environ.get("JSONBIN_API_KEY")
 JSONBIN_BIN_ID = os.environ.get("JSONBIN_BIN_ID")
 
+def cleanup_old_logs(logs):
+    if not logs:
+        return []
+    
+    cutoff = datetime.now() - timedelta(days=30)
+    cleaned = []
+    removed = 0
+    
+    for log in logs:
+        try:
+            timestamp = datetime.fromisoformat(log['timestamp'])
+            if timestamp >= cutoff:
+                cleaned.append(log)
+            else:
+                removed += 1
+        except:
+            cleaned.append(log)
+    
+    if removed > 0:
+        logger.info(f"Cleaned up {removed} logs older than 30 days")
+    
+    return cleaned
+
+def load_analytics_from_jsonbin():
+    if not JSONBIN_API_KEY or not JSONBIN_BIN_ID:
+        logger.warning("JSONBin credentials not configured")
+        return None
+    
+    try:
+        response = requests.get(
+            f"https://api.jsonbin.io/v3/b/{JSONBIN_BIN_ID}/latest",
+            headers={"X-Master-Key": JSONBIN_API_KEY}
+        )
+        if response.status_code == 200:
+            data = response.json()
+            record = data.get('record', {})
+            if 'execution_logs' in record:
+                record['execution_logs'] = cleanup_old_logs(record['execution_logs'])
+            return record
+        else:
+            logger.error(f"JSONBin load failed: {response.status_code}")
+            return None
+    except Exception as e:
+        logger.error(f"JSONBin load error: {str(e)}")
+        return None
+
+def save_analytics_to_jsonbin(data):
+    if not JSONBIN_API_KEY or not JSONBIN_BIN_ID:
+        logger.warning("JSONBin credentials not configured")
+        return False
+    
+    if 'execution_logs' in data:
+        data['execution_logs'] = cleanup_old_logs(data['execution_logs'])
+    
+    try:
+        response = requests.put(
+            f"https://api.jsonbin.io/v3/b/{JSONBIN_BIN_ID}",
+            headers={
+                "Content-Type": "application/json",
+                "X-Master-Key": JSONBIN_API_KEY
+            },
+            json=data
+        )
+        if response.status_code == 200:
+            logger.info("Analytics saved to JSONBin")
+            return True
+        else:
+            logger.error(f"JSONBin save failed: {response.status_code}")
+            return False
+    except Exception as e:
+        logger.error(f"JSONBin save error: {str(e)}")
+        return False
+
 def get_client_ip():
     client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
     if client_ip and ',' in client_ip:
@@ -63,52 +136,6 @@ def verify_turnstile(token, ip):
         return result.get('success', False)
     except Exception as e:
         logger.error(f"Turnstile verification error: {str(e)}")
-        return False
-
-def load_analytics_from_jsonbin():
-    if not JSONBIN_API_KEY or not JSONBIN_BIN_ID:
-        logger.warning("JSONBin credentials not configured")
-        return None
-    
-    try:
-        response = requests.get(
-            f"https://api.jsonbin.io/v3/b/{JSONBIN_BIN_ID}/latest",
-            headers={
-                "X-Master-Key": JSONBIN_API_KEY
-            }
-        )
-        if response.status_code == 200:
-            data = response.json()
-            return data.get('record', {})
-        else:
-            logger.error(f"JSONBin load failed: {response.status_code}")
-            return None
-    except Exception as e:
-        logger.error(f"JSONBin load error: {str(e)}")
-        return None
-
-def save_analytics_to_jsonbin(data):
-    if not JSONBIN_API_KEY or not JSONBIN_BIN_ID:
-        logger.warning("JSONBin credentials not configured")
-        return False
-    
-    try:
-        response = requests.put(
-            f"https://api.jsonbin.io/v3/b/{JSONBIN_BIN_ID}",
-            headers={
-                "Content-Type": "application/json",
-                "X-Master-Key": JSONBIN_API_KEY
-            },
-            json=data
-        )
-        if response.status_code == 200:
-            logger.info("Analytics saved to JSONBin")
-            return True
-        else:
-            logger.error(f"JSONBin save failed: {response.status_code}")
-            return False
-    except Exception as e:
-        logger.error(f"JSONBin save error: {str(e)}")
         return False
 
 @app.route('/')
