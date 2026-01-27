@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analytics Dashboard</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Analytics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
@@ -15,215 +13,184 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --bg: #09090b;
+            --card: #18181b;
+            --card-hover: #1f1f23;
+            --border: #27272a;
+            --text: #fafafa;
+            --text-muted: #71717a;
+            --accent: #a855f7;
+            --accent-dim: rgba(168, 85, 247, 0.1);
+        }
+
         body {
-            font-family: 'Outfit', sans-serif;
-            background: linear-gradient(135deg, #0c0c14 0%, #1a1a2e 50%, #0c0c14 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
             min-height: 100vh;
-            color: #fff;
             overflow-x: hidden;
         }
 
-        .bg-grid {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                radial-gradient(circle at 25% 25%, rgba(123, 97, 255, 0.03) 0%, transparent 50%),
-                radial-gradient(circle at 75% 75%, rgba(59, 130, 246, 0.03) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .container {
-            max-width: 1200px;
+        .page {
+            max-width: 1100px;
             margin: 0 auto;
-            padding: 60px 24px;
-            position: relative;
-            z-index: 1;
+            padding: 80px 24px;
         }
 
-        .header {
+        .hero {
             text-align: center;
-            margin-bottom: 60px;
+            margin-bottom: 80px;
         }
 
-        .header h1 {
-            font-size: 3.2em;
-            font-weight: 800;
-            letter-spacing: -2px;
-            margin-bottom: 12px;
-            background: linear-gradient(135deg, #fff 0%, #a78bfa 50%, #60a5fa 100%);
+        .hero h1 {
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            margin-bottom: 16px;
+            background: linear-gradient(to bottom, #fff 0%, #71717a 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        .header .subtitle {
-            font-size: 1.1em;
-            color: rgba(255, 255, 255, 0.4);
+        .hero p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
             font-weight: 400;
-            letter-spacing: 3px;
-            text-transform: uppercase;
         }
 
-        .status-badge {
+        .status {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            margin-top: 20px;
-            padding: 8px 16px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 100px;
-            font-size: 0.85em;
-            color: rgba(255, 255, 255, 0.5);
+            margin-top: 24px;
+            padding: 10px 20px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            font-size: 0.875rem;
+            color: var(--text-muted);
         }
 
-        .status-badge .dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
+        .status .ping {
+            width: 8px;
+            height: 8px;
             background: #22c55e;
-            box-shadow: 0 0 8px #22c55e;
-            animation: blink 2s infinite;
+            border-radius: 50%;
+            animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
         }
 
-        .status-badge.error .dot {
+        @keyframes ping {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .status.error .ping {
             background: #ef4444;
-            box-shadow: 0 0 8px #ef4444;
             animation: none;
         }
 
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
-
-        .stats-grid {
+        .metrics {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 16px;
-            margin-bottom: 40px;
+            margin-bottom: 48px;
         }
 
-        .stat-card {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 20px;
-            padding: 28px;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        .metric {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.2s ease;
         }
 
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(123, 97, 255, 0.1) 0%, transparent 60%);
-            opacity: 0;
-            transition: opacity 0.4s ease;
+        .metric:hover {
+            background: var(--card-hover);
+            border-color: #3f3f46;
+            transform: translateY(-2px);
         }
 
-        .stat-card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(123, 97, 255, 0.2);
-            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
-        }
-
-        .stat-card:hover::before {
-            opacity: 1;
-        }
-
-        .stat-card .label {
-            font-size: 0.75em;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.35);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 12px;
-        }
-
-        .stat-card .value {
-            font-size: 2.4em;
-            font-weight: 700;
-            color: #fff;
+        .metric .num {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
             line-height: 1;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
 
-        .stat-card .sub {
-            font-size: 0.85em;
-            color: rgba(255, 255, 255, 0.3);
+        .metric .label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-weight: 500;
         }
 
-        .card {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 24px;
+        .metric .sub {
+            font-size: 0.75rem;
+            color: #52525b;
+            margin-top: 4px;
+        }
+
+        .section {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
             padding: 32px;
             margin-bottom: 24px;
         }
 
-        .card-title {
-            font-size: 1.4em;
+        .section-title {
+            font-size: 1.25rem;
             font-weight: 700;
-            color: #fff;
             margin-bottom: 24px;
             display: flex;
             align-items: center;
             gap: 12px;
         }
 
-        .card-title::before {
+        .section-title::before {
             content: '';
             width: 4px;
-            height: 24px;
-            background: linear-gradient(180deg, #7b61ff, #60a5fa);
-            border-radius: 4px;
+            height: 20px;
+            background: var(--accent);
+            border-radius: 2px;
         }
 
-        .chart-container {
-            height: 320px;
-            position: relative;
+        .chart-wrap {
+            height: 300px;
         }
 
-        .script-list {
+        .scripts {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
         }
 
         .script-row {
-            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
         }
 
-        .script-item {
+        .script-row:hover,
+        .script-row.open {
+            box-shadow: 0 0 0 1px var(--accent), 0 8px 32px -8px rgba(168, 85, 247, 0.3);
+        }
+
+        .script-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 18px 24px;
-            background: rgba(255, 255, 255, 0.015);
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            border-radius: 16px;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.02);
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            z-index: 2;
+            transition: all 0.2s ease;
         }
 
-        .script-item:hover,
-        .script-row.active .script-item {
-            background: linear-gradient(135deg, rgba(123, 97, 255, 0.08) 0%, rgba(96, 165, 250, 0.04) 100%);
-            border-color: rgba(123, 97, 255, 0.15);
-            transform: translateX(8px);
-            box-shadow: 0 0 30px -5px rgba(123, 97, 255, 0.2);
-        }
-
-        .script-row.active .script-item {
-            border-radius: 16px 16px 0 0;
-            border-bottom-color: transparent;
+        .script-row:hover .script-header,
+        .script-row.open .script-header {
+            background: var(--accent-dim);
         }
 
         .script-left {
@@ -233,16 +200,27 @@
         }
 
         .script-rank {
-            font-size: 0.8em;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.25);
-            min-width: 28px;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .script-row:hover .script-rank,
+        .script-row.open .script-rank {
+            background: var(--accent);
+            color: #fff;
         }
 
         .script-name {
-            font-size: 1em;
-            font-weight: 500;
-            color: rgba(255, 255, 255, 0.85);
+            font-weight: 600;
+            font-size: 0.95rem;
         }
 
         .script-right {
@@ -252,161 +230,137 @@
         }
 
         .script-count {
-            font-size: 0.95em;
-            font-weight: 600;
-            color: #a78bfa;
-            background: rgba(167, 139, 250, 0.1);
-            padding: 6px 16px;
-            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--accent);
         }
 
-        .script-chevron {
+        .script-arrow {
             width: 20px;
             height: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .script-chevron svg {
-            width: 16px;
-            height: 16px;
             transition: transform 0.3s ease;
         }
 
-        .script-item:hover .script-chevron,
-        .script-row.active .script-chevron {
-            color: #a78bfa;
+        .script-arrow svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--text-muted);
+            stroke-width: 2;
+            fill: none;
         }
 
-        .script-row.active .script-chevron svg {
+        .script-row.open .script-arrow {
             transform: rotate(180deg);
         }
 
-        .script-dropdown {
+        .script-row:hover .script-arrow svg,
+        .script-row.open .script-arrow svg {
+            stroke: var(--accent);
+        }
+
+        .script-expand {
             max-height: 0;
             overflow: hidden;
-            background: rgba(10, 10, 20, 0.8);
-            border: 1px solid transparent;
-            border-top: none;
-            border-radius: 0 0 16px 16px;
-            margin-top: -1px;
-            opacity: 0;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .script-row.active .script-dropdown {
+        .script-row.open .script-expand {
             max-height: 400px;
-            padding: 24px;
-            border-color: rgba(123, 97, 255, 0.15);
-            border-top-color: rgba(123, 97, 255, 0.08);
-            opacity: 1;
-            box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.4);
         }
 
-        .dropdown-inner {
+        .script-expand-inner {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-top: 1px solid var(--border);
+        }
+
+        .expand-grid {
             display: grid;
-            grid-template-columns: 1fr 220px;
+            grid-template-columns: 1fr 200px;
             gap: 24px;
-            align-items: start;
+            align-items: center;
         }
 
-        .dropdown-chart {
-            height: 180px;
+        .expand-chart {
+            height: 160px;
         }
 
-        .dropdown-stats {
+        .expand-stats {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
         }
 
-        .mini-stat {
+        .expand-stat {
             background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            padding: 16px;
-            border-radius: 12px;
+            border-radius: 10px;
+            padding: 14px;
             text-align: center;
         }
 
-        .mini-stat .num {
-            font-size: 1.3em;
+        .expand-stat .val {
+            font-size: 1.25rem;
             font-weight: 700;
-            color: #60a5fa;
-            margin-bottom: 4px;
+            color: var(--accent);
         }
 
-        .mini-stat .txt {
-            font-size: 0.7em;
-            font-weight: 500;
-            color: rgba(255, 255, 255, 0.3);
+        .expand-stat .lbl {
+            font-size: 0.7rem;
+            color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
         }
 
         .refresh-btn {
-            display: block;
-            margin: 40px auto 0;
-            padding: 16px 48px;
-            background: linear-gradient(135deg, #7b61ff 0%, #60a5fa 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 48px auto 0;
+            padding: 14px 32px;
+            background: var(--accent);
             border: none;
-            border-radius: 14px;
+            border-radius: 12px;
             color: #fff;
-            font-family: 'Outfit', sans-serif;
-            font-size: 1em;
+            font-family: inherit;
+            font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 24px -8px rgba(123, 97, 255, 0.5);
+            transition: all 0.2s ease;
         }
 
         .refresh-btn:hover {
+            background: #9333ea;
             transform: translateY(-2px);
-            box-shadow: 0 12px 32px -8px rgba(123, 97, 255, 0.6);
+            box-shadow: 0 8px 24px -8px rgba(168, 85, 247, 0.5);
         }
 
-        .refresh-btn:active {
-            transform: translateY(0);
+        .refresh-btn svg {
+            width: 18px;
+            height: 18px;
         }
 
-        .toast {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            padding: 16px 24px;
-            background: rgba(15, 15, 25, 0.95);
-            border: 1px solid rgba(123, 97, 255, 0.2);
-            border-radius: 14px;
-            color: #fff;
-            font-size: 0.9em;
-            backdrop-filter: blur(20px);
-            transform: translateY(100px);
-            opacity: 0;
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
-
-        .toast.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        .loading {
-            text-align: center;
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             padding: 60px 20px;
-            color: rgba(255, 255, 255, 0.3);
+            color: var(--text-muted);
         }
 
-        .loading-spinner {
+        .spinner {
             width: 32px;
             height: 32px;
-            border: 3px solid rgba(123, 97, 255, 0.2);
-            border-top-color: #7b61ff;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 16px;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 16px;
         }
 
         @keyframes spin {
@@ -416,157 +370,159 @@
         .empty {
             text-align: center;
             padding: 40px;
-            color: rgba(255, 255, 255, 0.25);
+            color: var(--text-muted);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 14px 24px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
         }
 
         @media (max-width: 900px) {
-            .stats-grid {
+            .metrics {
                 grid-template-columns: repeat(2, 1fr);
             }
-            .dropdown-inner {
+            .expand-grid {
                 grid-template-columns: 1fr;
             }
-            .dropdown-stats {
+            .expand-stats {
                 order: -1;
             }
         }
 
         @media (max-width: 600px) {
-            .container {
-                padding: 40px 16px;
+            .page {
+                padding: 48px 16px;
             }
-            .header h1 {
-                font-size: 2.2em;
-            }
-            .stats-grid {
+            .metrics {
                 grid-template-columns: 1fr;
-                gap: 12px;
             }
-            .stat-card {
+            .metric {
                 padding: 20px;
             }
-            .stat-card .value {
-                font-size: 2em;
+            .metric .num {
+                font-size: 2rem;
             }
-            .card {
-                padding: 20px;
-                border-radius: 18px;
-            }
-            .script-item {
-                padding: 14px 18px;
-            }
-            .script-row.active .script-dropdown {
-                padding: 16px;
+            .section {
+                padding: 24px 20px;
+                border-radius: 16px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="bg-grid"></div>
-
-    <div class="container">
-        <div class="header">
+    <div class="page">
+        <div class="hero">
             <h1>Analytics</h1>
-            <div class="subtitle">Execution Metrics</div>
-            <div class="status-badge" id="syncStatus">
-                <span class="dot"></span>
+            <p>Script execution metrics</p>
+            <div class="status" id="status">
+                <span class="ping"></span>
                 <span class="text">Connecting</span>
             </div>
         </div>
 
-        <div class="stats-grid" id="statsGrid">
-            <div class="loading">
-                <div class="loading-spinner"></div>
-                Loading
+        <div class="metrics" id="metrics">
+            <div class="loading-state">
+                <div class="spinner"></div>
+                <span>Loading</span>
             </div>
         </div>
 
-        <div class="card">
-            <div class="card-title">Execution Trend</div>
-            <div class="chart-container">
-                <canvas id="executionsChart"></canvas>
+        <div class="section">
+            <div class="section-title">Executions</div>
+            <div class="chart-wrap">
+                <canvas id="mainChart"></canvas>
             </div>
         </div>
 
-        <div class="card">
-            <div class="card-title">Scripts</div>
-            <div class="script-list" id="scriptList">
-                <div class="loading">
-                    <div class="loading-spinner"></div>
-                    Loading
+        <div class="section">
+            <div class="section-title">Scripts</div>
+            <div class="scripts" id="scripts">
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <span>Loading</span>
                 </div>
             </div>
         </div>
 
-        <button class="refresh-btn" onclick="loadAnalytics(true)">Refresh Data</button>
+        <button class="refresh-btn" onclick="load(true)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12a9 9 0 11-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
+                <path d="M21 3v5h-5"/>
+            </svg>
+            Refresh
+        </button>
     </div>
 
     <div class="toast" id="toast"></div>
 
     <script>
-        let mainChart;
-        let currentData = null;
-        let chartInstances = {};
-        let isMobile = window.innerWidth <= 900;
+        let mainChart = null;
+        let scriptCharts = {};
+        let data = null;
+        let isMobile = window.innerWidth <= 768;
 
-        window.addEventListener('resize', () => {
-            isMobile = window.innerWidth <= 900;
-        });
+        window.addEventListener('resize', () => isMobile = window.innerWidth <= 768);
 
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
+        function toast(msg) {
+            const el = document.getElementById('toast');
+            el.textContent = msg;
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 3000);
         }
 
-        function updateSyncStatus(status, message) {
-            const el = document.getElementById('syncStatus');
-            el.className = `status-badge ${status}`;
-            el.querySelector('.text').textContent = message;
+        function setStatus(ok, msg) {
+            const el = document.getElementById('status');
+            el.className = 'status' + (ok ? '' : ' error');
+            el.querySelector('.text').textContent = msg;
         }
 
-        function generateScriptDailyData(scriptBreakdown, totalDailyData, chartLabels) {
-            const scriptDailyData = {};
-            const scripts = Object.keys(scriptBreakdown);
-            const totalCount = Object.values(scriptBreakdown).reduce((a, b) => a + b, 0);
-            scripts.forEach(script => {
-                const ratio = scriptBreakdown[script] / totalCount;
-                scriptDailyData[script] = totalDailyData.map(daily => {
-                    const variance = 0.5 + Math.random();
-                    return Math.round(daily * ratio * variance);
-                });
+        function genScriptDaily(breakdown, daily, labels) {
+            const out = {};
+            const total = Object.values(breakdown).reduce((a, b) => a + b, 0);
+            Object.keys(breakdown).forEach(s => {
+                const r = breakdown[s] / total;
+                out[s] = daily.map(d => Math.round(d * r * (0.5 + Math.random())));
             });
-            return scriptDailyData;
+            return out;
         }
 
-        function createScriptChart(script, container, data, labels) {
-            const canvas = container.querySelector('canvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            const chartKey = script.replace(/[^a-zA-Z0-9]/g, '_');
-            if (chartInstances[chartKey]) chartInstances[chartKey].destroy();
+        function makeChart(ctx, labels, vals, h) {
+            const g = ctx.createLinearGradient(0, 0, 0, h);
+            g.addColorStop(0, 'rgba(168, 85, 247, 0.3)');
+            g.addColorStop(1, 'rgba(168, 85, 247, 0)');
 
-            const gradient = ctx.createLinearGradient(0, 0, 0, 180);
-            gradient.addColorStop(0, 'rgba(123, 97, 255, 0.3)');
-            gradient.addColorStop(1, 'rgba(123, 97, 255, 0)');
-
-            chartInstances[chartKey] = new Chart(ctx, {
+            return new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: labels.map(date => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
+                    labels: labels.map(d => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
                     datasets: [{
-                        data: data,
-                        borderColor: '#7b61ff',
-                        backgroundColor: gradient,
+                        data: vals,
+                        borderColor: '#a855f7',
+                        backgroundColor: g,
                         tension: 0.4,
                         fill: true,
-                        pointBackgroundColor: '#7b61ff',
-                        pointBorderColor: 'rgba(10, 10, 20, 0.9)',
+                        pointBackgroundColor: '#a855f7',
+                        pointBorderColor: '#09090b',
                         pointBorderWidth: 2,
                         pointRadius: 3,
                         pointHoverRadius: 6,
-                        borderWidth: 2.5
+                        borderWidth: 2
                     }]
                 },
                 options: {
@@ -575,229 +531,173 @@
                     plugins: {
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: 'rgba(10, 10, 20, 0.95)',
-                            padding: 12,
-                            titleColor: '#fff',
-                            bodyColor: '#a78bfa',
-                            borderColor: 'rgba(123, 97, 255, 0.3)',
+                            backgroundColor: '#18181b',
+                            titleColor: '#fafafa',
+                            bodyColor: '#a855f7',
+                            borderColor: '#27272a',
                             borderWidth: 1,
-                            cornerRadius: 10,
-                            displayColors: false
+                            padding: 12,
+                            cornerRadius: 8,
+                            displayColors: false,
+                            titleFont: { weight: '600' },
+                            bodyFont: { weight: '700', size: 16 }
                         }
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
-                            grid: { color: 'rgba(255, 255, 255, 0.03)', drawBorder: false },
-                            ticks: { color: 'rgba(255, 255, 255, 0.25)', font: { size: 10 } }
+                            grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
+                            ticks: { color: '#52525b', font: { size: 11 } }
                         },
                         x: {
                             grid: { display: false },
-                            ticks: { color: 'rgba(255, 255, 255, 0.25)', maxRotation: 0, font: { size: 9 }, maxTicksLimit: 7 }
+                            ticks: { color: '#52525b', maxRotation: 0, font: { size: 10 }, maxTicksLimit: 8 }
                         }
                     },
                     interaction: { intersect: false, mode: 'index' }
                 }
             });
-
-            const max = Math.max(...data);
-            const min = Math.min(...data);
-            const avg = Math.round(data.reduce((a, b) => a + b, 0) / data.length);
-            const total = data.reduce((a, b) => a + b, 0);
-
-            const statsEl = container.querySelector('.dropdown-stats');
-            if (statsEl) {
-                statsEl.innerHTML = `
-                    <div class="mini-stat"><div class="num">${total.toLocaleString()}</div><div class="txt">Total</div></div>
-                    <div class="mini-stat"><div class="num">${avg.toLocaleString()}</div><div class="txt">Daily Avg</div></div>
-                    <div class="mini-stat"><div class="num">${max.toLocaleString()}</div><div class="txt">Peak</div></div>
-                    <div class="mini-stat"><div class="num">${min.toLocaleString()}</div><div class="txt">Lowest</div></div>
-                `;
-            }
         }
 
-        function setupScriptInteractions() {
+        function initScriptChart(row) {
+            const name = row.dataset.script;
+            const container = row.querySelector('.expand-chart');
+            const canvas = container.querySelector('canvas');
+            if (!canvas || !data || !data.script_daily_data[name]) return;
+
+            const key = name.replace(/[^a-zA-Z0-9]/g, '_');
+            if (scriptCharts[key]) scriptCharts[key].destroy();
+
+            const ctx = canvas.getContext('2d');
+            const vals = data.script_daily_data[name];
+            scriptCharts[key] = makeChart(ctx, data.chart_labels, vals, 160);
+
+            const stats = row.querySelector('.expand-stats');
+            const total = vals.reduce((a, b) => a + b, 0);
+            const avg = Math.round(total / vals.length);
+            const peak = Math.max(...vals);
+            const low = Math.min(...vals);
+
+            stats.innerHTML = `
+                <div class="expand-stat"><div class="val">${total.toLocaleString()}</div><div class="lbl">Total</div></div>
+                <div class="expand-stat"><div class="val">${avg.toLocaleString()}</div><div class="lbl">Daily Avg</div></div>
+                <div class="expand-stat"><div class="val">${peak.toLocaleString()}</div><div class="lbl">Peak</div></div>
+                <div class="expand-stat"><div class="val">${low.toLocaleString()}</div><div class="lbl">Lowest</div></div>
+            `;
+        }
+
+        function setupScripts() {
             document.querySelectorAll('.script-row').forEach(row => {
-                const item = row.querySelector('.script-item');
-                let hoverTimeout;
+                const header = row.querySelector('.script-header');
+                let timeout;
 
                 if (isMobile) {
-                    item.addEventListener('click', () => {
-                        const wasActive = row.classList.contains('active');
-                        document.querySelectorAll('.script-row.active').forEach(r => r.classList.remove('active'));
-                        if (!wasActive) {
-                            row.classList.add('active');
-                            initChartForRow(row);
+                    header.addEventListener('click', () => {
+                        const wasOpen = row.classList.contains('open');
+                        document.querySelectorAll('.script-row.open').forEach(r => r.classList.remove('open'));
+                        if (!wasOpen) {
+                            row.classList.add('open');
+                            setTimeout(() => initScriptChart(row), 50);
                         }
                     });
                 } else {
                     row.addEventListener('mouseenter', () => {
-                        hoverTimeout = setTimeout(() => {
-                            document.querySelectorAll('.script-row.active').forEach(r => r.classList.remove('active'));
-                            row.classList.add('active');
-                            initChartForRow(row);
-                        }, 100);
+                        timeout = setTimeout(() => {
+                            document.querySelectorAll('.script-row.open').forEach(r => r.classList.remove('open'));
+                            row.classList.add('open');
+                            setTimeout(() => initScriptChart(row), 50);
+                        }, 80);
                     });
-
                     row.addEventListener('mouseleave', () => {
-                        clearTimeout(hoverTimeout);
-                        row.classList.remove('active');
+                        clearTimeout(timeout);
+                        row.classList.remove('open');
                     });
                 }
             });
         }
 
-        function initChartForRow(row) {
-            const script = row.dataset.script;
-            const dropdown = row.querySelector('.script-dropdown');
-            if (currentData && currentData.script_daily_data && currentData.script_daily_data[script]) {
-                setTimeout(() => {
-                    createScriptChart(script, dropdown, currentData.script_daily_data[script], currentData.chart_labels);
-                }, 50);
-            }
-        }
-
-        async function loadAnalytics(forceRefresh = false) {
+        async function load(refresh = false) {
             try {
-                updateSyncStatus('', 'Loading');
-                const response = await fetch('/analytics-data');
-                const data = await response.json();
+                setStatus(true, 'Loading');
+                const res = await fetch('/analytics-data');
+                data = await res.json();
 
                 if (!data.script_daily_data && data.script_breakdown && data.chart_data) {
-                    data.script_daily_data = generateScriptDailyData(data.script_breakdown, data.chart_data, data.chart_labels);
+                    data.script_daily_data = genScriptDaily(data.script_breakdown, data.chart_data, data.chart_labels);
                 }
 
-                currentData = data;
-                updateSyncStatus('', 'Live');
-                if (forceRefresh) showToast('Data refreshed');
-                renderData(data);
-            } catch (error) {
-                console.error('Error:', error);
-                updateSyncStatus('error', 'Offline');
-                document.getElementById('statsGrid').innerHTML = '<div class="loading">Failed to connect</div>';
+                setStatus(true, 'Live');
+                if (refresh) toast('Refreshed');
+                render();
+            } catch (e) {
+                console.error(e);
+                setStatus(false, 'Offline');
             }
         }
 
-        function renderData(data) {
-            document.getElementById('statsGrid').innerHTML = `
-                <div class="stat-card">
+        function render() {
+            document.getElementById('metrics').innerHTML = `
+                <div class="metric">
+                    <div class="num">${data.total_executions.toLocaleString()}</div>
                     <div class="label">Total Executions</div>
-                    <div class="value">${data.total_executions.toLocaleString()}</div>
                     <div class="sub">All time</div>
                 </div>
-                <div class="stat-card">
+                <div class="metric">
+                    <div class="num">${data.week_executions.toLocaleString()}</div>
                     <div class="label">This Week</div>
-                    <div class="value">${data.week_executions.toLocaleString()}</div>
                     <div class="sub">${data.unique_users_week} users</div>
                 </div>
-                <div class="stat-card">
+                <div class="metric">
+                    <div class="num">${data.month_executions.toLocaleString()}</div>
                     <div class="label">This Month</div>
-                    <div class="value">${data.month_executions.toLocaleString()}</div>
                     <div class="sub">${data.unique_users_month} users</div>
                 </div>
-                <div class="stat-card">
+                <div class="metric">
+                    <div class="num">${Math.round(data.month_executions / 30).toLocaleString()}</div>
                     <div class="label">Daily Average</div>
-                    <div class="value">${Math.round(data.month_executions / 30).toLocaleString()}</div>
                     <div class="sub">Last 30 days</div>
                 </div>
             `;
 
             const scripts = Object.entries(data.script_breakdown).sort((a, b) => b[1] - a[1]);
-            let scriptHtml = '';
-            scripts.forEach(([script, count], index) => {
-                scriptHtml += `
-                    <div class="script-row" data-script="${script}">
-                        <div class="script-item">
+            let html = '';
+            scripts.forEach(([name, count], i) => {
+                html += `
+                    <div class="script-row" data-script="${name}">
+                        <div class="script-header">
                             <div class="script-left">
-                                <span class="script-rank">#${index + 1}</span>
-                                <span class="script-name">${script}</span>
+                                <div class="script-rank">${i + 1}</div>
+                                <div class="script-name">${name}</div>
                             </div>
                             <div class="script-right">
-                                <span class="script-count">${count.toLocaleString()}</span>
-                                <span class="script-chevron">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                        <polyline points="6 9 12 15 18 9"></polyline>
-                                    </svg>
-                                </span>
+                                <div class="script-count">${count.toLocaleString()}</div>
+                                <div class="script-arrow">
+                                    <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                                </div>
                             </div>
                         </div>
-                        <div class="script-dropdown">
-                            <div class="dropdown-inner">
-                                <div class="dropdown-chart"><canvas></canvas></div>
-                                <div class="dropdown-stats"></div>
+                        <div class="script-expand">
+                            <div class="script-expand-inner">
+                                <div class="expand-grid">
+                                    <div class="expand-chart"><canvas></canvas></div>
+                                    <div class="expand-stats"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 `;
             });
-            document.getElementById('scriptList').innerHTML = scriptHtml || '<div class="empty">No scripts yet</div>';
+            document.getElementById('scripts').innerHTML = html || '<div class="empty">No data yet</div>';
 
-            setupScriptInteractions();
+            setupScripts();
 
             if (mainChart) mainChart.destroy();
-
-            const ctx = document.getElementById('executionsChart').getContext('2d');
-            const gradient = ctx.createLinearGradient(0, 0, 0, 320);
-            gradient.addColorStop(0, 'rgba(123, 97, 255, 0.35)');
-            gradient.addColorStop(0.5, 'rgba(96, 165, 250, 0.15)');
-            gradient.addColorStop(1, 'rgba(96, 165, 250, 0)');
-
-            mainChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: data.chart_labels.map(date => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
-                    datasets: [{
-                        label: 'Executions',
-                        data: data.chart_data,
-                        borderColor: '#7b61ff',
-                        backgroundColor: gradient,
-                        tension: 0.4,
-                        fill: true,
-                        pointBackgroundColor: '#7b61ff',
-                        pointBorderColor: '#0c0c14',
-                        pointBorderWidth: 3,
-                        pointRadius: 4,
-                        pointHoverRadius: 8,
-                        pointHoverBackgroundColor: '#60a5fa',
-                        borderWidth: 3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: 'rgba(10, 10, 20, 0.95)',
-                            padding: 14,
-                            titleColor: '#fff',
-                            titleFont: { size: 13, weight: '600' },
-                            bodyColor: '#a78bfa',
-                            bodyFont: { size: 18, weight: '700' },
-                            borderColor: 'rgba(123, 97, 255, 0.3)',
-                            borderWidth: 1,
-                            cornerRadius: 12,
-                            displayColors: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: 'rgba(255, 255, 255, 0.03)', drawBorder: false },
-                            ticks: { color: 'rgba(255, 255, 255, 0.3)', font: { size: 11, weight: '500' } }
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: { color: 'rgba(255, 255, 255, 0.3)', maxRotation: 45, minRotation: 45, font: { size: 10, weight: '500' } }
-                        }
-                    },
-                    interaction: { intersect: false, mode: 'index' }
-                }
-            });
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            mainChart = makeChart(ctx, data.chart_labels, data.chart_data, 300);
         }
 
-        loadAnalytics();
-        setInterval(() => loadAnalytics(false), 60000);
+        load();
+        setInterval(() => load(false), 60000);
     </script>
 </body>
 </html>
