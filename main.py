@@ -39,6 +39,9 @@ API_SECRET = "vadriftsisalwaysinseason"
 TURNSTILE_SITE_KEY = os.environ.get("TURNSTILE_SITE_KEY")
 TURNSTILE_SECRET_KEY = os.environ.get("TURNSTILE_SECRET_KEY")
 
+JSONBIN_API_KEY = os.environ.get("JSONBIN_API_KEY")
+JSONBIN_BIN_ID = os.environ.get("JSONBIN_BIN_ID")
+
 def get_client_ip():
     client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
     if client_ip and ',' in client_ip:
@@ -60,6 +63,52 @@ def verify_turnstile(token, ip):
         return result.get('success', False)
     except Exception as e:
         logger.error(f"Turnstile verification error: {str(e)}")
+        return False
+
+def load_analytics_from_jsonbin():
+    if not JSONBIN_API_KEY or not JSONBIN_BIN_ID:
+        logger.warning("JSONBin credentials not configured")
+        return None
+    
+    try:
+        response = requests.get(
+            f"https://api.jsonbin.io/v3/b/{JSONBIN_BIN_ID}/latest",
+            headers={
+                "X-Master-Key": JSONBIN_API_KEY
+            }
+        )
+        if response.status_code == 200:
+            data = response.json()
+            return data.get('record', {})
+        else:
+            logger.error(f"JSONBin load failed: {response.status_code}")
+            return None
+    except Exception as e:
+        logger.error(f"JSONBin load error: {str(e)}")
+        return None
+
+def save_analytics_to_jsonbin(data):
+    if not JSONBIN_API_KEY or not JSONBIN_BIN_ID:
+        logger.warning("JSONBin credentials not configured")
+        return False
+    
+    try:
+        response = requests.put(
+            f"https://api.jsonbin.io/v3/b/{JSONBIN_BIN_ID}",
+            headers={
+                "Content-Type": "application/json",
+                "X-Master-Key": JSONBIN_API_KEY
+            },
+            json=data
+        )
+        if response.status_code == 200:
+            logger.info("Analytics saved to JSONBin")
+            return True
+        else:
+            logger.error(f"JSONBin save failed: {response.status_code}")
+            return False
+    except Exception as e:
+        logger.error(f"JSONBin save error: {str(e)}")
         return False
 
 @app.route('/')
@@ -221,6 +270,20 @@ def converter():
 usage_data = {}
 copy_usage_data = {}
 execution_logs = []
+cloud_data_loaded = False
+
+def ensure_cloud_data_loaded():
+    global execution_logs, cloud_data_loaded
+    
+    if cloud_data_loaded:
+        return
+    
+    cloud_data = load_analytics_from_jsonbin()
+    if cloud_data and 'execution_logs' in cloud_data:
+        execution_logs = cloud_data['execution_logs']
+        logger.info(f"Loaded {len(execution_logs)} logs from JSONBin")
+    
+    cloud_data_loaded = True
 
 @app.route('/check-usage', methods=['GET'])
 def check_usage():
@@ -283,6 +346,9 @@ def update_copy_usage():
 
 @app.route('/log-execution', methods=['GET'])
 def log_execution():
+    global execution_logs
+    ensure_cloud_data_loaded()
+    
     hwid = request.args.get('hwid')
     script = request.args.get('script', 'Unknown')
     
@@ -295,11 +361,19 @@ def log_execution():
         
         if len(execution_logs) > 10000:
             execution_logs.pop(0)
+        
+        if len(execution_logs) % 10 == 0:
+            save_analytics_to_jsonbin({
+                'execution_logs': execution_logs,
+                'last_updated': datetime.now().isoformat()
+            })
     
     return jsonify({"success": True})
 
 @app.route('/analytics-data', methods=['GET'])
 def analytics_data():
+    ensure_cloud_data_loaded()
+    
     now = datetime.now()
     week_ago = now - timedelta(days=7)
     month_ago = now - timedelta(days=30)
@@ -311,6 +385,7 @@ def analytics_data():
     unique_users_month = set()
     
     daily_data = defaultdict(int)
+    script_daily_data = defaultdict(lambda: defaultdict(int))
     
     for log in execution_logs:
         timestamp = datetime.fromisoformat(log['timestamp'])
@@ -318,6 +393,7 @@ def analytics_data():
         
         day_key = timestamp.strftime('%Y-%m-%d')
         daily_data[day_key] += 1
+        script_daily_data[log['script']][day_key] += 1
         
         if timestamp >= week_ago:
             week_execs.append(log)
@@ -330,6 +406,10 @@ def analytics_data():
     last_30_days = [(now - timedelta(days=i)).strftime('%Y-%m-%d') for i in range(29, -1, -1)]
     chart_data = [daily_data.get(day, 0) for day in last_30_days]
     
+    script_chart_data = {}
+    for script in script_counts.keys():
+        script_chart_data[script] = [script_daily_data[script].get(day, 0) for day in last_30_days]
+    
     return jsonify({
         'total_executions': len(execution_logs),
         'week_executions': len(week_execs),
@@ -338,8 +418,23 @@ def analytics_data():
         'unique_users_month': len(unique_users_month),
         'script_breakdown': dict(script_counts),
         'chart_labels': last_30_days,
-        'chart_data': chart_data
+        'chart_data': chart_data,
+        'script_daily_data': script_chart_data
     })
+
+@app.route('/analytics-sync', methods=['POST'])
+def analytics_sync():
+    ensure_cloud_data_loaded()
+    
+    success = save_analytics_to_jsonbin({
+        'execution_logs': execution_logs,
+        'last_updated': datetime.now().isoformat()
+    })
+    
+    if success:
+        return jsonify({'success': True, 'message': 'Synced to cloud'})
+    else:
+        return jsonify({'success': False, 'error': 'Failed to sync'}), 500
 
 @app.route('/analytics')
 def analytics_page():
