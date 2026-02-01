@@ -369,6 +369,53 @@ body {
   line-height: 1.6;
 }
 
+.vpn-warning {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.12) 0%, rgba(251, 191, 36, 0.06) 100%);
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  border-radius: 16px;
+  padding: 18px 24px;
+  margin-bottom: 25px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  animation: pulseGlow 3s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 20px rgba(251, 191, 36, 0.1); }
+  50% { box-shadow: 0 0 30px rgba(251, 191, 36, 0.2); }
+}
+
+.vpn-warning-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.vpn-warning-content {
+  flex: 1;
+}
+
+.vpn-warning-title {
+  color: #fbbf24;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.vpn-warning-text {
+  color: #d4a574;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.vpn-warning-text strong {
+  color: #fbbf24;
+  font-weight: 600;
+}
+
 .instruction-box {
   background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0.03) 100%);
   border: 1px solid rgba(16, 185, 129, 0.2);
@@ -712,6 +759,14 @@ body {
   .info-badges {
     flex-direction: column;
   }
+
+  .vpn-warning {
+    padding: 16px 18px;
+  }
+
+  .vpn-warning-icon {
+    font-size: 20px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -783,6 +838,16 @@ body {
           <p class="key-subtitle">Complete a quick verification to unlock this script. Choose your preferred method below.</p>
         </div>
 
+        <div class="vpn-warning">
+          <div class="vpn-warning-icon">⚠️</div>
+          <div class="vpn-warning-content">
+            <div class="vpn-warning-title">Important: VPN/Proxy Notice</div>
+            <div class="vpn-warning-text">
+              Please <strong>disable any VPN or proxy</strong> before continuing and <strong>keep it off</strong> during the entire verification process. Switching IPs mid-way will cause your key to fail.
+            </div>
+          </div>
+        </div>
+
         <div class="instruction-box">
           <div class="instruction-title">
             <i data-lucide="list-ordered"></i>
@@ -791,8 +856,7 @@ body {
           <ol class="instruction-steps">
             <li>Click a verification button below</li>
             <li>Complete the quick task (~2 minutes)</li>
-            <li>Copy your <strong>HWID</strong> from the Roblox script</li>
-            <li>Paste your HWID on the verification page</li>
+            <li>Complete the captcha verification</li>
             <li>Copy the generated key and paste it in the script</li>
           </ol>
         </div>
