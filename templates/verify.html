@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>HWID Verification - Vadrifts</title>
+  <title>IP Verification - Vadrifts</title>
   <link rel="icon" href="https://i.imgur.com/ePueN25.png" type="image/png">
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <style>
@@ -296,6 +296,9 @@
       position: relative;
       margin-bottom: 20px;
       min-height: 90px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .input-label {
@@ -314,93 +317,6 @@
       display: flex;
       justify-content: center;
       align-items: center;
-    }
-
-    .hwid-wrapper {
-      opacity: 0;
-      position: absolute;
-      top: 32px;
-      left: 0;
-      width: 100%;
-      transition: opacity 0.3s ease;
-      display: none;
-    }
-
-    input {
-      width: 100%;
-      padding: 18px 50px 18px 20px;
-      font-size: 15px;
-      background: rgba(0, 0, 0, 0.5);
-      border: 2px solid rgba(255, 255, 255, 0.1);
-      border-radius: 14px;
-      color: #ffffff;
-      outline: none;
-      transition: all 0.3s ease;
-      font-family: 'Consolas', 'Monaco', monospace;
-      letter-spacing: 0.5px;
-    }
-
-    input.error {
-      border-color: rgba(239, 68, 68, 0.5);
-      background: rgba(239, 68, 68, 0.05);
-    }
-
-    input.valid {
-      border-color: rgba(16, 185, 129, 0.5);
-      background: rgba(16, 185, 129, 0.05);
-    }
-
-    input:focus {
-      border-color: #10b981;
-      background: rgba(0, 0, 0, 0.7);
-      box-shadow: 
-        0 0 0 4px rgba(16, 185, 129, 0.1),
-        0 0 30px rgba(16, 185, 129, 0.2);
-      transform: translateY(-2px);
-    }
-
-    input.error:focus {
-      border-color: #ef4444;
-      box-shadow: 
-        0 0 0 4px rgba(239, 68, 68, 0.1),
-        0 0 30px rgba(239, 68, 68, 0.2);
-    }
-
-    input::placeholder {
-      color: #555;
-      font-family: 'Inter', sans-serif;
-      letter-spacing: 0;
-    }
-
-    .hwid-indicator {
-      position: absolute;
-      top: 50%;
-      right: 18px;
-      transform: translateY(-50%);
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: rgba(239, 68, 68, 0.8);
-      transition: all 0.3s ease;
-      box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
-      border: 2px solid rgba(0, 0, 0, 0.3);
-    }
-
-    .hwid-indicator.valid {
-      background: #10b981;
-      box-shadow: 0 0 15px rgba(16, 185, 129, 0.6);
-      animation: pulse 2s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% {
-        transform: translateY(-50%) scale(1);
-        opacity: 1;
-      }
-      50% {
-        transform: translateY(-50%) scale(1.15);
-        opacity: 0.8;
-      }
     }
 
     .verify-btn {
@@ -586,11 +502,6 @@
         font-size: 12px;
       }
 
-      input {
-        font-size: 14px;
-        padding: 16px 45px 16px 18px;
-      }
-
       .verify-btn {
         font-size: 14px;
         padding: 16px;
@@ -629,44 +540,28 @@
   <div class="container">
     <div class="box">
       <div class="logo-wrapper">🔐</div>
-      <h2>HWID Verification</h2>
+      <h2>Quick Verification</h2>
       <p class="subtitle">
-        To generate your access key, <strong>complete the captcha</strong> and enter your <strong>Hardware ID (HWID)</strong>.
+        Complete the <strong>captcha</strong> below to generate your access key. No HWID needed!
       </p>
 
       <div class="instruction-box">
         <div class="instruction-title">
           <span>📋</span>
-          <span>How to get your HWID:</span>
+          <span>How it works:</span>
         </div>
         <ol class="instruction-steps">
-          <li>Execute the <span class="highlight">Roblox script hub</span></li>
-          <li>The <span class="highlight">key system popup</span> will appear</li>
-          <li>Click <span class="highlight">"Copy HWID"</span> button in the script</li>
-          <li>Paste it in the field below</li>
+          <li>Complete the <span class="highlight">captcha verification</span></li>
+          <li>Click <span class="highlight">"Generate Access Key"</span></li>
+          <li>Copy the key and paste it in the <span class="highlight">Roblox script</span></li>
         </ol>
       </div>
 
       <div class="input-container">
-        <label class="input-label" for="hwidInput">Hardware ID</label>
-        
         <div id="captchaWrapper" class="captcha-wrapper">
           <div class="cf-turnstile" data-sitekey="YOUR_SITE_KEY_HERE" data-callback="onCaptchaSuccess" data-theme="dark"></div>
         </div>
-        
-        <div id="hwidWrapper" class="hwid-wrapper">
-          <input 
-            id="hwidInput" 
-            type="text" 
-            placeholder="Paste your HWID here..." 
-            autocomplete="off"
-            spellcheck="false"
-          />
-          <div class="hwid-indicator" id="hwidIndicator"></div>
-        </div>
       </div>
-
-      <div class="status" id="validationStatus"></div>
       
       <button class="verify-btn" onclick="getKey()" id="verifyBtn" disabled>
         Generate Access Key
@@ -676,7 +571,7 @@
 
       <div class="info-badge">
         <span class="info-icon">🛡️</span>
-        <span>Secure verification system</span>
+        <span>Secure IP-based verification</span>
       </div>
     </div>
   </div>
@@ -692,7 +587,6 @@
       }
     }
 
-    let isValidHwid = false;
     let isCaptchaVerified = false;
     let captchaToken = null;
     let verificationToken = null;
@@ -744,7 +638,7 @@
           <ol class="instruction-steps">
             <li>Complete the key system challenge (Work.ink or LootLabs)</li>
             <li>You'll be automatically redirected here</li>
-            <li>Enter your HWID to generate the key</li>
+            <li>Complete the captcha to generate the key</li>
           </ol>
         </div>
         <div class="status error show" style="margin-top: 30px;">
@@ -758,84 +652,8 @@
       captchaToken = token;
       isCaptchaVerified = true;
       
-      const captchaWrapper = document.getElementById('captchaWrapper');
-      const hwidWrapper = document.getElementById('hwidWrapper');
-      
-      captchaWrapper.style.opacity = '0';
-      
-      setTimeout(() => {
-        captchaWrapper.style.display = 'none';
-        hwidWrapper.style.display = 'block';
-        
-        setTimeout(() => {
-          hwidWrapper.style.opacity = '1';
-          document.getElementById('hwidInput').focus();
-        }, 10);
-      }, 300);
-      
-      updateButtonState();
-    }
-
-    function updateButtonState() {
       const btn = document.getElementById('verifyBtn');
-      btn.disabled = !(isValidHwid && isCaptchaVerified);
-    }
-
-    function validateHwid(hwid) {
-      const validPattern = /^[a-zA-Z0-9_-]+$/;
-      const errors = [];
-
-      if (hwid.length < 35) {
-        errors.push('HWID must be at least 35 characters');
-      }
-
-      if (hwid.includes(' ')) {
-        errors.push('HWID cannot contain spaces');
-      }
-
-      if (!validPattern.test(hwid)) {
-        errors.push('HWID can only contain letters, numbers, hyphens (-), and underscores (_)');
-      }
-
-      return {
-        isValid: errors.length === 0,
-        errors: errors
-      };
-    }
-
-    function updateHwidIndicator() {
-      const hwid = document.getElementById("hwidInput").value.trim();
-      const indicator = document.getElementById("hwidIndicator");
-      const input = document.getElementById("hwidInput");
-      const validationStatus = document.getElementById("validationStatus");
-      
-      if (!hwid) {
-        indicator.classList.remove("valid");
-        input.classList.remove("valid", "error");
-        validationStatus.classList.remove("show");
-        isValidHwid = false;
-        updateButtonState();
-        return;
-      }
-
-      const validation = validateHwid(hwid);
-      
-      if (validation.isValid) {
-        indicator.classList.add("valid");
-        input.classList.add("valid");
-        input.classList.remove("error");
-        validationStatus.classList.remove("show");
-        isValidHwid = true;
-      } else {
-        indicator.classList.remove("valid");
-        input.classList.add("error");
-        input.classList.remove("valid");
-        validationStatus.className = "status error show";
-        validationStatus.innerHTML = `<strong>❌ Invalid HWID:</strong><br>${validation.errors.join('<br>')}`;
-        isValidHwid = false;
-      }
-      
-      updateButtonState();
+      btn.disabled = false;
     }
 
     function setStatus(message, type = '') {
@@ -851,16 +669,10 @@
     }
 
     async function getKey() {
-      const hwid = document.getElementById("hwidInput").value.trim();
       const btn = document.getElementById("verifyBtn");
       
       if (!isCaptchaVerified || !captchaToken) {
         setStatus("⚠️ Please complete the captcha first", "error");
-        return;
-      }
-      
-      if (!hwid) {
-        setStatus("⚠️ Please enter your HWID", "error");
         return;
       }
 
@@ -869,19 +681,12 @@
         return;
       }
 
-      const validation = validateHwid(hwid);
-      
-      if (!validation.isValid) {
-        setStatus(`<strong>❌ Invalid HWID:</strong><br>${validation.errors.join('<br>')}`, "error");
-        return;
-      }
-
       btn.disabled = true;
       btn.innerHTML = '<div class="loading-spinner"></div>Generating Key...';
       setStatus('<div class="loading-spinner"></div>Generating your access key...', "loading");
 
       try {
-        const res = await fetch(`/create?hwid=${encodeURIComponent(hwid)}&token=${encodeURIComponent(verificationToken)}&captcha=${encodeURIComponent(captchaToken)}`);
+        const res = await fetch(`/create?token=${encodeURIComponent(verificationToken)}&captcha=${encodeURIComponent(captchaToken)}`);
         const link = await res.text();
         
         if (res.ok) {
@@ -905,21 +710,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       createParticles();
-      
-      if (checkAccess()) {
-        const hwidInput = document.getElementById("hwidInput");
-        hwidInput.addEventListener("input", updateHwidIndicator);
-        
-        hwidInput.addEventListener("keypress", (e) => {
-          if (e.key === "Enter" && isValidHwid && isCaptchaVerified) {
-            getKey();
-          }
-        });
-
-        hwidInput.addEventListener("paste", (e) => {
-          setTimeout(updateHwidIndicator, 10);
-        });
-      }
+      checkAccess();
     });
   </script>
 </body>
