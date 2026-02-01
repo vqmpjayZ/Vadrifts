@@ -536,34 +536,30 @@ def verify_page():
 
 @app.route('/create')
 def create_key():
-    hwid = request.args.get('hwid')
     token = request.args.get('token')
     captcha = request.args.get('captcha')
     
-    if not hwid:
-        return "Missing HWID", 400
-    
     if not token:
-        logger.warning(f"Create attempt without token for HWID: {hwid[:8]}...")
+        logger.warning(f"Create attempt without token")
         return "Missing verification token", 403
     
     if not captcha:
-        logger.warning(f"Create attempt without captcha for HWID: {hwid[:8]}...")
+        logger.warning(f"Create attempt without captcha")
         return "Missing captcha token", 403
     
     client_ip = get_client_ip()
     
     if not verify_turnstile(captcha, client_ip):
-        logger.warning(f"Invalid captcha for HWID: {hwid[:8]}... from IP: {client_ip}")
+        logger.warning(f"Invalid captcha from IP: {client_ip}")
         return "Captcha verification failed", 403
     
     token_data = verification_tokens.get(token)
     if not token_data:
-        logger.warning(f"Invalid token attempt for HWID: {hwid[:8]}...")
+        logger.warning(f"Invalid token attempt from IP: {client_ip}")
         return "Invalid or expired token", 403
     
     if token_data['used']:
-        logger.warning(f"Reused token attempt for HWID: {hwid[:8]}...")
+        logger.warning(f"Reused token attempt from IP: {client_ip}")
         return "Token already used", 403
     
     if time.time() > token_data['expires']:
@@ -571,40 +567,40 @@ def create_key():
         return "Token expired", 403
     
     if token_data['ip'] != client_ip:
-        logger.warning(f"Token IP mismatch for HWID: {hwid[:8]}... Expected {token_data['ip']}, got {client_ip}")
+        logger.warning(f"Token IP mismatch. Expected {token_data['ip']}, got {client_ip}")
         return "Session mismatch", 403
     
     verification_tokens[token]['used'] = True
     
-    slug = key_system.create_slug(hwid)
+    slug = key_system.create_slug(client_ip)
     host = request.headers.get('host', 'vadrifts.onrender.com')
     
-    logger.info(f"Created key slug for HWID: {hwid[:8]}...")
+    logger.info(f"Created key slug for IP: {client_ip}")
     return f"https://{host}/getkey/{slug}"
 
 @app.route('/getkey/<slug>')
 def get_key(slug):
-    hwid = key_system.get_hwid_from_slug(slug)
+    ip = key_system.get_ip_from_slug(slug)
     
-    if not hwid:
+    if not ip:
         logger.warning(f"Invalid or expired slug attempted: {slug}")
         return "Invalid or expired key link", 404
     
     key_system.consume_slug(slug)
-    key = key_system.generate_key(hwid)
+    key = key_system.generate_key(ip)
     
-    logger.info(f"Key generated for HWID: {hwid[:8]}... Key: {key}")
+    logger.info(f"Key generated for IP: {ip} - Key: {key}")
     return key
 
 @app.route('/validate')
 def validate_key_route():
-    hwid = request.args.get('hwid')
     key = request.args.get('key')
     
-    if not hwid or not key:
+    if not key:
         return "false"
     
-    is_valid = key_system.validate_key(hwid, key)
+    client_ip = get_client_ip()
+    is_valid = key_system.validate_key(client_ip, key)
     return "true" if is_valid else "false"
 
 @app.route('/plugin/<plugin_id>')
