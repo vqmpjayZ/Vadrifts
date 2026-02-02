@@ -138,6 +138,135 @@ def verify_turnstile(token, ip):
         logger.error(f"Turnstile verification error: {str(e)}")
         return False
 
+unlock_data = {}
+
+@app.route('/create-unlock')
+def create_unlock():
+    client_ip = get_client_ip()
+    
+    slug = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+    
+    unlock_data[slug] = {
+        'ip': client_ip,
+        'unlocked': False,
+        'expires': time.time() + 600,
+        'created': time.time()
+    }
+    
+    def remove_slug():
+        if slug in unlock_data:
+            del unlock_data[slug]
+    
+    timer = threading.Timer(600, remove_slug)
+    timer.start()
+    
+    host = request.headers.get('host', 'vadrifts.onrender.com')
+    logger.info(f"Created unlock slug for IP: {client_ip}")
+    
+    return f"https://{host}/unlock/{slug}"
+
+@app.route('/unlock/<slug>')
+def unlock_page(slug):
+    if slug not in unlock_data:
+        return "Invalid or expired unlock link", 404
+    
+    unlock_info = unlock_data[slug]
+    
+    if time.time() > unlock_info['expires']:
+        del unlock_data[slug]
+        return "Unlock link expired", 404
+    
+    try:
+        with open('templates/unlock.html', 'r', encoding='utf-8') as f:
+            html_content = f.read()
+        
+        html_content = html_content.replace('UNLOCK_SLUG_HERE', slug)
+        return html_content
+    except FileNotFoundError:
+        logger.error("unlock.html template not found")
+        return jsonify({"error": "Unlock page not found"}), 404
+
+@app.route('/complete-unlock/<slug>')
+def complete_unlock(slug):
+    if slug not in unlock_data:
+        return "Invalid or expired unlock link", 404
+    
+    client_ip = get_client_ip()
+    unlock_info = unlock_data[slug]
+    
+    if unlock_info['ip'] != client_ip:
+        logger.warning(f"IP mismatch for unlock. Expected {unlock_info['ip']}, got {client_ip}")
+        return "IP mismatch - please use the same network", 403
+    
+    unlock_data[slug]['unlocked'] = True
+    logger.info(f"Unlock completed for slug: {slug}")
+    
+    return """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Feature Unlocked!</title>
+        <style>
+            body {
+                background: #000;
+                color: #fff;
+                font-family: 'Inter', sans-serif;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                margin: 0;
+            }
+            .success-box {
+                text-align: center;
+                background: rgba(16, 185, 129, 0.1);
+                border: 2px solid #10b981;
+                padding: 40px;
+                border-radius: 20px;
+                box-shadow: 0 0 50px rgba(16, 185, 129, 0.3);
+            }
+            h1 {
+                color: #10b981;
+                font-size: 48px;
+                margin-bottom: 20px;
+            }
+            p {
+                font-size: 18px;
+                color: #aaa;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="success-box">
+            <h1>✓ Feature Unlocked!</h1>
+            <p>You can now close this page and return to Roblox.</p>
+            <p style="margin-top: 20px; font-size: 14px;">The premium feature is now available in your script.</p>
+        </div>
+    </body>
+    </html>
+    """
+
+@app.route('/check-unlock')
+def check_unlock():
+    slug = request.args.get('slug')
+    
+    if not slug:
+        return jsonify({"unlocked": False, "error": "No slug provided"})
+    
+    if slug not in unlock_data:
+        return jsonify({"unlocked": False, "error": "Invalid or expired slug"})
+    
+    client_ip = get_client_ip()
+    unlock_info = unlock_data[slug]
+    
+    if unlock_info['ip'] != client_ip:
+        return jsonify({"unlocked": False, "error": "IP mismatch"})
+    
+    return jsonify({
+        "unlocked": unlock_info['unlocked'],
+        "expires_in": int(unlock_info['expires'] - time.time())
+    })
+    
 @app.route('/')
 def home():
     try:
