@@ -138,75 +138,159 @@ def verify_turnstile(token, ip):
         logger.error(f"Turnstile verification error: {str(e)}")
         return False
 
-unlock_data = {}
+feature_unlocks = {}
 
-@app.route('/create-unlock')
-def create_unlock():
+@app.route('/start-feature-unlock')
+def start_feature_unlock():
     client_ip = get_client_ip()
+    feature = request.args.get('feature', 'default')
     
-    slug = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+    verification_timer.start_timer(client_ip)
+    logger.info(f"Feature unlock timer started for IP: {client_ip}, feature: {feature}")
     
-    unlock_data[slug] = {
-        'ip': client_ip,
-        'unlocked': False,
-        'expires': time.time() + 600,
-        'created': time.time()
+    return jsonify({
+        "success": True,
+        "message": "Timer started"
+    })
+
+@app.route('/feature-unlock')
+def feature_unlock():
+    client_ip = get_client_ip()
+    feature = request.args.get('feature', 'default')
+    referer = request.headers.get('Referer', '')
+    
+    timer_check = verification_timer.check_timer(client_ip)
+    
+    if not timer_check['valid']:
+        return """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Access Denied - Vadrifts</title>
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+                body {
+                    background: #000;
+                    color: #fff;
+                    font-family: 'Inter', sans-serif;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    height: 100vh;
+                    margin: 0;
+                }
+                .error-box {
+                    text-align: center;
+                    background: rgba(239, 68, 68, 0.15);
+                    border: 2px solid #ef4444;
+                    padding: 50px 40px;
+                    border-radius: 20px;
+                    box-shadow: 0 0 50px rgba(239, 68, 68, 0.3);
+                    max-width: 500px;
+                }
+                h1 {
+                    color: #ef4444;
+                    font-size: 48px;
+                    margin-bottom: 20px;
+                    font-weight: 800;
+                }
+                p {
+                    font-size: 16px;
+                    color: #aaa;
+                    line-height: 1.6;
+                }
+                .icon {
+                    font-size: 80px;
+                    margin-bottom: 20px;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="error-box">
+                <div class="icon">🚫</div>
+                <h1>Access Denied</h1>
+                <p>Please access this page through the proper verification flow.</p>
+                <p style="margin-top: 15px; font-size: 14px;">Click the unlock button in the script to start.</p>
+            </div>
+        </body>
+        </html>
+        """, 403
+    
+    if not is_valid_referrer(referer):
+        logger.warning(f"Invalid referer for feature unlock from IP: {client_ip}")
+        return """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Access Denied - Vadrifts</title>
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+                body {
+                    background: #000;
+                    color: #fff;
+                    font-family: 'Inter', sans-serif;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    height: 100vh;
+                    margin: 0;
+                }
+                .error-box {
+                    text-align: center;
+                    background: rgba(239, 68, 68, 0.15);
+                    border: 2px solid #ef4444;
+                    padding: 50px 40px;
+                    border-radius: 20px;
+                    box-shadow: 0 0 50px rgba(239, 68, 68, 0.3);
+                    max-width: 500px;
+                }
+                h1 {
+                    color: #ef4444;
+                    font-size: 48px;
+                    margin-bottom: 20px;
+                    font-weight: 800;
+                }
+                p {
+                    font-size: 16px;
+                    color: #aaa;
+                    line-height: 1.6;
+                }
+                .icon {
+                    font-size: 80px;
+                    margin-bottom: 20px;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="error-box">
+                <div class="icon">⚠️</div>
+                <h1>Invalid Access</h1>
+                <p>You must complete the verification task to unlock this feature.</p>
+            </div>
+        </body>
+        </html>
+        """, 403
+    
+    verification_timer.mark_verified(client_ip)
+    
+    if client_ip not in feature_unlocks:
+        feature_unlocks[client_ip] = {}
+    
+    feature_unlocks[client_ip][feature] = {
+        'unlocked': True,
+        'unlocked_at': time.time(),
+        'expires_at': time.time() + (24 * 60 * 60)
     }
     
-    def remove_slug():
-        if slug in unlock_data:
-            del unlock_data[slug]
-    
-    timer = threading.Timer(600, remove_slug)
-    timer.start()
-    
-    host = request.headers.get('host', 'vadrifts.onrender.com')
-    logger.info(f"Created unlock slug for IP: {client_ip}")
-    
-    return f"https://{host}/unlock/{slug}"
-
-@app.route('/unlock/<slug>')
-def unlock_page(slug):
-    if slug not in unlock_data:
-        return "Invalid or expired unlock link", 404
-    
-    unlock_info = unlock_data[slug]
-    
-    if time.time() > unlock_info['expires']:
-        del unlock_data[slug]
-        return "Unlock link expired", 404
-    
-    try:
-        with open('templates/unlock.html', 'r', encoding='utf-8') as f:
-            html_content = f.read()
-        
-        html_content = html_content.replace('UNLOCK_SLUG_HERE', slug)
-        return html_content
-    except FileNotFoundError:
-        logger.error("unlock.html template not found")
-        return jsonify({"error": "Unlock page not found"}), 404
-
-@app.route('/complete-unlock/<slug>')
-def complete_unlock(slug):
-    if slug not in unlock_data:
-        return "Invalid or expired unlock link", 404
-    
-    client_ip = get_client_ip()
-    unlock_info = unlock_data[slug]
-    
-    if unlock_info['ip'] != client_ip:
-        logger.warning(f"IP mismatch for unlock. Expected {unlock_info['ip']}, got {client_ip}")
-        return "IP mismatch - please use the same network", 403
-    
-    unlock_data[slug]['unlocked'] = True
-    logger.info(f"Unlock completed for slug: {slug}")
+    logger.info(f"Feature '{feature}' unlocked for IP: {client_ip}")
     
     return """
     <!DOCTYPE html>
     <html>
     <head>
-        <title>Feature Unlocked!</title>
+        <title>Feature Unlocked! - Vadrifts</title>
         <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
             body {
                 background: #000;
                 color: #fff;
@@ -219,53 +303,87 @@ def complete_unlock(slug):
             }
             .success-box {
                 text-align: center;
-                background: rgba(16, 185, 129, 0.1);
-                border: 2px solid #10b981;
-                padding: 40px;
-                border-radius: 20px;
-                box-shadow: 0 0 50px rgba(16, 185, 129, 0.3);
+                background: rgba(114, 9, 183, 0.15);
+                border: 2px solid #9c88ff;
+                padding: 60px 50px;
+                border-radius: 24px;
+                box-shadow: 0 0 60px rgba(114, 9, 183, 0.4);
+                animation: slideIn 0.6s ease;
+                max-width: 500px;
+            }
+            @keyframes slideIn {
+                from { opacity: 0; transform: translateY(30px) scale(0.95); }
+                to { opacity: 1; transform: translateY(0) scale(1); }
             }
             h1 {
-                color: #10b981;
-                font-size: 48px;
+                color: #9c88ff;
+                font-size: 52px;
                 margin-bottom: 20px;
+                font-weight: 800;
+                letter-spacing: -1px;
             }
             p {
                 font-size: 18px;
                 color: #aaa;
+                margin: 12px 0;
+                line-height: 1.6;
+            }
+            .highlight {
+                color: #9c88ff;
+                font-weight: 600;
+            }
+            .icon {
+                font-size: 100px;
+                margin-bottom: 25px;
+                animation: bounce 2s ease infinite;
+            }
+            @keyframes bounce {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-12px); }
+            }
+            .badge {
+                display: inline-block;
+                background: rgba(156, 136, 255, 0.2);
+                border: 1px solid rgba(156, 136, 255, 0.4);
+                padding: 10px 20px;
+                border-radius: 12px;
+                margin-top: 25px;
+                font-size: 14px;
+                color: #9c88ff;
+                font-weight: 600;
             }
         </style>
     </head>
     <body>
         <div class="success-box">
-            <h1>✓ Feature Unlocked!</h1>
-            <p>You can now close this page and return to Roblox.</p>
-            <p style="margin-top: 20px; font-size: 14px;">The premium feature is now available in your script.</p>
+            <div class="icon">🔓</div>
+            <h1>Feature Unlocked!</h1>
+            <p>You can now <span class="highlight">close this page</span> and return to Roblox.</p>
+            <p style="margin-top: 20px;">The premium feature is now available in your script.</p>
+            <div class="badge">✓ Active for 24 hours</div>
         </div>
     </body>
     </html>
     """
 
-@app.route('/check-unlock')
-def check_unlock():
-    slug = request.args.get('slug')
-    
-    if not slug:
-        return jsonify({"unlocked": False, "error": "No slug provided"})
-    
-    if slug not in unlock_data:
-        return jsonify({"unlocked": False, "error": "Invalid or expired slug"})
-    
+@app.route('/check-feature-unlock')
+def check_feature_unlock():
+    feature = request.args.get('feature', 'default')
     client_ip = get_client_ip()
-    unlock_info = unlock_data[slug]
     
-    if unlock_info['ip'] != client_ip:
-        return jsonify({"unlocked": False, "error": "IP mismatch"})
+    if client_ip in feature_unlocks and feature in feature_unlocks[client_ip]:
+        unlock_data = feature_unlocks[client_ip][feature]
+        
+        if time.time() < unlock_data['expires_at']:
+            return jsonify({
+                "unlocked": True,
+                "unlocked_at": unlock_data['unlocked_at'],
+                "expires_at": unlock_data['expires_at']
+            })
+        else:
+            del feature_unlocks[client_ip][feature]
     
-    return jsonify({
-        "unlocked": unlock_info['unlocked'],
-        "expires_in": int(unlock_info['expires'] - time.time())
-    })
+    return jsonify({"unlocked": False})
     
 @app.route('/')
 def home():
