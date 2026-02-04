@@ -50,7 +50,7 @@ FEATURE_CONFIG = {
         "credits_per_unlock": 2,
         "icon": "🎨",
         "description": "Copy art with special brushes from other players",
-        "workink_url": "https://work.ink/YOUR_COPY_ART_LINK"
+        "workink_url": "https://work.ink/20yd/Vadrifts-StarvingArtists"
     }
 }
 
