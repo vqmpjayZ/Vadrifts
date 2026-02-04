@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credits Unlocked! - Vadrifts</title>
+    <link rel="icon" href="https://i.imgur.com/ePueN25.png" type="image/png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        .bg-lights {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        .light {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(150px);
+            opacity: 0.4;
+            animation: float 15s ease-in-out infinite;
+        }
+        
+        .light-1 {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, #7209b7 0%, transparent 70%);
+            top: -150px;
+            left: -150px;
+        }
+        
+        .light-2 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, #9c88ff 0%, transparent 70%);
+            bottom: -150px;
+            right: -150px;
+            animation-delay: -7s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(30px, -30px) scale(1.1); }
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #a855f7;
+            border-radius: 50%;
+            opacity: 0.7;
+            animation: floatUp 15s linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: 0.7; }
+            90% { opacity: 0.5; }
+            100% { transform: translateY(-50px) translateX(30px); opacity: 0; }
+        }
+
+        .confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 3;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            top: -20px;
+            animation: confettiFall 4s ease-out forwards;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+        
+        .container {
+            position: relative;
+            z-index: 10;
+            animation: fadeIn 0.8s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        .box {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(114, 9, 183, 0.3);
+            padding: 60px 50px;
+            border-radius: 28px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 100px rgba(114, 9, 183, 0.15);
+            text-align: center;
+            width: 480px;
+            max-width: 90vw;
+        }
+        
+        .icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 30px;
+            background: linear-gradient(135deg, #7209b7, #9c88ff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            animation: pulse 2s ease-in-out infinite, iconPop 0.6s ease-out;
+            box-shadow: 0 20px 50px rgba(114, 9, 183, 0.4);
+        }
+
+        @keyframes iconPop {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 20px 50px rgba(114, 9, 183, 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 25px 60px rgba(114, 9, 183, 0.5); }
+        }
+        
+        h1 {
+            font-size: 38px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, #9c88ff 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+            animation: titleSlide 0.6s ease-out 0.2s both;
+        }
+
+        @keyframes titleSlide {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .subtitle {
+            color: #888;
+            font-size: 16px;
+            margin-bottom: 35px;
+            line-height: 1.6;
+            animation: subtitleSlide 0.6s ease-out 0.3s both;
+        }
+
+        @keyframes subtitleSlide {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .subtitle strong {
+            color: #9c88ff;
+        }
+        
+        .credits-box {
+            background: rgba(114, 9, 183, 0.15);
+            border: 1px solid rgba(114, 9, 183, 0.3);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            animation: creditsSlide 0.6s ease-out 0.4s both;
+        }
+
+        @keyframes creditsSlide {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .credits-number {
+            font-size: 72px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #a855f7, #9c88ff);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+            animation: numberPop 0.8s ease-out 0.5s both;
+        }
+
+        @keyframes numberPop {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .credits-label {
+            color: #888;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 10px;
+        }
+        
+        .info {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 12px;
+            padding: 18px;
+            color: #10b981;
+            font-size: 14px;
+            animation: infoSlide 0.6s ease-out 0.6s both;
+        }
+
+        @keyframes infoSlide {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .feature-name {
+            margin-top: 20px;
+            padding: 12px 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            display: inline-block;
+            animation: featureSlide 0.6s ease-out 0.7s both;
+        }
+
+        @keyframes featureSlide {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .feature-name span {
+            color: #888;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .feature-name strong {
+            color: #fff;
+            font-size: 14px;
+            display: block;
+            margin-top: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .box {
+                padding: 40px 30px;
+            }
+
+            h1 {
+                font-size: 30px;
+            }
+
+            .credits-number {
+                font-size: 56px;
+            }
+
+            .icon {
+                width: 80px;
+                height: 80px;
+                font-size: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-lights">
+        <div class="light light-1"></div>
+        <div class="light light-2"></div>
+    </div>
+
+    <div class="particles" id="particles"></div>
+    <div class="confetti" id="confetti"></div>
+    
+    <div class="container">
+        <div class="box">
+            <div class="icon" id="featureIcon">🎨</div>
+            <h1>Credits Unlocked!</h1>
+            <p class="subtitle">You've earned <strong id="creditsEarned">+2</strong> credits!</p>
+            
+            <div class="credits-box">
+                <div class="credits-number" id="totalCredits">2</div>
+                <div class="credits-label">Total Credits</div>
+            </div>
+            
+            <div class="info">
+                ✓ Close this page and return to Roblox to use your credits!
+            </div>
+
+            <div class="feature-name">
+                <span>Feature</span>
+                <strong id="featureName">Copy Art Credits</strong>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const FEATURE_ICON = "{{FEATURE_ICON}}";
+        const FEATURE_NAME = "{{FEATURE_NAME}}";
+        const CREDITS_ADDED = "{{CREDITS_ADDED}}";
+        const TOTAL_CREDITS = "{{TOTAL_CREDITS}}";
+
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 25; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.animationDelay = -Math.random() * 15 + 's';
+                p.style.animationDuration = (12 + Math.random() * 8) + 's';
+                container.appendChild(p);
+            }
+        }
+
+        function createConfetti() {
+            const container = document.getElementById('confetti');
+            const colors = ['#7209b7', '#9c88ff', '#a855f7', '#c084fc', '#10b981', '#fbbf24'];
+            
+            for (let i = 0; i < 50; i++) {
+                const piece = document.createElement('div');
+                piece.className = 'confetti-piece';
+                piece.style.left = Math.random() * 100 + '%';
+                piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                piece.style.animationDelay = Math.random() * 2 + 's';
+                piece.style.animationDuration = (3 + Math.random() * 2) + 's';
+                
+                if (Math.random() > 0.5) {
+                    piece.style.borderRadius = '50%';
+                }
+                
+                container.appendChild(piece);
+            }
+        }
+
+        function init() {
+            if (FEATURE_ICON && FEATURE_ICON !== '{{FEATURE_ICON}}') {
+                document.getElementById('featureIcon').textContent = FEATURE_ICON;
+            }
+            if (FEATURE_NAME && FEATURE_NAME !== '{{FEATURE_NAME}}') {
+                document.getElementById('featureName').textContent = FEATURE_NAME;
+            }
+            if (CREDITS_ADDED && CREDITS_ADDED !== '{{CREDITS_ADDED}}') {
+                document.getElementById('creditsEarned').textContent = '+' + CREDITS_ADDED;
+            }
+            if (TOTAL_CREDITS && TOTAL_CREDITS !== '{{TOTAL_CREDITS}}') {
+                document.getElementById('totalCredits').textContent = TOTAL_CREDITS;
+            }
+        }
+
+        window.addEventListener('load', () => {
+            init();
+            createParticles();
+            createConfetti();
+        });
+    </script>
+</body>
+</html>
