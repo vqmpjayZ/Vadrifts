@@ -138,151 +138,319 @@ def verify_turnstile(token, ip):
         logger.error(f"Turnstile verification error: {str(e)}")
         return False
 
-feature_unlocks = {}
+copy_credits_data = {}
 
-@app.route('/start-feature-unlock')
-def start_feature_unlock():
+@app.route('/copy-unlock-start')
+def copy_unlock_start_page():
+    try:
+        return send_file('templates/copy-unlock-start.html')
+    except FileNotFoundError:
+        return jsonify({"error": "Page not found"}), 404
+
+@app.route('/start-copy-unlock')
+def start_copy_unlock():
     client_ip = get_client_ip()
-    feature = request.args.get('feature', 'default')
-    
     verification_timer.start_timer(client_ip)
-    logger.info(f"Feature unlock timer started for IP: {client_ip}, feature: {feature}")
-    
-    return jsonify({
-        "success": True,
-        "message": "Timer started"
-    })
+    return jsonify({"success": True})
 
-@app.route('/feature-unlock')
-def feature_unlock():
+@app.route('/check-copy-credits')
+def check_copy_credits_route():
     client_ip = get_client_ip()
-    feature = request.args.get('feature', 'default')
+    credits_info = copy_credits_data.get(client_ip, {"credits": 0})
+    return jsonify({"credits": credits_info.get("credits", 0)})
+
+@app.route('/use-copy-credit')
+def use_copy_credit():
+    client_ip = get_client_ip()
+    
+    if client_ip not in copy_credits_data:
+        return jsonify({"success": False, "remaining": 0})
+    
+    current = copy_credits_data[client_ip].get("credits", 0)
+    
+    if current <= 0:
+        return jsonify({"success": False, "remaining": 0})
+    
+    copy_credits_data[client_ip]["credits"] = current - 1
+    
+    return jsonify({"success": True, "remaining": current - 1})
+
+@app.route('/copy-unlock')
+def copy_unlock():
+    client_ip = get_client_ip()
     referer = request.headers.get('Referer', '')
     
     timer_check = verification_timer.check_timer(client_ip)
     
     if not timer_check['valid']:
-        return """
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Access Denied - Vadrifts</title>
-            <style>
-                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
-                body {
-                    background: #000;
-                    color: #fff;
-                    font-family: 'Inter', sans-serif;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    height: 100vh;
-                    margin: 0;
-                }
-                .error-box {
-                    text-align: center;
-                    background: rgba(239, 68, 68, 0.15);
-                    border: 2px solid #ef4444;
-                    padding: 50px 40px;
-                    border-radius: 20px;
-                    box-shadow: 0 0 50px rgba(239, 68, 68, 0.3);
-                    max-width: 500px;
-                }
-                h1 {
-                    color: #ef4444;
-                    font-size: 48px;
-                    margin-bottom: 20px;
-                    font-weight: 800;
-                }
-                p {
-                    font-size: 16px;
-                    color: #aaa;
-                    line-height: 1.6;
-                }
-                .icon {
-                    font-size: 80px;
-                    margin-bottom: 20px;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="error-box">
-                <div class="icon">🚫</div>
-                <h1>Access Denied</h1>
-                <p>Please access this page through the proper verification flow.</p>
-                <p style="margin-top: 15px; font-size: 14px;">Click the unlock button in the script to start.</p>
-            </div>
-        </body>
-        </html>
-        """, 403
+        return render_copy_error("Access Denied", "Please start the unlock process from the proper page first.")
     
     if not is_valid_referrer(referer):
-        logger.warning(f"Invalid referer for feature unlock from IP: {client_ip}")
-        return """
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Access Denied - Vadrifts</title>
-            <style>
-                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
-                body {
-                    background: #000;
-                    color: #fff;
-                    font-family: 'Inter', sans-serif;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    height: 100vh;
-                    margin: 0;
-                }
-                .error-box {
-                    text-align: center;
-                    background: rgba(239, 68, 68, 0.15);
-                    border: 2px solid #ef4444;
-                    padding: 50px 40px;
-                    border-radius: 20px;
-                    box-shadow: 0 0 50px rgba(239, 68, 68, 0.3);
-                    max-width: 500px;
-                }
-                h1 {
-                    color: #ef4444;
-                    font-size: 48px;
-                    margin-bottom: 20px;
-                    font-weight: 800;
-                }
-                p {
-                    font-size: 16px;
-                    color: #aaa;
-                    line-height: 1.6;
-                }
-                .icon {
-                    font-size: 80px;
-                    margin-bottom: 20px;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="error-box">
-                <div class="icon">⚠️</div>
-                <h1>Invalid Access</h1>
-                <p>You must complete the verification task to unlock this feature.</p>
-            </div>
-        </body>
-        </html>
-        """, 403
+        return render_copy_error("Invalid Access", "You must complete the verification task to unlock credits.")
     
     verification_timer.mark_verified(client_ip)
     
-    if client_ip not in feature_unlocks:
-        feature_unlocks[client_ip] = {}
+    if client_ip not in copy_credits_data:
+        copy_credits_data[client_ip] = {"credits": 0}
     
-    feature_unlocks[client_ip][feature] = {
-        'unlocked': True,
-        'unlocked_at': time.time(),
-        'expires_at': time.time() + (24 * 60 * 60)
-    }
+    copy_credits_data[client_ip]["credits"] = copy_credits_data[client_ip].get("credits", 0) + 2
+    new_total = copy_credits_data[client_ip]["credits"]
     
-    logger.info(f"Feature '{feature}' unlocked for IP: {client_ip}")
+    return render_copy_success(new_total)
+
+    def render_copy_success(total):
+        return f"""
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Credits Unlocked! - Vadrifts</title>
+        <link rel="icon" href="https://i.imgur.com/ePueN25.png" type="image/png">
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+            
+            * {{
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }}
+            
+            body {{
+                background: #000;
+                color: #fff;
+                font-family: 'Inter', sans-serif;
+                min-height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                overflow: hidden;
+            }}
+            
+            .bg-lights {{
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 1;
+                pointer-events: none;
+            }}
+            
+            .light {{
+                position: absolute;
+                border-radius: 50%;
+                filter: blur(150px);
+                opacity: 0.4;
+                animation: float 15s ease-in-out infinite;
+            }}
+            
+            .light-1 {{
+                width: 600px;
+                height: 600px;
+                background: radial-gradient(circle, #7209b7 0%, transparent 70%);
+                top: -150px;
+                left: -150px;
+            }}
+            
+            .light-2 {{
+                width: 500px;
+                height: 500px;
+                background: radial-gradient(circle, #9c88ff 0%, transparent 70%);
+                bottom: -150px;
+                right: -150px;
+                animation-delay: -7s;
+            }}
+            
+            @keyframes float {{
+                0%, 100% {{ transform: translate(0, 0) scale(1); }}
+                50% {{ transform: translate(30px, -30px) scale(1.1); }}
+            }}
+            
+            .container {{
+                position: relative;
+                z-index: 10;
+                animation: fadeIn 0.8s ease;
+            }}
+            
+            @keyframes fadeIn {{
+                from {{ opacity: 0; transform: translateY(30px); }}
+                to {{ opacity: 1; transform: translateY(0); }}
+            }}
+            
+            .box {{
+                background: rgba(0, 0, 0, 0.7);
+                backdrop-filter: blur(30px);
+                border: 1px solid rgba(114, 9, 183, 0.3);
+                padding: 60px 50px;
+                border-radius: 28px;
+                box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 100px rgba(114, 9, 183, 0.15);
+                text-align: center;
+                width: 480px;
+                max-width: 90vw;
+            }}
+            
+            .icon {{
+                width: 100px;
+                height: 100px;
+                margin: 0 auto 30px;
+                background: linear-gradient(135deg, #7209b7, #9c88ff);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 50px;
+                animation: pulse 2s ease-in-out infinite;
+                box-shadow: 0 20px 50px rgba(114, 9, 183, 0.4);
+            }}
+            
+            @keyframes pulse {{
+                0%, 100% {{ transform: scale(1); }}
+                50% {{ transform: scale(1.05); }}
+            }}
+            
+            h1 {{
+                font-size: 38px;
+                font-weight: 800;
+                background: linear-gradient(135deg, #fff 0%, #9c88ff 100%);
+                background-clip: text;
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                margin-bottom: 15px;
+            }}
+            
+            .subtitle {{
+                color: #888;
+                font-size: 16px;
+                margin-bottom: 35px;
+                line-height: 1.6;
+            }}
+            
+            .subtitle strong {{
+                color: #9c88ff;
+            }}
+            
+            .credits-box {{
+                background: rgba(114, 9, 183, 0.15);
+                border: 1px solid rgba(114, 9, 183, 0.3);
+                border-radius: 16px;
+                padding: 30px;
+                margin-bottom: 30px;
+            }}
+            
+            .credits-number {{
+                font-size: 72px;
+                font-weight: 900;
+                background: linear-gradient(135deg, #a855f7, #9c88ff);
+                background-clip: text;
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                line-height: 1;
+            }}
+            
+            .credits-label {{
+                color: #888;
+                font-size: 14px;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                margin-top: 10px;
+            }}
+            
+            .info {{
+                background: rgba(16, 185, 129, 0.1);
+                border: 1px solid rgba(16, 185, 129, 0.2);
+                border-radius: 12px;
+                padding: 18px;
+                color: #10b981;
+                font-size: 14px;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="bg-lights">
+            <div class="light light-1"></div>
+            <div class="light light-2"></div>
+        </div>
+        
+        <div class="container">
+            <div class="box">
+                <div class="icon">🎨</div>
+                <h1>Credits Unlocked!</h1>
+                <p class="subtitle">You've earned <strong>+2 copy credits</strong>!</p>
+                
+                <div class="credits-box">
+                    <div class="credits-number">{total}</div>
+                    <div class="credits-label">Total Credits</div>
+                </div>
+                
+                <div class="info">
+                    ✓ Close this page and return to Roblox to use your credits!
+                </div>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    
+    def render_copy_error(title, message):
+        return f"""
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{title} - Vadrifts</title>
+        <link rel="icon" href="https://i.imgur.com/ePueN25.png" type="image/png">
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+            
+            body {{
+                background: #000;
+                color: #fff;
+                font-family: 'Inter', sans-serif;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                margin: 0;
+            }}
+            
+            .box {{
+                text-align: center;
+                background: rgba(239, 68, 68, 0.1);
+                border: 1px solid rgba(239, 68, 68, 0.3);
+                padding: 50px 40px;
+                border-radius: 24px;
+                max-width: 450px;
+            }}
+            
+            .icon {{
+                font-size: 70px;
+                margin-bottom: 25px;
+            }}
+            
+            h1 {{
+                color: #ef4444;
+                font-size: 36px;
+                margin-bottom: 15px;
+            }}
+            
+            p {{
+                color: #999;
+                font-size: 15px;
+                line-height: 1.6;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="box">
+            <div class="icon">🚫</div>
+            <h1>{title}</h1>
+            <p>{message}</p>
+        </div>
+    </body>
+    </html>
+    """, 403
     
     return """
     <!DOCTYPE html>
