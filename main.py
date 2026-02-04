@@ -51,13 +51,6 @@ FEATURE_CONFIG = {
         "icon": "🎨",
         "description": "Copy art with special brushes from other players",
         "workink_url": "https://work.ink/YOUR_COPY_ART_LINK"
-    },
-    "auto-farm": {
-        "name": "Auto Farm Credits",
-        "credits_per_unlock": 5,
-        "icon": "🌾",
-        "description": "Automatically farm resources",
-        "workink_url": "https://work.ink/YOUR_AUTO_FARM_LINK"
     }
 }
 
@@ -166,13 +159,44 @@ def require_api_key(f):
         return f(*args, **kwargs)
     return decorated_function
 
+@app.route('/api/feature-config/<feature_id>')
+def get_feature_config(feature_id):
+    if feature_id not in FEATURE_CONFIG:
+        return jsonify({"error": "Feature not found"}), 404
+    
+    return jsonify(FEATURE_CONFIG[feature_id])
+
 @app.route('/unlock/<feature_id>')
 def feature_unlock_page(feature_id):
     if feature_id not in FEATURE_CONFIG:
-        return render_feature_error("Feature Not Found", "This feature doesn't exist.")
+        try:
+            with open('templates/feature-unlock.html', 'r', encoding='utf-8') as f:
+                html_content = f.read()
+            
+            html_content = html_content.replace('{{PAGE_MODE}}', 'error')
+            html_content = html_content.replace('{{ERROR_TITLE}}', 'Feature Not Found')
+            html_content = html_content.replace('{{ERROR_MESSAGE}}', 'This feature does not exist or the link is invalid.')
+            
+            return html_content
+        except FileNotFoundError:
+            return jsonify({"error": "Template not found"}), 404
     
-    config = FEATURE_CONFIG[feature_id]
-    return render_feature_unlock_page(feature_id, config)
+    try:
+        with open('templates/feature-unlock.html', 'r', encoding='utf-8') as f:
+            html_content = f.read()
+        
+        html_content = html_content.replace('{{PAGE_MODE}}', 'unlock')
+        html_content = html_content.replace('{{ERROR_TITLE}}', '')
+        html_content = html_content.replace('{{ERROR_MESSAGE}}', '')
+        html_content = html_content.replace('{{SUCCESS_ICON}}', '')
+        html_content = html_content.replace('{{SUCCESS_NAME}}', '')
+        html_content = html_content.replace('{{CREDITS_ADDED}}', '')
+        html_content = html_content.replace('{{TOTAL_CREDITS}}', '')
+        
+        return html_content
+    except FileNotFoundError:
+        logger.error("feature-unlock.html template not found")
+        return jsonify({"error": "Template not found"}), 404
 
 @app.route('/start-unlock/<feature_id>')
 def start_feature_unlock(feature_id):
@@ -188,7 +212,17 @@ def start_feature_unlock(feature_id):
 @app.route('/complete-unlock/<feature_id>')
 def complete_feature_unlock(feature_id):
     if feature_id not in FEATURE_CONFIG:
-        return render_feature_error("Feature Not Found", "This feature doesn't exist.")
+        try:
+            with open('templates/feature-unlock.html', 'r', encoding='utf-8') as f:
+                html_content = f.read()
+            
+            html_content = html_content.replace('{{PAGE_MODE}}', 'error')
+            html_content = html_content.replace('{{ERROR_TITLE}}', 'Feature Not Found')
+            html_content = html_content.replace('{{ERROR_MESSAGE}}', 'This feature does not exist.')
+            
+            return html_content, 404
+        except FileNotFoundError:
+            return jsonify({"error": "Template not found"}), 404
     
     client_ip = get_client_ip()
     referer = request.headers.get('Referer', '')
@@ -197,10 +231,32 @@ def complete_feature_unlock(feature_id):
     timer_check = verification_timer.check_timer(client_ip)
     
     if not timer_check['valid']:
-        return render_feature_error("Access Denied", "Please start the unlock process from the proper page first.")
+        logger.warning(f"Invalid timer for feature unlock from IP: {client_ip}")
+        try:
+            with open('templates/feature-unlock.html', 'r', encoding='utf-8') as f:
+                html_content = f.read()
+            
+            html_content = html_content.replace('{{PAGE_MODE}}', 'error')
+            html_content = html_content.replace('{{ERROR_TITLE}}', 'Access Denied')
+            html_content = html_content.replace('{{ERROR_MESSAGE}}', 'Please start the unlock process from the proper page first.')
+            
+            return html_content, 403
+        except FileNotFoundError:
+            return jsonify({"error": "Template not found"}), 404
     
     if not is_valid_referrer(referer):
-        return render_feature_error("Invalid Access", "You must complete the verification task to unlock this feature.")
+        logger.warning(f"Invalid referer for feature unlock from IP: {client_ip}")
+        try:
+            with open('templates/feature-unlock.html', 'r', encoding='utf-8') as f:
+                html_content = f.read()
+            
+            html_content = html_content.replace('{{PAGE_MODE}}', 'error')
+            html_content = html_content.replace('{{ERROR_TITLE}}', 'Invalid Access')
+            html_content = html_content.replace('{{ERROR_MESSAGE}}', 'You must complete the verification task to unlock credits.')
+            
+            return html_content, 403
+        except FileNotFoundError:
+            return jsonify({"error": "Template not found"}), 404
     
     verification_timer.mark_verified(client_ip)
     
@@ -214,9 +270,23 @@ def complete_feature_unlock(feature_id):
     feature_credits[client_ip][feature_id] += credits_to_add
     new_total = feature_credits[client_ip][feature_id]
     
-    logger.info(f"Feature '{feature_id}' credits granted to IP: {client_ip}, total: {new_total}")
+    logger.info(f"Feature '{feature_id}' credits granted to IP: {client_ip}, added: {credits_to_add}, total: {new_total}")
     
-    return render_feature_success(config, credits_to_add, new_total)
+    try:
+        with open('templates/feature-unlock.html', 'r', encoding='utf-8') as f:
+            html_content = f.read()
+        
+        html_content = html_content.replace('{{PAGE_MODE}}', 'success')
+        html_content = html_content.replace('{{SUCCESS_ICON}}', config.get('icon', '🎉'))
+        html_content = html_content.replace('{{SUCCESS_NAME}}', config.get('name', 'Feature'))
+        html_content = html_content.replace('{{CREDITS_ADDED}}', str(credits_to_add))
+        html_content = html_content.replace('{{TOTAL_CREDITS}}', str(new_total))
+        html_content = html_content.replace('{{ERROR_TITLE}}', '')
+        html_content = html_content.replace('{{ERROR_MESSAGE}}', '')
+        
+        return html_content
+    except FileNotFoundError:
+        return jsonify({"error": "Template not found"}), 404
 
 @app.route('/check-credits/<feature_id>')
 def check_feature_credits(feature_id):
@@ -245,860 +315,6 @@ def use_feature_credit(feature_id):
     logger.info(f"Credit used for '{feature_id}' by IP: {client_ip}, remaining: {current - 1}")
     
     return jsonify({"success": True, "remaining": current - 1})
-
-def render_feature_unlock_page(feature_id, config):
-    return f"""
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unlock {config['name']} - Vadrifts</title>
-    <link rel="icon" href="https://i.imgur.com/ePueN25.png" type="image/png">
-    <script defer src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-
-        * {{
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }}
-
-        :root {{
-            --gradient-primary: linear-gradient(90deg, #ffffff 0%, #7209b7 100%);
-            --gradient-button: linear-gradient(135deg, #7209b7 0%, #9c88ff 100%);
-            --accent-color: #7209b7;
-            --accent-glow: rgba(114, 9, 183, 0.5);
-        }}
-
-        body {{
-            background: #000;
-            color: #fff;
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }}
-
-        .bg-lights {{
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            pointer-events: none;
-        }}
-
-        .light {{
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(150px);
-            opacity: 0.35;
-            animation: float 15s ease-in-out infinite;
-        }}
-
-        .light-1 {{
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, #7209b7 0%, transparent 70%);
-            top: -150px;
-            left: -150px;
-        }}
-
-        .light-2 {{
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, #9c88ff 0%, transparent 70%);
-            bottom: -150px;
-            right: -150px;
-            animation-delay: -7s;
-        }}
-
-        @keyframes float {{
-            0%, 100% {{ transform: translate(0, 0) scale(1); }}
-            50% {{ transform: translate(30px, -30px) scale(1.1); }}
-        }}
-
-        .particles {{
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 2;
-            pointer-events: none;
-        }}
-
-        .particle {{
-            position: absolute;
-            width: 3px;
-            height: 3px;
-            background: #a855f7;
-            border-radius: 50%;
-            opacity: 0.6;
-            animation: floatUp 20s linear infinite;
-        }}
-
-        @keyframes floatUp {{
-            0% {{ transform: translateY(100vh) translateX(0); opacity: 0; }}
-            10% {{ opacity: 0.6; }}
-            90% {{ opacity: 0.4; }}
-            100% {{ transform: translateY(-50px) translateX(50px); opacity: 0; }}
-        }}
-
-        .navbar {{
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 100;
-            background: rgba(0,0,0,0.4);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 20px;
-            padding: 24px 32px;
-            max-width: 1000px;
-            width: 90%;
-        }}
-
-        .nav-content {{
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }}
-
-        .nav-logo {{
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 24px;
-            font-weight: 700;
-            background: var(--gradient-primary);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-decoration: none;
-        }}
-
-        .nav-logo-img {{
-            width: 28px;
-            height: 28px;
-        }}
-
-        .nav-links {{
-            display: flex;
-            gap: 30px;
-        }}
-
-        .nav-link {{
-            color: #ccc;
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            padding: 8px 12px;
-        }}
-
-        .nav-link:hover {{
-            color: #fff;
-        }}
-
-        .container {{
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 140px 20px 40px;
-            position: relative;
-            z-index: 10;
-        }}
-
-        .main-box {{
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 24px;
-            padding: 50px 40px;
-            animation: fadeIn 0.8s ease;
-        }}
-
-        @keyframes fadeIn {{
-            from {{ opacity: 0; transform: translateY(30px); }}
-            to {{ opacity: 1; transform: translateY(0); }}
-        }}
-
-        .header {{
-            text-align: center;
-            margin-bottom: 35px;
-        }}
-
-        .icon-wrapper {{
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 25px;
-            background: linear-gradient(135deg, #7209b7, #9c88ff);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            box-shadow: 0 15px 40px rgba(114, 9, 183, 0.4);
-        }}
-
-        h1 {{
-            font-size: 32px;
-            font-weight: 800;
-            background: var(--gradient-primary);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 12px;
-        }}
-
-        .subtitle {{
-            color: #888;
-            font-size: 15px;
-            line-height: 1.6;
-        }}
-
-        .vpn-warning {{
-            background: linear-gradient(135deg, rgba(251, 191, 36, 0.12) 0%, rgba(251, 191, 36, 0.06) 100%);
-            border: 1px solid rgba(251, 191, 36, 0.25);
-            border-radius: 14px;
-            padding: 18px 22px;
-            margin-bottom: 25px;
-            display: flex;
-            align-items: flex-start;
-            gap: 14px;
-        }}
-
-        .vpn-warning-icon {{
-            font-size: 22px;
-            flex-shrink: 0;
-        }}
-
-        .vpn-warning-content {{
-            flex: 1;
-        }}
-
-        .vpn-warning-title {{
-            color: #fbbf24;
-            font-size: 13px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 6px;
-        }}
-
-        .vpn-warning-text {{
-            color: #d4a574;
-            font-size: 13px;
-            line-height: 1.6;
-        }}
-
-        .vpn-warning-text strong {{
-            color: #fbbf24;
-        }}
-
-        .instruction-box {{
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0.03) 100%);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            border-radius: 14px;
-            padding: 22px;
-            margin-bottom: 30px;
-        }}
-
-        .instruction-title {{
-            color: #10b981;
-            font-size: 13px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 14px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }}
-
-        .instruction-title i {{
-            width: 18px;
-            height: 18px;
-        }}
-
-        .instruction-steps {{
-            color: #bbb;
-            font-size: 14px;
-            line-height: 1.9;
-            list-style: none;
-            counter-reset: step;
-        }}
-
-        .instruction-steps li {{
-            counter-increment: step;
-            position: relative;
-            padding-left: 36px;
-            margin-bottom: 8px;
-        }}
-
-        .instruction-steps li:last-child {{
-            margin-bottom: 0;
-        }}
-
-        .instruction-steps li::before {{
-            content: counter(step);
-            position: absolute;
-            left: 0;
-            top: 1px;
-            width: 22px;
-            height: 22px;
-            background: rgba(16, 185, 129, 0.15);
-            border: 1px solid rgba(16, 185, 129, 0.4);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            font-weight: 700;
-            color: #10b981;
-        }}
-
-        .unlock-btn {{
-            width: 100%;
-            padding: 18px 24px;
-            background: linear-gradient(135deg, #7209b7 0%, #9c88ff 100%);
-            border: none;
-            border-radius: 14px;
-            color: #fff;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-family: 'Inter', sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 10px 30px rgba(114, 9, 183, 0.35);
-            position: relative;
-            overflow: hidden;
-            margin-bottom: 25px;
-        }}
-
-        .unlock-btn::before {{
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s ease;
-        }}
-
-        .unlock-btn:hover {{
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(114, 9, 183, 0.5);
-        }}
-
-        .unlock-btn:hover::before {{
-            left: 100%;
-        }}
-
-        .unlock-btn:disabled {{
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }}
-
-        .unlock-btn i {{
-            width: 20px;
-            height: 20px;
-        }}
-
-        .info-badges {{
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }}
-
-        .info-badge {{
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            padding: 10px 16px;
-            border-radius: 10px;
-            font-size: 13px;
-            color: #888;
-            font-weight: 500;
-        }}
-
-        .info-badge i {{
-            width: 16px;
-            height: 16px;
-        }}
-
-        .status-msg {{
-            padding: 14px 18px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 20px;
-            display: none;
-            align-items: center;
-            gap: 10px;
-        }}
-
-        .status-msg.show {{
-            display: flex;
-        }}
-
-        .status-msg.loading {{
-            background: rgba(251, 191, 36, 0.12);
-            color: #fbbf24;
-            border: 1px solid rgba(251, 191, 36, 0.25);
-        }}
-
-        .status-msg.error {{
-            background: rgba(239, 68, 68, 0.12);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.25);
-        }}
-
-        .loading-spinner {{
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 50%;
-            border-top-color: currentColor;
-            animation: spin 0.8s linear infinite;
-        }}
-
-        @keyframes spin {{
-            to {{ transform: rotate(360deg); }}
-        }}
-
-        @media (max-width: 768px) {{
-            .navbar {{
-                left: 10px;
-                right: 10px;
-                width: auto;
-                transform: none;
-                padding: 16px 18px;
-            }}
-
-            .nav-links {{
-                gap: 15px;
-            }}
-
-            .nav-link {{
-                font-size: 12px;
-            }}
-
-            .container {{
-                padding: 120px 15px 30px;
-            }}
-
-            .main-box {{
-                padding: 35px 25px;
-            }}
-
-            h1 {{
-                font-size: 26px;
-            }}
-
-            .info-badges {{
-                flex-direction: column;
-            }}
-        }}
-    </style>
-</head>
-<body>
-    <div class="bg-lights">
-        <div class="light light-1"></div>
-        <div class="light light-2"></div>
-    </div>
-
-    <div class="particles" id="particles"></div>
-
-    <nav class="navbar">
-        <div class="nav-content">
-            <a href="/" class="nav-logo">
-                <img src="https://i.imgur.com/ePueN25.png" alt="Vadrifts" class="nav-logo-img">
-                Vadrifts
-            </a>
-            <div class="nav-links">
-                <a href="/scripts" class="nav-link">Scripts</a>
-                <a href="/plugins" class="nav-link">Plugins</a>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container">
-        <div class="main-box">
-            <div class="header">
-                <div class="icon-wrapper">{config['icon']}</div>
-                <h1>Unlock {config['name']}</h1>
-                <p class="subtitle">{config['description']}</p>
-            </div>
-
-            <div class="vpn-warning">
-                <div class="vpn-warning-icon">⚠️</div>
-                <div class="vpn-warning-content">
-                    <div class="vpn-warning-title">Important: VPN/Proxy Notice</div>
-                    <div class="vpn-warning-text">
-                        Please <strong>disable any VPN or proxy</strong> before continuing and <strong>keep it off</strong> during the entire process.
-                    </div>
-                </div>
-            </div>
-
-            <div class="instruction-box">
-                <div class="instruction-title">
-                    <i data-lucide="list-ordered"></i>
-                    <span>How to unlock:</span>
-                </div>
-                <ol class="instruction-steps">
-                    <li>Click the unlock button below</li>
-                    <li>Complete the quick task (~2 minutes)</li>
-                    <li>Return to Roblox and use the feature</li>
-                </ol>
-            </div>
-
-            <div class="status-msg" id="statusMsg"></div>
-
-            <button class="unlock-btn" id="unlockBtn" onclick="startUnlock()">
-                <i data-lucide="unlock"></i>
-                Unlock +{config['credits_per_unlock']} Credits
-            </button>
-
-            <div class="info-badges">
-                <div class="info-badge">
-                    <i data-lucide="clock"></i>
-                    <span>Takes ~2 minutes</span>
-                </div>
-                <div class="info-badge">
-                    <i data-lucide="zap"></i>
-                    <span>+{config['credits_per_unlock']} credits per unlock</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const FEATURE_ID = "{feature_id}";
-        const WORKINK_URL = "{config['workink_url']}";
-
-        function createParticles() {{
-            const container = document.getElementById('particles');
-            for (let i = 0; i < 20; i++) {{
-                const p = document.createElement('div');
-                p.className = 'particle';
-                p.style.left = Math.random() * 100 + '%';
-                p.style.animationDelay = -Math.random() * 20 + 's';
-                p.style.animationDuration = (15 + Math.random() * 10) + 's';
-                container.appendChild(p);
-            }}
-        }}
-
-        function showStatus(msg, type) {{
-            const el = document.getElementById('statusMsg');
-            el.className = 'status-msg show ' + type;
-            if (type === 'loading') {{
-                el.innerHTML = '<span class="loading-spinner"></span> ' + msg;
-            }} else {{
-                el.textContent = msg;
-            }}
-        }}
-
-        async function startUnlock() {{
-            const btn = document.getElementById('unlockBtn');
-            btn.disabled = true;
-            showStatus('Starting verification...', 'loading');
-
-            try {{
-                const res = await fetch('/start-unlock/' + FEATURE_ID);
-                const data = await res.json();
-
-                if (data.success) {{
-                    showStatus('Redirecting...', 'loading');
-                    setTimeout(() => {{
-                        window.location.href = WORKINK_URL;
-                    }}, 800);
-                }} else {{
-                    showStatus('Failed to start. Please try again.', 'error');
-                    btn.disabled = false;
-                }}
-            }} catch (e) {{
-                showStatus('Network error. Please try again.', 'error');
-                btn.disabled = false;
-            }}
-        }}
-
-        window.addEventListener('load', () => {{
-            createParticles();
-            if (window.lucide) lucide.createIcons();
-        }});
-    </script>
-</body>
-</html>
-"""
-
-def render_feature_success(config, credits_added, total):
-    return f"""
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Credits Unlocked! - Vadrifts</title>
-    <link rel="icon" href="https://i.imgur.com/ePueN25.png" type="image/png">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-        
-        * {{
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }}
-        
-        body {{
-            background: #000;
-            color: #fff;
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }}
-        
-        .bg-lights {{
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            pointer-events: none;
-        }}
-        
-        .light {{
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(150px);
-            opacity: 0.4;
-            animation: float 15s ease-in-out infinite;
-        }}
-        
-        .light-1 {{
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, #7209b7 0%, transparent 70%);
-            top: -150px;
-            left: -150px;
-        }}
-        
-        .light-2 {{
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, #9c88ff 0%, transparent 70%);
-            bottom: -150px;
-            right: -150px;
-            animation-delay: -7s;
-        }}
-        
-        @keyframes float {{
-            0%, 100% {{ transform: translate(0, 0) scale(1); }}
-            50% {{ transform: translate(30px, -30px) scale(1.1); }}
-        }}
-        
-        .container {{
-            position: relative;
-            z-index: 10;
-            animation: fadeIn 0.8s ease;
-        }}
-        
-        @keyframes fadeIn {{
-            from {{ opacity: 0; transform: translateY(30px); }}
-            to {{ opacity: 1; transform: translateY(0); }}
-        }}
-        
-        .box {{
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(30px);
-            border: 1px solid rgba(114, 9, 183, 0.3);
-            padding: 60px 50px;
-            border-radius: 28px;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 100px rgba(114, 9, 183, 0.15);
-            text-align: center;
-            width: 480px;
-            max-width: 90vw;
-        }}
-        
-        .icon {{
-            width: 100px;
-            height: 100px;
-            margin: 0 auto 30px;
-            background: linear-gradient(135deg, #7209b7, #9c88ff);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 50px;
-            animation: pulse 2s ease-in-out infinite;
-            box-shadow: 0 20px 50px rgba(114, 9, 183, 0.4);
-        }}
-        
-        @keyframes pulse {{
-            0%, 100% {{ transform: scale(1); }}
-            50% {{ transform: scale(1.05); }}
-        }}
-        
-        h1 {{
-            font-size: 38px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #fff 0%, #9c88ff 100%);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 15px;
-        }}
-        
-        .subtitle {{
-            color: #888;
-            font-size: 16px;
-            margin-bottom: 35px;
-            line-height: 1.6;
-        }}
-        
-        .subtitle strong {{
-            color: #9c88ff;
-        }}
-        
-        .credits-box {{
-            background: rgba(114, 9, 183, 0.15);
-            border: 1px solid rgba(114, 9, 183, 0.3);
-            border-radius: 16px;
-            padding: 30px;
-            margin-bottom: 30px;
-        }}
-        
-        .credits-number {{
-            font-size: 72px;
-            font-weight: 900;
-            background: linear-gradient(135deg, #a855f7, #9c88ff);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            line-height: 1;
-        }}
-        
-        .credits-label {{
-            color: #888;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-top: 10px;
-        }}
-        
-        .info {{
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            border-radius: 12px;
-            padding: 18px;
-            color: #10b981;
-            font-size: 14px;
-        }}
-    </style>
-</head>
-<body>
-    <div class="bg-lights">
-        <div class="light light-1"></div>
-        <div class="light light-2"></div>
-    </div>
-    
-    <div class="container">
-        <div class="box">
-            <div class="icon">{config['icon']}</div>
-            <h1>Credits Unlocked!</h1>
-            <p class="subtitle">You've earned <strong>+{credits_added} {config['name'].lower()}</strong>!</p>
-            
-            <div class="credits-box">
-                <div class="credits-number">{total}</div>
-                <div class="credits-label">Total Credits</div>
-            </div>
-            
-            <div class="info">
-                ✓ Close this page and return to Roblox to use your credits!
-            </div>
-        </div>
-    </div>
-</body>
-</html>
-"""
-
-def render_feature_error(title, message):
-    return f"""
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{title} - Vadrifts</title>
-    <link rel="icon" href="https://i.imgur.com/ePueN25.png" type="image/png">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
-        
-        body {{
-            background: #000;
-            color: #fff;
-            font-family: 'Inter', sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-        }}
-        
-        .box {{
-            text-align: center;
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            padding: 50px 40px;
-            border-radius: 24px;
-            max-width: 450px;
-        }}
-        
-        .icon {{
-            font-size: 70px;
-            margin-bottom: 25px;
-        }}
-        
-        h1 {{
-            color: #ef4444;
-            font-size: 36px;
-            margin-bottom: 15px;
-        }}
-        
-        p {{
-            color: #999;
-            font-size: 15px;
-            line-height: 1.6;
-        }}
-    </style>
-</head>
-<body>
-    <div class="box">
-        <div class="icon">🚫</div>
-        <h1>{title}</h1>
-        <p>{message}</p>
-    </div>
-</body>
-</html>
-""", 403
 
 @app.route('/')
 def home():
