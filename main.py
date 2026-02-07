@@ -572,10 +572,14 @@ def analytics_data():
     
     now = datetime.now()
     week_ago = now - timedelta(days=7)
+    two_weeks_ago = now - timedelta(days=14)
     month_ago = now - timedelta(days=30)
+    two_months_ago = now - timedelta(days=60)
     
     week_execs = []
+    prev_week_execs = []
     month_execs = []
+    prev_month_execs = []
     script_counts = defaultdict(int)
     unique_users_week = set()
     unique_users_month = set()
@@ -594,10 +598,14 @@ def analytics_data():
         if timestamp >= week_ago:
             week_execs.append(log)
             unique_users_week.add(log['hwid'])
+        elif timestamp >= two_weeks_ago:
+            prev_week_execs.append(log)
         
         if timestamp >= month_ago:
             month_execs.append(log)
             unique_users_month.add(log['hwid'])
+        elif timestamp >= two_months_ago:
+            prev_month_execs.append(log)
     
     last_30_days = [(now - timedelta(days=i)).strftime('%Y-%m-%d') for i in range(29, -1, -1)]
     chart_data = [daily_data.get(day, 0) for day in last_30_days]
@@ -610,6 +618,8 @@ def analytics_data():
         'total_executions': len(execution_logs),
         'week_executions': len(week_execs),
         'month_executions': len(month_execs),
+        'prev_week_executions': len(prev_week_execs),
+        'prev_month_executions': len(prev_month_execs),
         'unique_users_week': len(unique_users_week),
         'unique_users_month': len(unique_users_month),
         'script_breakdown': dict(script_counts),
