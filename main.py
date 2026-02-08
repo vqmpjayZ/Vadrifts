@@ -3,10 +3,12 @@ import logging
 import json
 import secrets
 import time
+import atexit
 import requests
 from functools import wraps
 from flask import Flask, request, jsonify, send_file, redirect, send_from_directory, make_response
 from datetime import datetime, timedelta
+from threading import Timer
 
 from config import *
 from discord_bot import start_bot
@@ -41,23 +43,6 @@ TURNSTILE_SECRET_KEY = os.environ.get("TURNSTILE_SECRET_KEY")
 
 JSONBIN_API_KEY = os.environ.get("JSONBIN_API_KEY")
 JSONBIN_BIN_ID = os.environ.get("JSONBIN_BIN_ID")
-
-def auto_save_analytics():
-    import time as _time
-    while True:
-        _time.sleep(1800)
-        try:
-            if execution_logs:
-                save_analytics_to_jsonbin({
-                    'execution_logs': execution_logs,
-                    'last_updated': datetime.now().isoformat()
-                })
-                logger.info("Auto-saved analytics to JSONBin")
-        except Exception as e:
-            logger.error(f"Auto-save failed: {str(e)}")
-            
-analytics_save_thread = threading.Thread(target=auto_save_analytics, daemon=True)
-analytics_save_thread.start()
 
 feature_credits = {}
 
@@ -484,6 +469,54 @@ usage_data = {}
 copy_usage_data = {}
 execution_logs = []
 cloud_data_loaded = False
+_save_timer = None
+_unsaved_changes = False
+_logs_since_last_save = 0
+
+def force_save():
+    global _unsaved_changes, _logs_since_last_save
+    
+    if not execution_logs:
+        return False
+    
+    success = save_analytics_to_jsonbin({
+        'execution_logs': execution_logs,
+        'last_updated': datetime.now().isoformat()
+    })
+    
+    if success:
+        _unsaved_changes = False
+        _logs_since_last_save = 0
+        logger.info(f"Saved {len(execution_logs)} logs to JSONBin")
+    
+    return success
+
+def start_periodic_save():
+    global _save_timer
+    
+    def save_loop():
+        global _save_timer
+        if _unsaved_changes:
+            logger.info("Periodic save triggered")
+            force_save()
+        
+        _save_timer = Timer(300, save_loop)
+        _save_timer.daemon = True
+        _save_timer.start()
+    
+    if _save_timer:
+        _save_timer.cancel()
+    
+    _save_timer = Timer(300, save_loop)
+    _save_timer.daemon = True
+    _save_timer.start()
+    logger.info("Periodic save loop started (every 5 minutes)")
+
+def save_on_exit():
+    logger.info("Server shutting down - saving analytics...")
+    force_save()
+
+atexit.register(save_on_exit)
 
 def ensure_cloud_data_loaded():
     global execution_logs, cloud_data_loaded
@@ -497,6 +530,7 @@ def ensure_cloud_data_loaded():
         logger.info(f"Loaded {len(execution_logs)} logs from JSONBin")
     
     cloud_data_loaded = True
+    start_periodic_save()
 
 @app.route('/check-usage', methods=['GET'])
 def check_usage():
@@ -559,7 +593,7 @@ def update_copy_usage():
 
 @app.route('/log-execution', methods=['GET'])
 def log_execution():
-    global execution_logs
+    global execution_logs, _unsaved_changes, _logs_since_last_save
     ensure_cloud_data_loaded()
     
     hwid = request.args.get('hwid')
@@ -573,13 +607,14 @@ def log_execution():
         })
         
         if len(execution_logs) > 10000:
-            execution_logs.pop(0)
+            execution_logs = execution_logs[-10000:]
         
-        if len(execution_logs) % 5 == 0:
-            save_analytics_to_jsonbin({
-                'execution_logs': execution_logs,
-                'last_updated': datetime.now().isoformat()
-            })
+        _unsaved_changes = True
+        _logs_since_last_save += 1
+        
+        if _logs_since_last_save >= 25:
+            logger.info(f"Batch save triggered after {_logs_since_last_save} new logs")
+            force_save()
     
     return jsonify({"success": True})
 
@@ -649,13 +684,10 @@ def analytics_data():
 def analytics_sync():
     ensure_cloud_data_loaded()
     
-    success = save_analytics_to_jsonbin({
-        'execution_logs': execution_logs,
-        'last_updated': datetime.now().isoformat()
-    })
+    success = force_save()
     
     if success:
-        return jsonify({'success': True, 'message': 'Synced to cloud'})
+        return jsonify({'success': True, 'message': f'Synced {len(execution_logs)} logs to cloud'})
     else:
         return jsonify({'success': False, 'error': 'Failed to sync'}), 500
 
