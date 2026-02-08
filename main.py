@@ -42,6 +42,23 @@ TURNSTILE_SECRET_KEY = os.environ.get("TURNSTILE_SECRET_KEY")
 JSONBIN_API_KEY = os.environ.get("JSONBIN_API_KEY")
 JSONBIN_BIN_ID = os.environ.get("JSONBIN_BIN_ID")
 
+def auto_save_analytics():
+    import time as _time
+    while True:
+        _time.sleep(1800)
+        try:
+            if execution_logs:
+                save_analytics_to_jsonbin({
+                    'execution_logs': execution_logs,
+                    'last_updated': datetime.now().isoformat()
+                })
+                logger.info("Auto-saved analytics to JSONBin")
+        except Exception as e:
+            logger.error(f"Auto-save failed: {str(e)}")
+            
+analytics_save_thread = threading.Thread(target=auto_save_analytics, daemon=True)
+analytics_save_thread.start()
+
 feature_credits = {}
 
 FEATURE_CONFIG = {
@@ -558,7 +575,7 @@ def log_execution():
         if len(execution_logs) > 10000:
             execution_logs.pop(0)
         
-        if len(execution_logs) % 10 == 0:
+        if len(execution_logs) % 5 == 0:
             save_analytics_to_jsonbin({
                 'execution_logs': execution_logs,
                 'last_updated': datetime.now().isoformat()
