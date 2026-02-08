@@ -393,14 +393,14 @@
         }
 
         function makeSparkline(canvas, vals) {
-            var ctx = canvas.getContext('2d');
             var parent = canvas.parentElement;
-            canvas.width = 80;
-            canvas.height = 28;
             canvas.style.width = '80px';
             canvas.style.height = '28px';
+            canvas.width = 160;
+            canvas.height = 56;
             
-            var g = ctx.createLinearGradient(0, 0, 0, 28);
+            var ctx = canvas.getContext('2d');
+            var g = ctx.createLinearGradient(0, 0, 0, 56);
             g.addColorStop(0, 'rgba(88, 101, 242, 0.4)');
             g.addColorStop(1, 'rgba(88, 101, 242, 0)');
             var sliced = vals.slice(-14);
