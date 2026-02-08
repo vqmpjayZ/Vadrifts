@@ -112,7 +112,6 @@
         .section-legend .dot { width: 10px; height: 10px; border-radius: 50%; background: #5865F2; }
 
         .chart-wrap { height: 320px; padding: 0 32px 24px; user-select: none; -webkit-user-select: none; -moz-user-select: none; }
-        .spark-container canvas { pointer-events: none; user-select: none; -webkit-user-select: none; -moz-user-select: none; }
         .chart-wrap canvas, .expand-chart canvas { user-select: none; -webkit-user-select: none; -moz-user-select: none; }
 
         .scripts-card .table-header {
@@ -148,23 +147,12 @@
 
         .script-rank { font-size: 14px; font-weight: 700; color: #6d6f78; font-variant-numeric: tabular-nums; }
         .script-name { font-size: 15px; font-weight: 500; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
         .spark-container { 
             width: 80px; 
             height: 28px; 
-            position: relative;
-            overflow: hidden;
-            flex-shrink: 0;
-            user-select: none; 
-            -webkit-user-select: none; 
-            -moz-user-select: none; 
-            pointer-events: none; 
-        }
-        .spark-container canvas {
-            position: absolute !important;
-            top: 0;
-            left: 0;
-            width: 100% !important;
-            height: 100% !important;
+            display: inline-block;
+            vertical-align: middle;
         }
 
         .script-trend { display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 12px; font-weight: 600; }
@@ -299,6 +287,7 @@
     <script type="module" src="/src/main.tsx"></script>
     <script>
         var mainChart = null;
+        var sparklineCharts = {};
         var scriptCharts = {};
         var data = null;
         var expanded = null;
@@ -392,21 +381,26 @@
             });
         }
 
-        function makeSparkline(canvas, vals) {
-            var parent = canvas.parentElement;
-            canvas.style.width = '80px';
-            canvas.style.height = '28px';
-            canvas.width = 160;
-            canvas.height = 56;
+        function makeSparkline(canvasId, vals) {
+            var canvas = document.getElementById(canvasId);
+            if (!canvas) return null;
             
-            var ctx = canvas.getContext('2d');
-            var g = ctx.createLinearGradient(0, 0, 0, 56);
-            g.addColorStop(0, 'rgba(88, 101, 242, 0.4)');
-            g.addColorStop(1, 'rgba(88, 101, 242, 0)');
+            if (sparklineCharts[canvasId]) {
+                sparklineCharts[canvasId].destroy();
+                delete sparklineCharts[canvasId];
+            }
+            
             var sliced = vals.slice(-14);
             var mx = Math.max.apply(null, sliced);
-            var normalized = mx > 0 ? sliced.map(function(v) { return v / mx; }) : sliced;
-            return new Chart(ctx, {
+            if (mx === 0) mx = 1;
+            var normalized = sliced.map(function(v) { return v / mx; });
+            
+            var ctx = canvas.getContext('2d');
+            var g = ctx.createLinearGradient(0, 0, 0, 28);
+            g.addColorStop(0, 'rgba(88, 101, 242, 0.4)');
+            g.addColorStop(1, 'rgba(88, 101, 242, 0)');
+            
+            var chart = new Chart(ctx, {
                 type: 'line',
                 data: { 
                     labels: normalized.map(function(_, i) { return i; }), 
@@ -422,20 +416,23 @@
                     }] 
                 },
                 options: { 
-                    responsive: false,
+                    responsive: true,
                     maintainAspectRatio: false,
                     plugins: { 
                         legend: { display: false }, 
                         tooltip: { enabled: false } 
                     }, 
                     scales: { 
-                        y: { display: false, min: 0, max: 1.1 }, 
+                        y: { display: false, min: 0, max: 1.2 }, 
                         x: { display: false } 
                     }, 
-                    events: [], 
-                    animation: false 
+                    events: [],
+                    animation: false
                 }
             });
+            
+            sparklineCharts[canvasId] = chart;
+            return chart;
         }
 
         function toggleScript(name) {
@@ -498,7 +495,7 @@
                 h += '<button class="script-row" onclick="toggleScript(\'' + name.replace(/'/g, "\\'") + '\')">';
                 h += '<span class="col-rank script-rank">' + (i + 1) + '</span>';
                 h += '<span class="col-name script-name">' + name + '</span>';
-                h += '<span class="col-spark"><span class="spark-container"><canvas id="spark-' + key + '"></canvas></span></span>';
+                h += '<span class="col-spark"><div class="spark-container"><canvas id="spark-' + key + '" width="80" height="28"></canvas></div></span>';
                 h += '<span class="col-trend">' + scriptTrendHTML(daily) + '</span>';
                 h += '<span class="col-count script-count">' + count.toLocaleString() + '</span>';
                 h += '<span class="col-arrow script-arrow"><svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
@@ -521,18 +518,27 @@
             var mc = document.getElementById('mainChart');
             if (mc) mainChart = makeChart(mc, data.chart_labels, data.chart_data, 320, true);
 
-            Object.keys(scriptCharts).forEach(function(k) { scriptCharts[k].destroy(); });
+            Object.keys(sparklineCharts).forEach(function(k) { 
+                sparklineCharts[k].destroy(); 
+            });
+            sparklineCharts = {};
+            
+            Object.keys(scriptCharts).forEach(function(k) { 
+                scriptCharts[k].destroy(); 
+            });
             scriptCharts = {};
 
-            scripts.forEach(function(entry) {
-                var name = entry[0];
-                var daily = (data.script_daily_data && data.script_daily_data[name]) || [];
-                if (daily.length > 0) {
-                    var key = name.replace(/[^a-zA-Z0-9]/g, '_');
-                    var sc = document.getElementById('spark-' + key);
-                    if (sc) makeSparkline(sc, daily);
-                }
-            });
+            setTimeout(function() {
+                scripts.forEach(function(entry) {
+                    var name = entry[0];
+                    var daily = (data.script_daily_data && data.script_daily_data[name]) || [];
+                    if (daily.length > 0) {
+                        var key = name.replace(/[^a-zA-Z0-9]/g, '_');
+                        makeSparkline('spark-' + key, daily);
+                    }
+                });
+            }, 50);
+            
             expanded = null;
         }
 
