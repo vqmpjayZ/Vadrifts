@@ -148,7 +148,24 @@
 
         .script-rank { font-size: 14px; font-weight: 700; color: #6d6f78; font-variant-numeric: tabular-nums; }
         .script-name { font-size: 15px; font-weight: 500; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .spark-container { width: 80px; height: 28px; user-select: none; -webkit-user-select: none; -moz-user-select: none; pointer-events: none; }
+        .spark-container { 
+            width: 80px; 
+            height: 28px; 
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+            user-select: none; 
+            -webkit-user-select: none; 
+            -moz-user-select: none; 
+            pointer-events: none; 
+        }
+        .spark-container canvas {
+            position: absolute !important;
+            top: 0;
+            left: 0;
+            width: 100% !important;
+            height: 100% !important;
+        }
 
         .script-trend { display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 12px; font-weight: 600; }
         .script-trend.up { color: #3ba55d; }
@@ -377,6 +394,12 @@
 
         function makeSparkline(canvas, vals) {
             var ctx = canvas.getContext('2d');
+            var parent = canvas.parentElement;
+            canvas.width = 80;
+            canvas.height = 28;
+            canvas.style.width = '80px';
+            canvas.style.height = '28px';
+            
             var g = ctx.createLinearGradient(0, 0, 0, 28);
             g.addColorStop(0, 'rgba(88, 101, 242, 0.4)');
             g.addColorStop(1, 'rgba(88, 101, 242, 0)');
@@ -385,8 +408,33 @@
             var normalized = mx > 0 ? sliced.map(function(v) { return v / mx; }) : sliced;
             return new Chart(ctx, {
                 type: 'line',
-                data: { labels: normalized.map(function(_, i) { return i; }), datasets: [{ data: normalized, borderColor: '#5865F2', backgroundColor: g, tension: 0.4, fill: true, pointRadius: 0, pointHoverRadius: 0, borderWidth: 1.5 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, scales: { y: { display: false, min: 0, max: 1.1 }, x: { display: false } }, events: [], animation: false }
+                data: { 
+                    labels: normalized.map(function(_, i) { return i; }), 
+                    datasets: [{ 
+                        data: normalized, 
+                        borderColor: '#5865F2', 
+                        backgroundColor: g, 
+                        tension: 0.4, 
+                        fill: true, 
+                        pointRadius: 0, 
+                        pointHoverRadius: 0, 
+                        borderWidth: 1.5 
+                    }] 
+                },
+                options: { 
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { display: false }, 
+                        tooltip: { enabled: false } 
+                    }, 
+                    scales: { 
+                        y: { display: false, min: 0, max: 1.1 }, 
+                        x: { display: false } 
+                    }, 
+                    events: [], 
+                    animation: false 
+                }
             });
         }
 
