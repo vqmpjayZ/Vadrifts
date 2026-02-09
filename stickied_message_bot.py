@@ -8,7 +8,18 @@ from discord.ext import commands
 from discord import Embed, app_commands
 from config import STICKIED_TOKEN
 
-r = redis.from_url(os.environ["REDIS_URL"])
+REDIS_URL = os.environ.get("REDIS_URL")
+if not REDIS_URL:
+    print("❌ REDIS_URL not set! Data will NOT persist between restarts.")
+    r = None
+else:
+    try:
+        r = redis.from_url(REDIS_URL, decode_responses=True, ssl_cert_reqs=None)
+        r.ping()
+        print("✅ Connected to Redis")
+    except Exception as e:
+        print(f"❌ Redis connection failed: {e}")
+        r = None
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -19,12 +30,23 @@ bot = commands.Bot(command_prefix="?", intents=intents)
 stickied_messages = {}
 
 def save_data():
-    r.set("stickied_messages", json.dumps(stickied_messages))
+    if r:
+        try:
+            r.set("stickied_messages", json.dumps(stickied_messages))
+        except Exception as e:
+            print(f"❌ Redis save failed: {e}")
 
 def load_data():
     global stickied_messages
-    raw = r.get("stickied_messages")
-    stickied_messages = json.loads(raw) if raw else {}
+    if r:
+        try:
+            raw = r.get("stickied_messages")
+            stickied_messages = json.loads(raw) if raw else {}
+            print(f"✅ Loaded {len(stickied_messages)} stickied channels from Redis")
+            return
+        except Exception as e:
+            print(f"❌ Redis load failed: {e}")
+    stickied_messages = {}
 
 @bot.event
 async def on_ready():
