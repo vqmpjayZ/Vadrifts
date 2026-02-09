@@ -4,6 +4,7 @@ import json
 import secrets
 import time
 import atexit
+import signal
 import requests
 from functools import wraps
 from flask import Flask, request, jsonify, send_file, redirect, send_from_directory, make_response
@@ -471,10 +472,10 @@ execution_logs = []
 cloud_data_loaded = False
 _save_timer = None
 _unsaved_changes = False
-_logs_since_last_save = 0
+_last_save_time = 0
 
 def force_save():
-    global _unsaved_changes, _logs_since_last_save
+    global _unsaved_changes, _last_save_time
     
     if not execution_logs:
         return False
@@ -486,10 +487,19 @@ def force_save():
     
     if success:
         _unsaved_changes = False
-        _logs_since_last_save = 0
+        _last_save_time = time.time()
         logger.info(f"Saved {len(execution_logs)} logs to JSONBin")
     
     return success
+
+def debounced_save():
+    global _last_save_time
+    
+    if time.time() - _last_save_time < 60:
+        return
+    
+    if _unsaved_changes:
+        force_save()
 
 def start_periodic_save():
     global _save_timer
@@ -500,17 +510,25 @@ def start_periodic_save():
             logger.info("Periodic save triggered")
             force_save()
         
-        _save_timer = Timer(300, save_loop)
+        _save_timer = Timer(120, save_loop)
         _save_timer.daemon = True
         _save_timer.start()
     
     if _save_timer:
         _save_timer.cancel()
     
-    _save_timer = Timer(300, save_loop)
+    _save_timer = Timer(120, save_loop)
     _save_timer.daemon = True
     _save_timer.start()
-    logger.info("Periodic save loop started (every 5 minutes)")
+    logger.info("Periodic save loop started (every 2 minutes)")
+
+def shutdown_handler(signum, frame):
+    logger.info(f"Received signal {signum} - saving before shutdown...")
+    force_save()
+    exit(0)
+
+signal.signal(signal.SIGTERM, shutdown_handler)
+signal.signal(signal.SIGINT, shutdown_handler)
 
 def save_on_exit():
     logger.info("Server shutting down - saving analytics...")
@@ -593,7 +611,7 @@ def update_copy_usage():
 
 @app.route('/log-execution', methods=['GET'])
 def log_execution():
-    global execution_logs, _unsaved_changes, _logs_since_last_save
+    global execution_logs, _unsaved_changes
     ensure_cloud_data_loaded()
     
     hwid = request.args.get('hwid')
@@ -610,11 +628,7 @@ def log_execution():
             execution_logs = execution_logs[-10000:]
         
         _unsaved_changes = True
-        _logs_since_last_save += 1
-        
-        if _logs_since_last_save >= 25:
-            logger.info(f"Batch save triggered after {_logs_since_last_save} new logs")
-            force_save()
+        debounced_save()
     
     return jsonify({"success": True})
 
