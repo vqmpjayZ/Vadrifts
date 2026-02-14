@@ -291,6 +291,14 @@ def complete_feature_unlock(feature_id):
     except FileNotFoundError:
         return jsonify({"error": "Template not found"}), 404
 
+@app.route('/docs/arrayfield')
+def arrayfield_docs():
+    try:
+        return send_file('templates/arrayfield-docs.html')
+    except FileNotFoundError:
+        logger.error("arrayfield-docs.html template not found")
+        return jsonify({"error": "Documentation page not found"}), 404
+        
 @app.route('/check-credits/<feature_id>')
 def check_feature_credits(feature_id):
     client_ip = get_client_ip()
