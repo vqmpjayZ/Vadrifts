@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArrayField Documentation</title>
+    <meta name="description" content="ArrayField is a powerful and feature-rich interface suite for Roblox.">
+    <meta name="theme-color" content="#1a1a2e">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css">
+    <style>
+        :root {
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #16213e;
+            --bg-tertiary: #0f3460;
+            --bg-sidebar: #141425;
+            --bg-code: #0d1117;
+            --bg-inline-code: #2a2a4a;
+            --text-primary: #e4e4e7;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --accent: #6c63ff;
+            --accent-hover: #5a52d5;
+            --accent-dim: rgba(108, 99, 255, 0.15);
+            --border: #2a2a4a;
+            --border-hover: #3a3a5a;
+            --success: #22c55e;
+            --warning: #eab308;
+            --error: #ef4444;
+            --info: #3b82f6;
+            --sidebar-width: 260px;
+            --navbar-height: 60px;
+            --tip-bg: rgba(34, 197, 94, 0.1);
+            --tip-border: #22c55e;
+            --warn-bg: rgba(234, 179, 8, 0.1);
+            --warn-border: #eab308;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 80px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        ::selection {
+            background: var(--accent);
+            color: white;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--border-hover);
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--navbar-height);
+            background: rgba(20, 20, 37, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--text-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar-brand span {
+            color: var(--accent);
+        }
+
+        .navbar-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+
+        .navbar-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 6px 14px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .navbar-links a:hover {
+            color: var(--text-primary);
+            background: var(--accent-dim);
+        }
+
+        .layout {
+            display: flex;
+            margin-top: var(--navbar-height);
+            min-height: calc(100vh - var(--navbar-height));
+        }
+
+        .sidebar {
+            position: fixed;
+            top: var(--navbar-height);
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - var(--navbar-height));
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            padding: 16px 0;
+            z-index: 100;
+        }
+
+        .sidebar-section {
+            padding: 0 12px;
+            margin-bottom: 8px;
+        }
+
+        .sidebar-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-muted);
+            padding: 8px 12px 4px;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 6px 12px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            border-radius: 6px;
+            transition: all 0.15s;
+            margin: 1px 0;
+        }
+
+        .sidebar a:hover {
+            color: var(--text-primary);
+            background: var(--accent-dim);
+        }
+
+        .sidebar a.active {
+            color: var(--accent);
+            background: var(--accent-dim);
+            font-weight: 500;
+        }
+
+        .sidebar a.sub {
+            padding-left: 28px;
+            font-size: 12.5px;
+        }
+
+        .main {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            max-width: 900px;
+            padding: 40px 48px 80px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            letter-spacing: -0.5px;
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-top: 56px;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+            letter-spacing: -0.3px;
+        }
+
+        h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 32px;
+            margin-bottom: 12px;
+        }
+
+        p {
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+        }
+
+        a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        ul, ol {
+            margin-bottom: 16px;
+            padding-left: 24px;
+        }
+
+        li {
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+        }
+
+        li strong {
+            color: var(--text-primary);
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+        }
+
+        :not(pre) > code {
+            background: var(--bg-inline-code);
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 12.5px;
+            color: #c4b5fd;
+        }
+
+        pre {
+            background: var(--bg-code) !important;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        pre code {
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .code-block-wrapper {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: var(--border);
+            border: none;
+            color: var(--text-muted);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.2s;
+        }
+
+        .code-block-wrapper:hover .copy-btn {
+            opacity: 1;
+        }
+
+        .copy-btn:hover {
+            background: var(--border-hover);
+            color: var(--text-primary);
+        }
+
+        .tip, .warning {
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+        }
+
+        .tip {
+            background: var(--tip-bg);
+            border-color: var(--tip-border);
+        }
+
+        .warning {
+            background: var(--warn-bg);
+            border-color: var(--warn-border);
+        }
+
+        .tip-title, .warning-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tip-title { color: var(--success); }
+        .warning-title { color: var(--warning); }
+
+        .tip p, .warning p {
+            margin-bottom: 0;
+            font-size: 14px;
+        }
+
+        .section-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 48px 0;
+            border: none;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 48px 40px;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 40px;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, var(--accent), #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 500px;
+            margin: 0 auto 24px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 22px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            text-decoration: none;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            color: var(--text-primary);
+            border-color: var(--border-hover);
+            text-decoration: none;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .feature {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .feature-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .feature h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .feature p {
+            font-size: 13px;
+            margin-bottom: 0;
+        }
+
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 13.5px;
+        }
+
+        .param-table th {
+            text-align: left;
+            padding: 10px 14px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+        }
+
+        .param-table td {
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        .param-table tr:hover td {
+            background: rgba(108, 99, 255, 0.03);
+        }
+
+        .type {
+            color: #c084fc;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+        }
+
+        footer {
+            margin-left: var(--sidebar-width);
+            padding: 24px 48px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+                z-index: 999;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 24px 20px 60px;
+            }
+
+            footer {
+                margin-left: 0;
+                padding: 24px 20px;
+            }
+
+            .mobile-toggle {
+                display: block;
+            }
+
+            .hero h1 {
+                font-size: 28px;
+            }
+
+            .hero {
+                padding: 32px 20px;
+            }
+
+            h1 { font-size: 26px; }
+            h2 { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <button class="mobile-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+    <a class="navbar-brand" href="/docs/arrayfield"><span>ArrayField</span> Docs</a>
+    <div class="navbar-links">
+        <a href="https://github.com/vqmpjayZ/laboratory" target="_blank">GitHub</a>
+        <a href="https://discord.gg/WDbJ5wE2cR" target="_blank">Discord</a>
+    </div>
+</nav>
+
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sidebar-section">
+            <a href="#introduction">Introduction</a>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-title">Configuration</div>
+            <a href="#booting">Booting the Library</a>
+            <a href="#windows">Windows</a>
+            <a href="#tabs">Tabs</a>
+            <a href="#categories">Categories</a>
+            <a href="#sections">Sections</a>
+            <a href="#dividers">Dividers & Spacing</a>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-title">Interactive Elements</div>
+            <a href="#buttons">Buttons</a>
+            <a href="#toggles">Toggles</a>
+            <a href="#sliders">Sliders</a>
+            <a href="#inputs">Text Inputs</a>
+            <a href="#keybinds">Keybinds</a>
+            <a href="#dropdowns">Dropdowns</a>
+            <a href="#colorpickers">Color Pickers</a>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-title">UI Components</div>
+            <a href="#labels">Labels</a>
+            <a href="#paragraphs">Paragraphs</a>
+            <a href="#images">Images</a>
+            <a href="#console">Console</a>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-title">Feedback</div>
+            <a href="#notifications">Notifications</a>
+            <a href="#prompts">Prompts & Dialogs</a>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-title">Customization</div>
+            <a href="#themes">Themes</a>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-title">Reference</div>
+            <a href="#methods">Universal Methods</a>
+            <a href="#saving">Saving & Loading</a>
+            <a href="#destroy">Destroying the UI</a>
+        </div>
+    </aside>
+
+    <main class="main">
+
+        <section id="introduction">
+            <div class="hero">
+                <h1>ArrayField</h1>
+                <p>A powerful, feature-rich, and beautifully designed interface suite for Roblox.</p>
+                <div class="hero-buttons">
+                    <a class="btn btn-primary" href="#booting">Get Started</a>
+                    <a class="btn btn-secondary" href="https://discord.gg/WDbJ5wE2cR" target="_blank">Join Discord</a>
+                </div>
+            </div>
+
+            <h2 style="margin-top: 24px; border: none; padding: 0;">Why ArrayField?</h2>
+
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">🎨</div>
+                    <h4>Themeable</h4>
+                    <p>Multiple built-in themes with full custom theme support, switchable in-app</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">📂</div>
+                    <h4>Categories</h4>
+                    <p>Organize tabs into collapsible groups in the sidebar</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🖥️</div>
+                    <h4>Console Element</h4>
+                    <p>Built-in terminal-style console for logging with color coded entries</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🔔</div>
+                    <h4>Notifications</h4>
+                    <p>Rich notifications with action buttons and icons</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">💾</div>
+                    <h4>Auto Save</h4>
+                    <p>Configuration saving with flag system, togglable from settings</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🔓</div>
+                    <h4>Open Source</h4>
+                    <p>Fully open source and free to use in any project</p>
+                </div>
+            </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <section id="booting">
+            <h1>Booting the Library</h1>
+
+            <h2 id="loading">Loading ArrayField</h2>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">local ArrayField = loadstring(game:HttpGet('https://raw.githubusercontent.com/vqmpjayZ/laboratory/refs/heads/main/ArrayField/ArrayField.lua'))()</code></pre>
+            </div>
+
+            <h3>Enabling Configuration Saving</h3>
+
+            <div class="tip">
+                <div class="tip-title">💡 Tip</div>
+                <p>Configuration saving is toggled by the user from the in-app settings panel. As a developer, you just need to set a <code>FolderName</code> and <code>FileName</code> in <code>ConfigurationSaving</code>, and assign a unique <code>Flag</code> to each element you want saved.</p>
+            </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <section id="windows">
+            <h1>Windows</h1>
+
+            <h2>Creating a Window</h2>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">local Window = ArrayField:CreateWindow({
+    Name = "My Script Hub",
+    Icon = "shield",
+    LoadingTitle = "Loading Script Hub",
+    LoadingSubtitle = "by YourName",
+    ConfigurationSaving = {
+        FolderName = "MyScriptHub",
+        FileName = "Config"
+    }
+})</code></pre>
+            </div>
+
+            <table class="param-table">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>Name</code></td>
+                        <td><span class="type">string</span></td>
+                        <td>Window title displayed in the topbar</td>
+                    </tr>
+                    <tr>
+                        <td><code>Icon</code></td>
+                        <td><span class="type">string | number</span></td>
+                        <td>Lucide icon name or Roblox asset ID for the topbar icon</td>
+                    </tr>
+                    <tr>
+                        <td><code>LoadingTitle</code></td>
+                        <td><span class="type">string</span></td>
+                        <td>Text shown during the loading screen</td>
+                    </tr>
+                    <tr>
+                        <td><code>LoadingSubtitle</code></td>
+                        <td><span class="type">string</span></td>
+                        <td>Subtitle shown during the loading screen</td>
+                    </tr>
+                    <tr>
+                        <td><code>DefaultTheme</code></td>
+                        <td><span class="type">string</span></td>
+                        <td>Optional. Forces a theme and prevents users from keeping their previously selected one</td>
+                    </tr>
+                    <tr>
+                        <td><code>ConfigurationSaving</code></td>
+                        <td><span class="type">table</span></td>
+                        <td>Contains <code>FolderName</code> and <code>FileName</code> for config file storage</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>Changing Visibility</h2>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">ArrayField:SetVisibility(false)
+
+local isVisible = ArrayField:IsVisible()</code></pre>
+            </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <section id="tabs">
+            <h1>Tabs</h1>
+
+            <h2>Creating a Tab</h2>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">local Tab = Window:CreateTab("Main", "home")</code></pre>
+            </div>
+
+            <p>The first argument is the tab name, the second is an optional icon (Lucide icon name or Roblox asset ID).</p>
+
+            <h3 id="lucide-icons">Lucide Icon Support</h3>
+
+            <p>ArrayField supports <a href="https://lucide.dev/icons/" target="_blank">Lucide Icons</a>. Pass the icon name as a string:</p>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">local CombatTab = Window:CreateTab("Combat", "sword")
+local VisualsTab = Window:CreateTab("Visuals", "eye")
+local PlayerTab = Window:CreateTab("Player", "user")</code></pre>
+            </div>
+
+            <p>You can also use Roblox asset IDs:</p>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">local Tab = Window:CreateTab("Tab Example", 4483362458)</code></pre>
+            </div>
+
+            <p><a href="https://lucide.dev/icons/" target="_blank">Browse all Lucide Icons</a> · <a href="https://github.com/latte-soft/lucide-roblox/tree/master/icons/compiled/48px" target="_blank">Supported Icons List</a></p>
+
+            <div class="tip">
+                <div class="tip-title">💡 Marquee Effect</div>
+                <p>If a tab name is too long to fit in the sidebar, it automatically scrolls horizontally so the full name is always visible.</p>
+            </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <section id="categories">
+            <h1>Categories</h1>
+
+            <p>Categories let you organize tabs into collapsible groups in the sidebar.</p>
+
+            <h2>Creating a Category</h2>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">local MainCategory = Window:CreateCategory("Main Features", {DefaultOpen = true})
+local SettingsCategory = Window:CreateCategory("Settings", {DefaultOpen = false})</code></pre>
+            </div>
+
+            <h2>Creating Tabs Under Categories</h2>
+
+            <p>Pass the category as the third argument to <code>CreateTab</code>:</p>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">local PlayerTab = Window:CreateTab("Player", "user", MainCategory)
+local ConfigTab = Window:CreateTab("Config", "settings", SettingsCategory)</code></pre>
+            </div>
+
+            <table class="param-table">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>Name</code></td>
+                        <td><span class="type">string</span></td>
+                        <td>Category display name</td>
+                    </tr>
+                    <tr>
+                        <td><code>DefaultOpen</code></td>
+                        <td><span class="type">boolean</span></td>
+                        <td>Whether the category starts expanded or collapsed</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <hr class="section-divider">
+
+        <section id="sections">
+            <h1>Sections</h1>
+
+            <p>Sections organize elements within a tab into titled groups.</p>
+
+            <h2>Creating a Section</h2>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">local Section = Tab:CreateSection("Movement")</code></pre>
+            </div>
+
+            <h3>Updating a Section</h3>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">Section:Set("New Section Title")</code></pre>
+            </div>
+
+            <p>To place elements inside a section, pass <code>SectionParent = Section</code> in the element's settings table.</p>
+        </section>
+
+        <hr class="section-divider">
+
+        <section id="dividers">
+            <h1>Dividers & Spacing</h1>
+
+            <h2>Creating a Separator</h2>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">Tab:CreateSeparator(Section, {
+    Title = "Advanced Settings",
+    Width = 0.9,
+    Padding = 10
+})</code></pre>
+            </div>
+
+            <table class="param-table">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>Title</code></td>
+                        <td><span class="type">string</span></td>
+                        <td>Optional text displayed in the center of the separator</td>
+                    </tr>
+                    <tr>
+                        <td><code>Width</code></td>
+                        <td><span class="type">number</span></td>
+                        <td>0 to 1, percentage of container width</td>
+                    </tr>
+                    <tr>
+                        <td><code>Padding</code></td>
+                        <td><span class="type">number</span></td>
+                        <td>Vertical padding in pixels</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>Creating Spacing</h2>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">Tab:CreateSpacing(Section, 15)</code></pre>
+            </div>
+
+            <p>Adds vertical empty space (in pixels) between elements.</p>
+        </section>
+
+        <hr class="section-divider">
+
+        <section id="buttons">
+            <h1>Buttons</h1>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">Tab:CreateButton({
+    Name = "Click Me",
+    Description = "Appears on hover",
+    Interact = "click",
+    SectionParent = Section,
+    Callback = function()
+        print("Button clicked!")
+    end
+})</code></pre>
+            </div>
+
+            <table class="param-table">
+                <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+                <tbody>
+                    <tr><td><code>Name</code></td><td><span class="type">string</span></td><td>Button label</td></tr>
+                    <tr><td><code>Description</code></td><td><span class="type">string</span></td><td>Optional hover description</td></tr>
+                    <tr><td><code>Interact</code></td><td><span class="type">string</span></td><td>Optional hint text on the button</td></tr>
+                    <tr><td><code>SectionParent</code></td><td><span class="type">Section</span></td><td>Optional section to place the button in</td></tr>
+                    <tr><td><code>Callback</code></td><td><span class="type">function</span></td><td>Fires when the button is clicked</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <hr class="section-divider">
+
+        <section id="toggles">
+            <h1>Toggles</h1>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">local Toggle = Tab:CreateToggle({
+    Name = "Speed Boost",
+    Description = "Increases movement speed",
+    CurrentValue = false,
+    Flag = "SpeedToggle",
+    SectionParent = Section,
+    Callback = function(Value)
+        print("Speed Boost:", Value)
+    end
+})</code></pre>
+            </div>
+
+            <h3>Methods</h3>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">Toggle:Set(true)
+
+Toggle:Lock("Premium feature")
+Toggle:Unlock()</code></pre>
+            </div>
+
+            <table class="param-table">
+                <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+                <tbody>
+                    <tr><td><code>Name</code></td><td><span class="type">string</span></td><td>Toggle label</td></tr>
+                    <tr><td><code>Description</code></td><td><span class="type">string</span></td><td>Optional hover description</td></tr>
+                    <tr><td><code>CurrentValue</code></td><td><span class="type">boolean</span></td><td>Initial toggle state</td></tr>
+                    <tr><td><code>Flag</code></td><td><span class="type">string</span></td><td>Unique ID for config saving</td></tr>
+                    <tr><td><code>Callback</code></td><td><span class="type">function</span></td><td>Receives <code>true</code> or <code>false</code></td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <hr class="section-divider">
+
+        <section id="sliders">
+            <h1>Sliders</h1>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">local Slider = Tab:CreateSlider({
+    Name = "Speed Multiplier",
+    Description = "Adjust speed from 1x to 10x",
+    Range = {1, 10},
+    Increment = 0.5,
+    Suffix = "x",
+    CurrentValue = 1,
+    Flag = "SpeedValue",
+    SectionParent = Section,
+    Callback = function(Value)
+        print("Speed:", Value)
+    end
+})</code></pre>
+            </div>
+
+            <h3>Methods</h3>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">Slider:Set(5)</code></pre>
+            </div>
+
+            <table class="param-table">
+                <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+                <tbody>
+                    <tr><td><code>Range</code></td><td><span class="type">{min, max}</span></td><td>Min and max values</td></tr>
+                    <tr><td><code>Increment</code></td><td><span class="type">number</span></td><td>Step size</td></tr>
+                    <tr><td><code>Suffix</code></td><td><span class="type">string</span></td><td>Optional display suffix (e.g. "x", "%", "studs")</td></tr>
+                    <tr><td><code>CurrentValue</code></td><td><span class="type">number</span></td><td>Starting value</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <hr class="section-divider">
+
+        <section id="inputs">
+            <h1>Text Inputs</h1>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">local Input = Tab:CreateInput({
+    Name = "Username",
+    Description = "Enter a player's username",
+    PlaceholderText = "Type here...",
+    RemoveTextAfterFocusLost = false,
+    NumbersOnly = false,
+    CharacterLimit = 20,
+    OnEnter = false,
+    SectionParent = Section,
+    Callback = function(Text)
+        print("Input:", Text)
+    end
+})</code></pre>
+            </div>
+
+            <h3>Methods</h3>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">Input:Set("NewUsername")</code></pre>
+            </div>
+
+            <table class="param-table">
+                <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+                <tbody>
+                    <tr><td><code>PlaceholderText</code></td><td><span class="type">string</span></td><td>Grayed-out hint text</td></tr>
+                    <tr><td><code>RemoveTextAfterFocusLost</code></td><td><span class="type">boolean</span></td><td>Clear text when clicking away</td></tr>
+                    <tr><td><code>NumbersOnly</code></td><td><span class="type">boolean</span></td><td>Only allow numeric input</td></tr>
+                    <tr><td><code>CharacterLimit</code></td><td><span class="type">number</span></td><td>Max characters allowed</td></tr>
+                    <tr><td><code>OnEnter</code></td><td><span class="type">boolean</span></td><td>Only fire callback on Enter key</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <hr class="section-divider">
+
+        <section id="keybinds">
+            <h1>Keybinds</h1>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">local Keybind = Tab:CreateKeybind({
+    Name = "Fly Key",
+    Description = "Press to toggle flight",
+    CurrentKeybind = "F",
+    HoldToInteract = false,
+    Flag = "FlyKey",
+    SectionParent = Section,
+    Callback = function(IsHeld)
+        print("Fly key pressed!")
+    end
+})</code></pre>
+            </div>
+
+            <h3>Methods</h3>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">Keybind:Set("G")</code></pre>
+            </div>
+
+            <table class="param-table">
+                <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+                <tbody>
+                    <tr><td><code>CurrentKeybind</code></td><td><span class="type">string</span></td><td>Default key</td></tr>
+                    <tr><td><code>HoldToInteract</code></td><td><span class="type">boolean</span></td><td>If true, callback fires while held</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <hr class="section-divider">
+
+        <section id="dropdowns">
+            <h1>Dropdowns</h1>
+
+            <h2>Single Selection</h2>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">local Dropdown = Tab:CreateDropdown({
+    Name = "Select Weapon",
+    Options = {"Sword", "Axe", "Spear", "Bow"},
+    CurrentOption = "Sword",
+    MultiSelection = false,
+    Flag = "SelectedWeapon",
+    Callback = function(Option)
+        print("Selected:", Option)
+    end
+})</code></pre>
+            </div>
+
+            <h2>Multi Selection</h2>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">local Features = Tab:CreateDropdown({
+    Name = "Enable Features",
+    Options = {"Auto Heal", "Auto Attack", "Auto Block"},
+    CurrentOption = {"Auto Heal"},
+    MultiSelection = true,
+    Flag = "EnabledFeatures",
+    Callback = function(Option)
+        print("Toggled:", Option)
+    end
+})</code></pre>
+            </div>
+
+            <h3>Methods</h3>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">Dropdown:Set("Bow")
+
+Dropdown:Add({"Dagger", "Staff"})
+
+Dropdown:Remove("Sword")
+
+Dropdown:Refresh({"Katana", "Claymore"}, "Katana")</code></pre>
+            </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <section id="colorpickers">
+            <h1>Color Pickers</h1>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">local ColorPicker = Tab:CreateColorPicker({
+    Name = "ESP Color",
+    Color = Color3.fromRGB(255, 0, 0),
+    Flag = "ESPColor",
+    Callback = function(Color)
+        print("Color:", Color)
+    end
+})</code></pre>
+            </div>
+
+            <h3>Methods</h3>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">ColorPicker:Set(Color3.fromRGB(0, 255, 0))</code></pre>
+            </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <section id="labels">
+            <h1>Labels</h1>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">Tab:CreateLabel({
+    Text = "Welcome to my script!",
+    SectionParent = Section
+})</code></pre>
+            </div>
+
+            <h3>With Icon</h3>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">Tab:CreateLabel({
+    Text = "Press K to toggle the UI",
+    Icon = "keyboard",
+    SectionParent = Section
+})</code></pre>
+            </div>
+
+            <h3>Colored Backgrounds</h3>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">Tab:CreateLabel({
+    Text = "Warning: Use at your own risk!",
+    Background = "warn",
+    SectionParent = Section
+})
+
+Tab:CreateLabel({
+    Text = "Custom pink label",
+    Background = "#FF69B4",
+    SectionParent = Section
+})</code></pre>
+            </div>
+
+            <p>Built-in background options: <code>"warn"</code>, <code>"success"</code>, <code>"error"</code>, or any hex color code.</p>
+        </section>
+
+        <hr class="section-divider">
+
+        <section id="paragraphs">
+            <h1>Paragraphs</h1>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">local Paragraph = Tab:CreateParagraph({
+    Title = "&lt;b&gt;Getting Started&lt;/b&gt;",
+    Content = "This script includes powerful features. Configure everything properly!",
+    Icon = "info",
+    Background = "success",
+    SectionParent = Section
+})</code></pre>
+            </div>
+
+            <h3>Updating a Paragraph</h3>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">Paragraph:Set({
+    Title = "Updated Title",
+    Content = "New content here",
+    Background = "warn"
+})</code></pre>
+            </div>
+
+            <p>Paragraphs support RichText in both <code>Title</code> and <code>Content</code>. The same <code>Background</code> options as labels apply.</p>
+        </section>
+
+        <hr class="section-divider">
+
+        <section id="images">
+            <h1>Images</h1>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">Tab:CreateImage(Section, {
+    Image = "https://example.com/image.png",
+    Width = 200,
+    Height = 200,
+    Transparency = 0
+})</code></pre>
+            </div>
+
+            <p>The <code>Image</code> field accepts URLs, Roblox asset IDs, or file paths. <code>Transparency</code> ranges from 0 (opaque) to 1 (invisible).</p>
+        </section>
+
+        <hr class="section-divider">
+
+        <section id="console">
+            <h1>Console</h1>
+
+            <p>A built-in terminal-style log viewer with color coded entries, timestamps, auto-scroll, and a max line limit.</p>
+
+            <h2>Creating a Console</h2>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">local Console = Tab:CreateConsole({
+    Title = "Remote Logger",
+    Icon = "terminal",
+    MaxLines = 200,
+    Height = 150,
+    Timestamps = true,
+    SectionParent = Section
+})</code></pre>
+            </div>
+
+            <table class="param-table">
+                <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+                <tbody>
+                    <tr><td><code>Title</code></td><td><span class="type">string</span></td><td><code>"Console"</code></td><td>Header text</td></tr>
+                    <tr><td><code>Icon</code></td><td><span class="type">string | number</span></td><td><code>nil</code></td><td>Lucide icon name or asset ID</td></tr>
+                    <tr><td><code>MaxLines</code></td><td><span class="type">number</span></td><td><code>100</code></td><td>Maximum log entries before oldest are removed</td></tr>
+                    <tr><td><code>Height</code></td><td><span class="type">number</span></td><td><code>150</code></td><td>Height of the log area in pixels</td></tr>
+                    <tr><td><code>Timestamps</code></td><td><span class="type">boolean</span></td><td><code>true</code></td><td>Show <code>[HH:MM:SS]</code> before each entry</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Logging Methods</h2>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">Console:Log("Script initialized")
+Console:Info("Listening for remotes")
+Console:Success("Connected to server")
+Console:Warn("Rate limit approaching")
+Console:Error("Failed to fetch data")
+
+Console:Clear()</code></pre>
+            </div>
+
+            <table class="param-table">
+                <thead><tr><th>Method</th><th>Color</th><th>Prefix</th></tr></thead>
+                <tbody>
+                    <tr><td><code>:Log(message)</code></td><td>Gray</td><td><code>[LOG]</code></td></tr>
+                    <tr><td><code>:Info(message)</code></td><td>Blue</td><td><code>[INFO]</code></td></tr>
+                    <tr><td><code>:Success(message)</code></td><td>Green</td><td><code>[OK]</code></td></tr>
+                    <tr><td><code>:Warn(message)</code></td><td>Yellow</td><td><code>[WARN]</code></td></tr>
+                    <tr><td><code>:Error(message)</code></td><td>Red</td><td><code>[ERROR]</code></td></tr>
+                    <tr><td><code>:Clear()</code></td><td>—</td><td>Clears all entries with a fade animation</td></tr>
+                </tbody>
+            </table>
+
+            <div class="tip">
+                <div class="tip-title">💡 Tip</div>
+                <p>The console has a small trash icon in the top right corner that users can click to clear all entries. It also auto-scrolls to the latest entry.</p>
+            </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <section id="notifications">
+            <h1>Notifications</h1>
+
+            <h2>Simple Notification</h2>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">ArrayField:Notify({
+    Title = "Success",
+    Content = "Script loaded successfully!",
+    Duration = 5,
+    Image = "check-circle"
+})</code></pre>
+            </div>
+
+            <h2>Notification with Actions</h2>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">ArrayField:Notify({
+    Title = "Update Available",
+    Content = "A new version is ready.",
+    Image = "download",
+    Actions = {
+        {
+            Name = "Update",
+            Callback = function()
+                print("Updating...")
+            end
+        },
+        {
+            Name = "Later",
+            Callback = function()
+                print("Dismissed")
+            end
+        }
+    }
+})</code></pre>
+            </div>
+
+            <table class="param-table">
+                <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+                <tbody>
+                    <tr><td><code>Title</code></td><td><span class="type">string</span></td><td>Notification title</td></tr>
+                    <tr><td><code>Content</code></td><td><span class="type">string</span></td><td>Notification body text</td></tr>
+                    <tr><td><code>Duration</code></td><td><span class="type">number</span></td><td>Seconds before auto-dismiss (default 6.5)</td></tr>
+                    <tr><td><code>Image</code></td><td><span class="type">string | number</span></td><td>Lucide icon, asset ID, or image URL</td></tr>
+                    <tr><td><code>Actions</code></td><td><span class="type">table</span></td><td>Array of <code>{Name, Callback}</code> action buttons</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <hr class="section-divider">
+
+        <section id="prompts">
+            <h1>Prompts & Dialogs</h1>
+
+            <h2>Note Prompt</h2>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">Window:NotePrompt({
+    Title = "Welcome!",
+    Description = "Thanks for using this script",
+    Icon = "sparkles",
+    Callback = function()
+        print("User clicked OK")
+    end
+})</code></pre>
+            </div>
+
+            <h2>Confirmation Dialog</h2>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">Window:Prompt({
+    Title = "Confirm Action",
+    SubTitle = "Are you sure?",
+    Content = "This action cannot be undone.",
+    Actions = {
+        Confirm = {
+            Name = "Yes",
+            Callback = function()
+                print("Confirmed")
+            end
+        },
+        Cancel = {
+            Name = "No",
+            Callback = function()
+                print("Cancelled")
+            end
+        }
+    }
+})</code></pre>
+            </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <section id="themes">
+            <h1>Themes</h1>
+
+            <p>ArrayField ships with multiple built-in themes. Users can switch themes at any time from the in-app settings panel without needing to re-execute.</p>
+
+            <h2>Setting a Default Theme</h2>
+
+            <p>You can optionally force a default theme in <code>CreateWindow</code>:</p>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">local Window = ArrayField:CreateWindow({
+    Name = "My Hub",
+    DefaultTheme = "Ocean",
+})</code></pre>
+            </div>
+
+            <div class="warning">
+                <div class="warning-title">⚠️ Note</div>
+                <p>Setting <code>DefaultTheme</code> overrides the user's previously selected theme on every execution. Omit this parameter to let users keep their choice.</p>
+            </div>
+
+            <h2>Custom Themes</h2>
+
+            <p>You can create a fully custom theme by defining a theme table with all color properties. Pass it as the <code>DefaultTheme</code> or register it in the theme table.</p>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">local MyTheme = {
+    TextColor = Color3.fromRGB(240, 240, 240),
+
+    Background = Color3.fromRGB(25, 25, 25),
+    Topbar = Color3.fromRGB(34, 34, 34),
+    Shadow = Color3.fromRGB(20, 20, 20),
+
+    NotificationBackground = Color3.fromRGB(20, 20, 20),
+    NotificationActionsBackground = Color3.fromRGB(230, 230, 230),
+
+    TabBackground = Color3.fromRGB(80, 80, 80),
+    TabStroke = Color3.fromRGB(85, 85, 85),
+    TabBackgroundSelected = Color3.fromRGB(210, 210, 210),
+    TabTextColor = Color3.fromRGB(240, 240, 240),
+    SelectedTabTextColor = Color3.fromRGB(50, 50, 50),
+
+    ElementBackground = Color3.fromRGB(35, 35, 35),
+    ElementBackgroundHover = Color3.fromRGB(40, 40, 40),
+    SecondaryElementBackground = Color3.fromRGB(25, 25, 25),
+    ElementStroke = Color3.fromRGB(50, 50, 50),
+    SecondaryElementStroke = Color3.fromRGB(40, 40, 40),
+
+    SliderBackground = Color3.fromRGB(50, 138, 220),
+    SliderProgress = Color3.fromRGB(50, 138, 220),
+    SliderStroke = Color3.fromRGB(58, 163, 255),
+
+    ToggleBackground = Color3.fromRGB(30, 30, 30),
+    ToggleEnabled = Color3.fromRGB(0, 146, 214),
+    ToggleDisabled = Color3.fromRGB(100, 100, 100),
+    ToggleEnabledStroke = Color3.fromRGB(0, 170, 255),
+    ToggleDisabledStroke = Color3.fromRGB(125, 125, 125),
+    ToggleEnabledOuterStroke = Color3.fromRGB(100, 100, 100),
+    ToggleDisabledOuterStroke = Color3.fromRGB(65, 65, 65),
+
+    DropdownSelected = Color3.fromRGB(40, 40, 40),
+    DropdownUnselected = Color3.fromRGB(30, 30, 30),
+
+    InputBackground = Color3.fromRGB(30, 30, 30),
+    InputStroke = Color3.fromRGB(65, 65, 65),
+    PlaceholderColor = Color3.fromRGB(178, 178, 178)
+}</code></pre>
+            </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <section id="methods">
+            <h1>Universal Methods</h1>
+
+            <p>All interactive elements support these common methods:</p>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">Element:Lock("Reason text")
+
+Element:Unlock()
+
+Element:Visible(false)
+Element:Visible(true)
+
+Element:Destroy()</code></pre>
+            </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <section id="saving">
+            <h1>Saving & Loading</h1>
+
+            <p>When <code>ConfigurationSaving</code> is set and the user enables it from settings, ArrayField automatically saves and loads element values using the <code>Flag</code> identifiers.</p>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">ArrayField.SaveConfiguration()
+
+ArrayField.LoadConfiguration()
+
+print(ArrayField.Flags["SpeedToggle"].CurrentValue)
+print(ArrayField.Flags["SpeedValue"].CurrentValue)</code></pre>
+            </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <section id="destroy">
+            <h1>Destroying the UI</h1>
+
+            <div class="code-block-wrapper">
+                <pre><code class="language-lua">ArrayField:Destroy()</code></pre>
+            </div>
+
+            <p>Completely removes the interface and cleans up all connections.</p>
+        </section>
+
+    </main>
+</div>
+
+<footer>
+    &copy; 2026 Vadrifts. All Rights Reserved.
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/lua.min.js"></script>
+<script>
+    hljs.highlightAll();
+
+    document.querySelectorAll('.code-block-wrapper').forEach(function(wrapper) {
+        var btn = document.createElement('button');
+        btn.className = 'copy-btn';
+        btn.textContent = 'Copy';
+        btn.addEventListener('click', function() {
+            var code = wrapper.querySelector('code').textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                btn.textContent = 'Copied!';
+                setTimeout(function() { btn.textContent = 'Copy'; }, 1500);
+            });
+        });
+        wrapper.appendChild(btn);
+    });
+
+    var links = document.querySelectorAll('.sidebar a');
+    var sections = document.querySelectorAll('section[id]');
+
+    window.addEventListener('scroll', function() {
+        var current = '';
+        sections.forEach(function(section) {
+            if (window.scrollY >= section.offsetTop - 100) {
+                current = section.getAttribute('id');
+            }
+        });
+        links.forEach(function(link) {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === '#' + current) {
+                link.classList.add('active');
+            }
+        });
+    });
+
+    document.querySelectorAll('.sidebar a').forEach(function(link) {
+        link.addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.remove('open');
+        });
+    });
+</script>
+
+</body>
+</html>
