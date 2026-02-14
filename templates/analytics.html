@@ -147,10 +147,10 @@
 
         .script-rank { font-size: 14px; font-weight: 700; color: #6d6f78; font-variant-numeric: tabular-nums; }
         .script-name { font-size: 15px; font-weight: 500; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        
-        .spark-container { 
-            width: 80px; 
-            height: 28px; 
+
+        .spark-container {
+            width: 80px;
+            height: 28px;
             display: inline-block;
             vertical-align: middle;
         }
@@ -308,6 +308,13 @@
             text.textContent = msg;
         }
 
+        function sumSlice(arr, from, to) {
+            var s = 0;
+            var slice = arr.slice(from, to);
+            for (var i = 0; i < slice.length; i++) s += slice[i];
+            return s;
+        }
+
         function trendHTML(current, previous) {
             if (!previous || previous === 0) return '';
             var pct = ((current - previous) / previous) * 100;
@@ -321,8 +328,8 @@
 
         function scriptTrendHTML(daily) {
             if (!daily || daily.length < 14) return '';
-            var thisWeek = daily.slice(-7).reduce(function(a, b) { return a + b; }, 0);
-            var lastWeek = daily.slice(-14, -7).reduce(function(a, b) { return a + b; }, 0);
+            var thisWeek = sumSlice(daily, -7);
+            var lastWeek = sumSlice(daily, -14, -7);
             if (lastWeek === 0) return '';
             var pct = ((thisWeek - lastWeek) / lastWeek) * 100;
             var isUp = pct >= 0;
@@ -337,9 +344,10 @@
             var out = {};
             var total = 0;
             for (var k in breakdown) total += breakdown[k];
+            if (total === 0) return out;
             for (var s in breakdown) {
                 var r = breakdown[s] / total;
-                out[s] = daily.map(function(d) { return Math.round(d * r * (0.5 + Math.random())); });
+                out[s] = daily.map(function(d) { return Math.round(d * r); });
             }
             return out;
         }
@@ -384,53 +392,53 @@
         function makeSparkline(canvasId, vals) {
             var canvas = document.getElementById(canvasId);
             if (!canvas) return null;
-            
+
             if (sparklineCharts[canvasId]) {
                 sparklineCharts[canvasId].destroy();
                 delete sparklineCharts[canvasId];
             }
-            
+
             var sliced = vals.slice(-14);
             var mx = Math.max.apply(null, sliced);
             if (mx === 0) mx = 1;
             var normalized = sliced.map(function(v) { return v / mx; });
-            
+
             var ctx = canvas.getContext('2d');
             var g = ctx.createLinearGradient(0, 0, 0, 28);
             g.addColorStop(0, 'rgba(88, 101, 242, 0.4)');
             g.addColorStop(1, 'rgba(88, 101, 242, 0)');
-            
+
             var chart = new Chart(ctx, {
                 type: 'line',
-                data: { 
-                    labels: normalized.map(function(_, i) { return i; }), 
-                    datasets: [{ 
-                        data: normalized, 
-                        borderColor: '#5865F2', 
-                        backgroundColor: g, 
-                        tension: 0.4, 
-                        fill: true, 
-                        pointRadius: 0, 
-                        pointHoverRadius: 0, 
-                        borderWidth: 1.5 
-                    }] 
+                data: {
+                    labels: normalized.map(function(_, i) { return i; }),
+                    datasets: [{
+                        data: normalized,
+                        borderColor: '#5865F2',
+                        backgroundColor: g,
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 0,
+                        pointHoverRadius: 0,
+                        borderWidth: 1.5
+                    }]
                 },
-                options: { 
+                options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { display: false }, 
-                        tooltip: { enabled: false } 
-                    }, 
-                    scales: { 
-                        y: { display: false, min: 0, max: 1.2 }, 
-                        x: { display: false } 
-                    }, 
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    },
+                    scales: {
+                        y: { display: false, min: 0, max: 1.2 },
+                        x: { display: false }
+                    },
                     events: [],
                     animation: false
                 }
             });
-            
+
             sparklineCharts[canvasId] = chart;
             return chart;
         }
@@ -461,18 +469,51 @@
 
         function render() {
             if (!data) return;
-            var dailyAvg = Math.round(data.month_executions / 30);
-            var prevDailyAvg = data.prev_month_executions ? Math.round(data.prev_month_executions / 30) : 0;
+            var cd = data.chart_data || [];
+
+            var weekExec = data.week_executions;
+            var prevWeekExec = data.prev_week_executions;
+            var monthExec = data.month_executions;
+            var prevMonthExec = data.prev_month_executions;
+
+            if (typeof weekExec === 'undefined' || weekExec === null) {
+                weekExec = cd.length >= 7 ? sumSlice(cd, -7) : sumSlice(cd, 0);
+            }
+
+            if (typeof prevWeekExec === 'undefined' || prevWeekExec === null) {
+                prevWeekExec = cd.length >= 14 ? sumSlice(cd, -14, -7) : 0;
+            }
+
+            if (typeof monthExec === 'undefined' || monthExec === null) {
+                monthExec = sumSlice(cd, 0);
+            }
+
+            if (typeof prevMonthExec === 'undefined' || prevMonthExec === null) {
+                prevMonthExec = 0;
+            }
+
+            var halfLen = Math.floor(cd.length / 2);
+            var dailyAvg, prevDailyAvg;
+            if (halfLen > 0) {
+                var firstHalf = sumSlice(cd, 0, halfLen);
+                var secondHalf = sumSlice(cd, halfLen);
+                prevDailyAvg = Math.round(firstHalf / halfLen);
+                dailyAvg = Math.round(secondHalf / (cd.length - halfLen));
+            } else {
+                dailyAvg = cd.length > 0 ? Math.round(sumSlice(cd, 0) / cd.length) : 0;
+                prevDailyAvg = 0;
+            }
+
             var h = '';
 
             h += '<div class="metrics">';
             h += '<div class="card metric-card anim anim-d1"><div class="metric-top"><span class="metric-label">Total Executions</span></div><div class="metric-value">' + data.total_executions.toLocaleString() + '</div><div class="metric-sub">All time</div></div>';
-            h += '<div class="card metric-card anim anim-d2"><div class="metric-top"><span class="metric-label">This Week</span>' + trendHTML(data.week_executions, data.prev_week_executions) + '</div><div class="metric-value">' + data.week_executions.toLocaleString() + '</div><div class="metric-sub">' + (data.unique_users_week || 0).toLocaleString() + ' users</div></div>';
-            h += '<div class="card metric-card anim anim-d3"><div class="metric-top"><span class="metric-label">This Month</span>' + trendHTML(data.month_executions, data.prev_month_executions) + '</div><div class="metric-value">' + data.month_executions.toLocaleString() + '</div><div class="metric-sub">' + (data.unique_users_month || 0).toLocaleString() + ' users</div></div>';
-            h += '<div class="card metric-card anim anim-d4"><div class="metric-top"><span class="metric-label">Daily Average</span>' + trendHTML(dailyAvg, prevDailyAvg) + '</div><div class="metric-value">' + dailyAvg.toLocaleString() + '</div><div class="metric-sub">Last 30 days</div></div>';
+            h += '<div class="card metric-card anim anim-d2"><div class="metric-top"><span class="metric-label">This Week</span>' + trendHTML(weekExec, prevWeekExec) + '</div><div class="metric-value">' + weekExec.toLocaleString() + '</div><div class="metric-sub">' + (data.unique_users_week || 0).toLocaleString() + ' users</div></div>';
+            h += '<div class="card metric-card anim anim-d3"><div class="metric-top"><span class="metric-label">This Month</span>' + trendHTML(monthExec, prevMonthExec) + '</div><div class="metric-value">' + monthExec.toLocaleString() + '</div><div class="metric-sub">' + (data.unique_users_month || 0).toLocaleString() + ' users</div></div>';
+            h += '<div class="card metric-card anim anim-d4"><div class="metric-top"><span class="metric-label">Daily Average</span>' + trendHTML(dailyAvg, prevDailyAvg) + '</div><div class="metric-value">' + dailyAvg.toLocaleString() + '</div><div class="metric-sub">Last ' + cd.length + ' days</div></div>';
             h += '</div>';
 
-            h += '<div class="card section-card anim anim-d5"><div class="section-header" style="display:flex;align-items:center;justify-content:space-between"><div><div class="section-title">Execution History</div><div class="section-sub">Last 30 days</div></div><div class="section-legend"><span class="dot"></span>Executions</div></div><div class="chart-wrap"><canvas id="mainChart"></canvas></div></div>';
+            h += '<div class="card section-card anim anim-d5"><div class="section-header" style="display:flex;align-items:center;justify-content:space-between"><div><div class="section-title">Execution History</div><div class="section-sub">Last ' + cd.length + ' days</div></div><div class="section-legend"><span class="dot"></span>Executions</div></div><div class="chart-wrap"><canvas id="mainChart"></canvas></div></div>';
 
             var scripts = Object.entries(data.script_breakdown).sort(function(a, b) { return b[1] - a[1]; });
             var totalAll = scripts.reduce(function(a, b) { return a + b[1]; }, 0);
@@ -518,13 +559,13 @@
             var mc = document.getElementById('mainChart');
             if (mc) mainChart = makeChart(mc, data.chart_labels, data.chart_data, 320, true);
 
-            Object.keys(sparklineCharts).forEach(function(k) { 
-                sparklineCharts[k].destroy(); 
+            Object.keys(sparklineCharts).forEach(function(k) {
+                sparklineCharts[k].destroy();
             });
             sparklineCharts = {};
-            
-            Object.keys(scriptCharts).forEach(function(k) { 
-                scriptCharts[k].destroy(); 
+
+            Object.keys(scriptCharts).forEach(function(k) {
+                scriptCharts[k].destroy();
             });
             scriptCharts = {};
 
@@ -538,7 +579,7 @@
                     }
                 });
             }, 50);
-            
+
             expanded = null;
         }
 
@@ -547,9 +588,9 @@
                 setStatus('connecting', 'Connecting...');
                 var res = await fetch('/analytics-data');
                 data = await res.json();
-                if (!data.script_daily_data && data.script_breakdown && data.chart_data) data.script_daily_data = genScriptDaily(data.script_breakdown, data.chart_data);
-                if (!data.prev_week_executions) data.prev_week_executions = Math.round(data.week_executions * (0.8 + Math.random() * 0.35));
-                if (!data.prev_month_executions) data.prev_month_executions = Math.round(data.month_executions * (0.8 + Math.random() * 0.35));
+                if (!data.script_daily_data && data.script_breakdown && data.chart_data) {
+                    data.script_daily_data = genScriptDaily(data.script_breakdown, data.chart_data);
+                }
                 setStatus('live', 'Live');
                 if (refresh) toast('Data refreshed');
                 render();
