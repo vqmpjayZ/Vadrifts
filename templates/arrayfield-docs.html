@@ -1,1557 +1,877 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" dir="ltr" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ArrayField Documentation</title>
-    <meta name="description" content="ArrayField is a powerful and feature-rich interface suite for Roblox.">
-    <meta name="theme-color" content="#1a1a2e">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css">
-    <style>
-        :root {
-            --bg-primary: #1a1a2e;
-            --bg-secondary: #16213e;
-            --bg-tertiary: #0f3460;
-            --bg-sidebar: #141425;
-            --bg-code: #0d1117;
-            --bg-inline-code: #2a2a4a;
-            --text-primary: #e4e4e7;
-            --text-secondary: #a1a1aa;
-            --text-muted: #71717a;
-            --accent: #6c63ff;
-            --accent-hover: #5a52d5;
-            --accent-dim: rgba(108, 99, 255, 0.15);
-            --border: #2a2a4a;
-            --border-hover: #3a3a5a;
-            --success: #22c55e;
-            --warning: #eab308;
-            --error: #ef4444;
-            --info: #3b82f6;
-            --sidebar-width: 260px;
-            --navbar-height: 60px;
-            --tip-bg: rgba(34, 197, 94, 0.1);
-            --tip-border: #22c55e;
-            --warn-bg: rgba(234, 179, 8, 0.1);
-            --warn-border: #eab308;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-            scroll-padding-top: 80px;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.7;
-            overflow-x: hidden;
-        }
-
-        ::selection {
-            background: var(--accent);
-            color: white;
-        }
-
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--border-hover);
-        }
-
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: var(--navbar-height);
-            background: rgba(20, 20, 37, 0.85);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            padding: 0 24px;
-            z-index: 1000;
-        }
-
-        .navbar-brand {
-            font-weight: 700;
-            font-size: 16px;
-            color: var(--text-primary);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .navbar-brand span {
-            color: var(--accent);
-        }
-
-        .navbar-links {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-left: auto;
-        }
-
-        .navbar-links a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            padding: 6px 14px;
-            border-radius: 6px;
-            transition: all 0.2s;
-        }
-
-        .navbar-links a:hover {
-            color: var(--text-primary);
-            background: var(--accent-dim);
-        }
-
-        .layout {
-            display: flex;
-            margin-top: var(--navbar-height);
-            min-height: calc(100vh - var(--navbar-height));
-        }
-
-        .sidebar {
-            position: fixed;
-            top: var(--navbar-height);
-            left: 0;
-            width: var(--sidebar-width);
-            height: calc(100vh - var(--navbar-height));
-            background: var(--bg-sidebar);
-            border-right: 1px solid var(--border);
-            overflow-y: auto;
-            padding: 16px 0;
-            z-index: 100;
-        }
-
-        .sidebar-section {
-            padding: 0 12px;
-            margin-bottom: 8px;
-        }
-
-        .sidebar-title {
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            color: var(--text-muted);
-            padding: 8px 12px 4px;
-        }
-
-        .sidebar a {
-            display: block;
-            padding: 6px 12px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 13px;
-            border-radius: 6px;
-            transition: all 0.15s;
-            margin: 1px 0;
-        }
-
-        .sidebar a:hover {
-            color: var(--text-primary);
-            background: var(--accent-dim);
-        }
-
-        .sidebar a.active {
-            color: var(--accent);
-            background: var(--accent-dim);
-            font-weight: 500;
-        }
-
-        .sidebar a.sub {
-            padding-left: 28px;
-            font-size: 12.5px;
-        }
-
-        .main {
-            margin-left: var(--sidebar-width);
-            flex: 1;
-            max-width: 900px;
-            padding: 40px 48px 80px;
-        }
-
-        h1 {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 16px;
-            letter-spacing: -0.5px;
-        }
-
-        h2 {
-            font-size: 24px;
-            font-weight: 600;
-            margin-top: 56px;
-            margin-bottom: 16px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid var(--border);
-            letter-spacing: -0.3px;
-        }
-
-        h3 {
-            font-size: 18px;
-            font-weight: 600;
-            margin-top: 32px;
-            margin-bottom: 12px;
-        }
-
-        p {
-            margin-bottom: 16px;
-            color: var(--text-secondary);
-        }
-
-        a {
-            color: var(--accent);
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        ul, ol {
-            margin-bottom: 16px;
-            padding-left: 24px;
-        }
-
-        li {
-            margin-bottom: 6px;
-            color: var(--text-secondary);
-        }
-
-        li strong {
-            color: var(--text-primary);
-        }
-
-        code {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 13px;
-        }
-
-        :not(pre) > code {
-            background: var(--bg-inline-code);
-            padding: 2px 7px;
-            border-radius: 4px;
-            font-size: 12.5px;
-            color: #c4b5fd;
-        }
-
-        pre {
-            background: var(--bg-code) !important;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 16px 20px;
-            margin-bottom: 20px;
-            overflow-x: auto;
-            position: relative;
-        }
-
-        pre code {
-            font-size: 13px;
-            line-height: 1.6;
-        }
-
-        .code-block-wrapper {
-            position: relative;
-            margin-bottom: 20px;
-        }
-
-        .copy-btn {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: var(--border);
-            border: none;
-            color: var(--text-muted);
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-family: 'Inter', sans-serif;
-            cursor: pointer;
-            opacity: 0;
-            transition: all 0.2s;
-        }
-
-        .code-block-wrapper:hover .copy-btn {
-            opacity: 1;
-        }
-
-        .copy-btn:hover {
-            background: var(--border-hover);
-            color: var(--text-primary);
-        }
-
-        .tip, .warning {
-            border-radius: 8px;
-            padding: 16px 20px;
-            margin-bottom: 20px;
-            border-left: 4px solid;
-        }
-
-        .tip {
-            background: var(--tip-bg);
-            border-color: var(--tip-border);
-        }
-
-        .warning {
-            background: var(--warn-bg);
-            border-color: var(--warn-border);
-        }
-
-        .tip-title, .warning-title {
-            font-weight: 600;
-            font-size: 14px;
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .tip-title { color: var(--success); }
-        .warning-title { color: var(--warning); }
-
-        .tip p, .warning p {
-            margin-bottom: 0;
-            font-size: 14px;
-        }
-
-        .section-divider {
-            height: 1px;
-            background: var(--border);
-            margin: 48px 0;
-            border: none;
-        }
-
-        .hero {
-            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 48px 40px;
-            margin-bottom: 32px;
-            text-align: center;
-        }
-
-        .hero h1 {
-            font-size: 40px;
-            margin-bottom: 12px;
-            background: linear-gradient(135deg, var(--accent), #a78bfa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .hero p {
-            font-size: 18px;
-            color: var(--text-secondary);
-            max-width: 500px;
-            margin: 0 auto 24px;
-        }
-
-        .hero-buttons {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 22px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            text-decoration: none;
-            transition: all 0.2s;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-primary {
-            background: var(--accent);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--accent-hover);
-            text-decoration: none;
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: var(--text-secondary);
-            border: 1px solid var(--border);
-        }
-
-        .btn-secondary:hover {
-            color: var(--text-primary);
-            border-color: var(--border-hover);
-            text-decoration: none;
-        }
-
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .feature {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 20px;
-        }
-
-        .feature-icon {
-            font-size: 24px;
-            margin-bottom: 8px;
-        }
-
-        .feature h4 {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .feature p {
-            font-size: 13px;
-            margin-bottom: 0;
-        }
-
-        .param-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-            font-size: 13.5px;
-        }
-
-        .param-table th {
-            text-align: left;
-            padding: 10px 14px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            font-weight: 600;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-muted);
-        }
-
-        .param-table td {
-            padding: 10px 14px;
-            border: 1px solid var(--border);
-            color: var(--text-secondary);
-        }
-
-        .param-table tr:hover td {
-            background: rgba(108, 99, 255, 0.03);
-        }
-
-        .type {
-            color: #c084fc;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 12px;
-        }
-
-        footer {
-            margin-left: var(--sidebar-width);
-            padding: 24px 48px;
-            border-top: 1px solid var(--border);
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 13px;
-        }
-
-        .mobile-toggle {
-            display: none;
-            background: none;
-            border: none;
-            color: var(--text-primary);
-            font-size: 24px;
-            cursor: pointer;
-            padding: 4px 8px;
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s;
-                z-index: 999;
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-
-            .main {
-                margin-left: 0;
-                padding: 24px 20px 60px;
-            }
-
-            footer {
-                margin-left: 0;
-                padding: 24px 20px;
-            }
-
-            .mobile-toggle {
-                display: block;
-            }
-
-            .hero h1 {
-                font-size: 28px;
-            }
-
-            .hero {
-                padding: 32px 20px;
-            }
-
-            h1 { font-size: 26px; }
-            h2 { font-size: 20px; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ArrayField Documentation</title>
+<meta name="description" content="ArrayField is a powerful and feature-rich interface suite for Roblox.">
+<meta name="theme-color" content="#2B2D31">
+<meta property="og:title" content="ArrayField Documentation">
+<meta property="og:description" content="ArrayField is a powerful and feature-rich interface suite for Roblox.">
+<meta property="og:image" content="https://i.imgur.com/W9FaXAY.png">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--ifm-background:#1b1b1d;
+--ifm-background-surface:#242526;
+--ifm-navbar-background:#242526;
+--ifm-sidebar-background:#1b1b1d;
+--ifm-color-primary:#4d8bff;
+--ifm-color-primary-light:#6ea0ff;
+--ifm-font-color:#e3e3e3;
+--ifm-font-color-secondary:#adadad;
+--ifm-border:#3d3d3f;
+--ifm-code-bg:#1E1E1E;
+--ifm-hover:#2a2a2c;
+--ifm-tip-bg:rgba(0,164,114,0.1);
+--ifm-tip-border:#00a472;
+--ifm-warn-bg:rgba(232,167,2,0.1);
+--ifm-warn-border:#e8a702;
+--navbar-height:60px;
+--sidebar-width:280px;
+}
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--navbar-height) + 16px)}
+body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,Ubuntu,Cantarell,'Noto Sans',sans-serif,'Apple Color Emoji','Segoe UI Emoji';background:var(--ifm-background);color:var(--ifm-font-color);line-height:1.65;-webkit-font-smoothing:antialiased}
+::selection{background:var(--ifm-color-primary);color:#fff}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#4a4a4c;border-radius:10px}
+::-webkit-scrollbar-thumb:hover{background:#5a5a5c}
+a{color:var(--ifm-color-primary);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.navbar{position:fixed;top:0;left:0;right:0;height:var(--navbar-height);background:var(--ifm-navbar-background);border-bottom:1px solid var(--ifm-border);display:flex;align-items:center;padding:0 20px;z-index:1000;box-shadow:0 1px 2px 0 rgba(0,0,0,0.3)}
+.navbar-inner{display:flex;align-items:center;width:100%;max-width:100%}
+.navbar-brand{font-weight:700;font-size:15px;color:var(--ifm-font-color);text-decoration:none;display:flex;align-items:center;gap:8px;margin-right:24px}
+.navbar-brand:hover{color:var(--ifm-font-color);text-decoration:none}
+.navbar-items{display:flex;align-items:center;gap:4px}
+.navbar-items a{color:var(--ifm-font-color);text-decoration:none;font-size:14px;font-weight:500;padding:8px 12px;border-radius:6px;transition:background 0.2s,color 0.2s}
+.navbar-items a:hover{background:var(--ifm-hover);text-decoration:none}
+.navbar-items a.active{color:var(--ifm-color-primary)}
+.navbar-right{margin-left:auto;display:flex;align-items:center;gap:4px}
+.mobile-toggle{display:none;background:none;border:none;color:var(--ifm-font-color);font-size:22px;cursor:pointer;padding:8px;margin-right:8px}
+
+.layout{display:flex;margin-top:var(--navbar-height)}
+.sidebar{position:fixed;top:var(--navbar-height);left:0;bottom:0;width:var(--sidebar-width);background:var(--ifm-sidebar-background);border-right:1px solid var(--ifm-border);overflow-y:auto;overflow-x:hidden;padding:12px;z-index:100}
+.menu-list{list-style:none;padding:0;margin:0}
+.menu-list .menu-list{padding-left:0;margin-left:12px;border-left:1px solid var(--ifm-border)}
+.menu-link{display:block;padding:6px 12px;color:var(--ifm-font-color-secondary);font-size:14px;border-radius:4px;transition:all 0.15s;cursor:pointer;text-decoration:none;line-height:1.4}
+.menu-link:hover{background:var(--ifm-hover);color:var(--ifm-font-color);text-decoration:none}
+.menu-link.active{color:var(--ifm-color-primary);background:rgba(77,139,255,0.1);font-weight:500}
+.menu-category{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;color:var(--ifm-font-color-secondary);font-size:14px;font-weight:500;border-radius:4px;cursor:pointer;transition:all 0.15s;user-select:none}
+.menu-category:hover{background:var(--ifm-hover);color:var(--ifm-font-color)}
+.menu-category.expanded{color:var(--ifm-font-color)}
+.menu-arrow{font-size:10px;transition:transform 0.2s;color:var(--ifm-font-color-secondary)}
+.menu-category.expanded .menu-arrow{transform:rotate(90deg)}
+.menu-submenu{overflow:hidden;max-height:0;transition:max-height 0.25s ease-out}
+.menu-submenu.open{max-height:500px;transition:max-height 0.35s ease-in}
+.menu-submenu .menu-link{padding:4px 12px;font-size:13px}
+.menu-list-item{margin:1px 0}
+
+.main-container{margin-left:var(--sidebar-width);flex:1;min-height:calc(100vh - var(--navbar-height))}
+.doc-content{max-width:820px;padding:24px 48px 80px;width:100%}
+
+.breadcrumbs{display:flex;align-items:center;gap:6px;margin-bottom:20px;font-size:13px;color:var(--ifm-font-color-secondary);flex-wrap:wrap}
+.breadcrumbs a{color:var(--ifm-font-color-secondary)}
+.breadcrumbs a:hover{color:var(--ifm-color-primary);text-decoration:underline}
+.breadcrumb-sep{color:var(--ifm-font-color-secondary);font-size:11px}
+.breadcrumb-home{width:16px;height:16px;fill:currentColor;vertical-align:middle}
+
+.markdown h1{font-size:2rem;font-weight:700;margin-bottom:16px;line-height:1.2}
+.markdown h2{font-size:1.5rem;font-weight:600;margin-top:40px;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--ifm-border);line-height:1.3}
+.markdown h3{font-size:1.2rem;font-weight:600;margin-top:28px;margin-bottom:10px}
+.markdown p{margin-bottom:16px;color:var(--ifm-font-color)}
+.markdown ul,.markdown ol{margin-bottom:16px;padding-left:28px}
+.markdown li{margin-bottom:6px;color:var(--ifm-font-color)}
+.markdown li strong{color:var(--ifm-font-color)}
+.markdown img{max-width:100%;border-radius:8px;display:block;margin:0 auto}
+.markdown>*:first-child{margin-top:0}
+
+.hero-image{position:relative;display:block;margin-bottom:24px;border-radius:8px;overflow:hidden}
+.hero-image img{width:100%;height:auto;display:block;border-radius:8px}
+.hero-image .hero-blur{position:absolute;inset:0;z-index:-1;filter:blur(40px) saturate(1.3);opacity:0.4}
+
+code{font-family:'JetBrains Mono','Fira Code',monospace;font-size:0.875em}
+:not(pre)>code{background:#2d2d2f;padding:2px 6px;border-radius:4px;font-size:0.85em;color:#e3e3e3;border:1px solid #3d3d3f}
+
+.code-block{position:relative;margin-bottom:20px;border-radius:8px;overflow:hidden;border:1px solid var(--ifm-border)}
+.code-block pre{background:var(--ifm-code-bg)!important;margin:0;padding:16px;overflow-x:auto;font-size:13px;line-height:1.55;border-radius:0}
+.code-block code{font-size:13px;color:#9CDCFE;background:none;border:none;padding:0}
+.code-block .copy-btn{position:absolute;top:8px;right:8px;background:#3d3d3f;border:none;color:#adadad;padding:4px 10px;border-radius:4px;font-size:11px;font-family:system-ui;cursor:pointer;opacity:0;transition:opacity 0.15s}
+.code-block:hover .copy-btn{opacity:1}
+.code-block .copy-btn:hover{background:#4d4d4f;color:#e3e3e3}
+
+.kw{color:rgb(86,156,214)}
+.str{color:rgb(206,145,120)}
+.fn{color:rgb(220,220,170)}
+.pn{color:rgb(212,212,212)}
+.cm{color:rgb(106,153,85)}
+.nm{color:rgb(181,206,168)}
+.pl{color:#9CDCFE}
+.op{color:rgb(212,212,212)}
+
+.admonition{border-radius:6px;padding:16px 20px;margin-bottom:20px;border-left:5px solid}
+.admonition-tip{background:var(--ifm-tip-bg);border-color:var(--ifm-tip-border)}
+.admonition-warn{background:var(--ifm-warn-bg);border-color:var(--ifm-warn-border)}
+.admonition-heading{font-weight:700;font-size:14px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.admonition-tip .admonition-heading{color:var(--ifm-tip-border)}
+.admonition-warn .admonition-heading{color:var(--ifm-warn-border)}
+.admonition p{margin-bottom:0;font-size:14px}
+.admonition ol,.admonition ul{margin-bottom:0;font-size:14px}
+
+.doc-section{display:none}
+.doc-section.active{display:block}
+
+.pagination{display:flex;justify-content:space-between;margin-top:40px;gap:16px}
+.pagination-link{display:flex;flex-direction:column;padding:12px 16px;border:1px solid var(--ifm-border);border-radius:8px;text-decoration:none;flex:1;transition:border-color 0.2s}
+.pagination-link:hover{border-color:var(--ifm-color-primary);text-decoration:none}
+.pagination-sublabel{font-size:12px;color:var(--ifm-font-color-secondary);margin-bottom:2px;font-weight:500;text-transform:capitalize}
+.pagination-label{font-size:14px;color:var(--ifm-color-primary);font-weight:600}
+.pagination-link.next{text-align:right}
+.pagination-link.prev{}
+
+footer{margin-left:var(--sidebar-width);padding:20px 48px;border-top:1px solid var(--ifm-border);text-align:center;color:var(--ifm-font-color-secondary);font-size:13px}
+
+@media(max-width:996px){
+.sidebar{transform:translateX(-100%);transition:transform 0.3s ease;width:280px;z-index:999}
+.sidebar.open{transform:translateX(0)}
+.sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:998}
+.sidebar-backdrop.show{display:block}
+.main-container{margin-left:0}
+footer{margin-left:0}
+.mobile-toggle{display:block}
+.doc-content{padding:20px 16px 60px}
+.markdown h1{font-size:1.6rem}
+.markdown h2{font-size:1.3rem}
+}
+</style>
 </head>
 <body>
 
 <nav class="navbar">
-    <button class="mobile-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
-    <a class="navbar-brand" href="/docs/arrayfield"><span>ArrayField</span> Docs</a>
-    <div class="navbar-links">
-        <a href="https://github.com/vqmpjayZ/laboratory" target="_blank">GitHub</a>
-        <a href="https://discord.gg/WDbJ5wE2cR" target="_blank">Discord</a>
-    </div>
+<div class="navbar-inner">
+<button class="mobile-toggle" onclick="toggleSidebar()">☰</button>
+<a class="navbar-brand" href="/docs/arrayfield"><b>ArrayField Docs</b></a>
+<div class="navbar-items">
+<a class="active" href="/docs/arrayfield">ArrayField</a>
+</div>
+<div class="navbar-right">
+<a href="https://github.com/vqmpjayZ/laboratory" target="_blank" style="color:var(--ifm-font-color-secondary);font-size:14px;padding:8px 12px;border-radius:6px;">GitHub</a>
+<a href="https://discord.gg/WDbJ5wE2cR" target="_blank" style="color:var(--ifm-font-color-secondary);font-size:14px;padding:8px 12px;border-radius:6px;">Discord</a>
+</div>
+</div>
 </nav>
 
+<div class="sidebar-backdrop" onclick="closeSidebar()"></div>
+
 <div class="layout">
-    <aside class="sidebar">
-        <div class="sidebar-section">
-            <a href="#introduction">Introduction</a>
-        </div>
-        <div class="sidebar-section">
-            <div class="sidebar-title">Configuration</div>
-            <a href="#booting">Booting the Library</a>
-            <a href="#windows">Windows</a>
-            <a href="#tabs">Tabs</a>
-            <a href="#categories">Categories</a>
-            <a href="#sections">Sections</a>
-            <a href="#dividers">Dividers & Spacing</a>
-        </div>
-        <div class="sidebar-section">
-            <div class="sidebar-title">Interactive Elements</div>
-            <a href="#buttons">Buttons</a>
-            <a href="#toggles">Toggles</a>
-            <a href="#sliders">Sliders</a>
-            <a href="#inputs">Text Inputs</a>
-            <a href="#keybinds">Keybinds</a>
-            <a href="#dropdowns">Dropdowns</a>
-            <a href="#colorpickers">Color Pickers</a>
-        </div>
-        <div class="sidebar-section">
-            <div class="sidebar-title">UI Components</div>
-            <a href="#labels">Labels</a>
-            <a href="#paragraphs">Paragraphs</a>
-            <a href="#images">Images</a>
-            <a href="#console">Console</a>
-        </div>
-        <div class="sidebar-section">
-            <div class="sidebar-title">Feedback</div>
-            <a href="#notifications">Notifications</a>
-            <a href="#prompts">Prompts & Dialogs</a>
-        </div>
-        <div class="sidebar-section">
-            <div class="sidebar-title">Customization</div>
-            <a href="#themes">Themes</a>
-        </div>
-        <div class="sidebar-section">
-            <div class="sidebar-title">Reference</div>
-            <a href="#methods">Universal Methods</a>
-            <a href="#saving">Saving & Loading</a>
-            <a href="#destroy">Destroying the UI</a>
-        </div>
-    </aside>
-
-    <main class="main">
-
-        <section id="introduction">
-            <div class="hero">
-                <h1>ArrayField</h1>
-                <p>A powerful, feature-rich, and beautifully designed interface suite for Roblox.</p>
-                <div class="hero-buttons">
-                    <a class="btn btn-primary" href="#booting">Get Started</a>
-                    <a class="btn btn-secondary" href="https://discord.gg/WDbJ5wE2cR" target="_blank">Join Discord</a>
-                </div>
-            </div>
-
-            <h2 style="margin-top: 24px; border: none; padding: 0;">Why ArrayField?</h2>
-
-            <div class="features">
-                <div class="feature">
-                    <div class="feature-icon">🎨</div>
-                    <h4>Themeable</h4>
-                    <p>Multiple built-in themes with full custom theme support, switchable in-app</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">📂</div>
-                    <h4>Categories</h4>
-                    <p>Organize tabs into collapsible groups in the sidebar</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">🖥️</div>
-                    <h4>Console Element</h4>
-                    <p>Built-in terminal-style console for logging with color coded entries</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">🔔</div>
-                    <h4>Notifications</h4>
-                    <p>Rich notifications with action buttons and icons</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">💾</div>
-                    <h4>Auto Save</h4>
-                    <p>Configuration saving with flag system, togglable from settings</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">🔓</div>
-                    <h4>Open Source</h4>
-                    <p>Fully open source and free to use in any project</p>
-                </div>
-            </div>
-        </section>
-
-        <hr class="section-divider">
-
-        <section id="booting">
-            <h1>Booting the Library</h1>
-
-            <h2 id="loading">Loading ArrayField</h2>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">local ArrayField = loadstring(game:HttpGet('https://raw.githubusercontent.com/vqmpjayZ/laboratory/refs/heads/main/ArrayField/ArrayField.lua'))()</code></pre>
-            </div>
-
-            <h3>Enabling Configuration Saving</h3>
-
-            <div class="tip">
-                <div class="tip-title">💡 Tip</div>
-                <p>Configuration saving is toggled by the user from the in-app settings panel. As a developer, you just need to set a <code>FolderName</code> and <code>FileName</code> in <code>ConfigurationSaving</code>, and assign a unique <code>Flag</code> to each element you want saved.</p>
-            </div>
-        </section>
-
-        <hr class="section-divider">
-
-        <section id="windows">
-            <h1>Windows</h1>
-
-            <h2>Creating a Window</h2>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">local Window = ArrayField:CreateWindow({
-    Name = "My Script Hub",
-    Icon = "shield",
-    LoadingTitle = "Loading Script Hub",
-    LoadingSubtitle = "by YourName",
-    ConfigurationSaving = {
-        FolderName = "MyScriptHub",
-        FileName = "Config"
-    }
-})</code></pre>
-            </div>
-
-            <table class="param-table">
-                <thead>
-                    <tr>
-                        <th>Parameter</th>
-                        <th>Type</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><code>Name</code></td>
-                        <td><span class="type">string</span></td>
-                        <td>Window title displayed in the topbar</td>
-                    </tr>
-                    <tr>
-                        <td><code>Icon</code></td>
-                        <td><span class="type">string | number</span></td>
-                        <td>Lucide icon name or Roblox asset ID for the topbar icon</td>
-                    </tr>
-                    <tr>
-                        <td><code>LoadingTitle</code></td>
-                        <td><span class="type">string</span></td>
-                        <td>Text shown during the loading screen</td>
-                    </tr>
-                    <tr>
-                        <td><code>LoadingSubtitle</code></td>
-                        <td><span class="type">string</span></td>
-                        <td>Subtitle shown during the loading screen</td>
-                    </tr>
-                    <tr>
-                        <td><code>DefaultTheme</code></td>
-                        <td><span class="type">string</span></td>
-                        <td>Optional. Forces a theme and prevents users from keeping their previously selected one</td>
-                    </tr>
-                    <tr>
-                        <td><code>ConfigurationSaving</code></td>
-                        <td><span class="type">table</span></td>
-                        <td>Contains <code>FolderName</code> and <code>FileName</code> for config file storage</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <h2>Changing Visibility</h2>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">ArrayField:SetVisibility(false)
-
-local isVisible = ArrayField:IsVisible()</code></pre>
-            </div>
-        </section>
-
-        <hr class="section-divider">
-
-        <section id="tabs">
-            <h1>Tabs</h1>
-
-            <h2>Creating a Tab</h2>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">local Tab = Window:CreateTab("Main", "home")</code></pre>
-            </div>
-
-            <p>The first argument is the tab name, the second is an optional icon (Lucide icon name or Roblox asset ID).</p>
-
-            <h3 id="lucide-icons">Lucide Icon Support</h3>
-
-            <p>ArrayField supports <a href="https://lucide.dev/icons/" target="_blank">Lucide Icons</a>. Pass the icon name as a string:</p>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">local CombatTab = Window:CreateTab("Combat", "sword")
-local VisualsTab = Window:CreateTab("Visuals", "eye")
-local PlayerTab = Window:CreateTab("Player", "user")</code></pre>
-            </div>
-
-            <p>You can also use Roblox asset IDs:</p>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">local Tab = Window:CreateTab("Tab Example", 4483362458)</code></pre>
-            </div>
-
-            <p><a href="https://lucide.dev/icons/" target="_blank">Browse all Lucide Icons</a> · <a href="https://github.com/latte-soft/lucide-roblox/tree/master/icons/compiled/48px" target="_blank">Supported Icons List</a></p>
-
-            <div class="tip">
-                <div class="tip-title">💡 Marquee Effect</div>
-                <p>If a tab name is too long to fit in the sidebar, it automatically scrolls horizontally so the full name is always visible.</p>
-            </div>
-        </section>
-
-        <hr class="section-divider">
-
-        <section id="categories">
-            <h1>Categories</h1>
-
-            <p>Categories let you organize tabs into collapsible groups in the sidebar.</p>
-
-            <h2>Creating a Category</h2>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">local MainCategory = Window:CreateCategory("Main Features", {DefaultOpen = true})
-local SettingsCategory = Window:CreateCategory("Settings", {DefaultOpen = false})</code></pre>
-            </div>
-
-            <h2>Creating Tabs Under Categories</h2>
-
-            <p>Pass the category as the third argument to <code>CreateTab</code>:</p>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">local PlayerTab = Window:CreateTab("Player", "user", MainCategory)
-local ConfigTab = Window:CreateTab("Config", "settings", SettingsCategory)</code></pre>
-            </div>
-
-            <table class="param-table">
-                <thead>
-                    <tr>
-                        <th>Parameter</th>
-                        <th>Type</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><code>Name</code></td>
-                        <td><span class="type">string</span></td>
-                        <td>Category display name</td>
-                    </tr>
-                    <tr>
-                        <td><code>DefaultOpen</code></td>
-                        <td><span class="type">boolean</span></td>
-                        <td>Whether the category starts expanded or collapsed</td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
-
-        <hr class="section-divider">
-
-        <section id="sections">
-            <h1>Sections</h1>
-
-            <p>Sections organize elements within a tab into titled groups.</p>
-
-            <h2>Creating a Section</h2>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">local Section = Tab:CreateSection("Movement")</code></pre>
-            </div>
-
-            <h3>Updating a Section</h3>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">Section:Set("New Section Title")</code></pre>
-            </div>
-
-            <p>To place elements inside a section, pass <code>SectionParent = Section</code> in the element's settings table.</p>
-        </section>
-
-        <hr class="section-divider">
-
-        <section id="dividers">
-            <h1>Dividers & Spacing</h1>
-
-            <h2>Creating a Separator</h2>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">Tab:CreateSeparator(Section, {
-    Title = "Advanced Settings",
-    Width = 0.9,
-    Padding = 10
-})</code></pre>
-            </div>
-
-            <table class="param-table">
-                <thead>
-                    <tr>
-                        <th>Parameter</th>
-                        <th>Type</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><code>Title</code></td>
-                        <td><span class="type">string</span></td>
-                        <td>Optional text displayed in the center of the separator</td>
-                    </tr>
-                    <tr>
-                        <td><code>Width</code></td>
-                        <td><span class="type">number</span></td>
-                        <td>0 to 1, percentage of container width</td>
-                    </tr>
-                    <tr>
-                        <td><code>Padding</code></td>
-                        <td><span class="type">number</span></td>
-                        <td>Vertical padding in pixels</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <h2>Creating Spacing</h2>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">Tab:CreateSpacing(Section, 15)</code></pre>
-            </div>
-
-            <p>Adds vertical empty space (in pixels) between elements.</p>
-        </section>
-
-        <hr class="section-divider">
-
-        <section id="buttons">
-            <h1>Buttons</h1>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">Tab:CreateButton({
-    Name = "Click Me",
-    Description = "Appears on hover",
-    Interact = "click",
-    SectionParent = Section,
-    Callback = function()
-        print("Button clicked!")
-    end
-})</code></pre>
-            </div>
-
-            <table class="param-table">
-                <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
-                <tbody>
-                    <tr><td><code>Name</code></td><td><span class="type">string</span></td><td>Button label</td></tr>
-                    <tr><td><code>Description</code></td><td><span class="type">string</span></td><td>Optional hover description</td></tr>
-                    <tr><td><code>Interact</code></td><td><span class="type">string</span></td><td>Optional hint text on the button</td></tr>
-                    <tr><td><code>SectionParent</code></td><td><span class="type">Section</span></td><td>Optional section to place the button in</td></tr>
-                    <tr><td><code>Callback</code></td><td><span class="type">function</span></td><td>Fires when the button is clicked</td></tr>
-                </tbody>
-            </table>
-        </section>
-
-        <hr class="section-divider">
-
-        <section id="toggles">
-            <h1>Toggles</h1>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">local Toggle = Tab:CreateToggle({
-    Name = "Speed Boost",
-    Description = "Increases movement speed",
-    CurrentValue = false,
-    Flag = "SpeedToggle",
-    SectionParent = Section,
-    Callback = function(Value)
-        print("Speed Boost:", Value)
-    end
-})</code></pre>
-            </div>
-
-            <h3>Methods</h3>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">Toggle:Set(true)
-
-Toggle:Lock("Premium feature")
-Toggle:Unlock()</code></pre>
-            </div>
-
-            <table class="param-table">
-                <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
-                <tbody>
-                    <tr><td><code>Name</code></td><td><span class="type">string</span></td><td>Toggle label</td></tr>
-                    <tr><td><code>Description</code></td><td><span class="type">string</span></td><td>Optional hover description</td></tr>
-                    <tr><td><code>CurrentValue</code></td><td><span class="type">boolean</span></td><td>Initial toggle state</td></tr>
-                    <tr><td><code>Flag</code></td><td><span class="type">string</span></td><td>Unique ID for config saving</td></tr>
-                    <tr><td><code>Callback</code></td><td><span class="type">function</span></td><td>Receives <code>true</code> or <code>false</code></td></tr>
-                </tbody>
-            </table>
-        </section>
-
-        <hr class="section-divider">
-
-        <section id="sliders">
-            <h1>Sliders</h1>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">local Slider = Tab:CreateSlider({
-    Name = "Speed Multiplier",
-    Description = "Adjust speed from 1x to 10x",
-    Range = {1, 10},
-    Increment = 0.5,
-    Suffix = "x",
-    CurrentValue = 1,
-    Flag = "SpeedValue",
-    SectionParent = Section,
-    Callback = function(Value)
-        print("Speed:", Value)
-    end
-})</code></pre>
-            </div>
-
-            <h3>Methods</h3>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">Slider:Set(5)</code></pre>
-            </div>
-
-            <table class="param-table">
-                <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
-                <tbody>
-                    <tr><td><code>Range</code></td><td><span class="type">{min, max}</span></td><td>Min and max values</td></tr>
-                    <tr><td><code>Increment</code></td><td><span class="type">number</span></td><td>Step size</td></tr>
-                    <tr><td><code>Suffix</code></td><td><span class="type">string</span></td><td>Optional display suffix (e.g. "x", "%", "studs")</td></tr>
-                    <tr><td><code>CurrentValue</code></td><td><span class="type">number</span></td><td>Starting value</td></tr>
-                </tbody>
-            </table>
-        </section>
-
-        <hr class="section-divider">
-
-        <section id="inputs">
-            <h1>Text Inputs</h1>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">local Input = Tab:CreateInput({
-    Name = "Username",
-    Description = "Enter a player's username",
-    PlaceholderText = "Type here...",
-    RemoveTextAfterFocusLost = false,
-    NumbersOnly = false,
-    CharacterLimit = 20,
-    OnEnter = false,
-    SectionParent = Section,
-    Callback = function(Text)
-        print("Input:", Text)
-    end
-})</code></pre>
-            </div>
-
-            <h3>Methods</h3>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">Input:Set("NewUsername")</code></pre>
-            </div>
-
-            <table class="param-table">
-                <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
-                <tbody>
-                    <tr><td><code>PlaceholderText</code></td><td><span class="type">string</span></td><td>Grayed-out hint text</td></tr>
-                    <tr><td><code>RemoveTextAfterFocusLost</code></td><td><span class="type">boolean</span></td><td>Clear text when clicking away</td></tr>
-                    <tr><td><code>NumbersOnly</code></td><td><span class="type">boolean</span></td><td>Only allow numeric input</td></tr>
-                    <tr><td><code>CharacterLimit</code></td><td><span class="type">number</span></td><td>Max characters allowed</td></tr>
-                    <tr><td><code>OnEnter</code></td><td><span class="type">boolean</span></td><td>Only fire callback on Enter key</td></tr>
-                </tbody>
-            </table>
-        </section>
-
-        <hr class="section-divider">
-
-        <section id="keybinds">
-            <h1>Keybinds</h1>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">local Keybind = Tab:CreateKeybind({
-    Name = "Fly Key",
-    Description = "Press to toggle flight",
-    CurrentKeybind = "F",
-    HoldToInteract = false,
-    Flag = "FlyKey",
-    SectionParent = Section,
-    Callback = function(IsHeld)
-        print("Fly key pressed!")
-    end
-})</code></pre>
-            </div>
-
-            <h3>Methods</h3>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">Keybind:Set("G")</code></pre>
-            </div>
-
-            <table class="param-table">
-                <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
-                <tbody>
-                    <tr><td><code>CurrentKeybind</code></td><td><span class="type">string</span></td><td>Default key</td></tr>
-                    <tr><td><code>HoldToInteract</code></td><td><span class="type">boolean</span></td><td>If true, callback fires while held</td></tr>
-                </tbody>
-            </table>
-        </section>
-
-        <hr class="section-divider">
-
-        <section id="dropdowns">
-            <h1>Dropdowns</h1>
-
-            <h2>Single Selection</h2>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">local Dropdown = Tab:CreateDropdown({
-    Name = "Select Weapon",
-    Options = {"Sword", "Axe", "Spear", "Bow"},
-    CurrentOption = "Sword",
-    MultiSelection = false,
-    Flag = "SelectedWeapon",
-    Callback = function(Option)
-        print("Selected:", Option)
-    end
-})</code></pre>
-            </div>
-
-            <h2>Multi Selection</h2>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">local Features = Tab:CreateDropdown({
-    Name = "Enable Features",
-    Options = {"Auto Heal", "Auto Attack", "Auto Block"},
-    CurrentOption = {"Auto Heal"},
-    MultiSelection = true,
-    Flag = "EnabledFeatures",
-    Callback = function(Option)
-        print("Toggled:", Option)
-    end
-})</code></pre>
-            </div>
-
-            <h3>Methods</h3>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">Dropdown:Set("Bow")
-
-Dropdown:Add({"Dagger", "Staff"})
-
-Dropdown:Remove("Sword")
-
-Dropdown:Refresh({"Katana", "Claymore"}, "Katana")</code></pre>
-            </div>
-        </section>
-
-        <hr class="section-divider">
-
-        <section id="colorpickers">
-            <h1>Color Pickers</h1>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">local ColorPicker = Tab:CreateColorPicker({
-    Name = "ESP Color",
-    Color = Color3.fromRGB(255, 0, 0),
-    Flag = "ESPColor",
-    Callback = function(Color)
-        print("Color:", Color)
-    end
-})</code></pre>
-            </div>
-
-            <h3>Methods</h3>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">ColorPicker:Set(Color3.fromRGB(0, 255, 0))</code></pre>
-            </div>
-        </section>
-
-        <hr class="section-divider">
-
-        <section id="labels">
-            <h1>Labels</h1>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">Tab:CreateLabel({
-    Text = "Welcome to my script!",
-    SectionParent = Section
-})</code></pre>
-            </div>
-
-            <h3>With Icon</h3>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">Tab:CreateLabel({
-    Text = "Press K to toggle the UI",
-    Icon = "keyboard",
-    SectionParent = Section
-})</code></pre>
-            </div>
-
-            <h3>Colored Backgrounds</h3>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">Tab:CreateLabel({
-    Text = "Warning: Use at your own risk!",
-    Background = "warn",
-    SectionParent = Section
-})
-
-Tab:CreateLabel({
-    Text = "Custom pink label",
-    Background = "#FF69B4",
-    SectionParent = Section
-})</code></pre>
-            </div>
-
-            <p>Built-in background options: <code>"warn"</code>, <code>"success"</code>, <code>"error"</code>, or any hex color code.</p>
-        </section>
-
-        <hr class="section-divider">
-
-        <section id="paragraphs">
-            <h1>Paragraphs</h1>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">local Paragraph = Tab:CreateParagraph({
-    Title = "&lt;b&gt;Getting Started&lt;/b&gt;",
-    Content = "This script includes powerful features. Configure everything properly!",
-    Icon = "info",
-    Background = "success",
-    SectionParent = Section
-})</code></pre>
-            </div>
-
-            <h3>Updating a Paragraph</h3>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">Paragraph:Set({
-    Title = "Updated Title",
-    Content = "New content here",
-    Background = "warn"
-})</code></pre>
-            </div>
-
-            <p>Paragraphs support RichText in both <code>Title</code> and <code>Content</code>. The same <code>Background</code> options as labels apply.</p>
-        </section>
-
-        <hr class="section-divider">
-
-        <section id="images">
-            <h1>Images</h1>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">Tab:CreateImage(Section, {
-    Image = "https://example.com/image.png",
-    Width = 200,
-    Height = 200,
-    Transparency = 0
-})</code></pre>
-            </div>
-
-            <p>The <code>Image</code> field accepts URLs, Roblox asset IDs, or file paths. <code>Transparency</code> ranges from 0 (opaque) to 1 (invisible).</p>
-        </section>
-
-        <hr class="section-divider">
-
-        <section id="console">
-            <h1>Console</h1>
-
-            <p>A built-in terminal-style log viewer with color coded entries, timestamps, auto-scroll, and a max line limit.</p>
-
-            <h2>Creating a Console</h2>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">local Console = Tab:CreateConsole({
-    Title = "Remote Logger",
-    Icon = "terminal",
-    MaxLines = 200,
-    Height = 150,
-    Timestamps = true,
-    SectionParent = Section
-})</code></pre>
-            </div>
-
-            <table class="param-table">
-                <thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
-                <tbody>
-                    <tr><td><code>Title</code></td><td><span class="type">string</span></td><td><code>"Console"</code></td><td>Header text</td></tr>
-                    <tr><td><code>Icon</code></td><td><span class="type">string | number</span></td><td><code>nil</code></td><td>Lucide icon name or asset ID</td></tr>
-                    <tr><td><code>MaxLines</code></td><td><span class="type">number</span></td><td><code>100</code></td><td>Maximum log entries before oldest are removed</td></tr>
-                    <tr><td><code>Height</code></td><td><span class="type">number</span></td><td><code>150</code></td><td>Height of the log area in pixels</td></tr>
-                    <tr><td><code>Timestamps</code></td><td><span class="type">boolean</span></td><td><code>true</code></td><td>Show <code>[HH:MM:SS]</code> before each entry</td></tr>
-                </tbody>
-            </table>
-
-            <h2>Logging Methods</h2>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">Console:Log("Script initialized")
-Console:Info("Listening for remotes")
-Console:Success("Connected to server")
-Console:Warn("Rate limit approaching")
-Console:Error("Failed to fetch data")
-
-Console:Clear()</code></pre>
-            </div>
-
-            <table class="param-table">
-                <thead><tr><th>Method</th><th>Color</th><th>Prefix</th></tr></thead>
-                <tbody>
-                    <tr><td><code>:Log(message)</code></td><td>Gray</td><td><code>[LOG]</code></td></tr>
-                    <tr><td><code>:Info(message)</code></td><td>Blue</td><td><code>[INFO]</code></td></tr>
-                    <tr><td><code>:Success(message)</code></td><td>Green</td><td><code>[OK]</code></td></tr>
-                    <tr><td><code>:Warn(message)</code></td><td>Yellow</td><td><code>[WARN]</code></td></tr>
-                    <tr><td><code>:Error(message)</code></td><td>Red</td><td><code>[ERROR]</code></td></tr>
-                    <tr><td><code>:Clear()</code></td><td>—</td><td>Clears all entries with a fade animation</td></tr>
-                </tbody>
-            </table>
-
-            <div class="tip">
-                <div class="tip-title">💡 Tip</div>
-                <p>The console has a small trash icon in the top right corner that users can click to clear all entries. It also auto-scrolls to the latest entry.</p>
-            </div>
-        </section>
-
-        <hr class="section-divider">
-
-        <section id="notifications">
-            <h1>Notifications</h1>
-
-            <h2>Simple Notification</h2>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">ArrayField:Notify({
-    Title = "Success",
-    Content = "Script loaded successfully!",
-    Duration = 5,
-    Image = "check-circle"
-})</code></pre>
-            </div>
-
-            <h2>Notification with Actions</h2>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">ArrayField:Notify({
-    Title = "Update Available",
-    Content = "A new version is ready.",
-    Image = "download",
-    Actions = {
-        {
-            Name = "Update",
-            Callback = function()
-                print("Updating...")
-            end
-        },
-        {
-            Name = "Later",
-            Callback = function()
-                print("Dismissed")
-            end
-        }
-    }
-})</code></pre>
-            </div>
-
-            <table class="param-table">
-                <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
-                <tbody>
-                    <tr><td><code>Title</code></td><td><span class="type">string</span></td><td>Notification title</td></tr>
-                    <tr><td><code>Content</code></td><td><span class="type">string</span></td><td>Notification body text</td></tr>
-                    <tr><td><code>Duration</code></td><td><span class="type">number</span></td><td>Seconds before auto-dismiss (default 6.5)</td></tr>
-                    <tr><td><code>Image</code></td><td><span class="type">string | number</span></td><td>Lucide icon, asset ID, or image URL</td></tr>
-                    <tr><td><code>Actions</code></td><td><span class="type">table</span></td><td>Array of <code>{Name, Callback}</code> action buttons</td></tr>
-                </tbody>
-            </table>
-        </section>
-
-        <hr class="section-divider">
-
-        <section id="prompts">
-            <h1>Prompts & Dialogs</h1>
-
-            <h2>Note Prompt</h2>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">Window:NotePrompt({
-    Title = "Welcome!",
-    Description = "Thanks for using this script",
-    Icon = "sparkles",
-    Callback = function()
-        print("User clicked OK")
-    end
-})</code></pre>
-            </div>
-
-            <h2>Confirmation Dialog</h2>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">Window:Prompt({
-    Title = "Confirm Action",
-    SubTitle = "Are you sure?",
-    Content = "This action cannot be undone.",
-    Actions = {
-        Confirm = {
-            Name = "Yes",
-            Callback = function()
-                print("Confirmed")
-            end
-        },
-        Cancel = {
-            Name = "No",
-            Callback = function()
-                print("Cancelled")
-            end
-        }
-    }
-})</code></pre>
-            </div>
-        </section>
-
-        <hr class="section-divider">
-
-        <section id="themes">
-            <h1>Themes</h1>
-
-            <p>ArrayField ships with multiple built-in themes. Users can switch themes at any time from the in-app settings panel without needing to re-execute.</p>
-
-            <h2>Setting a Default Theme</h2>
-
-            <p>You can optionally force a default theme in <code>CreateWindow</code>:</p>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">local Window = ArrayField:CreateWindow({
-    Name = "My Hub",
-    DefaultTheme = "Ocean",
-})</code></pre>
-            </div>
-
-            <div class="warning">
-                <div class="warning-title">⚠️ Note</div>
-                <p>Setting <code>DefaultTheme</code> overrides the user's previously selected theme on every execution. Omit this parameter to let users keep their choice.</p>
-            </div>
-
-            <h2>Custom Themes</h2>
-
-            <p>You can create a fully custom theme by defining a theme table with all color properties. Pass it as the <code>DefaultTheme</code> or register it in the theme table.</p>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">local MyTheme = {
-    TextColor = Color3.fromRGB(240, 240, 240),
-
-    Background = Color3.fromRGB(25, 25, 25),
-    Topbar = Color3.fromRGB(34, 34, 34),
-    Shadow = Color3.fromRGB(20, 20, 20),
-
-    NotificationBackground = Color3.fromRGB(20, 20, 20),
-    NotificationActionsBackground = Color3.fromRGB(230, 230, 230),
-
-    TabBackground = Color3.fromRGB(80, 80, 80),
-    TabStroke = Color3.fromRGB(85, 85, 85),
-    TabBackgroundSelected = Color3.fromRGB(210, 210, 210),
-    TabTextColor = Color3.fromRGB(240, 240, 240),
-    SelectedTabTextColor = Color3.fromRGB(50, 50, 50),
-
-    ElementBackground = Color3.fromRGB(35, 35, 35),
-    ElementBackgroundHover = Color3.fromRGB(40, 40, 40),
-    SecondaryElementBackground = Color3.fromRGB(25, 25, 25),
-    ElementStroke = Color3.fromRGB(50, 50, 50),
-    SecondaryElementStroke = Color3.fromRGB(40, 40, 40),
-
-    SliderBackground = Color3.fromRGB(50, 138, 220),
-    SliderProgress = Color3.fromRGB(50, 138, 220),
-    SliderStroke = Color3.fromRGB(58, 163, 255),
-
-    ToggleBackground = Color3.fromRGB(30, 30, 30),
-    ToggleEnabled = Color3.fromRGB(0, 146, 214),
-    ToggleDisabled = Color3.fromRGB(100, 100, 100),
-    ToggleEnabledStroke = Color3.fromRGB(0, 170, 255),
-    ToggleDisabledStroke = Color3.fromRGB(125, 125, 125),
-    ToggleEnabledOuterStroke = Color3.fromRGB(100, 100, 100),
-    ToggleDisabledOuterStroke = Color3.fromRGB(65, 65, 65),
-
-    DropdownSelected = Color3.fromRGB(40, 40, 40),
-    DropdownUnselected = Color3.fromRGB(30, 30, 30),
-
-    InputBackground = Color3.fromRGB(30, 30, 30),
-    InputStroke = Color3.fromRGB(65, 65, 65),
-    PlaceholderColor = Color3.fromRGB(178, 178, 178)
-}</code></pre>
-            </div>
-        </section>
-
-        <hr class="section-divider">
-
-        <section id="methods">
-            <h1>Universal Methods</h1>
-
-            <p>All interactive elements support these common methods:</p>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">Element:Lock("Reason text")
-
-Element:Unlock()
-
-Element:Visible(false)
-Element:Visible(true)
-
-Element:Destroy()</code></pre>
-            </div>
-        </section>
-
-        <hr class="section-divider">
-
-        <section id="saving">
-            <h1>Saving & Loading</h1>
-
-            <p>When <code>ConfigurationSaving</code> is set and the user enables it from settings, ArrayField automatically saves and loads element values using the <code>Flag</code> identifiers.</p>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">ArrayField.SaveConfiguration()
-
-ArrayField.LoadConfiguration()
-
-print(ArrayField.Flags["SpeedToggle"].CurrentValue)
-print(ArrayField.Flags["SpeedValue"].CurrentValue)</code></pre>
-            </div>
-        </section>
-
-        <hr class="section-divider">
-
-        <section id="destroy">
-            <h1>Destroying the UI</h1>
-
-            <div class="code-block-wrapper">
-                <pre><code class="language-lua">ArrayField:Destroy()</code></pre>
-            </div>
-
-            <p>Completely removes the interface and cleans up all connections.</p>
-        </section>
-
-    </main>
+<aside class="sidebar" id="sidebar">
+<nav>
+<ul class="menu-list">
+<li class="menu-list-item"><a class="menu-link active" data-section="introduction" onclick="showSection('introduction')">Introduction</a></li>
+
+<li class="menu-list-item">
+<div class="menu-category expanded" onclick="toggleCategory(this)"><span>Configuration</span><span class="menu-arrow">›</span></div>
+<ul class="menu-list menu-submenu open">
+<li class="menu-list-item"><a class="menu-link" data-section="booting" onclick="showSection('booting')">Booting the Library</a></li>
+<li class="menu-list-item"><a class="menu-link" data-section="windows" onclick="showSection('windows')">Windows</a></li>
+<li class="menu-list-item"><a class="menu-link" data-section="themes" onclick="showSection('themes')">Themes</a></li>
+</ul>
+</li>
+
+<li class="menu-list-item">
+<div class="menu-category" onclick="toggleCategory(this)"><span>Interaction</span><span class="menu-arrow">›</span></div>
+<ul class="menu-list menu-submenu">
+<li class="menu-list-item"><a class="menu-link" data-section="buttons" onclick="showSection('buttons')">Buttons</a></li>
+<li class="menu-list-item"><a class="menu-link" data-section="toggles" onclick="showSection('toggles')">Toggles</a></li>
+<li class="menu-list-item"><a class="menu-link" data-section="sliders" onclick="showSection('sliders')">Sliders</a></li>
+<li class="menu-list-item"><a class="menu-link" data-section="inputs" onclick="showSection('inputs')">Text Inputs</a></li>
+<li class="menu-list-item"><a class="menu-link" data-section="keybinds" onclick="showSection('keybinds')">Keybinds</a></li>
+<li class="menu-list-item"><a class="menu-link" data-section="dropdowns" onclick="showSection('dropdowns')">Dropdowns</a></li>
+<li class="menu-list-item"><a class="menu-link" data-section="colorpickers" onclick="showSection('colorpickers')">Color Pickers</a></li>
+</ul>
+</li>
+
+<li class="menu-list-item">
+<div class="menu-category" onclick="toggleCategory(this)"><span>UI Components</span><span class="menu-arrow">›</span></div>
+<ul class="menu-list menu-submenu">
+<li class="menu-list-item"><a class="menu-link" data-section="labels" onclick="showSection('labels')">Labels</a></li>
+<li class="menu-list-item"><a class="menu-link" data-section="paragraphs" onclick="showSection('paragraphs')">Paragraphs</a></li>
+<li class="menu-list-item"><a class="menu-link" data-section="images" onclick="showSection('images')">Images</a></li>
+<li class="menu-list-item"><a class="menu-link" data-section="console" onclick="showSection('console')">Console</a></li>
+<li class="menu-list-item"><a class="menu-link" data-section="notifications" onclick="showSection('notifications')">Notifications</a></li>
+<li class="menu-list-item"><a class="menu-link" data-section="prompts" onclick="showSection('prompts')">Prompts</a></li>
+</ul>
+</li>
+
+<li class="menu-list-item">
+<div class="menu-category" onclick="toggleCategory(this)"><span>Reference</span><span class="menu-arrow">›</span></div>
+<ul class="menu-list menu-submenu">
+<li class="menu-list-item"><a class="menu-link" data-section="methods" onclick="showSection('methods')">Universal Methods</a></li>
+<li class="menu-list-item"><a class="menu-link" data-section="saving" onclick="showSection('saving')">Saving & Loading</a></li>
+</ul>
+</li>
+
+</ul>
+</nav>
+</aside>
+
+<main class="main-container">
+<div class="doc-content">
+
+<!-- INTRODUCTION -->
+<div class="doc-section active" id="sec-introduction">
+<div class="breadcrumbs">
+<a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a>
+<span class="breadcrumb-sep">›</span>
+<span>Introduction</span>
+</div>
+<div class="markdown">
+<h1>Introduction</h1>
+
+<div class="hero-image">
+<a href="https://discord.gg/WDbJ5wE2cR" target="_blank">
+<img src="https://i.imgur.com/W9FaXAY.png" alt="ArrayField">
+<img src="https://i.imgur.com/W9FaXAY.png" alt="" class="hero-blur">
+</a>
+</div>
+
+<p>This is the written documentation for the ArrayField Interface Suite.</p>
+
+<h2>Why choose ArrayField?</h2>
+
+<ul>
+<li><p>🎨 <strong>Fully Themeable</strong> — Multiple built-in themes with custom theme support, switchable in-app</p></li>
+<li><p>📂 <strong>Category System</strong> — Organize tabs into collapsible sidebar groups</p></li>
+<li><p>🖥️ <strong>Built-in Console</strong> — Terminal-style log viewer with color coded entries</p></li>
+<li><p>🔔 <strong>Rich Notifications</strong> — Notifications with action buttons and icons</p></li>
+<li><p>💾 <strong>Auto Configuration Saving</strong> — Togglable from the in-app settings panel</p></li>
+<li><p>🔓 <strong>Open Source</strong> — Fully open source and free to use</p></li>
+<li><p>💃 <strong>Excellent Performance</strong></p></li>
+</ul>
+
+<h2>Getting Started</h2>
+
+<p>To get started with ArrayField, check out the sidebar on the left. It provides quick links to help you use all ArrayField features in your project. Keep this documentation handy so you can refer to it as you build.</p>
+
+<p>Found a missing feature? Please suggest it on <a href="https://discord.gg/WDbJ5wE2cR" target="_blank">Discord</a> and even consider contributing on <a href="https://github.com/vqmpjayZ/laboratory" target="_blank">GitHub</a>! ArrayField is open source, and contributions are welcome.</p>
+</div>
+<div class="pagination">
+<div style="flex:1"></div>
+<a class="pagination-link next" onclick="showSection('booting')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Booting the Library</div></a>
+</div>
+</div>
+
+<!-- BOOTING -->
+<div class="doc-section" id="sec-booting">
+<div class="breadcrumbs">
+<a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a>
+<span class="breadcrumb-sep">›</span><span>Configuration</span>
+<span class="breadcrumb-sep">›</span><span>Booting the Library</span>
+</div>
+<div class="markdown">
+<h1>Booting the Library</h1>
+
+<h2>Loading ArrayField</h2>
+
+<div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">ArrayField</span> <span class="op">=</span> <span class="fn">loadstring</span><span class="pn">(</span><span class="pl">game</span><span class="pn">:</span><span class="fn">HttpGet</span><span class="pn">(</span><span class="str">'https://raw.githubusercontent.com/vqmpjayZ/laboratory/refs/heads/main/ArrayField/ArrayField.lua'</span><span class="pn">)</span><span class="pn">)</span><span class="pn">(</span><span class="pn">)</span></code></pre></div>
+
+<h3>Enabling Configuration Saving</h3>
+
+<div class="admonition admonition-tip">
+<div class="admonition-heading">💡 tip</div>
+<ol>
+<li>Set a <code>FolderName</code> and <code>FileName</code> in the <code>ConfigurationSaving</code> table of <code>CreateWindow</code></li>
+<li>Choose a unique <code>Flag</code> identifier for each supported element you create</li>
+<li>The user can enable or disable config saving from the in-app settings panel</li>
+</ol>
+</div>
+
+<p>ArrayField will automatically save and load the configuration when the user enables it from settings.</p>
+</div>
+<div class="pagination">
+<a class="pagination-link prev" onclick="showSection('introduction')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Introduction</div></a>
+<a class="pagination-link next" onclick="showSection('windows')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Windows</div></a>
+</div>
+</div>
+
+<!-- WINDOWS -->
+<div class="doc-section" id="sec-windows">
+<div class="breadcrumbs">
+<a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a>
+<span class="breadcrumb-sep">›</span><span>Configuration</span>
+<span class="breadcrumb-sep">›</span><span>Windows</span>
+</div>
+<div class="markdown">
+<h1>Windows</h1>
+
+<h2>Creating a Window</h2>
+
+<div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">Window</span> <span class="op">=</span> <span class="pl">ArrayField</span><span class="pn">:</span><span class="fn">CreateWindow</span><span class="pn">(</span><span class="pn">{</span>
+   <span class="pl">Name</span> <span class="op">=</span> <span class="str">"My Script Hub"</span><span class="pn">,</span>
+   <span class="pl">Icon</span> <span class="op">=</span> <span class="str">"shield"</span><span class="pn">,</span> <span class="cm">-- Lucide icon name or Roblox asset ID</span>
+   <span class="pl">LoadingTitle</span> <span class="op">=</span> <span class="str">"Loading Script Hub"</span><span class="pn">,</span>
+   <span class="pl">LoadingSubtitle</span> <span class="op">=</span> <span class="str">"by YourName"</span><span class="pn">,</span>
+
+   <span class="pl">ConfigurationSaving</span> <span class="op">=</span> <span class="pn">{</span>
+      <span class="pl">FolderName</span> <span class="op">=</span> <span class="str">"MyScriptHub"</span><span class="pn">,</span>
+      <span class="pl">FileName</span> <span class="op">=</span> <span class="str">"Config"</span>
+   <span class="pn">}</span>
+<span class="pn">}</span><span class="pn">)</span></code></pre></div>
+
+<h2>Creating a Tab</h2>
+
+<div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">Tab</span> <span class="op">=</span> <span class="pl">Window</span><span class="pn">:</span><span class="fn">CreateTab</span><span class="pn">(</span><span class="str">"Tab Example"</span><span class="pn">,</span> <span class="str">"home"</span><span class="pn">)</span> <span class="cm">-- Title, Image</span></code></pre></div>
+
+<h3>Lucide Icon Support</h3>
+
+<p>You can use <a href="https://lucide.dev/icons/" target="_blank">Lucide Icons</a> by passing the icon name as a string.</p>
+
+<div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">Tab</span> <span class="op">=</span> <span class="pl">Window</span><span class="pn">:</span><span class="fn">CreateTab</span><span class="pn">(</span><span class="str">"Combat"</span><span class="pn">,</span> <span class="str">"sword"</span><span class="pn">)</span></code></pre></div>
+
+<p>You can also use Roblox asset IDs:</p>
+
+<div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">Tab</span> <span class="op">=</span> <span class="pl">Window</span><span class="pn">:</span><span class="fn">CreateTab</span><span class="pn">(</span><span class="str">"Tab Example"</span><span class="pn">,</span> <span class="nm">4483362458</span><span class="pn">)</span></code></pre></div>
+
+<p><a href="https://lucide.dev/icons/" target="_blank">All Lucide Icons</a> · <a href="https://github.com/latte-soft/lucide-roblox/tree/master/icons/compiled/48px" target="_blank">Supported Lucide Icons</a></p>
+
+<h2>Creating a Category</h2>
+
+<p>Categories organize tabs into collapsible groups in the sidebar.</p>
+
+<div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">MainCategory</span> <span class="op">=</span> <span class="pl">Window</span><span class="pn">:</span><span class="fn">CreateCategory</span><span class="pn">(</span><span class="str">"Main Features"</span><span class="pn">,</span> <span class="pn">{</span><span class="pl">DefaultOpen</span> <span class="op">=</span> <span class="kw">true</span><span class="pn">}</span><span class="pn">)</span></code></pre></div>
+
+<p>Pass the category as the third argument to <code>CreateTab</code>:</p>
+
+<div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">PlayerTab</span> <span class="op">=</span> <span class="pl">Window</span><span class="pn">:</span><span class="fn">CreateTab</span><span class="pn">(</span><span class="str">"Player"</span><span class="pn">,</span> <span class="str">"user"</span><span class="pn">,</span> <span class="pl">MainCategory</span><span class="pn">)</span></code></pre></div>
+
+<h2>Creating a Section</h2>
+
+<div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">Section</span> <span class="op">=</span> <span class="pl">Tab</span><span class="pn">:</span><span class="fn">CreateSection</span><span class="pn">(</span><span class="str">"Section Example"</span><span class="pn">)</span></code></pre></div>
+
+<h3>Updating a Section</h3>
+
+<div class="code-block"><pre><code><span class="pl">Section</span><span class="pn">:</span><span class="fn">Set</span><span class="pn">(</span><span class="str">"New Title"</span><span class="pn">)</span></code></pre></div>
+
+<h2>Separators & Spacing</h2>
+
+<div class="code-block"><pre><code><span class="pl">Tab</span><span class="pn">:</span><span class="fn">CreateSeparator</span><span class="pn">(</span><span class="pl">Section</span><span class="pn">,</span> <span class="pn">{</span>
+    <span class="pl">Title</span> <span class="op">=</span> <span class="str">"Advanced Settings"</span><span class="pn">,</span>
+    <span class="pl">Width</span> <span class="op">=</span> <span class="nm">0.9</span><span class="pn">,</span>
+    <span class="pl">Padding</span> <span class="op">=</span> <span class="nm">10</span>
+<span class="pn">}</span><span class="pn">)</span>
+
+<span class="pl">Tab</span><span class="pn">:</span><span class="fn">CreateSpacing</span><span class="pn">(</span><span class="pl">Section</span><span class="pn">,</span> <span class="nm">15</span><span class="pn">)</span> <span class="cm">-- 15 pixels of vertical space</span></code></pre></div>
+
+<h2>Visibility & Destroying</h2>
+
+<div class="code-block"><pre><code><span class="pl">ArrayField</span><span class="pn">:</span><span class="fn">SetVisibility</span><span class="pn">(</span><span class="kw">false</span><span class="pn">)</span>
+
+<span class="pl">ArrayField</span><span class="pn">:</span><span class="fn">IsVisible</span><span class="pn">(</span><span class="pn">)</span>
+
+<span class="pl">ArrayField</span><span class="pn">:</span><span class="fn">Destroy</span><span class="pn">(</span><span class="pn">)</span></code></pre></div>
+</div>
+<div class="pagination">
+<a class="pagination-link prev" onclick="showSection('booting')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Booting the Library</div></a>
+<a class="pagination-link next" onclick="showSection('themes')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Themes</div></a>
+</div>
+</div>
+
+<!-- THEMES -->
+<div class="doc-section" id="sec-themes">
+<div class="breadcrumbs">
+<a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a>
+<span class="breadcrumb-sep">›</span><span>Configuration</span>
+<span class="breadcrumb-sep">›</span><span>Themes</span>
+</div>
+<div class="markdown">
+<h1>Themes</h1>
+
+<p>All themes are designed to display ArrayField in its best form while allowing personality within each script. Users can switch themes at any time from the in-app settings panel.</p>
+
+<h2>Using Themes</h2>
+
+<p>You can optionally set a default theme via <code>DefaultTheme</code> in <code>CreateWindow</code>:</p>
+
+<div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">Window</span> <span class="op">=</span> <span class="pl">ArrayField</span><span class="pn">:</span><span class="fn">CreateWindow</span><span class="pn">(</span><span class="pn">{</span>
+    <span class="pl">Name</span> <span class="op">=</span> <span class="str">"My Hub"</span><span class="pn">,</span>
+    <span class="pl">DefaultTheme</span> <span class="op">=</span> <span class="str">"Ocean"</span>
+<span class="pn">}</span><span class="pn">)</span></code></pre></div>
+
+<div class="admonition admonition-warn">
+<div class="admonition-heading">⚠️ note</div>
+<p>Setting <code>DefaultTheme</code> overrides the user's previously selected theme on every execution. Omit it to let users keep their choice.</p>
+</div>
+
+<h2>Themes Available</h2>
+
+<div class="code-block"><pre><code><span class="pl">Theme Name</span> <span class="op">-</span> <span class="pl">ThemeIdentifier</span>
+
+<span class="pl">Default</span> <span class="op">-</span> <span class="pl">Default</span>
+<span class="pl">Amber Glow</span> <span class="op">-</span> <span class="pl">AmberGlow</span>
+<span class="pl">Amethyst</span> <span class="op">-</span> <span class="pl">Amethyst</span>
+<span class="pl">Bloom</span> <span class="op">-</span> <span class="pl">Bloom</span>
+<span class="pl">Dark Blue</span> <span class="op">-</span> <span class="pl">DarkBlue</span>
+<span class="pl">Green</span> <span class="op">-</span> <span class="pl">Green</span>
+<span class="pl">Light</span> <span class="op">-</span> <span class="pl">Light</span>
+<span class="pl">Ocean</span> <span class="op">-</span> <span class="pl">Ocean</span>
+<span class="pl">Serenity</span> <span class="op">-</span> <span class="pl">Serenity</span></code></pre></div>
+
+<h2>Custom Themes</h2>
+
+<p>You can create your own theme by defining a table with all the color properties:</p>
+
+<div class="code-block"><pre><code><span class="pn">{</span>
+    <span class="pl">TextColor</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">240</span><span class="pn">,</span> <span class="nm">240</span><span class="pn">,</span> <span class="nm">240</span><span class="pn">)</span><span class="pn">,</span>
+
+    <span class="pl">Background</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">25</span><span class="pn">,</span> <span class="nm">25</span><span class="pn">,</span> <span class="nm">25</span><span class="pn">)</span><span class="pn">,</span>
+    <span class="pl">Topbar</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">34</span><span class="pn">,</span> <span class="nm">34</span><span class="pn">,</span> <span class="nm">34</span><span class="pn">)</span><span class="pn">,</span>
+    <span class="pl">Shadow</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">20</span><span class="pn">,</span> <span class="nm">20</span><span class="pn">,</span> <span class="nm">20</span><span class="pn">)</span><span class="pn">,</span>
+
+    <span class="pl">NotificationBackground</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">20</span><span class="pn">,</span> <span class="nm">20</span><span class="pn">,</span> <span class="nm">20</span><span class="pn">)</span><span class="pn">,</span>
+    <span class="pl">NotificationActionsBackground</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">230</span><span class="pn">,</span> <span class="nm">230</span><span class="pn">,</span> <span class="nm">230</span><span class="pn">)</span><span class="pn">,</span>
+
+    <span class="pl">TabBackground</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">80</span><span class="pn">,</span> <span class="nm">80</span><span class="pn">,</span> <span class="nm">80</span><span class="pn">)</span><span class="pn">,</span>
+    <span class="pl">TabStroke</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">85</span><span class="pn">,</span> <span class="nm">85</span><span class="pn">,</span> <span class="nm">85</span><span class="pn">)</span><span class="pn">,</span>
+    <span class="pl">TabBackgroundSelected</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">210</span><span class="pn">,</span> <span class="nm">210</span><span class="pn">,</span> <span class="nm">210</span><span class="pn">)</span><span class="pn">,</span>
+    <span class="pl">TabTextColor</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">240</span><span class="pn">,</span> <span class="nm">240</span><span class="pn">,</span> <span class="nm">240</span><span class="pn">)</span><span class="pn">,</span>
+    <span class="pl">SelectedTabTextColor</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">50</span><span class="pn">,</span> <span class="nm">50</span><span class="pn">,</span> <span class="nm">50</span><span class="pn">)</span><span class="pn">,</span>
+
+    <span class="pl">ElementBackground</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">35</span><span class="pn">,</span> <span class="nm">35</span><span class="pn">,</span> <span class="nm">35</span><span class="pn">)</span><span class="pn">,</span>
+    <span class="pl">ElementBackgroundHover</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">40</span><span class="pn">,</span> <span class="nm">40</span><span class="pn">,</span> <span class="nm">40</span><span class="pn">)</span><span class="pn">,</span>
+    <span class="pl">SecondaryElementBackground</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">25</span><span class="pn">,</span> <span class="nm">25</span><span class="pn">,</span> <span class="nm">25</span><span class="pn">)</span><span class="pn">,</span>
+    <span class="pl">ElementStroke</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">50</span><span class="pn">,</span> <span class="nm">50</span><span class="pn">,</span> <span class="nm">50</span><span class="pn">)</span><span class="pn">,</span>
+    <span class="pl">SecondaryElementStroke</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">40</span><span class="pn">,</span> <span class="nm">40</span><span class="pn">,</span> <span class="nm">40</span><span class="pn">)</span><span class="pn">,</span>
+
+    <span class="pl">SliderBackground</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">50</span><span class="pn">,</span> <span class="nm">138</span><span class="pn">,</span> <span class="nm">220</span><span class="pn">)</span><span class="pn">,</span>
+    <span class="pl">SliderProgress</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">50</span><span class="pn">,</span> <span class="nm">138</span><span class="pn">,</span> <span class="nm">220</span><span class="pn">)</span><span class="pn">,</span>
+    <span class="pl">SliderStroke</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">58</span><span class="pn">,</span> <span class="nm">163</span><span class="pn">,</span> <span class="nm">255</span><span class="pn">)</span><span class="pn">,</span>
+
+    <span class="pl">ToggleBackground</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">30</span><span class="pn">,</span> <span class="nm">30</span><span class="pn">,</span> <span class="nm">30</span><span class="pn">)</span><span class="pn">,</span>
+    <span class="pl">ToggleEnabled</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">0</span><span class="pn">,</span> <span class="nm">146</span><span class="pn">,</span> <span class="nm">214</span><span class="pn">)</span><span class="pn">,</span>
+    <span class="pl">ToggleDisabled</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">100</span><span class="pn">,</span> <span class="nm">100</span><span class="pn">,</span> <span class="nm">100</span><span class="pn">)</span><span class="pn">,</span>
+    <span class="pl">ToggleEnabledStroke</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">0</span><span class="pn">,</span> <span class="nm">170</span><span class="pn">,</span> <span class="nm">255</span><span class="pn">)</span><span class="pn">,</span>
+    <span class="pl">ToggleDisabledStroke</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">125</span><span class="pn">,</span> <span class="nm">125</span><span class="pn">,</span> <span class="nm">125</span><span class="pn">)</span><span class="pn">,</span>
+    <span class="pl">ToggleEnabledOuterStroke</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">100</span><span class="pn">,</span> <span class="nm">100</span><span class="pn">,</span> <span class="nm">100</span><span class="pn">)</span><span class="pn">,</span>
+    <span class="pl">ToggleDisabledOuterStroke</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">65</span><span class="pn">,</span> <span class="nm">65</span><span class="pn">,</span> <span class="nm">65</span><span class="pn">)</span><span class="pn">,</span>
+
+    <span class="pl">DropdownSelected</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">40</span><span class="pn">,</span> <span class="nm">40</span><span class="pn">,</span> <span class="nm">40</span><span class="pn">)</span><span class="pn">,</span>
+    <span class="pl">DropdownUnselected</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">30</span><span class="pn">,</span> <span class="nm">30</span><span class="pn">,</span> <span class="nm">30</span><span class="pn">)</span><span class="pn">,</span>
+
+    <span class="pl">InputBackground</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">30</span><span class="pn">,</span> <span class="nm">30</span><span class="pn">,</span> <span class="nm">30</span><span class="pn">)</span><span class="pn">,</span>
+    <span class="pl">InputStroke</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">65</span><span class="pn">,</span> <span class="nm">65</span><span class="pn">,</span> <span class="nm">65</span><span class="pn">)</span><span class="pn">,</span>
+    <span class="pl">PlaceholderColor</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">178</span><span class="pn">,</span> <span class="nm">178</span><span class="pn">,</span> <span class="nm">178</span><span class="pn">)</span>
+<span class="pn">}</span></code></pre></div>
+</div>
+<div class="pagination">
+<a class="pagination-link prev" onclick="showSection('windows')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Windows</div></a>
+<a class="pagination-link next" onclick="showSection('buttons')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Buttons</div></a>
+</div>
+</div>
+
+<!-- BUTTONS -->
+<div class="doc-section" id="sec-buttons">
+<div class="breadcrumbs"><a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>Interaction</span><span class="breadcrumb-sep">›</span><span>Buttons</span></div>
+<div class="markdown">
+<h1>Buttons</h1>
+<div class="code-block"><pre><code><span class="pl">Tab</span><span class="pn">:</span><span class="fn">CreateButton</span><span class="pn">(</span><span class="pn">{</span>
+    <span class="pl">Name</span> <span class="op">=</span> <span class="str">"Click Me"</span><span class="pn">,</span>
+    <span class="pl">Description</span> <span class="op">=</span> <span class="str">"Appears on hover"</span><span class="pn">,</span>
+    <span class="pl">Interact</span> <span class="op">=</span> <span class="str">"click"</span><span class="pn">,</span>
+    <span class="pl">SectionParent</span> <span class="op">=</span> <span class="pl">Section</span><span class="pn">,</span>
+    <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pn">)</span>
+        <span class="fn">print</span><span class="pn">(</span><span class="str">"Button clicked!"</span><span class="pn">)</span>
+    <span class="kw">end</span>
+<span class="pn">}</span><span class="pn">)</span></code></pre></div>
+</div>
+<div class="pagination"><a class="pagination-link prev" onclick="showSection('themes')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Themes</div></a><a class="pagination-link next" onclick="showSection('toggles')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Toggles</div></a></div>
+</div>
+
+<!-- TOGGLES -->
+<div class="doc-section" id="sec-toggles">
+<div class="breadcrumbs"><a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>Interaction</span><span class="breadcrumb-sep">›</span><span>Toggles</span></div>
+<div class="markdown">
+<h1>Toggles</h1>
+<div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">Toggle</span> <span class="op">=</span> <span class="pl">Tab</span><span class="pn">:</span><span class="fn">CreateToggle</span><span class="pn">(</span><span class="pn">{</span>
+    <span class="pl">Name</span> <span class="op">=</span> <span class="str">"Speed Boost"</span><span class="pn">,</span>
+    <span class="pl">Description</span> <span class="op">=</span> <span class="str">"Increases movement speed"</span><span class="pn">,</span>
+    <span class="pl">CurrentValue</span> <span class="op">=</span> <span class="kw">false</span><span class="pn">,</span>
+    <span class="pl">Flag</span> <span class="op">=</span> <span class="str">"SpeedToggle"</span><span class="pn">,</span>
+    <span class="pl">SectionParent</span> <span class="op">=</span> <span class="pl">Section</span><span class="pn">,</span>
+    <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pl">Value</span><span class="pn">)</span>
+        <span class="fn">print</span><span class="pn">(</span><span class="str">"Speed Boost:"</span><span class="pn">,</span> <span class="pl">Value</span><span class="pn">)</span>
+    <span class="kw">end</span>
+<span class="pn">}</span><span class="pn">)</span>
+
+<span class="pl">Toggle</span><span class="pn">:</span><span class="fn">Set</span><span class="pn">(</span><span class="kw">true</span><span class="pn">)</span>
+<span class="pl">Toggle</span><span class="pn">:</span><span class="fn">Lock</span><span class="pn">(</span><span class="str">"Premium feature"</span><span class="pn">)</span>
+<span class="pl">Toggle</span><span class="pn">:</span><span class="fn">Unlock</span><span class="pn">(</span><span class="pn">)</span></code></pre></div>
+</div>
+<div class="pagination"><a class="pagination-link prev" onclick="showSection('buttons')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Buttons</div></a><a class="pagination-link next" onclick="showSection('sliders')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Sliders</div></a></div>
+</div>
+
+<!-- SLIDERS -->
+<div class="doc-section" id="sec-sliders">
+<div class="breadcrumbs"><a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>Interaction</span><span class="breadcrumb-sep">›</span><span>Sliders</span></div>
+<div class="markdown">
+<h1>Sliders</h1>
+<div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">Slider</span> <span class="op">=</span> <span class="pl">Tab</span><span class="pn">:</span><span class="fn">CreateSlider</span><span class="pn">(</span><span class="pn">{</span>
+    <span class="pl">Name</span> <span class="op">=</span> <span class="str">"Speed Multiplier"</span><span class="pn">,</span>
+    <span class="pl">Range</span> <span class="op">=</span> <span class="pn">{</span><span class="nm">1</span><span class="pn">,</span> <span class="nm">10</span><span class="pn">}</span><span class="pn">,</span>
+    <span class="pl">Increment</span> <span class="op">=</span> <span class="nm">0.5</span><span class="pn">,</span>
+    <span class="pl">Suffix</span> <span class="op">=</span> <span class="str">"x"</span><span class="pn">,</span>
+    <span class="pl">CurrentValue</span> <span class="op">=</span> <span class="nm">1</span><span class="pn">,</span>
+    <span class="pl">Flag</span> <span class="op">=</span> <span class="str">"SpeedValue"</span><span class="pn">,</span>
+    <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pl">Value</span><span class="pn">)</span>
+        <span class="fn">print</span><span class="pn">(</span><span class="str">"Speed:"</span><span class="pn">,</span> <span class="pl">Value</span><span class="pn">)</span>
+    <span class="kw">end</span>
+<span class="pn">}</span><span class="pn">)</span>
+
+<span class="pl">Slider</span><span class="pn">:</span><span class="fn">Set</span><span class="pn">(</span><span class="nm">5</span><span class="pn">)</span></code></pre></div>
+</div>
+<div class="pagination"><a class="pagination-link prev" onclick="showSection('toggles')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Toggles</div></a><a class="pagination-link next" onclick="showSection('inputs')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Text Inputs</div></a></div>
+</div>
+
+<!-- INPUTS -->
+<div class="doc-section" id="sec-inputs">
+<div class="breadcrumbs"><a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>Interaction</span><span class="breadcrumb-sep">›</span><span>Text Inputs</span></div>
+<div class="markdown">
+<h1>Text Inputs</h1>
+<div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">Input</span> <span class="op">=</span> <span class="pl">Tab</span><span class="pn">:</span><span class="fn">CreateInput</span><span class="pn">(</span><span class="pn">{</span>
+    <span class="pl">Name</span> <span class="op">=</span> <span class="str">"Username"</span><span class="pn">,</span>
+    <span class="pl">PlaceholderText</span> <span class="op">=</span> <span class="str">"Type here..."</span><span class="pn">,</span>
+    <span class="pl">RemoveTextAfterFocusLost</span> <span class="op">=</span> <span class="kw">false</span><span class="pn">,</span>
+    <span class="pl">NumbersOnly</span> <span class="op">=</span> <span class="kw">false</span><span class="pn">,</span>
+    <span class="pl">CharacterLimit</span> <span class="op">=</span> <span class="nm">20</span><span class="pn">,</span>
+    <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pl">Text</span><span class="pn">)</span>
+        <span class="fn">print</span><span class="pn">(</span><span class="str">"Input:"</span><span class="pn">,</span> <span class="pl">Text</span><span class="pn">)</span>
+    <span class="kw">end</span>
+<span class="pn">}</span><span class="pn">)</span>
+
+<span class="pl">Input</span><span class="pn">:</span><span class="fn">Set</span><span class="pn">(</span><span class="str">"NewUsername"</span><span class="pn">)</span></code></pre></div>
+</div>
+<div class="pagination"><a class="pagination-link prev" onclick="showSection('sliders')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Sliders</div></a><a class="pagination-link next" onclick="showSection('keybinds')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Keybinds</div></a></div>
+</div>
+
+<!-- KEYBINDS -->
+<div class="doc-section" id="sec-keybinds">
+<div class="breadcrumbs"><a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>Interaction</span><span class="breadcrumb-sep">›</span><span>Keybinds</span></div>
+<div class="markdown">
+<h1>Keybinds</h1>
+<div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">Keybind</span> <span class="op">=</span> <span class="pl">Tab</span><span class="pn">:</span><span class="fn">CreateKeybind</span><span class="pn">(</span><span class="pn">{</span>
+    <span class="pl">Name</span> <span class="op">=</span> <span class="str">"Fly Key"</span><span class="pn">,</span>
+    <span class="pl">CurrentKeybind</span> <span class="op">=</span> <span class="str">"F"</span><span class="pn">,</span>
+    <span class="pl">HoldToInteract</span> <span class="op">=</span> <span class="kw">false</span><span class="pn">,</span>
+    <span class="pl">Flag</span> <span class="op">=</span> <span class="str">"FlyKey"</span><span class="pn">,</span>
+    <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pl">IsHeld</span><span class="pn">)</span>
+        <span class="fn">print</span><span class="pn">(</span><span class="str">"Fly key pressed!"</span><span class="pn">)</span>
+    <span class="kw">end</span>
+<span class="pn">}</span><span class="pn">)</span>
+
+<span class="pl">Keybind</span><span class="pn">:</span><span class="fn">Set</span><span class="pn">(</span><span class="str">"G"</span><span class="pn">)</span></code></pre></div>
+</div>
+<div class="pagination"><a class="pagination-link prev" onclick="showSection('inputs')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Text Inputs</div></a><a class="pagination-link next" onclick="showSection('dropdowns')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Dropdowns</div></a></div>
+</div>
+
+<!-- DROPDOWNS -->
+<div class="doc-section" id="sec-dropdowns">
+<div class="breadcrumbs"><a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>Interaction</span><span class="breadcrumb-sep">›</span><span>Dropdowns</span></div>
+<div class="markdown">
+<h1>Dropdowns</h1>
+
+<h2>Single Selection</h2>
+<div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">Dropdown</span> <span class="op">=</span> <span class="pl">Tab</span><span class="pn">:</span><span class="fn">CreateDropdown</span><span class="pn">(</span><span class="pn">{</span>
+    <span class="pl">Name</span> <span class="op">=</span> <span class="str">"Select Weapon"</span><span class="pn">,</span>
+    <span class="pl">Options</span> <span class="op">=</span> <span class="pn">{</span><span class="str">"Sword"</span><span class="pn">,</span> <span class="str">"Axe"</span><span class="pn">,</span> <span class="str">"Spear"</span><span class="pn">,</span> <span class="str">"Bow"</span><span class="pn">}</span><span class="pn">,</span>
+    <span class="pl">CurrentOption</span> <span class="op">=</span> <span class="str">"Sword"</span><span class="pn">,</span>
+    <span class="pl">MultiSelection</span> <span class="op">=</span> <span class="kw">false</span><span class="pn">,</span>
+    <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pl">Option</span><span class="pn">)</span>
+        <span class="fn">print</span><span class="pn">(</span><span class="str">"Selected:"</span><span class="pn">,</span> <span class="pl">Option</span><span class="pn">)</span>
+    <span class="kw">end</span>
+<span class="pn">}</span><span class="pn">)</span></code></pre></div>
+
+<h2>Multi Selection</h2>
+<div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">Features</span> <span class="op">=</span> <span class="pl">Tab</span><span class="pn">:</span><span class="fn">CreateDropdown</span><span class="pn">(</span><span class="pn">{</span>
+    <span class="pl">Name</span> <span class="op">=</span> <span class="str">"Enable Features"</span><span class="pn">,</span>
+    <span class="pl">Options</span> <span class="op">=</span> <span class="pn">{</span><span class="str">"Auto Heal"</span><span class="pn">,</span> <span class="str">"Auto Attack"</span><span class="pn">,</span> <span class="str">"Auto Block"</span><span class="pn">}</span><span class="pn">,</span>
+    <span class="pl">CurrentOption</span> <span class="op">=</span> <span class="pn">{</span><span class="str">"Auto Heal"</span><span class="pn">}</span><span class="pn">,</span>
+    <span class="pl">MultiSelection</span> <span class="op">=</span> <span class="kw">true</span><span class="pn">,</span>
+    <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pl">Option</span><span class="pn">)</span>
+        <span class="fn">print</span><span class="pn">(</span><span class="str">"Toggled:"</span><span class="pn">,</span> <span class="pl">Option</span><span class="pn">)</span>
+    <span class="kw">end</span>
+<span class="pn">}</span><span class="pn">)</span></code></pre></div>
+
+<h3>Methods</h3>
+<div class="code-block"><pre><code><span class="pl">Dropdown</span><span class="pn">:</span><span class="fn">Set</span><span class="pn">(</span><span class="str">"Bow"</span><span class="pn">)</span>
+<span class="pl">Dropdown</span><span class="pn">:</span><span class="fn">Add</span><span class="pn">(</span><span class="pn">{</span><span class="str">"Dagger"</span><span class="pn">,</span> <span class="str">"Staff"</span><span class="pn">}</span><span class="pn">)</span>
+<span class="pl">Dropdown</span><span class="pn">:</span><span class="fn">Remove</span><span class="pn">(</span><span class="str">"Sword"</span><span class="pn">)</span>
+<span class="pl">Dropdown</span><span class="pn">:</span><span class="fn">Refresh</span><span class="pn">(</span><span class="pn">{</span><span class="str">"Katana"</span><span class="pn">,</span> <span class="str">"Claymore"</span><span class="pn">}</span><span class="pn">,</span> <span class="str">"Katana"</span><span class="pn">)</span></code></pre></div>
+</div>
+<div class="pagination"><a class="pagination-link prev" onclick="showSection('keybinds')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Keybinds</div></a><a class="pagination-link next" onclick="showSection('colorpickers')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Color Pickers</div></a></div>
+</div>
+
+<!-- COLORPICKERS -->
+<div class="doc-section" id="sec-colorpickers">
+<div class="breadcrumbs"><a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>Interaction</span><span class="breadcrumb-sep">›</span><span>Color Pickers</span></div>
+<div class="markdown">
+<h1>Color Pickers</h1>
+<div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">ColorPicker</span> <span class="op">=</span> <span class="pl">Tab</span><span class="pn">:</span><span class="fn">CreateColorPicker</span><span class="pn">(</span><span class="pn">{</span>
+    <span class="pl">Name</span> <span class="op">=</span> <span class="str">"ESP Color"</span><span class="pn">,</span>
+    <span class="pl">Color</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">255</span><span class="pn">,</span> <span class="nm">0</span><span class="pn">,</span> <span class="nm">0</span><span class="pn">)</span><span class="pn">,</span>
+    <span class="pl">Flag</span> <span class="op">=</span> <span class="str">"ESPColor"</span><span class="pn">,</span>
+    <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pl">Color</span><span class="pn">)</span>
+        <span class="fn">print</span><span class="pn">(</span><span class="str">"Color:"</span><span class="pn">,</span> <span class="pl">Color</span><span class="pn">)</span>
+    <span class="kw">end</span>
+<span class="pn">}</span><span class="pn">)</span>
+
+<span class="pl">ColorPicker</span><span class="pn">:</span><span class="fn">Set</span><span class="pn">(</span><span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">0</span><span class="pn">,</span> <span class="nm">255</span><span class="pn">,</span> <span class="nm">0</span><span class="pn">)</span><span class="pn">)</span></code></pre></div>
+</div>
+<div class="pagination"><a class="pagination-link prev" onclick="showSection('dropdowns')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Dropdowns</div></a><a class="pagination-link next" onclick="showSection('labels')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Labels</div></a></div>
+</div>
+
+<!-- LABELS -->
+<div class="doc-section" id="sec-labels">
+<div class="breadcrumbs"><a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>UI Components</span><span class="breadcrumb-sep">›</span><span>Labels</span></div>
+<div class="markdown">
+<h1>Labels</h1>
+<div class="code-block"><pre><code><span class="pl">Tab</span><span class="pn">:</span><span class="fn">CreateLabel</span><span class="pn">(</span><span class="pn">{</span>
+    <span class="pl">Text</span> <span class="op">=</span> <span class="str">"Welcome to my script!"</span><span class="pn">,</span>
+    <span class="pl">Icon</span> <span class="op">=</span> <span class="str">"keyboard"</span><span class="pn">,</span> <span class="cm">-- Optional Lucide icon</span>
+    <span class="pl">Background</span> <span class="op">=</span> <span class="str">"warn"</span><span class="pn">,</span> <span class="cm">-- "warn", "success", "error", or hex "#FF69B4"</span>
+    <span class="pl">SectionParent</span> <span class="op">=</span> <span class="pl">Section</span>
+<span class="pn">}</span><span class="pn">)</span></code></pre></div>
+</div>
+<div class="pagination"><a class="pagination-link prev" onclick="showSection('colorpickers')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Color Pickers</div></a><a class="pagination-link next" onclick="showSection('paragraphs')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Paragraphs</div></a></div>
+</div>
+
+<!-- PARAGRAPHS -->
+<div class="doc-section" id="sec-paragraphs">
+<div class="breadcrumbs"><a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>UI Components</span><span class="breadcrumb-sep">›</span><span>Paragraphs</span></div>
+<div class="markdown">
+<h1>Paragraphs</h1>
+<div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">Paragraph</span> <span class="op">=</span> <span class="pl">Tab</span><span class="pn">:</span><span class="fn">CreateParagraph</span><span class="pn">(</span><span class="pn">{</span>
+    <span class="pl">Title</span> <span class="op">=</span> <span class="str">"&lt;b&gt;Getting Started&lt;/b&gt;"</span><span class="pn">,</span>
+    <span class="pl">Content</span> <span class="op">=</span> <span class="str">"This script includes powerful features."</span><span class="pn">,</span>
+    <span class="pl">Icon</span> <span class="op">=</span> <span class="str">"info"</span><span class="pn">,</span>
+    <span class="pl">Background</span> <span class="op">=</span> <span class="str">"success"</span><span class="pn">,</span>
+    <span class="pl">SectionParent</span> <span class="op">=</span> <span class="pl">Section</span>
+<span class="pn">}</span><span class="pn">)</span>
+
+<span class="pl">Paragraph</span><span class="pn">:</span><span class="fn">Set</span><span class="pn">(</span><span class="pn">{</span>
+    <span class="pl">Title</span> <span class="op">=</span> <span class="str">"Updated Title"</span><span class="pn">,</span>
+    <span class="pl">Content</span> <span class="op">=</span> <span class="str">"New content"</span>
+<span class="pn">}</span><span class="pn">)</span></code></pre></div>
+<p>Supports RichText in both <code>Title</code> and <code>Content</code>. Same <code>Background</code> options as Labels.</p>
+</div>
+<div class="pagination"><a class="pagination-link prev" onclick="showSection('labels')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Labels</div></a><a class="pagination-link next" onclick="showSection('images')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Images</div></a></div>
+</div>
+
+<!-- IMAGES -->
+<div class="doc-section" id="sec-images">
+<div class="breadcrumbs"><a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>UI Components</span><span class="breadcrumb-sep">›</span><span>Images</span></div>
+<div class="markdown">
+<h1>Images</h1>
+<div class="code-block"><pre><code><span class="pl">Tab</span><span class="pn">:</span><span class="fn">CreateImage</span><span class="pn">(</span><span class="pl">Section</span><span class="pn">,</span> <span class="pn">{</span>
+    <span class="pl">Image</span> <span class="op">=</span> <span class="str">"https://example.com/image.png"</span><span class="pn">,</span>
+    <span class="pl">Width</span> <span class="op">=</span> <span class="nm">200</span><span class="pn">,</span>
+    <span class="pl">Height</span> <span class="op">=</span> <span class="nm">200</span><span class="pn">,</span>
+    <span class="pl">Transparency</span> <span class="op">=</span> <span class="nm">0</span>
+<span class="pn">}</span><span class="pn">)</span></code></pre></div>
+<p>Accepts URLs, Roblox asset IDs, or file paths. <code>Transparency</code> ranges from 0 (opaque) to 1 (invisible).</p>
+</div>
+<div class="pagination"><a class="pagination-link prev" onclick="showSection('paragraphs')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Paragraphs</div></a><a class="pagination-link next" onclick="showSection('console')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Console</div></a></div>
+</div>
+
+<!-- CONSOLE -->
+<div class="doc-section" id="sec-console">
+<div class="breadcrumbs"><a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>UI Components</span><span class="breadcrumb-sep">›</span><span>Console</span></div>
+<div class="markdown">
+<h1>Console</h1>
+<p>A built-in terminal-style log viewer with color coded entries, timestamps, auto-scroll, and a configurable max line limit.</p>
+
+<h2>Creating a Console</h2>
+<div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">Console</span> <span class="op">=</span> <span class="pl">Tab</span><span class="pn">:</span><span class="fn">CreateConsole</span><span class="pn">(</span><span class="pn">{</span>
+    <span class="pl">Title</span> <span class="op">=</span> <span class="str">"Remote Logger"</span><span class="pn">,</span>
+    <span class="pl">Icon</span> <span class="op">=</span> <span class="str">"terminal"</span><span class="pn">,</span>
+    <span class="pl">MaxLines</span> <span class="op">=</span> <span class="nm">200</span><span class="pn">,</span>
+    <span class="pl">Height</span> <span class="op">=</span> <span class="nm">150</span><span class="pn">,</span>
+    <span class="pl">Timestamps</span> <span class="op">=</span> <span class="kw">true</span><span class="pn">,</span>
+    <span class="pl">SectionParent</span> <span class="op">=</span> <span class="pl">Section</span>
+<span class="pn">}</span><span class="pn">)</span></code></pre></div>
+
+<h2>Logging Methods</h2>
+<div class="code-block"><pre><code><span class="pl">Console</span><span class="pn">:</span><span class="fn">Log</span><span class="pn">(</span><span class="str">"Script initialized"</span><span class="pn">)</span>       <span class="cm">-- Gray   [LOG]</span>
+<span class="pl">Console</span><span class="pn">:</span><span class="fn">Info</span><span class="pn">(</span><span class="str">"Listening for remotes"</span><span class="pn">)</span>  <span class="cm">-- Blue   [INFO]</span>
+<span class="pl">Console</span><span class="pn">:</span><span class="fn">Success</span><span class="pn">(</span><span class="str">"Connected"</span><span class="pn">)</span>         <span class="cm">-- Green  [OK]</span>
+<span class="pl">Console</span><span class="pn">:</span><span class="fn">Warn</span><span class="pn">(</span><span class="str">"Rate limit near"</span><span class="pn">)</span>      <span class="cm">-- Yellow [WARN]</span>
+<span class="pl">Console</span><span class="pn">:</span><span class="fn">Error</span><span class="pn">(</span><span class="str">"Failed to fetch"</span><span class="pn">)</span>     <span class="cm">-- Red    [ERROR]</span>
+
+<span class="pl">Console</span><span class="pn">:</span><span class="fn">Clear</span><span class="pn">(</span><span class="pn">)</span></code></pre></div>
+
+<div class="admonition admonition-tip">
+<div class="admonition-heading">💡 tip</div>
+<p>The console has a small trash icon in the top right that users can click to clear all entries. It also auto-scrolls to the latest entry and removes old entries when <code>MaxLines</code> is exceeded.</p>
+</div>
+</div>
+<div class="pagination"><a class="pagination-link prev" onclick="showSection('images')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Images</div></a><a class="pagination-link next" onclick="showSection('notifications')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Notifications</div></a></div>
+</div>
+
+<!-- NOTIFICATIONS -->
+<div class="doc-section" id="sec-notifications">
+<div class="breadcrumbs"><a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>UI Components</span><span class="breadcrumb-sep">›</span><span>Notifications</span></div>
+<div class="markdown">
+<h1>Notifications</h1>
+
+<h2>Simple Notification</h2>
+<div class="code-block"><pre><code><span class="pl">ArrayField</span><span class="pn">:</span><span class="fn">Notify</span><span class="pn">(</span><span class="pn">{</span>
+    <span class="pl">Title</span> <span class="op">=</span> <span class="str">"Success"</span><span class="pn">,</span>
+    <span class="pl">Content</span> <span class="op">=</span> <span class="str">"Script loaded successfully!"</span><span class="pn">,</span>
+    <span class="pl">Duration</span> <span class="op">=</span> <span class="nm">5</span><span class="pn">,</span>
+    <span class="pl">Image</span> <span class="op">=</span> <span class="str">"check-circle"</span>
+<span class="pn">}</span><span class="pn">)</span></code></pre></div>
+
+<h2>With Actions</h2>
+<div class="code-block"><pre><code><span class="pl">ArrayField</span><span class="pn">:</span><span class="fn">Notify</span><span class="pn">(</span><span class="pn">{</span>
+    <span class="pl">Title</span> <span class="op">=</span> <span class="str">"Update Available"</span><span class="pn">,</span>
+    <span class="pl">Content</span> <span class="op">=</span> <span class="str">"A new version is ready."</span><span class="pn">,</span>
+    <span class="pl">Image</span> <span class="op">=</span> <span class="str">"download"</span><span class="pn">,</span>
+    <span class="pl">Actions</span> <span class="op">=</span> <span class="pn">{</span>
+        <span class="pn">{</span><span class="pl">Name</span> <span class="op">=</span> <span class="str">"Update"</span><span class="pn">,</span> <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pn">)</span> <span class="fn">print</span><span class="pn">(</span><span class="str">"Updating..."</span><span class="pn">)</span> <span class="kw">end</span><span class="pn">}</span><span class="pn">,</span>
+        <span class="pn">{</span><span class="pl">Name</span> <span class="op">=</span> <span class="str">"Later"</span><span class="pn">,</span> <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pn">)</span> <span class="fn">print</span><span class="pn">(</span><span class="str">"Dismissed"</span><span class="pn">)</span> <span class="kw">end</span><span class="pn">}</span>
+    <span class="pn">}</span>
+<span class="pn">}</span><span class="pn">)</span></code></pre></div>
+</div>
+<div class="pagination"><a class="pagination-link prev" onclick="showSection('console')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Console</div></a><a class="pagination-link next" onclick="showSection('prompts')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Prompts</div></a></div>
+</div>
+
+<!-- PROMPTS -->
+<div class="doc-section" id="sec-prompts">
+<div class="breadcrumbs"><a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>UI Components</span><span class="breadcrumb-sep">›</span><span>Prompts</span></div>
+<div class="markdown">
+<h1>Prompts & Dialogs</h1>
+
+<h2>Note Prompt</h2>
+<div class="code-block"><pre><code><span class="pl">Window</span><span class="pn">:</span><span class="fn">NotePrompt</span><span class="pn">(</span><span class="pn">{</span>
+    <span class="pl">Title</span> <span class="op">=</span> <span class="str">"Welcome!"</span><span class="pn">,</span>
+    <span class="pl">Description</span> <span class="op">=</span> <span class="str">"Thanks for using this script"</span><span class="pn">,</span>
+    <span class="pl">Icon</span> <span class="op">=</span> <span class="str">"sparkles"</span><span class="pn">,</span>
+    <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pn">)</span> <span class="fn">print</span><span class="pn">(</span><span class="str">"OK"</span><span class="pn">)</span> <span class="kw">end</span>
+<span class="pn">}</span><span class="pn">)</span></code></pre></div>
+
+<h2>Confirmation Dialog</h2>
+<div class="code-block"><pre><code><span class="pl">Window</span><span class="pn">:</span><span class="fn">Prompt</span><span class="pn">(</span><span class="pn">{</span>
+    <span class="pl">Title</span> <span class="op">=</span> <span class="str">"Confirm Action"</span><span class="pn">,</span>
+    <span class="pl">SubTitle</span> <span class="op">=</span> <span class="str">"Are you sure?"</span><span class="pn">,</span>
+    <span class="pl">Content</span> <span class="op">=</span> <span class="str">"This action cannot be undone."</span><span class="pn">,</span>
+    <span class="pl">Actions</span> <span class="op">=</span> <span class="pn">{</span>
+        <span class="pl">Confirm</span> <span class="op">=</span> <span class="pn">{</span><span class="pl">Name</span> <span class="op">=</span> <span class="str">"Yes"</span><span class="pn">,</span> <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pn">)</span> <span class="fn">print</span><span class="pn">(</span><span class="str">"Yes"</span><span class="pn">)</span> <span class="kw">end</span><span class="pn">}</span><span class="pn">,</span>
+        <span class="pl">Cancel</span> <span class="op">=</span> <span class="pn">{</span><span class="pl">Name</span> <span class="op">=</span> <span class="str">"No"</span><span class="pn">,</span> <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pn">)</span> <span class="fn">print</span><span class="pn">(</span><span class="str">"No"</span><span class="pn">)</span> <span class="kw">end</span><span class="pn">}</span>
+    <span class="pn">}</span>
+<span class="pn">}</span><span class="pn">)</span></code></pre></div>
+</div>
+<div class="pagination"><a class="pagination-link prev" onclick="showSection('notifications')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Notifications</div></a><a class="pagination-link next" onclick="showSection('methods')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Universal Methods</div></a></div>
+</div>
+
+<!-- METHODS -->
+<div class="doc-section" id="sec-methods">
+<div class="breadcrumbs"><a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>Reference</span><span class="breadcrumb-sep">›</span><span>Universal Methods</span></div>
+<div class="markdown">
+<h1>Universal Methods</h1>
+<p>All interactive elements support these common methods:</p>
+<div class="code-block"><pre><code><span class="pl">Element</span><span class="pn">:</span><span class="fn">Lock</span><span class="pn">(</span><span class="str">"Reason text"</span><span class="pn">)</span>
+<span class="pl">Element</span><span class="pn">:</span><span class="fn">Unlock</span><span class="pn">(</span><span class="pn">)</span>
+
+<span class="pl">Element</span><span class="pn">:</span><span class="fn">Visible</span><span class="pn">(</span><span class="kw">false</span><span class="pn">)</span>
+<span class="pl">Element</span><span class="pn">:</span><span class="fn">Visible</span><span class="pn">(</span><span class="kw">true</span><span class="pn">)</span>
+
+<span class="pl">Element</span><span class="pn">:</span><span class="fn">Destroy</span><span class="pn">(</span><span class="pn">)</span></code></pre></div>
+</div>
+<div class="pagination"><a class="pagination-link prev" onclick="showSection('prompts')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Prompts</div></a><a class="pagination-link next" onclick="showSection('saving')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Saving & Loading</div></a></div>
+</div>
+
+<!-- SAVING -->
+<div class="doc-section" id="sec-saving">
+<div class="breadcrumbs"><a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>Reference</span><span class="breadcrumb-sep">›</span><span>Saving & Loading</span></div>
+<div class="markdown">
+<h1>Saving & Loading</h1>
+<p>When <code>ConfigurationSaving</code> is set and the user enables it from settings, ArrayField automatically saves and loads element values using <code>Flag</code> identifiers.</p>
+<div class="code-block"><pre><code><span class="pl">ArrayField</span><span class="pn">.</span><span class="fn">SaveConfiguration</span><span class="pn">(</span><span class="pn">)</span>
+<span class="pl">ArrayField</span><span class="pn">.</span><span class="fn">LoadConfiguration</span><span class="pn">(</span><span class="pn">)</span>
+
+<span class="fn">print</span><span class="pn">(</span><span class="pl">ArrayField</span><span class="pn">.</span><span class="pl">Flags</span><span class="pn">[</span><span class="str">"SpeedToggle"</span><span class="pn">]</span><span class="pn">.</span><span class="pl">CurrentValue</span><span class="pn">)</span></code></pre></div>
+
+<h2>Destroying the UI</h2>
+<div class="code-block"><pre><code><span class="pl">ArrayField</span><span class="pn">:</span><span class="fn">Destroy</span><span class="pn">(</span><span class="pn">)</span></code></pre></div>
+<p>Completely removes the interface and cleans up all connections.</p>
+</div>
+<div class="pagination"><a class="pagination-link prev" onclick="showSection('methods')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Universal Methods</div></a><div style="flex:1"></div></div>
+</div>
+
+</div>
+</main>
 </div>
 
 <footer>
-    &copy; 2026 Vadrifts. All Rights Reserved.
+Copyright &copy; 2026 Vadrifts. All Rights Reserved.
 </footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/lua.min.js"></script>
 <script>
-    hljs.highlightAll();
+function showSection(id) {
+    document.querySelectorAll('.doc-section').forEach(function(s) { s.classList.remove('active'); });
+    var sec = document.getElementById('sec-' + id);
+    if (sec) sec.classList.add('active');
 
-    document.querySelectorAll('.code-block-wrapper').forEach(function(wrapper) {
-        var btn = document.createElement('button');
-        btn.className = 'copy-btn';
-        btn.textContent = 'Copy';
-        btn.addEventListener('click', function() {
-            var code = wrapper.querySelector('code').textContent;
-            navigator.clipboard.writeText(code).then(function() {
-                btn.textContent = 'Copied!';
-                setTimeout(function() { btn.textContent = 'Copy'; }, 1500);
-            });
+    document.querySelectorAll('.sidebar .menu-link').forEach(function(l) { l.classList.remove('active'); });
+    var link = document.querySelector('.menu-link[data-section="' + id + '"]');
+    if (link) {
+        link.classList.add('active');
+        var submenu = link.closest('.menu-submenu');
+        if (submenu && !submenu.classList.contains('open')) {
+            submenu.classList.add('open');
+            var cat = submenu.previousElementSibling;
+            if (cat) cat.classList.add('expanded');
+        }
+    }
+
+    window.scrollTo(0, 0);
+    closeSidebar();
+}
+
+function toggleCategory(el) {
+    var submenu = el.nextElementSibling;
+    if (submenu) {
+        submenu.classList.toggle('open');
+        el.classList.toggle('expanded');
+    }
+}
+
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.querySelector('.sidebar-backdrop').classList.toggle('show');
+}
+
+function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.querySelector('.sidebar-backdrop').classList.remove('show');
+}
+
+document.querySelectorAll('.code-block').forEach(function(block) {
+    var btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = 'Copy';
+    btn.addEventListener('click', function() {
+        var code = block.querySelector('code').textContent;
+        navigator.clipboard.writeText(code).then(function() {
+            btn.textContent = 'Copied!';
+            setTimeout(function() { btn.textContent = 'Copy'; }, 1500);
         });
-        wrapper.appendChild(btn);
     });
-
-    var links = document.querySelectorAll('.sidebar a');
-    var sections = document.querySelectorAll('section[id]');
-
-    window.addEventListener('scroll', function() {
-        var current = '';
-        sections.forEach(function(section) {
-            if (window.scrollY >= section.offsetTop - 100) {
-                current = section.getAttribute('id');
-            }
-        });
-        links.forEach(function(link) {
-            link.classList.remove('active');
-            if (link.getAttribute('href') === '#' + current) {
-                link.classList.add('active');
-            }
-        });
-    });
-
-    document.querySelectorAll('.sidebar a').forEach(function(link) {
-        link.addEventListener('click', function() {
-            document.querySelector('.sidebar').classList.remove('open');
-        });
-    });
+    block.appendChild(btn);
+});
 </script>
 
 </body>
