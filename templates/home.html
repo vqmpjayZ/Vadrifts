@@ -1739,8 +1739,6 @@
 				</div>
 			</div>
 		</nav>
-			</div>
-		</nav>
 		<div class="header">
 			<div class="status-badge">
 				<span class="status-dot"></span>
@@ -2080,9 +2078,14 @@
 			</div>
 		</div>
 		<script>
+    const DISCORD_INVITE_CODE = 'WDbJ5wE2cR';
+    const CACHE_KEY = 'vadrifts_discord_members';
+    const CACHE_DURATION = 5 * 24 * 60 * 60 * 1000; // 5 days in milliseconds
+    const FALLBACK_COUNT = 6328;
+
     const SITE_CONFIG = {
       stats: [
-        { id: 'users', value: 6328, label: 'Total Users', suffix: '+', useCommas: true },
+        { id: 'users', value: FALLBACK_COUNT, label: 'Total Users', suffix: '+', useCommas: true },
         { id: 'scripts', value: 4, label: 'Scripts', suffix: '+', useCommas: false },
         { id: 'executor', value: 100, label: 'Executor Support', suffix: '%', useCommas: false }
       ],
@@ -2090,6 +2093,59 @@
         'MastersMZ', '1F0YT', 'ReverseScripts', 'Sr_LDS', 'Ras-Scripts'
       ]
     };
+
+    async function getDiscordMemberCount() {
+      // Check localStorage cache first
+      try {
+        const cached = localStorage.getItem(CACHE_KEY);
+        if (cached) {
+          const { count, timestamp } = JSON.parse(cached);
+          const age = Date.now() - timestamp;
+          if (age < CACHE_DURATION && count > 0) {
+            console.log(`Using cached Discord member count: ${count} (cached ${Math.round(age / 3600000)}h ago)`);
+            return count;
+          }
+        }
+      } catch (e) {
+        // Cache read failed, continue to fetch
+      }
+
+      // Fetch fresh count from Discord's public invite API
+      try {
+        const response = await fetch(`https://discord.com/api/v9/invites/${DISCORD_INVITE_CODE}?with_counts=true`);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        
+        const data = await response.json();
+        const count = data.approximate_member_count;
+
+        if (count && count > 0) {
+          // Save to cache
+          localStorage.setItem(CACHE_KEY, JSON.stringify({
+            count: count,
+            timestamp: Date.now()
+          }));
+          console.log(`Fetched fresh Discord member count: ${count}`);
+          return count;
+        }
+      } catch (error) {
+        console.warn('Failed to fetch Discord member count:', error);
+      }
+
+      // If fetch failed but we have an old cache, use it regardless of age
+      try {
+        const cached = localStorage.getItem(CACHE_KEY);
+        if (cached) {
+          const { count } = JSON.parse(cached);
+          if (count > 0) {
+            console.log(`Using expired cache as fallback: ${count}`);
+            return count;
+          }
+        }
+      } catch (e) {}
+
+      // Last resort fallback
+      return FALLBACK_COUNT;
+    }
 
     function formatNumber(num, useCommas, suffix) {
       let formatted = useCommas ? num.toLocaleString() : num.toString();
@@ -2104,7 +2160,7 @@
         const statItem = document.createElement('div');
         statItem.className = 'stat-item';
         statItem.innerHTML = `
-          <div class="stat-number" data-target="${stat.value}" data-suffix="${stat.suffix}" data-commas="${stat.useCommas}">0</div>
+          <div class="stat-number" data-target="${stat.value}" data-suffix="${stat.suffix}" data-commas="${stat.useCommas}" data-id="${stat.id}">0</div>
           <div class="stat-label">${stat.label}</div>
         `;
         statsSection.appendChild(statItem);
@@ -2157,9 +2213,21 @@
       });
     });
 
+    // Build stats with placeholder, fetch Discord count, then update & animate
     buildStats();
     createParticles();
-    animateCounters();
+
+    getDiscordMemberCount().then(memberCount => {
+      // Update the users stat target with the real count
+      const usersCounter = document.querySelector('.stat-number[data-id="users"]');
+      if (usersCounter) {
+        usersCounter.setAttribute('data-target', memberCount);
+      }
+      // Also update the config in case anything else reads it
+      SITE_CONFIG.stats[0].value = memberCount;
+      // Now animate all counters with the correct value
+      animateCounters();
+    });
 
     let lastScrollTop = 0;
     window.addEventListener('scroll', function() {
