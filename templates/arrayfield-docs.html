@@ -819,151 +819,338 @@ footer{margin-left:0}
 <h1>Full Template</h1>
 <p>A complete usage example demonstrating all ArrayField features. Copy this as a starting point for your project.</p>
 
-<div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">ArrayField</span> <span class="op">=</span> <span class="fn">loadstring</span><span class="pn">(</span><span class="pl">game</span><span class="pn">:</span><span class="fn">HttpGet</span><span class="pn">(</span><span class="str">'https://raw.githubusercontent.com/vqmpjayZ/laboratory/refs/heads/main/ArrayField/ArrayField.lua'</span><span class="pn">)</span><span class="pn">)</span><span class="pn">(</span><span class="pn">)</span>
+<div class="code-block"><pre><code class="language-lua">local ArrayField = loadstring(game:HttpGet('https://raw.githubusercontent.com/vqmpjayZ/laboratory/refs/heads/main/ArrayField/ArrayField.lua'))()
 
-<span class="cm">-- Window</span>
-<span class="kw">local</span> <span class="pl">Window</span> <span class="op">=</span> <span class="pl">ArrayField</span><span class="pn">:</span><span class="fn">CreateWindow</span><span class="pn">(</span><span class="pn">{</span>
-    <span class="pl">Name</span> <span class="op">=</span> <span class="str">"My Script Hub"</span><span class="pn">,</span>
-    <span class="pl">Icon</span> <span class="op">=</span> <span class="str">"shield"</span><span class="pn">,</span>
-    <span class="pl">LoadingTitle</span> <span class="op">=</span> <span class="str">"Loading Script Hub"</span><span class="pn">,</span>
-    <span class="pl">LoadingSubtitle</span> <span class="op">=</span> <span class="str">"by YourName"</span><span class="pn">,</span>
-    <span class="pl">ConfigurationSaving</span> <span class="op">=</span> <span class="pn">{</span>
-        <span class="pl">FolderName</span> <span class="op">=</span> <span class="str">"MyScriptHub"</span><span class="pn">,</span>
-        <span class="pl">FileName</span> <span class="op">=</span> <span class="str">"Config"</span>
-    <span class="pn">}</span>
-<span class="pn">}</span><span class="pn">)</span>
+-- ============================
+-- WINDOW CREATION
+-- ============================
 
-<span class="cm">-- Categories</span>
-<span class="kw">local</span> <span class="pl">MainCategory</span> <span class="op">=</span> <span class="pl">Window</span><span class="pn">:</span><span class="fn">CreateCategory</span><span class="pn">(</span><span class="str">"Main Features"</span><span class="pn">,</span> <span class="pn">{</span><span class="pl">DefaultOpen</span> <span class="op">=</span> <span class="kw">true</span><span class="pn">}</span><span class="pn">)</span>
-<span class="kw">local</span> <span class="pl">SettingsCategory</span> <span class="op">=</span> <span class="pl">Window</span><span class="pn">:</span><span class="fn">CreateCategory</span><span class="pn">(</span><span class="str">"Settings"</span><span class="pn">,</span> <span class="pn">{</span><span class="pl">DefaultOpen</span> <span class="op">=</span> <span class="kw">false</span><span class="pn">}</span><span class="pn">)</span>
+local Window = ArrayField:CreateWindow({
+    Name = "My Script Hub",
+    Icon = "shield",
+    LoadingTitle = "Loading Script Hub",
+    LoadingSubtitle = "by YourName",
 
-<span class="cm">-- Tabs</span>
-<span class="kw">local</span> <span class="pl">MainTab</span> <span class="op">=</span> <span class="pl">Window</span><span class="pn">:</span><span class="fn">CreateTab</span><span class="pn">(</span><span class="str">"Main"</span><span class="pn">,</span> <span class="str">"home"</span><span class="pn">)</span>
-<span class="kw">local</span> <span class="pl">CombatTab</span> <span class="op">=</span> <span class="pl">Window</span><span class="pn">:</span><span class="fn">CreateTab</span><span class="pn">(</span><span class="str">"Combat"</span><span class="pn">,</span> <span class="str">"sword"</span><span class="pn">)</span>
-<span class="kw">local</span> <span class="pl">PlayerTab</span> <span class="op">=</span> <span class="pl">Window</span><span class="pn">:</span><span class="fn">CreateTab</span><span class="pn">(</span><span class="str">"Player"</span><span class="pn">,</span> <span class="str">"user"</span><span class="pn">,</span> <span class="pl">MainCategory</span><span class="pn">)</span>
-<span class="kw">local</span> <span class="pl">ConfigTab</span> <span class="op">=</span> <span class="pl">Window</span><span class="pn">:</span><span class="fn">CreateTab</span><span class="pn">(</span><span class="str">"Config"</span><span class="pn">,</span> <span class="str">"settings"</span><span class="pn">,</span> <span class="pl">SettingsCategory</span><span class="pn">)</span>
+    -- Optional: forces a default theme (omit to let users keep their choice)
+    -- DefaultTheme = "Default",
 
-<span class="cm">-- Sections</span>
-<span class="kw">local</span> <span class="pl">WelcomeSection</span> <span class="op">=</span> <span class="pl">MainTab</span><span class="pn">:</span><span class="fn">CreateSection</span><span class="pn">(</span><span class="str">"Welcome"</span><span class="pn">)</span>
-<span class="kw">local</span> <span class="pl">MovementSection</span> <span class="op">=</span> <span class="pl">MainTab</span><span class="pn">:</span><span class="fn">CreateSection</span><span class="pn">(</span><span class="str">"Movement"</span><span class="pn">)</span>
+    ConfigurationSaving = {
+        FolderName = "MyScriptHub",
+        FileName = "Config"
+    }
+})
 
-<span class="cm">-- Label</span>
-<span class="pl">MainTab</span><span class="pn">:</span><span class="fn">CreateLabel</span><span class="pn">(</span><span class="pn">{</span>
-    <span class="pl">Text</span> <span class="op">=</span> <span class="str">"Welcome to my script!"</span><span class="pn">,</span>
-    <span class="pl">Icon</span> <span class="op">=</span> <span class="str">"keyboard"</span><span class="pn">,</span>
-    <span class="pl">SectionParent</span> <span class="op">=</span> <span class="pl">WelcomeSection</span>
-<span class="pn">}</span><span class="pn">)</span>
+-- ============================
+-- CREATING TABS
+-- ============================
 
-<span class="cm">-- Paragraph</span>
-<span class="pl">MainTab</span><span class="pn">:</span><span class="fn">CreateParagraph</span><span class="pn">(</span><span class="pn">{</span>
-    <span class="pl">Title</span> <span class="op">=</span> <span class="str">"&lt;b&gt;Getting Started&lt;/b&gt;"</span><span class="pn">,</span>
-    <span class="pl">Content</span> <span class="op">=</span> <span class="str">"Configure everything below to get started."</span><span class="pn">,</span>
-    <span class="pl">Icon</span> <span class="op">=</span> <span class="str">"info"</span><span class="pn">,</span>
-    <span class="pl">SectionParent</span> <span class="op">=</span> <span class="pl">WelcomeSection</span>
-<span class="pn">}</span><span class="pn">)</span>
+local MainTab = Window:CreateTab("Main", "home")
+local CombatTab = Window:CreateTab("Combat", "sword")
+local VisualsTab = Window:CreateTab("Visuals", "eye")
 
-<span class="cm">-- Console</span>
-<span class="kw">local</span> <span class="pl">MyConsole</span> <span class="op">=</span> <span class="pl">MainTab</span><span class="pn">:</span><span class="fn">CreateConsole</span><span class="pn">(</span><span class="pn">{</span>
-    <span class="pl">Title</span> <span class="op">=</span> <span class="str">"Event Logger"</span><span class="pn">,</span>
-    <span class="pl">Icon</span> <span class="op">=</span> <span class="str">"terminal"</span><span class="pn">,</span>
-    <span class="pl">MaxLines</span> <span class="op">=</span> <span class="nm">200</span><span class="pn">,</span>
-    <span class="pl">Height</span> <span class="op">=</span> <span class="nm">150</span><span class="pn">,</span>
-    <span class="pl">Timestamps</span> <span class="op">=</span> <span class="kw">true</span><span class="pn">,</span>
-    <span class="pl">SectionParent</span> <span class="op">=</span> <span class="pl">WelcomeSection</span>
-<span class="pn">}</span><span class="pn">)</span>
+-- ============================
+-- CREATING CATEGORIES (Optional)
+-- ============================
 
-<span class="pl">MyConsole</span><span class="pn">:</span><span class="fn">Log</span><span class="pn">(</span><span class="str">"Script initialized"</span><span class="pn">)</span>
-<span class="pl">MyConsole</span><span class="pn">:</span><span class="fn">Info</span><span class="pn">(</span><span class="str">"Listening for events"</span><span class="pn">)</span>
-<span class="pl">MyConsole</span><span class="pn">:</span><span class="fn">Success</span><span class="pn">(</span><span class="str">"Connected to server"</span><span class="pn">)</span>
+local MainCategory = Window:CreateCategory("Main Features", {DefaultOpen = true})
+local SettingsCategory = Window:CreateCategory("Settings", {DefaultOpen = false})
 
-<span class="cm">-- Button</span>
-<span class="pl">MainTab</span><span class="pn">:</span><span class="fn">CreateButton</span><span class="pn">(</span><span class="pn">{</span>
-    <span class="pl">Name</span> <span class="op">=</span> <span class="str">"Click Me"</span><span class="pn">,</span>
-    <span class="pl">Interact</span> <span class="op">=</span> <span class="str">"click"</span><span class="pn">,</span>
-    <span class="pl">SectionParent</span> <span class="op">=</span> <span class="pl">MovementSection</span><span class="pn">,</span>
-    <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pn">)</span>
-        <span class="fn">print</span><span class="pn">(</span><span class="str">"Button clicked!"</span><span class="pn">)</span>
-    <span class="kw">end</span>
-<span class="pn">}</span><span class="pn">)</span>
+local PlayerTab = Window:CreateTab("Player", "user", MainCategory)
+local ConfigTab = Window:CreateTab("Config", "settings", SettingsCategory)
 
-<span class="cm">-- Toggle</span>
-<span class="kw">local</span> <span class="pl">SpeedToggle</span> <span class="op">=</span> <span class="pl">MainTab</span><span class="pn">:</span><span class="fn">CreateToggle</span><span class="pn">(</span><span class="pn">{</span>
-    <span class="pl">Name</span> <span class="op">=</span> <span class="str">"Speed Boost"</span><span class="pn">,</span>
-    <span class="pl">CurrentValue</span> <span class="op">=</span> <span class="kw">false</span><span class="pn">,</span>
-    <span class="pl">Flag</span> <span class="op">=</span> <span class="str">"SpeedToggle"</span><span class="pn">,</span>
-    <span class="pl">SectionParent</span> <span class="op">=</span> <span class="pl">MovementSection</span><span class="pn">,</span>
-    <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pl">Value</span><span class="pn">)</span>
-        <span class="fn">print</span><span class="pn">(</span><span class="str">"Speed Boost:"</span><span class="pn">,</span> <span class="pl">Value</span><span class="pn">)</span>
-    <span class="kw">end</span>
-<span class="pn">}</span><span class="pn">)</span>
+-- ============================
+-- SECTIONS
+-- ============================
 
-<span class="cm">-- Slider</span>
-<span class="kw">local</span> <span class="pl">SpeedSlider</span> <span class="op">=</span> <span class="pl">MainTab</span><span class="pn">:</span><span class="fn">CreateSlider</span><span class="pn">(</span><span class="pn">{</span>
-    <span class="pl">Name</span> <span class="op">=</span> <span class="str">"Speed Multiplier"</span><span class="pn">,</span>
-    <span class="pl">Range</span> <span class="op">=</span> <span class="pn">{</span><span class="nm">1</span><span class="pn">,</span> <span class="nm">10</span><span class="pn">}</span><span class="pn">,</span>
-    <span class="pl">Increment</span> <span class="op">=</span> <span class="nm">0.5</span><span class="pn">,</span>
-    <span class="pl">Suffix</span> <span class="op">=</span> <span class="str">"x"</span><span class="pn">,</span>
-    <span class="pl">CurrentValue</span> <span class="op">=</span> <span class="nm">1</span><span class="pn">,</span>
-    <span class="pl">Flag</span> <span class="op">=</span> <span class="str">"SpeedValue"</span><span class="pn">,</span>
-    <span class="pl">SectionParent</span> <span class="op">=</span> <span class="pl">MovementSection</span><span class="pn">,</span>
-    <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pl">Value</span><span class="pn">)</span>
-        <span class="fn">print</span><span class="pn">(</span><span class="str">"Speed:"</span><span class="pn">,</span> <span class="pl">Value</span><span class="pn">)</span>
-    <span class="kw">end</span>
-<span class="pn">}</span><span class="pn">)</span>
+local WelcomeSection = MainTab:CreateSection("Welcome")
+local MovementSection = MainTab:CreateSection("Movement")
 
-<span class="cm">-- Input</span>
-<span class="pl">MainTab</span><span class="pn">:</span><span class="fn">CreateInput</span><span class="pn">(</span><span class="pn">{</span>
-    <span class="pl">Name</span> <span class="op">=</span> <span class="str">"Username"</span><span class="pn">,</span>
-    <span class="pl">PlaceholderText</span> <span class="op">=</span> <span class="str">"Type here..."</span><span class="pn">,</span>
-    <span class="pl">RemoveTextAfterFocusLost</span> <span class="op">=</span> <span class="kw">false</span><span class="pn">,</span>
-    <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pl">Text</span><span class="pn">)</span>
-        <span class="fn">print</span><span class="pn">(</span><span class="str">"Input:"</span><span class="pn">,</span> <span class="pl">Text</span><span class="pn">)</span>
-    <span class="kw">end</span>
-<span class="pn">}</span><span class="pn">)</span>
+-- ============================
+-- LABELS &amp; PARAGRAPHS
+-- ============================
 
-<span class="cm">-- Keybind</span>
-<span class="pl">MainTab</span><span class="pn">:</span><span class="fn">CreateKeybind</span><span class="pn">(</span><span class="pn">{</span>
-    <span class="pl">Name</span> <span class="op">=</span> <span class="str">"Fly Key"</span><span class="pn">,</span>
-    <span class="pl">CurrentKeybind</span> <span class="op">=</span> <span class="str">"F"</span><span class="pn">,</span>
-    <span class="pl">HoldToInteract</span> <span class="op">=</span> <span class="kw">false</span><span class="pn">,</span>
-    <span class="pl">Flag</span> <span class="op">=</span> <span class="str">"FlyKey"</span><span class="pn">,</span>
-    <span class="pl">SectionParent</span> <span class="op">=</span> <span class="pl">MovementSection</span><span class="pn">,</span>
-    <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pn">)</span>
-        <span class="fn">print</span><span class="pn">(</span><span class="str">"Fly key pressed!"</span><span class="pn">)</span>
-    <span class="kw">end</span>
-<span class="pn">}</span><span class="pn">)</span>
+MainTab:CreateLabel({
+    Text = "Welcome to my script!",
+    SectionParent = WelcomeSection
+})
 
-<span class="cm">-- Dropdown</span>
-<span class="kw">local</span> <span class="pl">WeaponDropdown</span> <span class="op">=</span> <span class="pl">CombatTab</span><span class="pn">:</span><span class="fn">CreateDropdown</span><span class="pn">(</span><span class="pn">{</span>
-    <span class="pl">Name</span> <span class="op">=</span> <span class="str">"Select Weapon"</span><span class="pn">,</span>
-    <span class="pl">Options</span> <span class="op">=</span> <span class="pn">{</span><span class="str">"Sword"</span><span class="pn">,</span> <span class="str">"Axe"</span><span class="pn">,</span> <span class="str">"Spear"</span><span class="pn">,</span> <span class="str">"Bow"</span><span class="pn">}</span><span class="pn">,</span>
-    <span class="pl">CurrentOption</span> <span class="op">=</span> <span class="str">"Sword"</span><span class="pn">,</span>
-    <span class="pl">MultiSelection</span> <span class="op">=</span> <span class="kw">false</span><span class="pn">,</span>
-    <span class="pl">Flag</span> <span class="op">=</span> <span class="str">"SelectedWeapon"</span><span class="pn">,</span>
-    <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pl">Option</span><span class="pn">)</span>
-        <span class="fn">print</span><span class="pn">(</span><span class="str">"Selected:"</span><span class="pn">,</span> <span class="pl">Option</span><span class="pn">)</span>
-    <span class="kw">end</span>
-<span class="pn">}</span><span class="pn">)</span>
+MainTab:CreateLabel({
+    Text = "Press K to toggle the UI",
+    Icon = "keyboard",
+    SectionParent = WelcomeSection
+})
 
-<span class="cm">-- Color Picker</span>
-<span class="kw">local</span> <span class="pl">ESPColor</span> <span class="op">=</span> <span class="pl">CombatTab</span><span class="pn">:</span><span class="fn">CreateColorPicker</span><span class="pn">(</span><span class="pn">{</span>
-    <span class="pl">Name</span> <span class="op">=</span> <span class="str">"ESP Color"</span><span class="pn">,</span>
-    <span class="pl">Color</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">255</span><span class="pn">,</span> <span class="nm">0</span><span class="pn">,</span> <span class="nm">0</span><span class="pn">)</span><span class="pn">,</span>
-    <span class="pl">Flag</span> <span class="op">=</span> <span class="str">"ESPColor"</span><span class="pn">,</span>
-    <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pl">Color</span><span class="pn">)</span>
-        <span class="fn">print</span><span class="pn">(</span><span class="str">"Color:"</span><span class="pn">,</span> <span class="pl">Color</span><span class="pn">)</span>
-    <span class="kw">end</span>
-<span class="pn">}</span><span class="pn">)</span>
+MainTab:CreateLabel({
+    Text = "Warning: Use at your own risk!",
+    Background = "warn",
+    SectionParent = WelcomeSection
+})
 
-<span class="cm">-- Notification</span>
-<span class="pl">ArrayField</span><span class="pn">:</span><span class="fn">Notify</span><span class="pn">(</span><span class="pn">{</span>
-    <span class="pl">Title</span> <span class="op">=</span> <span class="str">"Welcome"</span><span class="pn">,</span>
-    <span class="pl">Content</span> <span class="op">=</span> <span class="str">"Script loaded successfully!"</span><span class="pn">,</span>
-    <span class="pl">Duration</span> <span class="op">=</span> <span class="nm">5</span><span class="pn">,</span>
-    <span class="pl">Image</span> <span class="op">=</span> <span class="str">"check-circle"</span>
-<span class="pn">}</span><span class="pn">)</span></code></pre></div>
+MainTab:CreateLabel({
+    Text = "Custom color label",
+    Background = "#FF69B4",
+    SectionParent = WelcomeSection
+})
+
+MainTab:CreateParagraph({
+    Title = "&lt;b&gt;Getting Started&lt;/b&gt;",
+    Content = "This script includes &lt;i&gt;powerful features&lt;/i&gt; for your game.",
+    Icon = "info",
+    Background = "success",
+    SectionParent = WelcomeSection
+})
+
+-- ============================
+-- CONSOLE
+-- ============================
+
+local MyConsole = MainTab:CreateConsole({
+    Title = "Event Logger",
+    Icon = "terminal",
+    MaxLines = 200,
+    Height = 150,
+    Timestamps = true,
+    SectionParent = WelcomeSection
+})
+
+MyConsole:Log("Script initialized")
+MyConsole:Info("Listening for events")
+MyConsole:Success("Connected to server")
+MyConsole:Warn("Rate limit approaching")
+MyConsole:Error("Failed to fetch data")
+-- MyConsole:Clear()
+
+-- ============================
+-- BUTTONS
+-- ============================
+
+MainTab:CreateButton({
+    Name = "Click Me",
+    Description = "This description appears on hover",
+    Interact = "click",
+    SectionParent = MovementSection,
+    Callback = function()
+        print("Button clicked!")
+    end
+})
+
+-- ============================
+-- TOGGLES
+-- ============================
+
+local SpeedToggle = MainTab:CreateToggle({
+    Name = "Speed Boost",
+    Description = "Increases your movement speed",
+    CurrentValue = false,
+    Flag = "SpeedToggle",
+    SectionParent = MovementSection,
+    Callback = function(Value)
+        print("Speed Boost:", Value)
+    end
+})
+
+SpeedToggle:Set(true)
+SpeedToggle:Lock("Feature disabled")
+SpeedToggle:Unlock()
+
+-- ============================
+-- SLIDERS
+-- ============================
+
+local SpeedSlider = MainTab:CreateSlider({
+    Name = "Speed Multiplier",
+    Description = "Adjust your speed from 1x to 10x",
+    Range = {1, 10},
+    Increment = 0.5,
+    Suffix = "x",
+    CurrentValue = 1,
+    Flag = "SpeedValue",
+    SectionParent = MovementSection,
+    Callback = function(Value)
+        print("Speed set to:", Value)
+    end
+})
+
+SpeedSlider:Set(5)
+
+-- ============================
+-- TEXT INPUTS
+-- ============================
+
+local UsernameInput = MainTab:CreateInput({
+    Name = "Username",
+    Description = "Enter a player's username",
+    PlaceholderText = "Type here...",
+    RemoveTextAfterFocusLost = false,
+    NumbersOnly = false,
+    CharacterLimit = 20,
+    OnEnter = false,
+    SectionParent = WelcomeSection,
+    Callback = function(Text)
+        print("Input text:", Text)
+    end
+})
+
+UsernameInput:Set("NewUsername")
+
+-- ============================
+-- KEYBINDS
+-- ============================
+
+local FlyKeybind = MainTab:CreateKeybind({
+    Name = "Fly Key",
+    Description = "Press to toggle flight",
+    CurrentKeybind = "F",
+    HoldToInteract = false,
+    Flag = "FlyKey",
+    SectionParent = MovementSection,
+    Callback = function(IsHeld)
+        print("Fly key pressed!")
+    end
+})
+
+FlyKeybind:Set("G")
+
+-- ============================
+-- DROPDOWNS
+-- ============================
+
+local WeaponDropdown = CombatTab:CreateDropdown({
+    Name = "Select Weapon",
+    Options = {"Sword", "Axe", "Spear", "Bow"},
+    CurrentOption = "Sword",
+    MultiSelection = false,
+    Flag = "SelectedWeapon",
+    Callback = function(Option)
+        print("Selected:", Option)
+    end
+})
+
+local FeaturesDropdown = CombatTab:CreateDropdown({
+    Name = "Enable Features",
+    Options = {"Auto Heal", "Auto Attack", "Auto Block", "Auto Dodge"},
+    CurrentOption = {"Auto Heal"},
+    MultiSelection = true,
+    Flag = "EnabledFeatures",
+    Callback = function(Option)
+        print("Toggled:", Option)
+    end
+})
+
+WeaponDropdown:Set("Bow")
+WeaponDropdown:Add({"Dagger", "Staff"})
+WeaponDropdown:Remove("Sword")
+WeaponDropdown:Refresh({"Katana", "Claymore"}, "Katana")
+
+-- ============================
+-- COLOR PICKERS
+-- ============================
+
+local ESPColor = VisualsTab:CreateColorPicker({
+    Name = "ESP Color",
+    Color = Color3.fromRGB(255, 0, 0),
+    Flag = "ESPColor",
+    Callback = function(Color)
+        print("Color changed:", Color)
+    end
+})
+
+ESPColor:Set(Color3.fromRGB(0, 255, 0))
+
+-- ============================
+-- IMAGES
+-- ============================
+
+MainTab:CreateImage(WelcomeSection, {
+    Image = "https://example.com/image.png",
+    Width = 200,
+    Height = 200,
+    Transparency = 0
+})
+
+-- ============================
+-- SEPARATORS &amp; SPACING
+-- ============================
+
+MainTab:CreateSeparator(MovementSection, {
+    Title = "Advanced Settings",
+    Width = 0.9,
+    Padding = 10
+})
+
+MainTab:CreateSpacing(MovementSection, 15)
+
+-- ============================
+-- NOTIFICATIONS
+-- ============================
+
+ArrayField:Notify({
+    Title = "Success",
+    Content = "Script loaded successfully!",
+    Duration = 5,
+    Image = "check-circle"
+})
+
+ArrayField:Notify({
+    Title = "Update Available",
+    Content = "A new version is ready. Update now?",
+    Image = "download",
+    Actions = {
+        {Name = "Update", Callback = function() print("Updating...") end},
+        {Name = "Later", Callback = function() print("Cancelled") end}
+    }
+})
+
+-- ============================
+-- PROMPTS &amp; DIALOGS
+-- ============================
+
+Window:NotePrompt({
+    Title = "Welcome!",
+    Description = "Thanks for using this script",
+    Icon = "sparkles",
+    Callback = function()
+        print("User clicked OK")
+    end
+})
+
+Window:Prompt({
+    Title = "Confirm Action",
+    SubTitle = "Are you sure?",
+    Content = "This action cannot be undone.",
+    Actions = {
+        Confirm = {Name = "Yes", Callback = function() print("Confirmed") end},
+        Cancel = {Name = "No", Callback = function() print("Cancelled") end}
+    }
+})
+
+-- ============================
+-- UNIVERSAL ELEMENT METHODS
+-- ============================
+
+SpeedToggle:Lock("Premium feature")
+SpeedToggle:Unlock()
+SpeedToggle:Visible(false)
+SpeedToggle:Visible(true)
+-- SpeedToggle:Destroy()
+
+-- ============================
+-- SAVING &amp; LOADING
+-- ============================
+
+ArrayField.SaveConfiguration()
+ArrayField.LoadConfiguration()
+
+print(ArrayField.Flags["SpeedToggle"].CurrentValue)
+print(ArrayField.Flags["SpeedValue"].CurrentValue)
+
+-- ============================
+-- DESTROYING THE UI
+-- ============================
+
+-- ArrayField:Destroy()</code></pre></div>
 </div>
-<div class="pagination"><a class="pagination-link prev" onclick="showSection('saving')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Saving & Loading</div></a><div style="flex:1"></div></div>
+<div class="pagination"><a class="pagination-link prev" onclick="showSection('saving')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Saving &amp; Loading</div></a><div style="flex:1"></div></div>
 </div>
 
 </div>
@@ -1026,6 +1213,13 @@ document.querySelectorAll('.code-block').forEach(function(block) {
         });
     });
     block.appendChild(btn);
+});
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/lua.min.js"></script>
+<script>
+document.querySelectorAll('code.language-lua').forEach(function(block) {
+    hljs.highlightElement(block);
 });
 </script>
 
