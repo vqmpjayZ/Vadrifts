@@ -35,7 +35,7 @@
 --sidebar-width:280px;
 }
 html{scroll-behavior:smooth;scroll-padding-top:calc(var(--navbar-height) + 16px)}
-body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,Ubuntu,Cantarell,'Noto Sans',sans-serif,'Apple Color Emoji','Segoe UI Emoji';background:var(--ifm-background);color:var(--ifm-font-color);line-height:1.65;-webkit-font-smoothing:antialiased}
+body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,Ubuntu,Cantarell,'Noto Sans',sans-serif;background:var(--ifm-background);color:var(--ifm-font-color);line-height:1.65;-webkit-font-smoothing:antialiased}
 ::selection{background:var(--ifm-color-primary);color:#fff}
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:transparent}
@@ -45,7 +45,7 @@ a{color:var(--ifm-color-primary);text-decoration:none}
 a:hover{text-decoration:underline}
 
 .navbar{position:fixed;top:0;left:0;right:0;height:var(--navbar-height);background:var(--ifm-navbar-background);border-bottom:1px solid var(--ifm-border);display:flex;align-items:center;padding:0 20px;z-index:1000;box-shadow:0 1px 2px 0 rgba(0,0,0,0.3)}
-.navbar-inner{display:flex;align-items:center;width:100%;max-width:100%}
+.navbar-inner{display:flex;align-items:center;width:100%}
 .navbar-brand{font-weight:700;font-size:15px;color:var(--ifm-font-color);text-decoration:none;display:flex;align-items:center;gap:8px;margin-right:24px}
 .navbar-brand:hover{color:var(--ifm-font-color);text-decoration:none}
 .navbar-items{display:flex;align-items:center;gap:4px}
@@ -53,6 +53,8 @@ a:hover{text-decoration:underline}
 .navbar-items a:hover{background:var(--ifm-hover);text-decoration:none}
 .navbar-items a.active{color:var(--ifm-color-primary)}
 .navbar-right{margin-left:auto;display:flex;align-items:center;gap:4px}
+.navbar-right a{color:var(--ifm-font-color-secondary);font-size:14px;padding:8px 12px;border-radius:6px;text-decoration:none}
+.navbar-right a:hover{background:var(--ifm-hover);text-decoration:none;color:var(--ifm-font-color)}
 .mobile-toggle{display:none;background:none;border:none;color:var(--ifm-font-color);font-size:22px;cursor:pointer;padding:8px;margin-right:8px}
 
 .layout{display:flex;margin-top:var(--navbar-height)}
@@ -127,20 +129,20 @@ code{font-family:'JetBrains Mono','Fira Code',monospace;font-size:0.875em}
 .doc-section.active{display:block}
 
 .pagination{display:flex;justify-content:space-between;margin-top:40px;gap:16px}
-.pagination-link{display:flex;flex-direction:column;padding:12px 16px;border:1px solid var(--ifm-border);border-radius:8px;text-decoration:none;flex:1;transition:border-color 0.2s}
+.pagination-link{display:flex;flex-direction:column;padding:12px 16px;border:1px solid var(--ifm-border);border-radius:8px;text-decoration:none;flex:1;transition:border-color 0.2s;cursor:pointer}
 .pagination-link:hover{border-color:var(--ifm-color-primary);text-decoration:none}
-.pagination-sublabel{font-size:12px;color:var(--ifm-font-color-secondary);margin-bottom:2px;font-weight:500;text-transform:capitalize}
+.pagination-sublabel{font-size:12px;color:var(--ifm-font-color-secondary);margin-bottom:2px;font-weight:500}
 .pagination-label{font-size:14px;color:var(--ifm-color-primary);font-weight:600}
 .pagination-link.next{text-align:right}
-.pagination-link.prev{}
 
 footer{margin-left:var(--sidebar-width);padding:20px 48px;border-top:1px solid var(--ifm-border);text-align:center;color:var(--ifm-font-color-secondary);font-size:13px}
+
+.sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:998}
+.sidebar-backdrop.show{display:block}
 
 @media(max-width:996px){
 .sidebar{transform:translateX(-100%);transition:transform 0.3s ease;width:280px;z-index:999}
 .sidebar.open{transform:translateX(0)}
-.sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:998}
-.sidebar-backdrop.show{display:block}
 .main-container{margin-left:0}
 footer{margin-left:0}
 .mobile-toggle{display:block}
@@ -155,13 +157,13 @@ footer{margin-left:0}
 <nav class="navbar">
 <div class="navbar-inner">
 <button class="mobile-toggle" onclick="toggleSidebar()">☰</button>
-<a class="navbar-brand" href="/docs/arrayfield"><b>ArrayField Docs</b></a>
+<a class="navbar-brand" href="javascript:void(0)" onclick="showSection('introduction')"><b>ArrayField Docs</b></a>
 <div class="navbar-items">
-<a class="active" href="/docs/arrayfield">ArrayField</a>
+<a class="active" href="javascript:void(0)">ArrayField</a>
 </div>
 <div class="navbar-right">
-<a href="https://github.com/vqmpjayZ/laboratory" target="_blank" style="color:var(--ifm-font-color-secondary);font-size:14px;padding:8px 12px;border-radius:6px;">GitHub</a>
-<a href="https://discord.gg/WDbJ5wE2cR" target="_blank" style="color:var(--ifm-font-color-secondary);font-size:14px;padding:8px 12px;border-radius:6px;">Discord</a>
+<a href="https://github.com/vqmpjayZ/laboratory" target="_blank">GitHub</a>
+<a href="https://discord.gg/WDbJ5wE2cR" target="_blank">Discord</a>
 </div>
 </div>
 </nav>
@@ -172,48 +174,48 @@ footer{margin-left:0}
 <aside class="sidebar" id="sidebar">
 <nav>
 <ul class="menu-list">
-<li class="menu-list-item"><a class="menu-link active" data-section="introduction" onclick="showSection('introduction')">Introduction</a></li>
+<li class="menu-list-item"><a class="menu-link active" href="javascript:void(0)" data-section="introduction" onclick="showSection('introduction')">Introduction</a></li>
 
 <li class="menu-list-item">
 <div class="menu-category expanded" onclick="toggleCategory(this)"><span>Configuration</span><span class="menu-arrow">›</span></div>
 <ul class="menu-list menu-submenu open">
-<li class="menu-list-item"><a class="menu-link" data-section="booting" onclick="showSection('booting')">Booting the Library</a></li>
-<li class="menu-list-item"><a class="menu-link" data-section="windows" onclick="showSection('windows')">Windows</a></li>
-<li class="menu-list-item"><a class="menu-link" data-section="themes" onclick="showSection('themes')">Themes</a></li>
+<li class="menu-list-item"><a class="menu-link" href="javascript:void(0)" data-section="booting" onclick="showSection('booting')">Booting the Library</a></li>
+<li class="menu-list-item"><a class="menu-link" href="javascript:void(0)" data-section="windows" onclick="showSection('windows')">Windows</a></li>
+<li class="menu-list-item"><a class="menu-link" href="javascript:void(0)" data-section="themes" onclick="showSection('themes')">Themes</a></li>
 </ul>
 </li>
 
 <li class="menu-list-item">
 <div class="menu-category" onclick="toggleCategory(this)"><span>Interaction</span><span class="menu-arrow">›</span></div>
 <ul class="menu-list menu-submenu">
-<li class="menu-list-item"><a class="menu-link" data-section="buttons" onclick="showSection('buttons')">Buttons</a></li>
-<li class="menu-list-item"><a class="menu-link" data-section="toggles" onclick="showSection('toggles')">Toggles</a></li>
-<li class="menu-list-item"><a class="menu-link" data-section="sliders" onclick="showSection('sliders')">Sliders</a></li>
-<li class="menu-list-item"><a class="menu-link" data-section="inputs" onclick="showSection('inputs')">Text Inputs</a></li>
-<li class="menu-list-item"><a class="menu-link" data-section="keybinds" onclick="showSection('keybinds')">Keybinds</a></li>
-<li class="menu-list-item"><a class="menu-link" data-section="dropdowns" onclick="showSection('dropdowns')">Dropdowns</a></li>
-<li class="menu-list-item"><a class="menu-link" data-section="colorpickers" onclick="showSection('colorpickers')">Color Pickers</a></li>
+<li class="menu-list-item"><a class="menu-link" href="javascript:void(0)" data-section="buttons" onclick="showSection('buttons')">Buttons</a></li>
+<li class="menu-list-item"><a class="menu-link" href="javascript:void(0)" data-section="toggles" onclick="showSection('toggles')">Toggles</a></li>
+<li class="menu-list-item"><a class="menu-link" href="javascript:void(0)" data-section="sliders" onclick="showSection('sliders')">Sliders</a></li>
+<li class="menu-list-item"><a class="menu-link" href="javascript:void(0)" data-section="inputs" onclick="showSection('inputs')">Text Inputs</a></li>
+<li class="menu-list-item"><a class="menu-link" href="javascript:void(0)" data-section="keybinds" onclick="showSection('keybinds')">Keybinds</a></li>
+<li class="menu-list-item"><a class="menu-link" href="javascript:void(0)" data-section="dropdowns" onclick="showSection('dropdowns')">Dropdowns</a></li>
+<li class="menu-list-item"><a class="menu-link" href="javascript:void(0)" data-section="colorpickers" onclick="showSection('colorpickers')">Color Pickers</a></li>
 </ul>
 </li>
 
 <li class="menu-list-item">
 <div class="menu-category" onclick="toggleCategory(this)"><span>UI Components</span><span class="menu-arrow">›</span></div>
 <ul class="menu-list menu-submenu">
-<li class="menu-list-item"><a class="menu-link" data-section="labels" onclick="showSection('labels')">Labels</a></li>
-<li class="menu-list-item"><a class="menu-link" data-section="paragraphs" onclick="showSection('paragraphs')">Paragraphs</a></li>
-<li class="menu-list-item"><a class="menu-link" data-section="images" onclick="showSection('images')">Images</a></li>
-<li class="menu-list-item"><a class="menu-link" data-section="console" onclick="showSection('console')">Console</a></li>
-<li class="menu-list-item"><a class="menu-link" data-section="notifications" onclick="showSection('notifications')">Notifications</a></li>
-<li class="menu-list-item"><a class="menu-link" data-section="prompts" onclick="showSection('prompts')">Prompts</a></li>
+<li class="menu-list-item"><a class="menu-link" href="javascript:void(0)" data-section="labels" onclick="showSection('labels')">Labels</a></li>
+<li class="menu-list-item"><a class="menu-link" href="javascript:void(0)" data-section="paragraphs" onclick="showSection('paragraphs')">Paragraphs</a></li>
+<li class="menu-list-item"><a class="menu-link" href="javascript:void(0)" data-section="images" onclick="showSection('images')">Images</a></li>
+<li class="menu-list-item"><a class="menu-link" href="javascript:void(0)" data-section="console" onclick="showSection('console')">Console</a></li>
+<li class="menu-list-item"><a class="menu-link" href="javascript:void(0)" data-section="notifications" onclick="showSection('notifications')">Notifications</a></li>
+<li class="menu-list-item"><a class="menu-link" href="javascript:void(0)" data-section="prompts" onclick="showSection('prompts')">Prompts</a></li>
 </ul>
 </li>
 
 <li class="menu-list-item">
 <div class="menu-category" onclick="toggleCategory(this)"><span>Reference</span><span class="menu-arrow">›</span></div>
 <ul class="menu-list menu-submenu">
-<li class="menu-list-item"><a class="menu-link" data-section="template" onclick="showSection('template')">Full Template</a></li>
-<li class="menu-list-item"><a class="menu-link" data-section="methods" onclick="showSection('methods')">Universal Methods</a></li>
-<li class="menu-list-item"><a class="menu-link" data-section="saving" onclick="showSection('saving')">Saving & Loading</a></li>
+<li class="menu-list-item"><a class="menu-link" href="javascript:void(0)" data-section="methods" onclick="showSection('methods')">Universal Methods</a></li>
+<li class="menu-list-item"><a class="menu-link" href="javascript:void(0)" data-section="saving" onclick="showSection('saving')">Saving &amp; Loading</a></li>
+<li class="menu-list-item"><a class="menu-link" href="javascript:void(0)" data-section="template" onclick="showSection('template')">Full Template</a></li>
 </ul>
 </li>
 
@@ -227,24 +229,20 @@ footer{margin-left:0}
 <!-- INTRODUCTION -->
 <div class="doc-section active" id="sec-introduction">
 <div class="breadcrumbs">
-<a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a>
+<a href="javascript:void(0)" onclick="showSection('introduction')"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a>
 <span class="breadcrumb-sep">›</span>
 <span>Introduction</span>
 </div>
 <div class="markdown">
 <h1>Introduction</h1>
-
 <div class="hero-image">
 <a href="https://discord.gg/WDbJ5wE2cR" target="_blank">
 <img src="https://i.imgur.com/W9FaXAY.png" alt="ArrayField">
 <img src="https://i.imgur.com/W9FaXAY.png" alt="" class="hero-blur">
 </a>
 </div>
-
 <p>This is the written documentation for the ArrayField Interface Suite.</p>
-
 <h2>Why choose ArrayField?</h2>
-
 <ul>
 <li><p>🎨 <strong>Fully Themeable</strong> — Multiple built-in themes with custom theme support, switchable in-app</p></li>
 <li><p>📂 <strong>Category System</strong> — Organize tabs into collapsible sidebar groups</p></li>
@@ -254,35 +252,28 @@ footer{margin-left:0}
 <li><p>🔓 <strong>Open Source</strong> — Fully open source and free to use</p></li>
 <li><p>💃 <strong>Excellent Performance</strong></p></li>
 </ul>
-
 <h2>Getting Started</h2>
-
-<p>To get started with ArrayField, check out the sidebar on the left. It provides quick links to help you use all ArrayField features in your project. Keep this documentation handy so you can refer to it as you build.</p>
-
-<p>Found a missing feature? Please suggest it on <a href="https://discord.gg/WDbJ5wE2cR" target="_blank">Discord</a> and even consider contributing on <a href="https://github.com/vqmpjayZ/laboratory" target="_blank">GitHub</a>! ArrayField is open source, and contributions are welcome.</p>
+<p>To get started with ArrayField, check out the sidebar on the left. It provides quick links to help you use all ArrayField features in your project.</p>
+<p>Found a missing feature? Please suggest it on <a href="https://discord.gg/WDbJ5wE2cR" target="_blank">Discord</a> and even consider contributing on <a href="https://github.com/vqmpjayZ/laboratory" target="_blank">GitHub</a>!</p>
 </div>
 <div class="pagination">
 <div style="flex:1"></div>
-<a class="pagination-link next" onclick="showSection('booting')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Booting the Library</div></a>
+<a class="pagination-link next" href="javascript:void(0)" onclick="showSection('booting')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Booting the Library</div></a>
 </div>
 </div>
 
 <!-- BOOTING -->
 <div class="doc-section" id="sec-booting">
 <div class="breadcrumbs">
-<a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a>
+<a href="javascript:void(0)" onclick="showSection('introduction')"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a>
 <span class="breadcrumb-sep">›</span><span>Configuration</span>
 <span class="breadcrumb-sep">›</span><span>Booting the Library</span>
 </div>
 <div class="markdown">
 <h1>Booting the Library</h1>
-
 <h2>Loading ArrayField</h2>
-
 <div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">ArrayField</span> <span class="op">=</span> <span class="fn">loadstring</span><span class="pn">(</span><span class="pl">game</span><span class="pn">:</span><span class="fn">HttpGet</span><span class="pn">(</span><span class="str">'https://raw.githubusercontent.com/vqmpjayZ/laboratory/refs/heads/main/ArrayField/ArrayField.lua'</span><span class="pn">)</span><span class="pn">)</span><span class="pn">(</span><span class="pn">)</span></code></pre></div>
-
 <h3>Enabling Configuration Saving</h3>
-
 <div class="admonition admonition-tip">
 <div class="admonition-heading">💡 tip</div>
 <ol>
@@ -291,167 +282,107 @@ footer{margin-left:0}
 <li>The user can enable or disable config saving from the in-app settings panel</li>
 </ol>
 </div>
-
 <p>ArrayField will automatically save and load the configuration when the user enables it from settings.</p>
 </div>
 <div class="pagination">
-<a class="pagination-link prev" onclick="showSection('introduction')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Introduction</div></a>
-<a class="pagination-link next" onclick="showSection('windows')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Windows</div></a>
+<a class="pagination-link prev" href="javascript:void(0)" onclick="showSection('introduction')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Introduction</div></a>
+<a class="pagination-link next" href="javascript:void(0)" onclick="showSection('windows')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Windows</div></a>
 </div>
 </div>
 
 <!-- WINDOWS -->
 <div class="doc-section" id="sec-windows">
 <div class="breadcrumbs">
-<a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a>
+<a href="javascript:void(0)" onclick="showSection('introduction')"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a>
 <span class="breadcrumb-sep">›</span><span>Configuration</span>
 <span class="breadcrumb-sep">›</span><span>Windows</span>
 </div>
 <div class="markdown">
 <h1>Windows</h1>
-
 <h2>Creating a Window</h2>
-
 <div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">Window</span> <span class="op">=</span> <span class="pl">ArrayField</span><span class="pn">:</span><span class="fn">CreateWindow</span><span class="pn">(</span><span class="pn">{</span>
    <span class="pl">Name</span> <span class="op">=</span> <span class="str">"My Script Hub"</span><span class="pn">,</span>
-   <span class="pl">Icon</span> <span class="op">=</span> <span class="str">"shield"</span><span class="pn">,</span> <span class="cm">-- Lucide icon name or Roblox asset ID</span>
+   <span class="pl">Icon</span> <span class="op">=</span> <span class="str">"shield"</span><span class="pn">,</span>
    <span class="pl">LoadingTitle</span> <span class="op">=</span> <span class="str">"Loading Script Hub"</span><span class="pn">,</span>
    <span class="pl">LoadingSubtitle</span> <span class="op">=</span> <span class="str">"by YourName"</span><span class="pn">,</span>
-
    <span class="pl">ConfigurationSaving</span> <span class="op">=</span> <span class="pn">{</span>
       <span class="pl">FolderName</span> <span class="op">=</span> <span class="str">"MyScriptHub"</span><span class="pn">,</span>
       <span class="pl">FileName</span> <span class="op">=</span> <span class="str">"Config"</span>
    <span class="pn">}</span>
 <span class="pn">}</span><span class="pn">)</span></code></pre></div>
-
 <h2>Creating a Tab</h2>
-
-<div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">Tab</span> <span class="op">=</span> <span class="pl">Window</span><span class="pn">:</span><span class="fn">CreateTab</span><span class="pn">(</span><span class="str">"Tab Example"</span><span class="pn">,</span> <span class="str">"home"</span><span class="pn">)</span> <span class="cm">-- Title, Image</span></code></pre></div>
-
+<div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">Tab</span> <span class="op">=</span> <span class="pl">Window</span><span class="pn">:</span><span class="fn">CreateTab</span><span class="pn">(</span><span class="str">"Tab Example"</span><span class="pn">,</span> <span class="str">"home"</span><span class="pn">)</span></code></pre></div>
 <h3>Lucide Icon Support</h3>
-
-<p>You can use <a href="https://lucide.dev/icons/" target="_blank">Lucide Icons</a> by passing the icon name as a string.</p>
-
+<p>Use <a href="https://lucide.dev/icons/" target="_blank">Lucide Icons</a> by passing the icon name as a string:</p>
 <div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">Tab</span> <span class="op">=</span> <span class="pl">Window</span><span class="pn">:</span><span class="fn">CreateTab</span><span class="pn">(</span><span class="str">"Combat"</span><span class="pn">,</span> <span class="str">"sword"</span><span class="pn">)</span></code></pre></div>
-
-<p>You can also use Roblox asset IDs:</p>
-
+<p>Or Roblox asset IDs:</p>
 <div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">Tab</span> <span class="op">=</span> <span class="pl">Window</span><span class="pn">:</span><span class="fn">CreateTab</span><span class="pn">(</span><span class="str">"Tab Example"</span><span class="pn">,</span> <span class="nm">4483362458</span><span class="pn">)</span></code></pre></div>
-
 <p><a href="https://lucide.dev/icons/" target="_blank">All Lucide Icons</a> · <a href="https://github.com/latte-soft/lucide-roblox/tree/master/icons/compiled/48px" target="_blank">Supported Lucide Icons</a></p>
-
 <h2>Creating a Category</h2>
-
 <p>Categories organize tabs into collapsible groups in the sidebar.</p>
-
 <div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">MainCategory</span> <span class="op">=</span> <span class="pl">Window</span><span class="pn">:</span><span class="fn">CreateCategory</span><span class="pn">(</span><span class="str">"Main Features"</span><span class="pn">,</span> <span class="pn">{</span><span class="pl">DefaultOpen</span> <span class="op">=</span> <span class="kw">true</span><span class="pn">}</span><span class="pn">)</span></code></pre></div>
-
 <p>Pass the category as the third argument to <code>CreateTab</code>:</p>
-
 <div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">PlayerTab</span> <span class="op">=</span> <span class="pl">Window</span><span class="pn">:</span><span class="fn">CreateTab</span><span class="pn">(</span><span class="str">"Player"</span><span class="pn">,</span> <span class="str">"user"</span><span class="pn">,</span> <span class="pl">MainCategory</span><span class="pn">)</span></code></pre></div>
-
 <h2>Creating a Section</h2>
-
 <div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">Section</span> <span class="op">=</span> <span class="pl">Tab</span><span class="pn">:</span><span class="fn">CreateSection</span><span class="pn">(</span><span class="str">"Section Example"</span><span class="pn">)</span></code></pre></div>
-
 <h3>Updating a Section</h3>
-
 <div class="code-block"><pre><code><span class="pl">Section</span><span class="pn">:</span><span class="fn">Set</span><span class="pn">(</span><span class="str">"New Title"</span><span class="pn">)</span></code></pre></div>
-
-<h2>Separators & Spacing</h2>
-
+<h2>Separators &amp; Spacing</h2>
 <div class="code-block"><pre><code><span class="pl">Tab</span><span class="pn">:</span><span class="fn">CreateSeparator</span><span class="pn">(</span><span class="pl">Section</span><span class="pn">,</span> <span class="pn">{</span>
     <span class="pl">Title</span> <span class="op">=</span> <span class="str">"Advanced Settings"</span><span class="pn">,</span>
     <span class="pl">Width</span> <span class="op">=</span> <span class="nm">0.9</span><span class="pn">,</span>
     <span class="pl">Padding</span> <span class="op">=</span> <span class="nm">10</span>
 <span class="pn">}</span><span class="pn">)</span>
 
-<span class="pl">Tab</span><span class="pn">:</span><span class="fn">CreateSpacing</span><span class="pn">(</span><span class="pl">Section</span><span class="pn">,</span> <span class="nm">15</span><span class="pn">)</span> <span class="cm">-- 15 pixels of vertical space</span></code></pre></div>
-
-<h2>Visibility & Destroying</h2>
-
+<span class="pl">Tab</span><span class="pn">:</span><span class="fn">CreateSpacing</span><span class="pn">(</span><span class="pl">Section</span><span class="pn">,</span> <span class="nm">15</span><span class="pn">)</span></code></pre></div>
+<h2>Visibility &amp; Destroying</h2>
 <div class="code-block"><pre><code><span class="pl">ArrayField</span><span class="pn">:</span><span class="fn">SetVisibility</span><span class="pn">(</span><span class="kw">false</span><span class="pn">)</span>
-
 <span class="pl">ArrayField</span><span class="pn">:</span><span class="fn">IsVisible</span><span class="pn">(</span><span class="pn">)</span>
-
 <span class="pl">ArrayField</span><span class="pn">:</span><span class="fn">Destroy</span><span class="pn">(</span><span class="pn">)</span></code></pre></div>
 </div>
 <div class="pagination">
-<a class="pagination-link prev" onclick="showSection('booting')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Booting the Library</div></a>
-<a class="pagination-link next" onclick="showSection('themes')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Themes</div></a>
+<a class="pagination-link prev" href="javascript:void(0)" onclick="showSection('booting')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Booting the Library</div></a>
+<a class="pagination-link next" href="javascript:void(0)" onclick="showSection('themes')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Themes</div></a>
 </div>
 </div>
 
 <!-- THEMES -->
 <div class="doc-section" id="sec-themes">
-<div class="breadcrumbs">
-<a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a>
-<span class="breadcrumb-sep">›</span><span>Configuration</span>
-<span class="breadcrumb-sep">›</span><span>Themes</span>
-</div>
+<div class="breadcrumbs"><a href="javascript:void(0)" onclick="showSection('introduction')"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>Configuration</span><span class="breadcrumb-sep">›</span><span>Themes</span></div>
 <div class="markdown">
 <h1>Themes</h1>
-
-<p>All themes are designed to display ArrayField in its best form while allowing personality within each script. Users can switch themes at any time from the in-app settings panel.</p>
-
+<p>All themes are designed to display ArrayField in its best form. Users can switch themes at any time from the in-app settings panel.</p>
 <h2>Using Themes</h2>
-
-<p>You can optionally set a default theme via <code>DefaultTheme</code> in <code>CreateWindow</code>:</p>
-
+<p>Optionally set a default theme via <code>DefaultTheme</code> in <code>CreateWindow</code>:</p>
 <div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">Window</span> <span class="op">=</span> <span class="pl">ArrayField</span><span class="pn">:</span><span class="fn">CreateWindow</span><span class="pn">(</span><span class="pn">{</span>
     <span class="pl">Name</span> <span class="op">=</span> <span class="str">"My Hub"</span><span class="pn">,</span>
     <span class="pl">DefaultTheme</span> <span class="op">=</span> <span class="str">"Ocean"</span>
 <span class="pn">}</span><span class="pn">)</span></code></pre></div>
-
-<div class="admonition admonition-warn">
-<div class="admonition-heading">⚠️ note</div>
-<p>Setting <code>DefaultTheme</code> overrides the user's previously selected theme on every execution. Omit it to let users keep their choice.</p>
-</div>
-
+<div class="admonition admonition-warn"><div class="admonition-heading">⚠️ note</div><p>Setting <code>DefaultTheme</code> overrides the user's previously selected theme on every execution. Omit it to let users keep their choice.</p></div>
 <h2>Themes Available</h2>
-
-<div class="code-block"><pre><code><span class="pl">Theme Name</span> <span class="op">-</span> <span class="pl">ThemeIdentifier</span>
-
-<span class="pl">Default</span> <span class="op">-</span> <span class="pl">Default</span>
-<span class="pl">Amber Glow</span> <span class="op">-</span> <span class="pl">AmberGlow</span>
-<span class="pl">Amethyst</span> <span class="op">-</span> <span class="pl">Amethyst</span>
-<span class="pl">Bloom</span> <span class="op">-</span> <span class="pl">Bloom</span>
-<span class="pl">Dark Blue</span> <span class="op">-</span> <span class="pl">DarkBlue</span>
-<span class="pl">Green</span> <span class="op">-</span> <span class="pl">Green</span>
-<span class="pl">Light</span> <span class="op">-</span> <span class="pl">Light</span>
-<span class="pl">Ocean</span> <span class="op">-</span> <span class="pl">Ocean</span>
-<span class="pl">Serenity</span> <span class="op">-</span> <span class="pl">Serenity</span></code></pre></div>
-
+<div class="code-block"><pre><code><span class="pl">Default</span><span class="pn">,</span> <span class="pl">AmberGlow</span><span class="pn">,</span> <span class="pl">Amethyst</span><span class="pn">,</span> <span class="pl">Bloom</span><span class="pn">,</span> <span class="pl">DarkBlue</span><span class="pn">,</span> <span class="pl">Green</span><span class="pn">,</span> <span class="pl">Light</span><span class="pn">,</span> <span class="pl">Ocean</span><span class="pn">,</span> <span class="pl">Serenity</span></code></pre></div>
 <h2>Custom Themes</h2>
-
-<p>You can create your own theme by defining a table with all the color properties:</p>
-
+<p>Create your own theme by defining a table with all color properties:</p>
 <div class="code-block"><pre><code><span class="pn">{</span>
     <span class="pl">TextColor</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">240</span><span class="pn">,</span> <span class="nm">240</span><span class="pn">,</span> <span class="nm">240</span><span class="pn">)</span><span class="pn">,</span>
-
     <span class="pl">Background</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">25</span><span class="pn">,</span> <span class="nm">25</span><span class="pn">,</span> <span class="nm">25</span><span class="pn">)</span><span class="pn">,</span>
     <span class="pl">Topbar</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">34</span><span class="pn">,</span> <span class="nm">34</span><span class="pn">,</span> <span class="nm">34</span><span class="pn">)</span><span class="pn">,</span>
     <span class="pl">Shadow</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">20</span><span class="pn">,</span> <span class="nm">20</span><span class="pn">,</span> <span class="nm">20</span><span class="pn">)</span><span class="pn">,</span>
-
     <span class="pl">NotificationBackground</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">20</span><span class="pn">,</span> <span class="nm">20</span><span class="pn">,</span> <span class="nm">20</span><span class="pn">)</span><span class="pn">,</span>
     <span class="pl">NotificationActionsBackground</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">230</span><span class="pn">,</span> <span class="nm">230</span><span class="pn">,</span> <span class="nm">230</span><span class="pn">)</span><span class="pn">,</span>
-
     <span class="pl">TabBackground</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">80</span><span class="pn">,</span> <span class="nm">80</span><span class="pn">,</span> <span class="nm">80</span><span class="pn">)</span><span class="pn">,</span>
     <span class="pl">TabStroke</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">85</span><span class="pn">,</span> <span class="nm">85</span><span class="pn">,</span> <span class="nm">85</span><span class="pn">)</span><span class="pn">,</span>
     <span class="pl">TabBackgroundSelected</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">210</span><span class="pn">,</span> <span class="nm">210</span><span class="pn">,</span> <span class="nm">210</span><span class="pn">)</span><span class="pn">,</span>
     <span class="pl">TabTextColor</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">240</span><span class="pn">,</span> <span class="nm">240</span><span class="pn">,</span> <span class="nm">240</span><span class="pn">)</span><span class="pn">,</span>
     <span class="pl">SelectedTabTextColor</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">50</span><span class="pn">,</span> <span class="nm">50</span><span class="pn">,</span> <span class="nm">50</span><span class="pn">)</span><span class="pn">,</span>
-
     <span class="pl">ElementBackground</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">35</span><span class="pn">,</span> <span class="nm">35</span><span class="pn">,</span> <span class="nm">35</span><span class="pn">)</span><span class="pn">,</span>
     <span class="pl">ElementBackgroundHover</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">40</span><span class="pn">,</span> <span class="nm">40</span><span class="pn">,</span> <span class="nm">40</span><span class="pn">)</span><span class="pn">,</span>
     <span class="pl">SecondaryElementBackground</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">25</span><span class="pn">,</span> <span class="nm">25</span><span class="pn">,</span> <span class="nm">25</span><span class="pn">)</span><span class="pn">,</span>
     <span class="pl">ElementStroke</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">50</span><span class="pn">,</span> <span class="nm">50</span><span class="pn">,</span> <span class="nm">50</span><span class="pn">)</span><span class="pn">,</span>
     <span class="pl">SecondaryElementStroke</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">40</span><span class="pn">,</span> <span class="nm">40</span><span class="pn">,</span> <span class="nm">40</span><span class="pn">)</span><span class="pn">,</span>
-
     <span class="pl">SliderBackground</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">50</span><span class="pn">,</span> <span class="nm">138</span><span class="pn">,</span> <span class="nm">220</span><span class="pn">)</span><span class="pn">,</span>
     <span class="pl">SliderProgress</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">50</span><span class="pn">,</span> <span class="nm">138</span><span class="pn">,</span> <span class="nm">220</span><span class="pn">)</span><span class="pn">,</span>
     <span class="pl">SliderStroke</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">58</span><span class="pn">,</span> <span class="nm">163</span><span class="pn">,</span> <span class="nm">255</span><span class="pn">)</span><span class="pn">,</span>
-
     <span class="pl">ToggleBackground</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">30</span><span class="pn">,</span> <span class="nm">30</span><span class="pn">,</span> <span class="nm">30</span><span class="pn">)</span><span class="pn">,</span>
     <span class="pl">ToggleEnabled</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">0</span><span class="pn">,</span> <span class="nm">146</span><span class="pn">,</span> <span class="nm">214</span><span class="pn">)</span><span class="pn">,</span>
     <span class="pl">ToggleDisabled</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">100</span><span class="pn">,</span> <span class="nm">100</span><span class="pn">,</span> <span class="nm">100</span><span class="pn">)</span><span class="pn">,</span>
@@ -459,24 +390,19 @@ footer{margin-left:0}
     <span class="pl">ToggleDisabledStroke</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">125</span><span class="pn">,</span> <span class="nm">125</span><span class="pn">,</span> <span class="nm">125</span><span class="pn">)</span><span class="pn">,</span>
     <span class="pl">ToggleEnabledOuterStroke</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">100</span><span class="pn">,</span> <span class="nm">100</span><span class="pn">,</span> <span class="nm">100</span><span class="pn">)</span><span class="pn">,</span>
     <span class="pl">ToggleDisabledOuterStroke</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">65</span><span class="pn">,</span> <span class="nm">65</span><span class="pn">,</span> <span class="nm">65</span><span class="pn">)</span><span class="pn">,</span>
-
     <span class="pl">DropdownSelected</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">40</span><span class="pn">,</span> <span class="nm">40</span><span class="pn">,</span> <span class="nm">40</span><span class="pn">)</span><span class="pn">,</span>
     <span class="pl">DropdownUnselected</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">30</span><span class="pn">,</span> <span class="nm">30</span><span class="pn">,</span> <span class="nm">30</span><span class="pn">)</span><span class="pn">,</span>
-
     <span class="pl">InputBackground</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">30</span><span class="pn">,</span> <span class="nm">30</span><span class="pn">,</span> <span class="nm">30</span><span class="pn">)</span><span class="pn">,</span>
     <span class="pl">InputStroke</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">65</span><span class="pn">,</span> <span class="nm">65</span><span class="pn">,</span> <span class="nm">65</span><span class="pn">)</span><span class="pn">,</span>
     <span class="pl">PlaceholderColor</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">178</span><span class="pn">,</span> <span class="nm">178</span><span class="pn">,</span> <span class="nm">178</span><span class="pn">)</span>
 <span class="pn">}</span></code></pre></div>
 </div>
-<div class="pagination">
-<a class="pagination-link prev" onclick="showSection('windows')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Windows</div></a>
-<a class="pagination-link next" onclick="showSection('buttons')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Buttons</div></a>
-</div>
+<div class="pagination"><a class="pagination-link prev" href="javascript:void(0)" onclick="showSection('windows')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Windows</div></a><a class="pagination-link next" href="javascript:void(0)" onclick="showSection('buttons')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Buttons</div></a></div>
 </div>
 
 <!-- BUTTONS -->
 <div class="doc-section" id="sec-buttons">
-<div class="breadcrumbs"><a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>Interaction</span><span class="breadcrumb-sep">›</span><span>Buttons</span></div>
+<div class="breadcrumbs"><a href="javascript:void(0)" onclick="showSection('introduction')"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>Interaction</span><span class="breadcrumb-sep">›</span><span>Buttons</span></div>
 <div class="markdown">
 <h1>Buttons</h1>
 <div class="code-block"><pre><code><span class="pl">Tab</span><span class="pn">:</span><span class="fn">CreateButton</span><span class="pn">(</span><span class="pn">{</span>
@@ -489,12 +415,12 @@ footer{margin-left:0}
     <span class="kw">end</span>
 <span class="pn">}</span><span class="pn">)</span></code></pre></div>
 </div>
-<div class="pagination"><a class="pagination-link prev" onclick="showSection('themes')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Themes</div></a><a class="pagination-link next" onclick="showSection('toggles')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Toggles</div></a></div>
+<div class="pagination"><a class="pagination-link prev" href="javascript:void(0)" onclick="showSection('themes')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Themes</div></a><a class="pagination-link next" href="javascript:void(0)" onclick="showSection('toggles')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Toggles</div></a></div>
 </div>
 
 <!-- TOGGLES -->
 <div class="doc-section" id="sec-toggles">
-<div class="breadcrumbs"><a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>Interaction</span><span class="breadcrumb-sep">›</span><span>Toggles</span></div>
+<div class="breadcrumbs"><a href="javascript:void(0)" onclick="showSection('introduction')"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>Interaction</span><span class="breadcrumb-sep">›</span><span>Toggles</span></div>
 <div class="markdown">
 <h1>Toggles</h1>
 <div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">Toggle</span> <span class="op">=</span> <span class="pl">Tab</span><span class="pn">:</span><span class="fn">CreateToggle</span><span class="pn">(</span><span class="pn">{</span>
@@ -512,12 +438,12 @@ footer{margin-left:0}
 <span class="pl">Toggle</span><span class="pn">:</span><span class="fn">Lock</span><span class="pn">(</span><span class="str">"Premium feature"</span><span class="pn">)</span>
 <span class="pl">Toggle</span><span class="pn">:</span><span class="fn">Unlock</span><span class="pn">(</span><span class="pn">)</span></code></pre></div>
 </div>
-<div class="pagination"><a class="pagination-link prev" onclick="showSection('buttons')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Buttons</div></a><a class="pagination-link next" onclick="showSection('sliders')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Sliders</div></a></div>
+<div class="pagination"><a class="pagination-link prev" href="javascript:void(0)" onclick="showSection('buttons')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Buttons</div></a><a class="pagination-link next" href="javascript:void(0)" onclick="showSection('sliders')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Sliders</div></a></div>
 </div>
 
 <!-- SLIDERS -->
 <div class="doc-section" id="sec-sliders">
-<div class="breadcrumbs"><a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>Interaction</span><span class="breadcrumb-sep">›</span><span>Sliders</span></div>
+<div class="breadcrumbs"><a href="javascript:void(0)" onclick="showSection('introduction')"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>Interaction</span><span class="breadcrumb-sep">›</span><span>Sliders</span></div>
 <div class="markdown">
 <h1>Sliders</h1>
 <div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">Slider</span> <span class="op">=</span> <span class="pl">Tab</span><span class="pn">:</span><span class="fn">CreateSlider</span><span class="pn">(</span><span class="pn">{</span>
@@ -534,12 +460,12 @@ footer{margin-left:0}
 
 <span class="pl">Slider</span><span class="pn">:</span><span class="fn">Set</span><span class="pn">(</span><span class="nm">5</span><span class="pn">)</span></code></pre></div>
 </div>
-<div class="pagination"><a class="pagination-link prev" onclick="showSection('toggles')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Toggles</div></a><a class="pagination-link next" onclick="showSection('inputs')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Text Inputs</div></a></div>
+<div class="pagination"><a class="pagination-link prev" href="javascript:void(0)" onclick="showSection('toggles')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Toggles</div></a><a class="pagination-link next" href="javascript:void(0)" onclick="showSection('inputs')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Text Inputs</div></a></div>
 </div>
 
 <!-- INPUTS -->
 <div class="doc-section" id="sec-inputs">
-<div class="breadcrumbs"><a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>Interaction</span><span class="breadcrumb-sep">›</span><span>Text Inputs</span></div>
+<div class="breadcrumbs"><a href="javascript:void(0)" onclick="showSection('introduction')"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>Interaction</span><span class="breadcrumb-sep">›</span><span>Text Inputs</span></div>
 <div class="markdown">
 <h1>Text Inputs</h1>
 <div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">Input</span> <span class="op">=</span> <span class="pl">Tab</span><span class="pn">:</span><span class="fn">CreateInput</span><span class="pn">(</span><span class="pn">{</span>
@@ -555,12 +481,12 @@ footer{margin-left:0}
 
 <span class="pl">Input</span><span class="pn">:</span><span class="fn">Set</span><span class="pn">(</span><span class="str">"NewUsername"</span><span class="pn">)</span></code></pre></div>
 </div>
-<div class="pagination"><a class="pagination-link prev" onclick="showSection('sliders')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Sliders</div></a><a class="pagination-link next" onclick="showSection('keybinds')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Keybinds</div></a></div>
+<div class="pagination"><a class="pagination-link prev" href="javascript:void(0)" onclick="showSection('sliders')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Sliders</div></a><a class="pagination-link next" href="javascript:void(0)" onclick="showSection('keybinds')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Keybinds</div></a></div>
 </div>
 
 <!-- KEYBINDS -->
 <div class="doc-section" id="sec-keybinds">
-<div class="breadcrumbs"><a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>Interaction</span><span class="breadcrumb-sep">›</span><span>Keybinds</span></div>
+<div class="breadcrumbs"><a href="javascript:void(0)" onclick="showSection('introduction')"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>Interaction</span><span class="breadcrumb-sep">›</span><span>Keybinds</span></div>
 <div class="markdown">
 <h1>Keybinds</h1>
 <div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">Keybind</span> <span class="op">=</span> <span class="pl">Tab</span><span class="pn">:</span><span class="fn">CreateKeybind</span><span class="pn">(</span><span class="pn">{</span>
@@ -568,22 +494,21 @@ footer{margin-left:0}
     <span class="pl">CurrentKeybind</span> <span class="op">=</span> <span class="str">"F"</span><span class="pn">,</span>
     <span class="pl">HoldToInteract</span> <span class="op">=</span> <span class="kw">false</span><span class="pn">,</span>
     <span class="pl">Flag</span> <span class="op">=</span> <span class="str">"FlyKey"</span><span class="pn">,</span>
-    <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pl">IsHeld</span><span class="pn">)</span>
+    <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pn">)</span>
         <span class="fn">print</span><span class="pn">(</span><span class="str">"Fly key pressed!"</span><span class="pn">)</span>
     <span class="kw">end</span>
 <span class="pn">}</span><span class="pn">)</span>
 
 <span class="pl">Keybind</span><span class="pn">:</span><span class="fn">Set</span><span class="pn">(</span><span class="str">"G"</span><span class="pn">)</span></code></pre></div>
 </div>
-<div class="pagination"><a class="pagination-link prev" onclick="showSection('inputs')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Text Inputs</div></a><a class="pagination-link next" onclick="showSection('dropdowns')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Dropdowns</div></a></div>
+<div class="pagination"><a class="pagination-link prev" href="javascript:void(0)" onclick="showSection('inputs')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Text Inputs</div></a><a class="pagination-link next" href="javascript:void(0)" onclick="showSection('dropdowns')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Dropdowns</div></a></div>
 </div>
 
 <!-- DROPDOWNS -->
 <div class="doc-section" id="sec-dropdowns">
-<div class="breadcrumbs"><a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>Interaction</span><span class="breadcrumb-sep">›</span><span>Dropdowns</span></div>
+<div class="breadcrumbs"><a href="javascript:void(0)" onclick="showSection('introduction')"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>Interaction</span><span class="breadcrumb-sep">›</span><span>Dropdowns</span></div>
 <div class="markdown">
 <h1>Dropdowns</h1>
-
 <h2>Single Selection</h2>
 <div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">Dropdown</span> <span class="op">=</span> <span class="pl">Tab</span><span class="pn">:</span><span class="fn">CreateDropdown</span><span class="pn">(</span><span class="pn">{</span>
     <span class="pl">Name</span> <span class="op">=</span> <span class="str">"Select Weapon"</span><span class="pn">,</span>
@@ -594,7 +519,6 @@ footer{margin-left:0}
         <span class="fn">print</span><span class="pn">(</span><span class="str">"Selected:"</span><span class="pn">,</span> <span class="pl">Option</span><span class="pn">)</span>
     <span class="kw">end</span>
 <span class="pn">}</span><span class="pn">)</span></code></pre></div>
-
 <h2>Multi Selection</h2>
 <div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">Features</span> <span class="op">=</span> <span class="pl">Tab</span><span class="pn">:</span><span class="fn">CreateDropdown</span><span class="pn">(</span><span class="pn">{</span>
     <span class="pl">Name</span> <span class="op">=</span> <span class="str">"Enable Features"</span><span class="pn">,</span>
@@ -605,19 +529,18 @@ footer{margin-left:0}
         <span class="fn">print</span><span class="pn">(</span><span class="str">"Toggled:"</span><span class="pn">,</span> <span class="pl">Option</span><span class="pn">)</span>
     <span class="kw">end</span>
 <span class="pn">}</span><span class="pn">)</span></code></pre></div>
-
 <h3>Methods</h3>
 <div class="code-block"><pre><code><span class="pl">Dropdown</span><span class="pn">:</span><span class="fn">Set</span><span class="pn">(</span><span class="str">"Bow"</span><span class="pn">)</span>
 <span class="pl">Dropdown</span><span class="pn">:</span><span class="fn">Add</span><span class="pn">(</span><span class="pn">{</span><span class="str">"Dagger"</span><span class="pn">,</span> <span class="str">"Staff"</span><span class="pn">}</span><span class="pn">)</span>
 <span class="pl">Dropdown</span><span class="pn">:</span><span class="fn">Remove</span><span class="pn">(</span><span class="str">"Sword"</span><span class="pn">)</span>
 <span class="pl">Dropdown</span><span class="pn">:</span><span class="fn">Refresh</span><span class="pn">(</span><span class="pn">{</span><span class="str">"Katana"</span><span class="pn">,</span> <span class="str">"Claymore"</span><span class="pn">}</span><span class="pn">,</span> <span class="str">"Katana"</span><span class="pn">)</span></code></pre></div>
 </div>
-<div class="pagination"><a class="pagination-link prev" onclick="showSection('keybinds')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Keybinds</div></a><a class="pagination-link next" onclick="showSection('colorpickers')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Color Pickers</div></a></div>
+<div class="pagination"><a class="pagination-link prev" href="javascript:void(0)" onclick="showSection('keybinds')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Keybinds</div></a><a class="pagination-link next" href="javascript:void(0)" onclick="showSection('colorpickers')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Color Pickers</div></a></div>
 </div>
 
 <!-- COLORPICKERS -->
 <div class="doc-section" id="sec-colorpickers">
-<div class="breadcrumbs"><a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>Interaction</span><span class="breadcrumb-sep">›</span><span>Color Pickers</span></div>
+<div class="breadcrumbs"><a href="javascript:void(0)" onclick="showSection('introduction')"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>Interaction</span><span class="breadcrumb-sep">›</span><span>Color Pickers</span></div>
 <div class="markdown">
 <h1>Color Pickers</h1>
 <div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">ColorPicker</span> <span class="op">=</span> <span class="pl">Tab</span><span class="pn">:</span><span class="fn">CreateColorPicker</span><span class="pn">(</span><span class="pn">{</span>
@@ -631,27 +554,27 @@ footer{margin-left:0}
 
 <span class="pl">ColorPicker</span><span class="pn">:</span><span class="fn">Set</span><span class="pn">(</span><span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">0</span><span class="pn">,</span> <span class="nm">255</span><span class="pn">,</span> <span class="nm">0</span><span class="pn">)</span><span class="pn">)</span></code></pre></div>
 </div>
-<div class="pagination"><a class="pagination-link prev" onclick="showSection('dropdowns')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Dropdowns</div></a><a class="pagination-link next" onclick="showSection('labels')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Labels</div></a></div>
+<div class="pagination"><a class="pagination-link prev" href="javascript:void(0)" onclick="showSection('dropdowns')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Dropdowns</div></a><a class="pagination-link next" href="javascript:void(0)" onclick="showSection('labels')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Labels</div></a></div>
 </div>
 
 <!-- LABELS -->
 <div class="doc-section" id="sec-labels">
-<div class="breadcrumbs"><a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>UI Components</span><span class="breadcrumb-sep">›</span><span>Labels</span></div>
+<div class="breadcrumbs"><a href="javascript:void(0)" onclick="showSection('introduction')"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>UI Components</span><span class="breadcrumb-sep">›</span><span>Labels</span></div>
 <div class="markdown">
 <h1>Labels</h1>
 <div class="code-block"><pre><code><span class="pl">Tab</span><span class="pn">:</span><span class="fn">CreateLabel</span><span class="pn">(</span><span class="pn">{</span>
     <span class="pl">Text</span> <span class="op">=</span> <span class="str">"Welcome to my script!"</span><span class="pn">,</span>
-    <span class="pl">Icon</span> <span class="op">=</span> <span class="str">"keyboard"</span><span class="pn">,</span> <span class="cm">-- Optional Lucide icon</span>
+    <span class="pl">Icon</span> <span class="op">=</span> <span class="str">"keyboard"</span><span class="pn">,</span>
     <span class="pl">Background</span> <span class="op">=</span> <span class="str">"warn"</span><span class="pn">,</span> <span class="cm">-- "warn", "success", "error", or hex "#FF69B4"</span>
     <span class="pl">SectionParent</span> <span class="op">=</span> <span class="pl">Section</span>
 <span class="pn">}</span><span class="pn">)</span></code></pre></div>
 </div>
-<div class="pagination"><a class="pagination-link prev" onclick="showSection('colorpickers')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Color Pickers</div></a><a class="pagination-link next" onclick="showSection('paragraphs')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Paragraphs</div></a></div>
+<div class="pagination"><a class="pagination-link prev" href="javascript:void(0)" onclick="showSection('colorpickers')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Color Pickers</div></a><a class="pagination-link next" href="javascript:void(0)" onclick="showSection('paragraphs')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Paragraphs</div></a></div>
 </div>
 
 <!-- PARAGRAPHS -->
 <div class="doc-section" id="sec-paragraphs">
-<div class="breadcrumbs"><a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>UI Components</span><span class="breadcrumb-sep">›</span><span>Paragraphs</span></div>
+<div class="breadcrumbs"><a href="javascript:void(0)" onclick="showSection('introduction')"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>UI Components</span><span class="breadcrumb-sep">›</span><span>Paragraphs</span></div>
 <div class="markdown">
 <h1>Paragraphs</h1>
 <div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">Paragraph</span> <span class="op">=</span> <span class="pl">Tab</span><span class="pn">:</span><span class="fn">CreateParagraph</span><span class="pn">(</span><span class="pn">{</span>
@@ -662,18 +585,15 @@ footer{margin-left:0}
     <span class="pl">SectionParent</span> <span class="op">=</span> <span class="pl">Section</span>
 <span class="pn">}</span><span class="pn">)</span>
 
-<span class="pl">Paragraph</span><span class="pn">:</span><span class="fn">Set</span><span class="pn">(</span><span class="pn">{</span>
-    <span class="pl">Title</span> <span class="op">=</span> <span class="str">"Updated Title"</span><span class="pn">,</span>
-    <span class="pl">Content</span> <span class="op">=</span> <span class="str">"New content"</span>
-<span class="pn">}</span><span class="pn">)</span></code></pre></div>
+<span class="pl">Paragraph</span><span class="pn">:</span><span class="fn">Set</span><span class="pn">(</span><span class="pn">{</span><span class="pl">Title</span> <span class="op">=</span> <span class="str">"Updated"</span><span class="pn">,</span> <span class="pl">Content</span> <span class="op">=</span> <span class="str">"New content"</span><span class="pn">}</span><span class="pn">)</span></code></pre></div>
 <p>Supports RichText in both <code>Title</code> and <code>Content</code>. Same <code>Background</code> options as Labels.</p>
 </div>
-<div class="pagination"><a class="pagination-link prev" onclick="showSection('labels')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Labels</div></a><a class="pagination-link next" onclick="showSection('images')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Images</div></a></div>
+<div class="pagination"><a class="pagination-link prev" href="javascript:void(0)" onclick="showSection('labels')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Labels</div></a><a class="pagination-link next" href="javascript:void(0)" onclick="showSection('images')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Images</div></a></div>
 </div>
 
 <!-- IMAGES -->
 <div class="doc-section" id="sec-images">
-<div class="breadcrumbs"><a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>UI Components</span><span class="breadcrumb-sep">›</span><span>Images</span></div>
+<div class="breadcrumbs"><a href="javascript:void(0)" onclick="showSection('introduction')"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>UI Components</span><span class="breadcrumb-sep">›</span><span>Images</span></div>
 <div class="markdown">
 <h1>Images</h1>
 <div class="code-block"><pre><code><span class="pl">Tab</span><span class="pn">:</span><span class="fn">CreateImage</span><span class="pn">(</span><span class="pl">Section</span><span class="pn">,</span> <span class="pn">{</span>
@@ -682,18 +602,17 @@ footer{margin-left:0}
     <span class="pl">Height</span> <span class="op">=</span> <span class="nm">200</span><span class="pn">,</span>
     <span class="pl">Transparency</span> <span class="op">=</span> <span class="nm">0</span>
 <span class="pn">}</span><span class="pn">)</span></code></pre></div>
-<p>Accepts URLs, Roblox asset IDs, or file paths. <code>Transparency</code> ranges from 0 (opaque) to 1 (invisible).</p>
+<p>Accepts URLs, asset IDs, or file paths.</p>
 </div>
-<div class="pagination"><a class="pagination-link prev" onclick="showSection('paragraphs')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Paragraphs</div></a><a class="pagination-link next" onclick="showSection('console')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Console</div></a></div>
+<div class="pagination"><a class="pagination-link prev" href="javascript:void(0)" onclick="showSection('paragraphs')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Paragraphs</div></a><a class="pagination-link next" href="javascript:void(0)" onclick="showSection('console')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Console</div></a></div>
 </div>
 
 <!-- CONSOLE -->
 <div class="doc-section" id="sec-console">
-<div class="breadcrumbs"><a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>UI Components</span><span class="breadcrumb-sep">›</span><span>Console</span></div>
+<div class="breadcrumbs"><a href="javascript:void(0)" onclick="showSection('introduction')"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>UI Components</span><span class="breadcrumb-sep">›</span><span>Console</span></div>
 <div class="markdown">
 <h1>Console</h1>
-<p>A built-in terminal-style log viewer with color coded entries, timestamps, auto-scroll, and a configurable max line limit.</p>
-
+<p>A built-in terminal-style log viewer with color coded entries, timestamps, auto-scroll, selectable text, and a configurable max line limit.</p>
 <h2>Creating a Console</h2>
 <div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">Console</span> <span class="op">=</span> <span class="pl">Tab</span><span class="pn">:</span><span class="fn">CreateConsole</span><span class="pn">(</span><span class="pn">{</span>
     <span class="pl">Title</span> <span class="op">=</span> <span class="str">"Remote Logger"</span><span class="pn">,</span>
@@ -703,7 +622,6 @@ footer{margin-left:0}
     <span class="pl">Timestamps</span> <span class="op">=</span> <span class="kw">true</span><span class="pn">,</span>
     <span class="pl">SectionParent</span> <span class="op">=</span> <span class="pl">Section</span>
 <span class="pn">}</span><span class="pn">)</span></code></pre></div>
-
 <h2>Logging Methods</h2>
 <div class="code-block"><pre><code><span class="pl">Console</span><span class="pn">:</span><span class="fn">Log</span><span class="pn">(</span><span class="str">"Script initialized"</span><span class="pn">)</span>       <span class="cm">-- Gray   [LOG]</span>
 <span class="pl">Console</span><span class="pn">:</span><span class="fn">Info</span><span class="pn">(</span><span class="str">"Listening for remotes"</span><span class="pn">)</span>  <span class="cm">-- Blue   [INFO]</span>
@@ -712,49 +630,42 @@ footer{margin-left:0}
 <span class="pl">Console</span><span class="pn">:</span><span class="fn">Error</span><span class="pn">(</span><span class="str">"Failed to fetch"</span><span class="pn">)</span>     <span class="cm">-- Red    [ERROR]</span>
 
 <span class="pl">Console</span><span class="pn">:</span><span class="fn">Clear</span><span class="pn">(</span><span class="pn">)</span></code></pre></div>
-
-<div class="admonition admonition-tip">
-<div class="admonition-heading">💡 tip</div>
-<p>The console has a small trash icon in the top right that users can click to clear all entries. It also auto-scrolls to the latest entry and removes old entries when <code>MaxLines</code> is exceeded.</p>
+<div class="admonition admonition-tip"><div class="admonition-heading">💡 tip</div><p>The console has a copy button to copy all entries and a trash button to clear (click once to confirm, click again within 2 seconds to clear). Entries are selectable — click any line to select and copy text from it. It also auto-scrolls to the latest entry.</p></div>
 </div>
-</div>
-<div class="pagination"><a class="pagination-link prev" onclick="showSection('images')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Images</div></a><a class="pagination-link next" onclick="showSection('notifications')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Notifications</div></a></div>
+<div class="pagination"><a class="pagination-link prev" href="javascript:void(0)" onclick="showSection('images')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Images</div></a><a class="pagination-link next" href="javascript:void(0)" onclick="showSection('notifications')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Notifications</div></a></div>
 </div>
 
 <!-- NOTIFICATIONS -->
 <div class="doc-section" id="sec-notifications">
-<div class="breadcrumbs"><a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>UI Components</span><span class="breadcrumb-sep">›</span><span>Notifications</span></div>
+<div class="breadcrumbs"><a href="javascript:void(0)" onclick="showSection('introduction')"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>UI Components</span><span class="breadcrumb-sep">›</span><span>Notifications</span></div>
 <div class="markdown">
 <h1>Notifications</h1>
-
 <h2>Simple Notification</h2>
 <div class="code-block"><pre><code><span class="pl">ArrayField</span><span class="pn">:</span><span class="fn">Notify</span><span class="pn">(</span><span class="pn">{</span>
     <span class="pl">Title</span> <span class="op">=</span> <span class="str">"Success"</span><span class="pn">,</span>
-    <span class="pl">Content</span> <span class="op">=</span> <span class="str">"Script loaded successfully!"</span><span class="pn">,</span>
+    <span class="pl">Content</span> <span class="op">=</span> <span class="str">"Script loaded!"</span><span class="pn">,</span>
     <span class="pl">Duration</span> <span class="op">=</span> <span class="nm">5</span><span class="pn">,</span>
     <span class="pl">Image</span> <span class="op">=</span> <span class="str">"check-circle"</span>
 <span class="pn">}</span><span class="pn">)</span></code></pre></div>
-
 <h2>With Actions</h2>
 <div class="code-block"><pre><code><span class="pl">ArrayField</span><span class="pn">:</span><span class="fn">Notify</span><span class="pn">(</span><span class="pn">{</span>
     <span class="pl">Title</span> <span class="op">=</span> <span class="str">"Update Available"</span><span class="pn">,</span>
     <span class="pl">Content</span> <span class="op">=</span> <span class="str">"A new version is ready."</span><span class="pn">,</span>
     <span class="pl">Image</span> <span class="op">=</span> <span class="str">"download"</span><span class="pn">,</span>
     <span class="pl">Actions</span> <span class="op">=</span> <span class="pn">{</span>
-        <span class="pn">{</span><span class="pl">Name</span> <span class="op">=</span> <span class="str">"Update"</span><span class="pn">,</span> <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pn">)</span> <span class="fn">print</span><span class="pn">(</span><span class="str">"Updating..."</span><span class="pn">)</span> <span class="kw">end</span><span class="pn">}</span><span class="pn">,</span>
+        <span class="pn">{</span><span class="pl">Name</span> <span class="op">=</span> <span class="str">"Update"</span><span class="pn">,</span> <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pn">)</span> <span class="fn">print</span><span class="pn">(</span><span class="str">"Updating"</span><span class="pn">)</span> <span class="kw">end</span><span class="pn">}</span><span class="pn">,</span>
         <span class="pn">{</span><span class="pl">Name</span> <span class="op">=</span> <span class="str">"Later"</span><span class="pn">,</span> <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pn">)</span> <span class="fn">print</span><span class="pn">(</span><span class="str">"Dismissed"</span><span class="pn">)</span> <span class="kw">end</span><span class="pn">}</span>
     <span class="pn">}</span>
 <span class="pn">}</span><span class="pn">)</span></code></pre></div>
 </div>
-<div class="pagination"><a class="pagination-link prev" onclick="showSection('console')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Console</div></a><a class="pagination-link next" onclick="showSection('prompts')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Prompts</div></a></div>
+<div class="pagination"><a class="pagination-link prev" href="javascript:void(0)" onclick="showSection('console')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Console</div></a><a class="pagination-link next" href="javascript:void(0)" onclick="showSection('prompts')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Prompts</div></a></div>
 </div>
 
 <!-- PROMPTS -->
 <div class="doc-section" id="sec-prompts">
-<div class="breadcrumbs"><a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>UI Components</span><span class="breadcrumb-sep">›</span><span>Prompts</span></div>
+<div class="breadcrumbs"><a href="javascript:void(0)" onclick="showSection('introduction')"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>UI Components</span><span class="breadcrumb-sep">›</span><span>Prompts</span></div>
 <div class="markdown">
-<h1>Prompts & Dialogs</h1>
-
+<h1>Prompts &amp; Dialogs</h1>
 <h2>Note Prompt</h2>
 <div class="code-block"><pre><code><span class="pl">Window</span><span class="pn">:</span><span class="fn">NotePrompt</span><span class="pn">(</span><span class="pn">{</span>
     <span class="pl">Title</span> <span class="op">=</span> <span class="str">"Welcome!"</span><span class="pn">,</span>
@@ -762,63 +673,57 @@ footer{margin-left:0}
     <span class="pl">Icon</span> <span class="op">=</span> <span class="str">"sparkles"</span><span class="pn">,</span>
     <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pn">)</span> <span class="fn">print</span><span class="pn">(</span><span class="str">"OK"</span><span class="pn">)</span> <span class="kw">end</span>
 <span class="pn">}</span><span class="pn">)</span></code></pre></div>
-
 <h2>Confirmation Dialog</h2>
 <div class="code-block"><pre><code><span class="pl">Window</span><span class="pn">:</span><span class="fn">Prompt</span><span class="pn">(</span><span class="pn">{</span>
     <span class="pl">Title</span> <span class="op">=</span> <span class="str">"Confirm Action"</span><span class="pn">,</span>
     <span class="pl">SubTitle</span> <span class="op">=</span> <span class="str">"Are you sure?"</span><span class="pn">,</span>
-    <span class="pl">Content</span> <span class="op">=</span> <span class="str">"This action cannot be undone."</span><span class="pn">,</span>
+    <span class="pl">Content</span> <span class="op">=</span> <span class="str">"This cannot be undone."</span><span class="pn">,</span>
     <span class="pl">Actions</span> <span class="op">=</span> <span class="pn">{</span>
         <span class="pl">Confirm</span> <span class="op">=</span> <span class="pn">{</span><span class="pl">Name</span> <span class="op">=</span> <span class="str">"Yes"</span><span class="pn">,</span> <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pn">)</span> <span class="fn">print</span><span class="pn">(</span><span class="str">"Yes"</span><span class="pn">)</span> <span class="kw">end</span><span class="pn">}</span><span class="pn">,</span>
         <span class="pl">Cancel</span> <span class="op">=</span> <span class="pn">{</span><span class="pl">Name</span> <span class="op">=</span> <span class="str">"No"</span><span class="pn">,</span> <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pn">)</span> <span class="fn">print</span><span class="pn">(</span><span class="str">"No"</span><span class="pn">)</span> <span class="kw">end</span><span class="pn">}</span>
     <span class="pn">}</span>
 <span class="pn">}</span><span class="pn">)</span></code></pre></div>
 </div>
-<div class="pagination"><a class="pagination-link prev" onclick="showSection('notifications')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Notifications</div></a><a class="pagination-link next" onclick="showSection('methods')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Universal Methods</div></a></div>
+<div class="pagination"><a class="pagination-link prev" href="javascript:void(0)" onclick="showSection('notifications')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Notifications</div></a><a class="pagination-link next" href="javascript:void(0)" onclick="showSection('methods')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Universal Methods</div></a></div>
 </div>
 
 <!-- METHODS -->
 <div class="doc-section" id="sec-methods">
-<div class="breadcrumbs"><a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>Reference</span><span class="breadcrumb-sep">›</span><span>Universal Methods</span></div>
+<div class="breadcrumbs"><a href="javascript:void(0)" onclick="showSection('introduction')"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>Reference</span><span class="breadcrumb-sep">›</span><span>Universal Methods</span></div>
 <div class="markdown">
 <h1>Universal Methods</h1>
 <p>All interactive elements support these common methods:</p>
 <div class="code-block"><pre><code><span class="pl">Element</span><span class="pn">:</span><span class="fn">Lock</span><span class="pn">(</span><span class="str">"Reason text"</span><span class="pn">)</span>
 <span class="pl">Element</span><span class="pn">:</span><span class="fn">Unlock</span><span class="pn">(</span><span class="pn">)</span>
-
 <span class="pl">Element</span><span class="pn">:</span><span class="fn">Visible</span><span class="pn">(</span><span class="kw">false</span><span class="pn">)</span>
 <span class="pl">Element</span><span class="pn">:</span><span class="fn">Visible</span><span class="pn">(</span><span class="kw">true</span><span class="pn">)</span>
-
 <span class="pl">Element</span><span class="pn">:</span><span class="fn">Destroy</span><span class="pn">(</span><span class="pn">)</span></code></pre></div>
 </div>
-<div class="pagination"><a class="pagination-link prev" onclick="showSection('prompts')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Prompts</div></a><a class="pagination-link next" onclick="showSection('saving')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Saving & Loading</div></a></div>
+<div class="pagination"><a class="pagination-link prev" href="javascript:void(0)" onclick="showSection('prompts')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Prompts</div></a><a class="pagination-link next" href="javascript:void(0)" onclick="showSection('saving')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Saving &amp; Loading</div></a></div>
 </div>
 
 <!-- SAVING -->
 <div class="doc-section" id="sec-saving">
-<div class="breadcrumbs"><a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>Reference</span><span class="breadcrumb-sep">›</span><span>Saving & Loading</span></div>
+<div class="breadcrumbs"><a href="javascript:void(0)" onclick="showSection('introduction')"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>Reference</span><span class="breadcrumb-sep">›</span><span>Saving &amp; Loading</span></div>
 <div class="markdown">
-<h1>Saving & Loading</h1>
+<h1>Saving &amp; Loading</h1>
 <p>When <code>ConfigurationSaving</code> is set and the user enables it from settings, ArrayField automatically saves and loads element values using <code>Flag</code> identifiers.</p>
 <div class="code-block"><pre><code><span class="pl">ArrayField</span><span class="pn">.</span><span class="fn">SaveConfiguration</span><span class="pn">(</span><span class="pn">)</span>
 <span class="pl">ArrayField</span><span class="pn">.</span><span class="fn">LoadConfiguration</span><span class="pn">(</span><span class="pn">)</span>
-
 <span class="fn">print</span><span class="pn">(</span><span class="pl">ArrayField</span><span class="pn">.</span><span class="pl">Flags</span><span class="pn">[</span><span class="str">"SpeedToggle"</span><span class="pn">]</span><span class="pn">.</span><span class="pl">CurrentValue</span><span class="pn">)</span></code></pre></div>
-
 <h2>Destroying the UI</h2>
 <div class="code-block"><pre><code><span class="pl">ArrayField</span><span class="pn">:</span><span class="fn">Destroy</span><span class="pn">(</span><span class="pn">)</span></code></pre></div>
 <p>Completely removes the interface and cleans up all connections.</p>
 </div>
-<div class="pagination"><a class="pagination-link prev" onclick="showSection('methods')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Universal Methods</div></a><a class="pagination-link next" onclick="showSection('template')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Full Template</div></a></div>
+<div class="pagination"><a class="pagination-link prev" href="javascript:void(0)" onclick="showSection('methods')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Universal Methods</div></a><a class="pagination-link next" href="javascript:void(0)" onclick="showSection('template')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Full Template</div></a></div>
 </div>
 
 <!-- TEMPLATE -->
 <div class="doc-section" id="sec-template">
-<div class="breadcrumbs"><a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>Reference</span><span class="breadcrumb-sep">›</span><span>Full Template</span></div>
+<div class="breadcrumbs"><a href="javascript:void(0)" onclick="showSection('introduction')"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>Reference</span><span class="breadcrumb-sep">›</span><span>Full Template</span></div>
 <div class="markdown">
 <h1>Full Template</h1>
-<p>A complete usage example demonstrating all ArrayField features. Copy this as a starting point for your project.</p>
-
+<p>A complete usage example demonstrating all ArrayField features. Copy this as a starting point.</p>
 <div class="code-block"><pre><code class="language-lua">local ArrayField = loadstring(game:HttpGet('https://raw.githubusercontent.com/vqmpjayZ/laboratory/refs/heads/main/ArrayField/ArrayField.lua'))()
 
 -- ============================
@@ -830,10 +735,7 @@ local Window = ArrayField:CreateWindow({
     Icon = "shield",
     LoadingTitle = "Loading Script Hub",
     LoadingSubtitle = "by YourName",
-
-    -- Optional: forces a default theme (omit to let users keep their choice)
     -- DefaultTheme = "Default",
-
     ConfigurationSaving = {
         FolderName = "MyScriptHub",
         FileName = "Config"
@@ -841,16 +743,12 @@ local Window = ArrayField:CreateWindow({
 })
 
 -- ============================
--- CREATING TABS
+-- CATEGORIES &amp; TABS
 -- ============================
 
 local MainTab = Window:CreateTab("Main", "home")
 local CombatTab = Window:CreateTab("Combat", "sword")
 local VisualsTab = Window:CreateTab("Visuals", "eye")
-
--- ============================
--- CREATING CATEGORIES (Optional)
--- ============================
 
 local MainCategory = Window:CreateCategory("Main Features", {DefaultOpen = true})
 local SettingsCategory = Window:CreateCategory("Settings", {DefaultOpen = false})
@@ -886,12 +784,6 @@ MainTab:CreateLabel({
     SectionParent = WelcomeSection
 })
 
-MainTab:CreateLabel({
-    Text = "Custom color label",
-    Background = "#FF69B4",
-    SectionParent = WelcomeSection
-})
-
 MainTab:CreateParagraph({
     Title = "&lt;b&gt;Getting Started&lt;/b&gt;",
     Content = "This script includes &lt;i&gt;powerful features&lt;/i&gt; for your game.",
@@ -918,7 +810,6 @@ MyConsole:Info("Listening for events")
 MyConsole:Success("Connected to server")
 MyConsole:Warn("Rate limit approaching")
 MyConsole:Error("Failed to fetch data")
--- MyConsole:Clear()
 
 -- ============================
 -- BUTTONS
@@ -1132,7 +1023,6 @@ SpeedToggle:Lock("Premium feature")
 SpeedToggle:Unlock()
 SpeedToggle:Visible(false)
 SpeedToggle:Visible(true)
--- SpeedToggle:Destroy()
 
 -- ============================
 -- SAVING &amp; LOADING
@@ -1140,86 +1030,70 @@ SpeedToggle:Visible(true)
 
 ArrayField.SaveConfiguration()
 ArrayField.LoadConfiguration()
-
 print(ArrayField.Flags["SpeedToggle"].CurrentValue)
-print(ArrayField.Flags["SpeedValue"].CurrentValue)
-
--- ============================
--- DESTROYING THE UI
--- ============================
 
 -- ArrayField:Destroy()</code></pre></div>
 </div>
-<div class="pagination"><a class="pagination-link prev" onclick="showSection('saving')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Saving &amp; Loading</div></a><div style="flex:1"></div></div>
+<div class="pagination"><a class="pagination-link prev" href="javascript:void(0)" onclick="showSection('saving')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Saving &amp; Loading</div></a><div style="flex:1"></div></div>
 </div>
 
 </div>
 </main>
 </div>
 
-<footer>
-Copyright &copy; 2026 Vadrifts. All Rights Reserved.
-</footer>
-
-<script>
-function showSection(id) {
-    document.querySelectorAll('.doc-section').forEach(function(s) { s.classList.remove('active'); });
-    var sec = document.getElementById('sec-' + id);
-    if (sec) sec.classList.add('active');
-
-    document.querySelectorAll('.sidebar .menu-link').forEach(function(l) { l.classList.remove('active'); });
-    var link = document.querySelector('.menu-link[data-section="' + id + '"]');
-    if (link) {
-        link.classList.add('active');
-        var submenu = link.closest('.menu-submenu');
-        if (submenu && !submenu.classList.contains('open')) {
-            submenu.classList.add('open');
-            var cat = submenu.previousElementSibling;
-            if (cat) cat.classList.add('expanded');
-        }
-    }
-
-    window.scrollTo(0, 0);
-    closeSidebar();
-}
-
-function toggleCategory(el) {
-    var submenu = el.nextElementSibling;
-    if (submenu) {
-        submenu.classList.toggle('open');
-        el.classList.toggle('expanded');
-    }
-}
-
-function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('open');
-    document.querySelector('.sidebar-backdrop').classList.toggle('show');
-}
-
-function closeSidebar() {
-    document.getElementById('sidebar').classList.remove('open');
-    document.querySelector('.sidebar-backdrop').classList.remove('show');
-}
-
-document.querySelectorAll('.code-block').forEach(function(block) {
-    var btn = document.createElement('button');
-    btn.className = 'copy-btn';
-    btn.textContent = 'Copy';
-    btn.addEventListener('click', function() {
-        var code = block.querySelector('code').textContent;
-        navigator.clipboard.writeText(code).then(function() {
-            btn.textContent = 'Copied!';
-            setTimeout(function() { btn.textContent = 'Copy'; }, 1500);
-        });
-    });
-    block.appendChild(btn);
-});
+<footer>Copyright &copy; 2026 Vadrifts. All Rights Reserved.</footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/lua.min.js"></script>
 <script>
-document.querySelectorAll('code.language-lua').forEach(function(block) {
-    hljs.highlightElement(block);
+document.querySelectorAll('code.language-lua').forEach(function(block){hljs.highlightElement(block)});
+
+function showSection(id){
+    document.querySelectorAll('.doc-section').forEach(function(s){s.classList.remove('active')});
+    var sec=document.getElementById('sec-'+id);
+    if(sec)sec.classList.add('active');
+    document.querySelectorAll('.sidebar .menu-link').forEach(function(l){l.classList.remove('active')});
+    var link=document.querySelector('.menu-link[data-section="'+id+'"]');
+    if(link){
+        link.classList.add('active');
+        var submenu=link.closest('.menu-submenu');
+        if(submenu&&!submenu.classList.contains('open')){
+            submenu.classList.add('open');
+            var cat=submenu.previousElementSibling;
+            if(cat)cat.classList.add('expanded');
+        }
+    }
+    window.scrollTo(0,0);
+    closeSidebar();
+}
+
+function toggleCategory(el){
+    var submenu=el.nextElementSibling;
+    if(submenu){submenu.classList.toggle('open');el.classList.toggle('expanded')}
+}
+
+function toggleSidebar(){
+    document.getElementById('sidebar').classList.toggle('open');
+    document.querySelector('.sidebar-backdrop').classList.toggle('show');
+}
+
+function closeSidebar(){
+    document.getElementById('sidebar').classList.remove('open');
+    document.querySelector('.sidebar-backdrop').classList.remove('show');
+}
+
+document.querySelectorAll('.code-block').forEach(function(block){
+    var btn=document.createElement('button');
+    btn.className='copy-btn';
+    btn.textContent='Copy';
+    btn.addEventListener('click',function(){
+        var code=block.querySelector('code').textContent;
+        navigator.clipboard.writeText(code).then(function(){
+            btn.textContent='Copied!';
+            setTimeout(function(){btn.textContent='Copy'},1500);
+        });
+    });
+    block.appendChild(btn);
 });
 </script>
 
