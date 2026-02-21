@@ -211,6 +211,7 @@ footer{margin-left:0}
 <li class="menu-list-item">
 <div class="menu-category" onclick="toggleCategory(this)"><span>Reference</span><span class="menu-arrow">›</span></div>
 <ul class="menu-list menu-submenu">
+<li class="menu-list-item"><a class="menu-link" data-section="template" onclick="showSection('template')">Full Template</a></li>
 <li class="menu-list-item"><a class="menu-link" data-section="methods" onclick="showSection('methods')">Universal Methods</a></li>
 <li class="menu-list-item"><a class="menu-link" data-section="saving" onclick="showSection('saving')">Saving & Loading</a></li>
 </ul>
@@ -808,7 +809,161 @@ footer{margin-left:0}
 <div class="code-block"><pre><code><span class="pl">ArrayField</span><span class="pn">:</span><span class="fn">Destroy</span><span class="pn">(</span><span class="pn">)</span></code></pre></div>
 <p>Completely removes the interface and cleans up all connections.</p>
 </div>
-<div class="pagination"><a class="pagination-link prev" onclick="showSection('methods')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Universal Methods</div></a><div style="flex:1"></div></div>
+<div class="pagination"><a class="pagination-link prev" onclick="showSection('methods')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Universal Methods</div></a><a class="pagination-link next" onclick="showSection('template')"><div class="pagination-sublabel">Next</div><div class="pagination-label">Full Template</div></a></div>
+</div>
+
+<!-- TEMPLATE -->
+<div class="doc-section" id="sec-template">
+<div class="breadcrumbs"><a href="/docs/arrayfield"><svg class="breadcrumb-home" viewBox="0 0 24 24"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a><span class="breadcrumb-sep">›</span><span>Reference</span><span class="breadcrumb-sep">›</span><span>Full Template</span></div>
+<div class="markdown">
+<h1>Full Template</h1>
+<p>A complete usage example demonstrating all ArrayField features. Copy this as a starting point for your project.</p>
+
+<div class="code-block"><pre><code><span class="kw">local</span> <span class="pl">ArrayField</span> <span class="op">=</span> <span class="fn">loadstring</span><span class="pn">(</span><span class="pl">game</span><span class="pn">:</span><span class="fn">HttpGet</span><span class="pn">(</span><span class="str">'https://raw.githubusercontent.com/vqmpjayZ/laboratory/refs/heads/main/ArrayField/ArrayField.lua'</span><span class="pn">)</span><span class="pn">)</span><span class="pn">(</span><span class="pn">)</span>
+
+<span class="cm">-- Window</span>
+<span class="kw">local</span> <span class="pl">Window</span> <span class="op">=</span> <span class="pl">ArrayField</span><span class="pn">:</span><span class="fn">CreateWindow</span><span class="pn">(</span><span class="pn">{</span>
+    <span class="pl">Name</span> <span class="op">=</span> <span class="str">"My Script Hub"</span><span class="pn">,</span>
+    <span class="pl">Icon</span> <span class="op">=</span> <span class="str">"shield"</span><span class="pn">,</span>
+    <span class="pl">LoadingTitle</span> <span class="op">=</span> <span class="str">"Loading Script Hub"</span><span class="pn">,</span>
+    <span class="pl">LoadingSubtitle</span> <span class="op">=</span> <span class="str">"by YourName"</span><span class="pn">,</span>
+    <span class="pl">ConfigurationSaving</span> <span class="op">=</span> <span class="pn">{</span>
+        <span class="pl">FolderName</span> <span class="op">=</span> <span class="str">"MyScriptHub"</span><span class="pn">,</span>
+        <span class="pl">FileName</span> <span class="op">=</span> <span class="str">"Config"</span>
+    <span class="pn">}</span>
+<span class="pn">}</span><span class="pn">)</span>
+
+<span class="cm">-- Categories</span>
+<span class="kw">local</span> <span class="pl">MainCategory</span> <span class="op">=</span> <span class="pl">Window</span><span class="pn">:</span><span class="fn">CreateCategory</span><span class="pn">(</span><span class="str">"Main Features"</span><span class="pn">,</span> <span class="pn">{</span><span class="pl">DefaultOpen</span> <span class="op">=</span> <span class="kw">true</span><span class="pn">}</span><span class="pn">)</span>
+<span class="kw">local</span> <span class="pl">SettingsCategory</span> <span class="op">=</span> <span class="pl">Window</span><span class="pn">:</span><span class="fn">CreateCategory</span><span class="pn">(</span><span class="str">"Settings"</span><span class="pn">,</span> <span class="pn">{</span><span class="pl">DefaultOpen</span> <span class="op">=</span> <span class="kw">false</span><span class="pn">}</span><span class="pn">)</span>
+
+<span class="cm">-- Tabs</span>
+<span class="kw">local</span> <span class="pl">MainTab</span> <span class="op">=</span> <span class="pl">Window</span><span class="pn">:</span><span class="fn">CreateTab</span><span class="pn">(</span><span class="str">"Main"</span><span class="pn">,</span> <span class="str">"home"</span><span class="pn">)</span>
+<span class="kw">local</span> <span class="pl">CombatTab</span> <span class="op">=</span> <span class="pl">Window</span><span class="pn">:</span><span class="fn">CreateTab</span><span class="pn">(</span><span class="str">"Combat"</span><span class="pn">,</span> <span class="str">"sword"</span><span class="pn">)</span>
+<span class="kw">local</span> <span class="pl">PlayerTab</span> <span class="op">=</span> <span class="pl">Window</span><span class="pn">:</span><span class="fn">CreateTab</span><span class="pn">(</span><span class="str">"Player"</span><span class="pn">,</span> <span class="str">"user"</span><span class="pn">,</span> <span class="pl">MainCategory</span><span class="pn">)</span>
+<span class="kw">local</span> <span class="pl">ConfigTab</span> <span class="op">=</span> <span class="pl">Window</span><span class="pn">:</span><span class="fn">CreateTab</span><span class="pn">(</span><span class="str">"Config"</span><span class="pn">,</span> <span class="str">"settings"</span><span class="pn">,</span> <span class="pl">SettingsCategory</span><span class="pn">)</span>
+
+<span class="cm">-- Sections</span>
+<span class="kw">local</span> <span class="pl">WelcomeSection</span> <span class="op">=</span> <span class="pl">MainTab</span><span class="pn">:</span><span class="fn">CreateSection</span><span class="pn">(</span><span class="str">"Welcome"</span><span class="pn">)</span>
+<span class="kw">local</span> <span class="pl">MovementSection</span> <span class="op">=</span> <span class="pl">MainTab</span><span class="pn">:</span><span class="fn">CreateSection</span><span class="pn">(</span><span class="str">"Movement"</span><span class="pn">)</span>
+
+<span class="cm">-- Label</span>
+<span class="pl">MainTab</span><span class="pn">:</span><span class="fn">CreateLabel</span><span class="pn">(</span><span class="pn">{</span>
+    <span class="pl">Text</span> <span class="op">=</span> <span class="str">"Welcome to my script!"</span><span class="pn">,</span>
+    <span class="pl">Icon</span> <span class="op">=</span> <span class="str">"keyboard"</span><span class="pn">,</span>
+    <span class="pl">SectionParent</span> <span class="op">=</span> <span class="pl">WelcomeSection</span>
+<span class="pn">}</span><span class="pn">)</span>
+
+<span class="cm">-- Paragraph</span>
+<span class="pl">MainTab</span><span class="pn">:</span><span class="fn">CreateParagraph</span><span class="pn">(</span><span class="pn">{</span>
+    <span class="pl">Title</span> <span class="op">=</span> <span class="str">"&lt;b&gt;Getting Started&lt;/b&gt;"</span><span class="pn">,</span>
+    <span class="pl">Content</span> <span class="op">=</span> <span class="str">"Configure everything below to get started."</span><span class="pn">,</span>
+    <span class="pl">Icon</span> <span class="op">=</span> <span class="str">"info"</span><span class="pn">,</span>
+    <span class="pl">SectionParent</span> <span class="op">=</span> <span class="pl">WelcomeSection</span>
+<span class="pn">}</span><span class="pn">)</span>
+
+<span class="cm">-- Console</span>
+<span class="kw">local</span> <span class="pl">MyConsole</span> <span class="op">=</span> <span class="pl">MainTab</span><span class="pn">:</span><span class="fn">CreateConsole</span><span class="pn">(</span><span class="pn">{</span>
+    <span class="pl">Title</span> <span class="op">=</span> <span class="str">"Event Logger"</span><span class="pn">,</span>
+    <span class="pl">Icon</span> <span class="op">=</span> <span class="str">"terminal"</span><span class="pn">,</span>
+    <span class="pl">MaxLines</span> <span class="op">=</span> <span class="nm">200</span><span class="pn">,</span>
+    <span class="pl">Height</span> <span class="op">=</span> <span class="nm">150</span><span class="pn">,</span>
+    <span class="pl">Timestamps</span> <span class="op">=</span> <span class="kw">true</span><span class="pn">,</span>
+    <span class="pl">SectionParent</span> <span class="op">=</span> <span class="pl">WelcomeSection</span>
+<span class="pn">}</span><span class="pn">)</span>
+
+<span class="pl">MyConsole</span><span class="pn">:</span><span class="fn">Log</span><span class="pn">(</span><span class="str">"Script initialized"</span><span class="pn">)</span>
+<span class="pl">MyConsole</span><span class="pn">:</span><span class="fn">Info</span><span class="pn">(</span><span class="str">"Listening for events"</span><span class="pn">)</span>
+<span class="pl">MyConsole</span><span class="pn">:</span><span class="fn">Success</span><span class="pn">(</span><span class="str">"Connected to server"</span><span class="pn">)</span>
+
+<span class="cm">-- Button</span>
+<span class="pl">MainTab</span><span class="pn">:</span><span class="fn">CreateButton</span><span class="pn">(</span><span class="pn">{</span>
+    <span class="pl">Name</span> <span class="op">=</span> <span class="str">"Click Me"</span><span class="pn">,</span>
+    <span class="pl">Interact</span> <span class="op">=</span> <span class="str">"click"</span><span class="pn">,</span>
+    <span class="pl">SectionParent</span> <span class="op">=</span> <span class="pl">MovementSection</span><span class="pn">,</span>
+    <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pn">)</span>
+        <span class="fn">print</span><span class="pn">(</span><span class="str">"Button clicked!"</span><span class="pn">)</span>
+    <span class="kw">end</span>
+<span class="pn">}</span><span class="pn">)</span>
+
+<span class="cm">-- Toggle</span>
+<span class="kw">local</span> <span class="pl">SpeedToggle</span> <span class="op">=</span> <span class="pl">MainTab</span><span class="pn">:</span><span class="fn">CreateToggle</span><span class="pn">(</span><span class="pn">{</span>
+    <span class="pl">Name</span> <span class="op">=</span> <span class="str">"Speed Boost"</span><span class="pn">,</span>
+    <span class="pl">CurrentValue</span> <span class="op">=</span> <span class="kw">false</span><span class="pn">,</span>
+    <span class="pl">Flag</span> <span class="op">=</span> <span class="str">"SpeedToggle"</span><span class="pn">,</span>
+    <span class="pl">SectionParent</span> <span class="op">=</span> <span class="pl">MovementSection</span><span class="pn">,</span>
+    <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pl">Value</span><span class="pn">)</span>
+        <span class="fn">print</span><span class="pn">(</span><span class="str">"Speed Boost:"</span><span class="pn">,</span> <span class="pl">Value</span><span class="pn">)</span>
+    <span class="kw">end</span>
+<span class="pn">}</span><span class="pn">)</span>
+
+<span class="cm">-- Slider</span>
+<span class="kw">local</span> <span class="pl">SpeedSlider</span> <span class="op">=</span> <span class="pl">MainTab</span><span class="pn">:</span><span class="fn">CreateSlider</span><span class="pn">(</span><span class="pn">{</span>
+    <span class="pl">Name</span> <span class="op">=</span> <span class="str">"Speed Multiplier"</span><span class="pn">,</span>
+    <span class="pl">Range</span> <span class="op">=</span> <span class="pn">{</span><span class="nm">1</span><span class="pn">,</span> <span class="nm">10</span><span class="pn">}</span><span class="pn">,</span>
+    <span class="pl">Increment</span> <span class="op">=</span> <span class="nm">0.5</span><span class="pn">,</span>
+    <span class="pl">Suffix</span> <span class="op">=</span> <span class="str">"x"</span><span class="pn">,</span>
+    <span class="pl">CurrentValue</span> <span class="op">=</span> <span class="nm">1</span><span class="pn">,</span>
+    <span class="pl">Flag</span> <span class="op">=</span> <span class="str">"SpeedValue"</span><span class="pn">,</span>
+    <span class="pl">SectionParent</span> <span class="op">=</span> <span class="pl">MovementSection</span><span class="pn">,</span>
+    <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pl">Value</span><span class="pn">)</span>
+        <span class="fn">print</span><span class="pn">(</span><span class="str">"Speed:"</span><span class="pn">,</span> <span class="pl">Value</span><span class="pn">)</span>
+    <span class="kw">end</span>
+<span class="pn">}</span><span class="pn">)</span>
+
+<span class="cm">-- Input</span>
+<span class="pl">MainTab</span><span class="pn">:</span><span class="fn">CreateInput</span><span class="pn">(</span><span class="pn">{</span>
+    <span class="pl">Name</span> <span class="op">=</span> <span class="str">"Username"</span><span class="pn">,</span>
+    <span class="pl">PlaceholderText</span> <span class="op">=</span> <span class="str">"Type here..."</span><span class="pn">,</span>
+    <span class="pl">RemoveTextAfterFocusLost</span> <span class="op">=</span> <span class="kw">false</span><span class="pn">,</span>
+    <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pl">Text</span><span class="pn">)</span>
+        <span class="fn">print</span><span class="pn">(</span><span class="str">"Input:"</span><span class="pn">,</span> <span class="pl">Text</span><span class="pn">)</span>
+    <span class="kw">end</span>
+<span class="pn">}</span><span class="pn">)</span>
+
+<span class="cm">-- Keybind</span>
+<span class="pl">MainTab</span><span class="pn">:</span><span class="fn">CreateKeybind</span><span class="pn">(</span><span class="pn">{</span>
+    <span class="pl">Name</span> <span class="op">=</span> <span class="str">"Fly Key"</span><span class="pn">,</span>
+    <span class="pl">CurrentKeybind</span> <span class="op">=</span> <span class="str">"F"</span><span class="pn">,</span>
+    <span class="pl">HoldToInteract</span> <span class="op">=</span> <span class="kw">false</span><span class="pn">,</span>
+    <span class="pl">Flag</span> <span class="op">=</span> <span class="str">"FlyKey"</span><span class="pn">,</span>
+    <span class="pl">SectionParent</span> <span class="op">=</span> <span class="pl">MovementSection</span><span class="pn">,</span>
+    <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pn">)</span>
+        <span class="fn">print</span><span class="pn">(</span><span class="str">"Fly key pressed!"</span><span class="pn">)</span>
+    <span class="kw">end</span>
+<span class="pn">}</span><span class="pn">)</span>
+
+<span class="cm">-- Dropdown</span>
+<span class="kw">local</span> <span class="pl">WeaponDropdown</span> <span class="op">=</span> <span class="pl">CombatTab</span><span class="pn">:</span><span class="fn">CreateDropdown</span><span class="pn">(</span><span class="pn">{</span>
+    <span class="pl">Name</span> <span class="op">=</span> <span class="str">"Select Weapon"</span><span class="pn">,</span>
+    <span class="pl">Options</span> <span class="op">=</span> <span class="pn">{</span><span class="str">"Sword"</span><span class="pn">,</span> <span class="str">"Axe"</span><span class="pn">,</span> <span class="str">"Spear"</span><span class="pn">,</span> <span class="str">"Bow"</span><span class="pn">}</span><span class="pn">,</span>
+    <span class="pl">CurrentOption</span> <span class="op">=</span> <span class="str">"Sword"</span><span class="pn">,</span>
+    <span class="pl">MultiSelection</span> <span class="op">=</span> <span class="kw">false</span><span class="pn">,</span>
+    <span class="pl">Flag</span> <span class="op">=</span> <span class="str">"SelectedWeapon"</span><span class="pn">,</span>
+    <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pl">Option</span><span class="pn">)</span>
+        <span class="fn">print</span><span class="pn">(</span><span class="str">"Selected:"</span><span class="pn">,</span> <span class="pl">Option</span><span class="pn">)</span>
+    <span class="kw">end</span>
+<span class="pn">}</span><span class="pn">)</span>
+
+<span class="cm">-- Color Picker</span>
+<span class="kw">local</span> <span class="pl">ESPColor</span> <span class="op">=</span> <span class="pl">CombatTab</span><span class="pn">:</span><span class="fn">CreateColorPicker</span><span class="pn">(</span><span class="pn">{</span>
+    <span class="pl">Name</span> <span class="op">=</span> <span class="str">"ESP Color"</span><span class="pn">,</span>
+    <span class="pl">Color</span> <span class="op">=</span> <span class="pl">Color3</span><span class="pn">.</span><span class="fn">fromRGB</span><span class="pn">(</span><span class="nm">255</span><span class="pn">,</span> <span class="nm">0</span><span class="pn">,</span> <span class="nm">0</span><span class="pn">)</span><span class="pn">,</span>
+    <span class="pl">Flag</span> <span class="op">=</span> <span class="str">"ESPColor"</span><span class="pn">,</span>
+    <span class="pl">Callback</span> <span class="op">=</span> <span class="kw">function</span><span class="pn">(</span><span class="pl">Color</span><span class="pn">)</span>
+        <span class="fn">print</span><span class="pn">(</span><span class="str">"Color:"</span><span class="pn">,</span> <span class="pl">Color</span><span class="pn">)</span>
+    <span class="kw">end</span>
+<span class="pn">}</span><span class="pn">)</span>
+
+<span class="cm">-- Notification</span>
+<span class="pl">ArrayField</span><span class="pn">:</span><span class="fn">Notify</span><span class="pn">(</span><span class="pn">{</span>
+    <span class="pl">Title</span> <span class="op">=</span> <span class="str">"Welcome"</span><span class="pn">,</span>
+    <span class="pl">Content</span> <span class="op">=</span> <span class="str">"Script loaded successfully!"</span><span class="pn">,</span>
+    <span class="pl">Duration</span> <span class="op">=</span> <span class="nm">5</span><span class="pn">,</span>
+    <span class="pl">Image</span> <span class="op">=</span> <span class="str">"check-circle"</span>
+<span class="pn">}</span><span class="pn">)</span></code></pre></div>
+</div>
+<div class="pagination"><a class="pagination-link prev" onclick="showSection('saving')"><div class="pagination-sublabel">Previous</div><div class="pagination-label">Saving & Loading</div></a><div style="flex:1"></div></div>
 </div>
 
 </div>
