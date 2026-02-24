@@ -37,6 +37,8 @@ plugins_manager = PluginsManager()
 key_system = KeySystemManager()
 verification_timer = VerificationTimer(min_verification_time=25)
 verification_tokens = {}
+checkpoint_tokens = {}
+active_checkpoints = {}
 
 API_SECRET = "vadriftsisalwaysinseason"
 TURNSTILE_SITE_KEY = os.environ.get("TURNSTILE_SITE_KEY")
@@ -57,14 +59,29 @@ FEATURE_CONFIG = {
     }
 }
 
+def sanitize_script(script):
+    safe = dict(script)
+    key_link = safe.get('key_link', '') or ''
+    loot_link = safe.get('lootlabs_link', '') or ''
+    linkvertise_link = safe.get('linkvertise_link', '') or ''
+    safe['has_workink'] = 'work.ink' in key_link or safe.get('key_type') == 'work.ink'
+    safe['has_lootlabs'] = bool(loot_link)
+    safe['has_linkvertise'] = bool(linkvertise_link)
+    safe['has_generic_key'] = bool(key_link) and not safe['has_workink']
+    safe['has_key_system'] = safe['has_workink'] or safe['has_lootlabs'] or safe['has_linkvertise'] or safe['has_generic_key']
+    safe.pop('key_link', None)
+    safe.pop('lootlabs_link', None)
+    safe.pop('linkvertise_link', None)
+    return safe
+
 def cleanup_old_logs(logs):
     if not logs:
         return []
-    
+
     cutoff = datetime.now() - timedelta(days=30)
     cleaned = []
     removed = 0
-    
+
     for log in logs:
         try:
             timestamp = datetime.fromisoformat(log['timestamp'])
@@ -74,17 +91,17 @@ def cleanup_old_logs(logs):
                 removed += 1
         except:
             cleaned.append(log)
-    
+
     if removed > 0:
         logger.info(f"Cleaned up {removed} logs older than 30 days")
-    
+
     return cleaned
 
 def load_analytics_from_jsonbin():
     if not JSONBIN_API_KEY or not JSONBIN_BIN_ID:
         logger.warning("JSONBin credentials not configured")
         return None
-    
+
     try:
         response = requests.get(
             f"https://api.jsonbin.io/v3/b/{JSONBIN_BIN_ID}/latest",
@@ -107,10 +124,10 @@ def save_analytics_to_jsonbin(data):
     if not JSONBIN_API_KEY or not JSONBIN_BIN_ID:
         logger.warning("JSONBin credentials not configured")
         return False
-    
+
     if 'execution_logs' in data:
         data['execution_logs'] = cleanup_old_logs(data['execution_logs'])
-    
+
     try:
         response = requests.put(
             f"https://api.jsonbin.io/v3/b/{JSONBIN_BIN_ID}",
@@ -137,7 +154,13 @@ def get_client_ip():
     return client_ip
 
 def is_valid_referrer(referer):
-    allowed_referrers = ['work.ink', 'www.work.ink', 'lootdest.org', 'lootlabs.gg', 'www.lootlabs.gg']
+    allowed_referrers = [
+        'work.ink', 'www.work.ink',
+        'lootdest.org', 'lootlabs.gg', 'www.lootlabs.gg',
+        'linkvertise.com', 'www.linkvertise.com',
+        'link-to.net', 'direct-link.net', 'linkvertise.net',
+        'link-hub.net', 'link-center.net', 'up-to-down.net'
+    ]
     return any(domain in referer for domain in allowed_referrers)
 
 def verify_turnstile(token, ip):
@@ -166,7 +189,7 @@ def require_api_key(f):
 def get_feature_config(feature_id):
     if feature_id not in FEATURE_CONFIG:
         return jsonify({"error": "Feature not found"}), 404
-    
+
     return jsonify(FEATURE_CONFIG[feature_id])
 
 @app.route('/unlock/<feature_id>')
@@ -175,19 +198,19 @@ def feature_unlock_page(feature_id):
         try:
             with open('templates/feature-unlock.html', 'r', encoding='utf-8') as f:
                 html_content = f.read()
-            
+
             html_content = html_content.replace('{{PAGE_MODE}}', 'error')
             html_content = html_content.replace('{{ERROR_TITLE}}', 'Feature Not Found')
             html_content = html_content.replace('{{ERROR_MESSAGE}}', 'This feature does not exist or the link is invalid.')
-            
+
             return html_content
         except FileNotFoundError:
             return jsonify({"error": "Template not found"}), 404
-    
+
     try:
         with open('templates/feature-unlock.html', 'r', encoding='utf-8') as f:
             html_content = f.read()
-        
+
         html_content = html_content.replace('{{PAGE_MODE}}', 'unlock')
         html_content = html_content.replace('{{ERROR_TITLE}}', '')
         html_content = html_content.replace('{{ERROR_MESSAGE}}', '')
@@ -195,7 +218,7 @@ def feature_unlock_page(feature_id):
         html_content = html_content.replace('{{SUCCESS_NAME}}', '')
         html_content = html_content.replace('{{CREDITS_ADDED}}', '')
         html_content = html_content.replace('{{TOTAL_CREDITS}}', '')
-        
+
         return html_content
     except FileNotFoundError:
         logger.error("feature-unlock.html template not found")
@@ -205,11 +228,11 @@ def feature_unlock_page(feature_id):
 def start_feature_unlock(feature_id):
     if feature_id not in FEATURE_CONFIG:
         return jsonify({"success": False, "error": "Feature not found"})
-    
+
     client_ip = get_client_ip()
     verification_timer.start_timer(client_ip)
     logger.info(f"Feature unlock timer started for IP: {client_ip}, feature: {feature_id}")
-    
+
     return jsonify({"success": True})
 
 @app.route('/complete-unlock/<feature_id>')
@@ -218,67 +241,67 @@ def complete_feature_unlock(feature_id):
         try:
             with open('templates/feature-unlock.html', 'r', encoding='utf-8') as f:
                 html_content = f.read()
-            
+
             html_content = html_content.replace('{{PAGE_MODE}}', 'error')
             html_content = html_content.replace('{{ERROR_TITLE}}', 'Feature Not Found')
             html_content = html_content.replace('{{ERROR_MESSAGE}}', 'This feature does not exist.')
-            
+
             return html_content, 404
         except FileNotFoundError:
             return jsonify({"error": "Template not found"}), 404
-    
+
     client_ip = get_client_ip()
     referer = request.headers.get('Referer', '')
     config = FEATURE_CONFIG[feature_id]
-    
+
     timer_check = verification_timer.check_timer(client_ip)
-    
+
     if not timer_check['valid']:
         logger.warning(f"Invalid timer for feature unlock from IP: {client_ip}")
         try:
             with open('templates/feature-unlock.html', 'r', encoding='utf-8') as f:
                 html_content = f.read()
-            
+
             html_content = html_content.replace('{{PAGE_MODE}}', 'error')
             html_content = html_content.replace('{{ERROR_TITLE}}', 'Access Denied')
             html_content = html_content.replace('{{ERROR_MESSAGE}}', 'Please start the unlock process from the proper page first.')
-            
+
             return html_content, 403
         except FileNotFoundError:
             return jsonify({"error": "Template not found"}), 404
-    
+
     if not is_valid_referrer(referer):
         logger.warning(f"Invalid referer for feature unlock from IP: {client_ip}")
         try:
             with open('templates/feature-unlock.html', 'r', encoding='utf-8') as f:
                 html_content = f.read()
-            
+
             html_content = html_content.replace('{{PAGE_MODE}}', 'error')
             html_content = html_content.replace('{{ERROR_TITLE}}', 'Invalid Access')
             html_content = html_content.replace('{{ERROR_MESSAGE}}', 'You must complete the verification task to unlock credits.')
-            
+
             return html_content, 403
         except FileNotFoundError:
             return jsonify({"error": "Template not found"}), 404
-    
+
     verification_timer.mark_verified(client_ip)
-    
+
     if client_ip not in feature_credits:
         feature_credits[client_ip] = {}
-    
+
     if feature_id not in feature_credits[client_ip]:
         feature_credits[client_ip][feature_id] = 0
-    
+
     credits_to_add = config.get("credits_per_unlock", 2)
     feature_credits[client_ip][feature_id] += credits_to_add
     new_total = feature_credits[client_ip][feature_id]
-    
+
     logger.info(f"Feature '{feature_id}' credits granted to IP: {client_ip}, added: {credits_to_add}, total: {new_total}")
-    
+
     try:
         with open('templates/feature-unlock.html', 'r', encoding='utf-8') as f:
             html_content = f.read()
-        
+
         html_content = html_content.replace('{{PAGE_MODE}}', 'success')
         html_content = html_content.replace('{{SUCCESS_ICON}}', config.get('icon', '🎉'))
         html_content = html_content.replace('{{SUCCESS_NAME}}', config.get('name', 'Feature'))
@@ -286,7 +309,7 @@ def complete_feature_unlock(feature_id):
         html_content = html_content.replace('{{TOTAL_CREDITS}}', str(new_total))
         html_content = html_content.replace('{{ERROR_TITLE}}', '')
         html_content = html_content.replace('{{ERROR_MESSAGE}}', '')
-        
+
         return html_content
     except FileNotFoundError:
         return jsonify({"error": "Template not found"}), 404
@@ -298,33 +321,33 @@ def arrayfield_docs():
     except FileNotFoundError:
         logger.error("arrayfield-docs.html template not found")
         return jsonify({"error": "Documentation page not found"}), 404
-        
+
 @app.route('/check-credits/<feature_id>')
 def check_feature_credits(feature_id):
     client_ip = get_client_ip()
-    
+
     if client_ip not in feature_credits:
         return jsonify({"credits": 0})
-    
+
     credits = feature_credits[client_ip].get(feature_id, 0)
     return jsonify({"credits": credits})
 
 @app.route('/use-credit/<feature_id>')
 def use_feature_credit(feature_id):
     client_ip = get_client_ip()
-    
+
     if client_ip not in feature_credits:
         return jsonify({"success": False, "remaining": 0})
-    
+
     current = feature_credits[client_ip].get(feature_id, 0)
-    
+
     if current <= 0:
         return jsonify({"success": False, "remaining": 0})
-    
+
     feature_credits[client_ip][feature_id] = current - 1
-    
+
     logger.info(f"Credit used for '{feature_id}' by IP: {client_ip}, remaining: {current - 1}")
-    
+
     return jsonify({"success": True, "remaining": current - 1})
 
 @app.route('/')
@@ -332,7 +355,7 @@ def home():
     try:
         with open('templates/home.html', 'r', encoding='utf-8') as f:
             html_content = f.read()
-        
+
         meta_tags = HOME_META_TAGS
         return inject_meta_tags(html_content, meta_tags)
     except FileNotFoundError:
@@ -344,7 +367,7 @@ def scripts_page():
     try:
         with open('templates/scripts.html', 'r', encoding='utf-8') as f:
             html_content = f.read()
-        
+
         return inject_meta_tags(html_content, SCRIPTS_META_TAGS)
     except FileNotFoundError:
         logger.error("scripts.html template not found")
@@ -355,18 +378,18 @@ def start_verification():
     client_ip = get_client_ip()
     verification_timer.start_timer(client_ip)
     logger.info(f"Verification timer started for IP: {client_ip}")
-    
+
     return jsonify({
         "success": True,
         "message": "Timer started"
     })
-        
+
 @app.route('/plugins')
 def plugins_page():
     try:
         with open('templates/plugins.html', 'r', encoding='utf-8') as f:
             html_content = f.read()
-        
+
         return inject_meta_tags(html_content, PLUGINS_META_TAGS)
     except FileNotFoundError:
         logger.error("plugins.html template not found")
@@ -384,31 +407,31 @@ def plugin_details():
 def get_plugin_raw(plugin_id):
     try:
         plugin = plugins_manager.get_plugin_data(plugin_id)
-        
+
         if not plugin:
             response = make_response("-- Plugin not found")
             response.headers['Content-Type'] = 'text/plain; charset=utf-8'
             return response, 404
-        
+
         def escape_lua_string(s):
             if s is None:
                 return ""
             return str(s).replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n').replace('\r', '\\r')
-        
+
         sections = []
         for section_name, bypasses in plugin.get('sections', {}).items():
             escaped_bypasses = [f'                "{escape_lua_string(bypass)}"' for bypass in bypasses]
             bypasses_str = ',\n'.join(escaped_bypasses)
-            
+
             sections.append(f'''        {{
             Name = "{escape_lua_string(section_name)}",
             Bypasses = {{
 {bypasses_str}
             }}
         }}''')
-        
+
         sections_code = ',\n'.join(sections)
-        
+
         lua_code = f'''-- {escape_lua_string(plugin['name'])} by {escape_lua_string(plugin.get('author', 'Anonymous'))}
 -- {escape_lua_string(plugin.get('description', 'No description'))}
 
@@ -427,27 +450,27 @@ return Plugin'''
         response = make_response(lua_code)
         response.headers['Content-Type'] = 'text/plain; charset=utf-8'
         response.headers['Access-Control-Allow-Origin'] = '*'
-        
+
         logger.info(f"Served raw plugin: {plugin_id}")
         return response
-        
+
     except Exception as e:
         logger.error(f"Error serving raw plugin {plugin_id}: {str(e)}", exc_info=True)
         response = make_response(f"-- Error generating plugin: {str(e)}")
         response.headers['Content-Type'] = 'text/plain; charset=utf-8'
         return response, 500
-        
+
 @app.route('/script/<int:script_id>')
 def script_detail(script_id):
     script = next((s for s in scripts_data if s['id'] == script_id), None)
-    
+
     if not script:
         return jsonify({"error": "Script not found"}), 404
-    
+
     try:
         with open('templates/script-detail.html', 'r', encoding='utf-8') as f:
             html_content = f.read()
-        
+
         meta_tags = f'''
     <meta property="og:title" content="{script['title']} - Vadrifts">
     <meta property="og:description" content="{script['description']}">
@@ -460,7 +483,7 @@ def script_detail(script_id):
     <meta name="twitter:description" content="{script['description']}">
     <meta name="twitter:image" content="{script['thumbnail']}">
     <meta name="theme-color" content="#9c88ff">'''
-        
+
         return inject_meta_tags(html_content, meta_tags)
     except FileNotFoundError:
         logger.error("script-detail.html template not found")
@@ -484,47 +507,47 @@ _last_save_time = 0
 
 def force_save():
     global _unsaved_changes, _last_save_time
-    
+
     if not execution_logs:
         return False
-    
+
     success = save_analytics_to_jsonbin({
         'execution_logs': execution_logs,
         'last_updated': datetime.now().isoformat()
     })
-    
+
     if success:
         _unsaved_changes = False
         _last_save_time = time.time()
         logger.info(f"Saved {len(execution_logs)} logs to JSONBin")
-    
+
     return success
 
 def debounced_save():
     global _last_save_time
-    
+
     if time.time() - _last_save_time < 60:
         return
-    
+
     if _unsaved_changes:
         force_save()
 
 def start_periodic_save():
     global _save_timer
-    
+
     def save_loop():
         global _save_timer
         if _unsaved_changes:
             logger.info("Periodic save triggered")
             force_save()
-        
+
         _save_timer = Timer(120, save_loop)
         _save_timer.daemon = True
         _save_timer.start()
-    
+
     if _save_timer:
         _save_timer.cancel()
-    
+
     _save_timer = Timer(120, save_loop)
     _save_timer.daemon = True
     _save_timer.start()
@@ -546,15 +569,15 @@ atexit.register(save_on_exit)
 
 def ensure_cloud_data_loaded():
     global execution_logs, cloud_data_loaded
-    
+
     if cloud_data_loaded:
         return
-    
+
     cloud_data = load_analytics_from_jsonbin()
     if cloud_data and 'execution_logs' in cloud_data:
         execution_logs = cloud_data['execution_logs']
         logger.info(f"Loaded {len(execution_logs)} logs from JSONBin")
-    
+
     cloud_data_loaded = True
     start_periodic_save()
 
@@ -563,28 +586,28 @@ def check_usage():
     hwid = request.args.get('hwid')
     if not hwid:
         return jsonify({"error": "No HWID provided"}), 400
-    
+
     today = datetime.now().strftime("%Y-%m-%d")
-    
+
     if hwid in usage_data:
         if usage_data[hwid]['date'] != today:
             usage_data[hwid] = {'used': 0, 'date': today}
     else:
         usage_data[hwid] = {'used': 0, 'date': today}
-    
+
     return jsonify(usage_data[hwid])
 
 @app.route('/update-usage', methods=['GET'])
 def update_usage():
     hwid = request.args.get('hwid')
     used = request.args.get('used', 0)
-    
+
     if not hwid:
         return jsonify({"error": "No HWID provided"}), 400
-    
+
     today = datetime.now().strftime("%Y-%m-%d")
     usage_data[hwid] = {'used': int(used), 'date': today}
-    
+
     return jsonify({"success": True})
 
 @app.route('/check-copy-usage', methods=['GET'])
@@ -592,15 +615,15 @@ def check_copy_usage():
     hwid = request.args.get('hwid')
     if not hwid:
         return jsonify({"error": "No HWID provided"}), 400
-    
+
     today = datetime.now().strftime("%Y-%m-%d")
-    
+
     if hwid in copy_usage_data:
         if copy_usage_data[hwid]['date'] != today:
             copy_usage_data[hwid] = {'texture': 0, 'normal': 0, 'date': today}
     else:
         copy_usage_data[hwid] = {'texture': 0, 'normal': 0, 'date': today}
-    
+
     return jsonify(copy_usage_data[hwid])
 
 @app.route('/update-copy-usage', methods=['GET'])
@@ -608,48 +631,48 @@ def update_copy_usage():
     hwid = request.args.get('hwid')
     texture = request.args.get('texture', 0)
     normal = request.args.get('normal', 0)
-    
+
     if not hwid:
         return jsonify({"error": "No HWID provided"}), 400
-    
+
     today = datetime.now().strftime("%Y-%m-%d")
     copy_usage_data[hwid] = {'texture': int(texture), 'normal': int(normal), 'date': today}
-    
+
     return jsonify({"success": True})
 
 @app.route('/log-execution', methods=['GET'])
 def log_execution():
     global execution_logs, _unsaved_changes
     ensure_cloud_data_loaded()
-    
+
     hwid = request.args.get('hwid')
     script = request.args.get('script', 'Unknown')
-    
+
     if hwid:
         execution_logs.append({
             'hwid': hwid,
             'script': script,
             'timestamp': datetime.now().isoformat()
         })
-        
+
         if len(execution_logs) > 10000:
             execution_logs = execution_logs[-10000:]
-        
+
         _unsaved_changes = True
         debounced_save()
-    
+
     return jsonify({"success": True})
 
 @app.route('/analytics-data', methods=['GET'])
 def analytics_data():
     ensure_cloud_data_loaded()
-    
+
     now = datetime.now()
     week_ago = now - timedelta(days=7)
     two_weeks_ago = now - timedelta(days=14)
     month_ago = now - timedelta(days=30)
     two_months_ago = now - timedelta(days=60)
-    
+
     week_execs = []
     prev_week_execs = []
     month_execs = []
@@ -657,37 +680,37 @@ def analytics_data():
     script_counts = defaultdict(int)
     unique_users_week = set()
     unique_users_month = set()
-    
+
     daily_data = defaultdict(int)
     script_daily_data = defaultdict(lambda: defaultdict(int))
-    
+
     for log in execution_logs:
         timestamp = datetime.fromisoformat(log['timestamp'])
         script_counts[log['script']] += 1
-        
+
         day_key = timestamp.strftime('%Y-%m-%d')
         daily_data[day_key] += 1
         script_daily_data[log['script']][day_key] += 1
-        
+
         if timestamp >= week_ago:
             week_execs.append(log)
             unique_users_week.add(log['hwid'])
         elif timestamp >= two_weeks_ago:
             prev_week_execs.append(log)
-        
+
         if timestamp >= month_ago:
             month_execs.append(log)
             unique_users_month.add(log['hwid'])
         elif timestamp >= two_months_ago:
             prev_month_execs.append(log)
-    
+
     last_30_days = [(now - timedelta(days=i)).strftime('%Y-%m-%d') for i in range(29, -1, -1)]
     chart_data = [daily_data.get(day, 0) for day in last_30_days]
-    
+
     script_chart_data = {}
     for script in script_counts.keys():
         script_chart_data[script] = [script_daily_data[script].get(day, 0) for day in last_30_days]
-    
+
     return jsonify({
         'total_executions': len(execution_logs),
         'week_executions': len(week_execs),
@@ -705,9 +728,9 @@ def analytics_data():
 @app.route('/analytics-sync', methods=['POST'])
 def analytics_sync():
     ensure_cloud_data_loaded()
-    
+
     success = force_save()
-    
+
     if success:
         return jsonify({'success': True, 'message': f'Synced {len(execution_logs)} logs to cloud'})
     else:
@@ -720,7 +743,7 @@ def analytics_page():
     except FileNotFoundError:
         logger.error("analytics.html template not found")
         return jsonify({"error": "Analytics page not found"}), 404
-        
+
 @app.route('/key-system')
 def key_system_page():
     try:
@@ -729,27 +752,174 @@ def key_system_page():
         logger.error("key-system.html template not found")
         return jsonify({"error": "Key system page not found"}), 404
 
+@app.route('/checkpoint/start')
+def checkpoint_start():
+    client_ip = get_client_ip()
+    script_id = request.args.get('script', type=int)
+    provider = request.args.get('provider', '')
+
+    if not script_id:
+        return jsonify({"error": "Invalid request"}), 400
+
+    script = next((s for s in scripts_data if s['id'] == script_id), None)
+    if not script:
+        return jsonify({"error": "Script not found"}), 404
+
+    now = time.time()
+    expired = [k for k, v in checkpoint_tokens.items() if now > v['expires']]
+    for k in expired:
+        del checkpoint_tokens[k]
+
+    token = secrets.token_urlsafe(32)
+    checkpoint_tokens[token] = {
+        'ip': client_ip,
+        'script_id': script_id,
+        'provider': provider,
+        'expires': now + 120,
+        'used': False
+    }
+
+    logger.info(f"Checkpoint token created for IP: {client_ip}, script: {script_id}, provider: {provider}")
+    return jsonify({"token": token})
+
+@app.route('/checkpoint/load')
+def checkpoint_load():
+    token = request.args.get('t', '')
+
+    if not token:
+        return "Invalid request", 400
+
+    token_data = checkpoint_tokens.get(token)
+    if not token_data:
+        return "Invalid or expired checkpoint link", 403
+
+    if token_data['used']:
+        return "This checkpoint link has already been used", 403
+
+    if time.time() > token_data['expires']:
+        del checkpoint_tokens[token]
+        return "Checkpoint link expired", 403
+
+    client_ip = get_client_ip()
+    if token_data['ip'] != client_ip:
+        logger.warning(f"Checkpoint IP mismatch. Expected {token_data['ip']}, got {client_ip}")
+        return "Session mismatch", 403
+
+    checkpoint_tokens[token]['used'] = True
+
+    script = next((s for s in scripts_data if s['id'] == token_data['script_id']), None)
+    if not script:
+        return "Script not found", 404
+
+    if token_data['provider'] == 'lootlabs':
+        link = script.get('lootlabs_link')
+    elif token_data['provider'] == 'linkvertise':
+        link = script.get('linkvertise_link')
+    else:
+        link = script.get('key_link')
+
+    if not link:
+        return "No verification link available", 404
+
+    active_checkpoints[client_ip] = {
+        'started': time.time(),
+        'script_id': token_data['script_id'],
+        'provider': token_data['provider'],
+        'loaded': True
+    }
+
+    logger.info(f"Checkpoint loaded for IP: {client_ip}, redirecting to provider")
+    return redirect(link)
+
+@app.route('/checkpoint/done')
+def checkpoint_done():
+    client_ip = get_client_ip()
+    referer = request.headers.get('Referer', '')
+
+    timer_check = verification_timer.check_timer(client_ip)
+
+    if not timer_check['valid']:
+        logger.warning(f"Checkpoint done - invalid timer for IP: {client_ip}")
+        return "Access denied - complete the key system first", 403
+
+    cp_data = active_checkpoints.get(client_ip)
+
+    if not cp_data or not cp_data.get('loaded'):
+        if not is_valid_referrer(referer):
+            logger.warning(f"Checkpoint done - no active checkpoint and invalid referer for IP: {client_ip}")
+            return "No active checkpoint found - you must start from the key system page", 403
+        logger.info(f"Checkpoint done - no active checkpoint but valid referer for IP: {client_ip}")
+    else:
+        time_in_checkpoint = time.time() - cp_data['started']
+        if time_in_checkpoint < 10:
+            logger.warning(f"Checkpoint done too fast for IP: {client_ip}, took {time_in_checkpoint:.1f}s")
+            return "Verification completed too quickly - please try again properly", 403
+
+        if not is_valid_referrer(referer):
+            logger.info(f"Checkpoint done - valid checkpoint but missing referer for IP: {client_ip} (likely mobile)")
+
+        del active_checkpoints[client_ip]
+
+    now = time.time()
+    expired = [k for k, v in active_checkpoints.items() if now - v['started'] > 600]
+    for k in expired:
+        del active_checkpoints[k]
+
+    verification_timer.mark_verified(client_ip)
+
+    token = secrets.token_urlsafe(32)
+    verification_tokens[token] = {
+        'ip': client_ip,
+        'expires': time.time() + 300,
+        'used': False
+    }
+
+    logger.info(f"Checkpoint completed for IP: {client_ip}, redirecting to verify")
+    return redirect(f'/verify?token={token}')
+
+@app.route('/checkpoint/status')
+def checkpoint_status():
+    client_ip = get_client_ip()
+    data = completed_checkpoints.get(client_ip)
+
+    if data and time.time() <= data['expires']:
+        token = data['token']
+        del completed_checkpoints[client_ip]
+        return jsonify({"completed": True, "token": token})
+
+    return jsonify({"completed": False})
+    
 @app.route('/verify')
 def verify_page():
     client_ip = get_client_ip()
-    referer = request.headers.get('Referer', '')
-    
+
     try:
         with open('templates/verify.html', 'r', encoding='utf-8') as f:
             html_content = f.read()
     except FileNotFoundError:
         logger.error("verify.html template not found")
         return jsonify({"error": "Verify page not found"}), 404
-    
+
     html_content = html_content.replace('YOUR_SITE_KEY_HERE', TURNSTILE_SITE_KEY or '')
-    
-    html_content = html_content.replace(
-        'let verificationToken = null;',
-        'let verificationToken = null;'
-    )
-    
+
+    token_param = request.args.get('token')
+
+    if token_param:
+        token_data = verification_tokens.get(token_param)
+        if (token_data
+                and not token_data['used']
+                and time.time() <= token_data['expires']
+                and token_data['ip'] == client_ip):
+            html_content = html_content.replace(
+                'let verificationToken = null;',
+                f'let verificationToken = "{token_param}";'
+            )
+            logger.info(f"Verify page loaded with valid token for IP: {client_ip}")
+            return html_content
+
+    referer = request.headers.get('Referer', '')
     timer_check = verification_timer.check_timer(client_ip)
-    
+
     if not timer_check['valid']:
         reason = timer_check.get('reason')
         if reason == 'time_not_elapsed':
@@ -761,26 +931,25 @@ def verify_page():
         else:
             logger.warning(f"No timer found for IP: {client_ip}")
         return html_content
-    
+
     if not is_valid_referrer(referer):
         logger.warning(f"Invalid referer from IP: {client_ip}. Referer: {referer}")
         return html_content
-    
+
     verification_timer.mark_verified(client_ip)
-    
+
     token = secrets.token_urlsafe(32)
-    
     verification_tokens[token] = {
         'ip': client_ip,
         'expires': time.time() + 300,
         'used': False
     }
-    
+
     html_content = html_content.replace(
         'let verificationToken = null;',
         f'let verificationToken = "{token}";'
     )
-    
+
     logger.info(f"Verification token created for IP: {client_ip} after {timer_check['elapsed']:.1f}s")
     return html_content
 
@@ -788,67 +957,67 @@ def verify_page():
 def create_key():
     token = request.args.get('token')
     captcha = request.args.get('captcha')
-    
+
     if not token:
         logger.warning(f"Create attempt without token")
         return "Missing verification token", 403
-    
+
     if not captcha:
         logger.warning(f"Create attempt without captcha")
         return "Missing captcha token", 403
-    
+
     client_ip = get_client_ip()
-    
+
     if not verify_turnstile(captcha, client_ip):
         logger.warning(f"Invalid captcha from IP: {client_ip}")
         return "Captcha verification failed", 403
-    
+
     token_data = verification_tokens.get(token)
     if not token_data:
         logger.warning(f"Invalid token attempt from IP: {client_ip}")
         return "Invalid or expired token", 403
-    
+
     if token_data['used']:
         logger.warning(f"Reused token attempt from IP: {client_ip}")
         return "Token already used", 403
-    
+
     if time.time() > token_data['expires']:
         del verification_tokens[token]
         return "Token expired", 403
-    
+
     if token_data['ip'] != client_ip:
         logger.warning(f"Token IP mismatch. Expected {token_data['ip']}, got {client_ip}")
         return "Session mismatch", 403
-    
+
     verification_tokens[token]['used'] = True
-    
+
     slug = key_system.create_slug(client_ip)
     host = request.headers.get('host', 'vadrifts.onrender.com')
-    
+
     logger.info(f"Created key slug for IP: {client_ip}")
     return f"https://{host}/getkey/{slug}"
 
 @app.route('/getkey/<slug>')
 def get_key(slug):
     ip = key_system.get_ip_from_slug(slug)
-    
+
     if not ip:
         logger.warning(f"Invalid or expired slug attempted: {slug}")
         return "Invalid or expired key link", 404
-    
+
     key_system.consume_slug(slug)
     key = key_system.generate_key(ip)
-    
+
     logger.info(f"Key generated for IP: {ip} - Key: {key}")
     return key
 
 @app.route('/validate')
 def validate_key_route():
     key = request.args.get('key')
-    
+
     if not key:
         return "false"
-    
+
     client_ip = get_client_ip()
     is_valid = key_system.validate_key(client_ip, key)
     return "true" if is_valid else "false"
@@ -858,7 +1027,7 @@ def plugin_detail(plugin_id):
     plugin = plugins_manager.get_plugin_data(plugin_id)
     if not plugin:
         return jsonify({"error": "Plugin not found"}), 404
-    
+
     html = f"""
     <!DOCTYPE html>
     <html>
@@ -874,13 +1043,13 @@ def plugin_detail(plugin_id):
                 margin: 0 auto;
             }}
             h1 {{ color: #9c88ff; }}
-            .section {{ 
+            .section {{
                 background: rgba(40, 40, 40, 0.8);
                 padding: 20px;
                 border-radius: 10px;
                 margin: 20px 0;
             }}
-            .bypass {{ 
+            .bypass {{
                 background: rgba(114, 9, 183, 0.2);
                 padding: 8px 12px;
                 border-radius: 6px;
@@ -913,10 +1082,10 @@ def plugin_detail(plugin_id):
         <p>By {plugin.get('author', 'Anonymous')}</p>
         <p>{plugin.get('description', 'No description')}</p>
         <p>Used {plugin.get('uses', 0)} times</p>
-        
+
         <div id="sections">
     """
-    
+
     for section_name, bypasses in plugin.get('sections', {}).items():
         html += f"""
             <div class="section">
@@ -929,10 +1098,10 @@ def plugin_detail(plugin_id):
                 </div>
             </div>
         """
-    
+
     html += f"""
         <button class="export-btn" onclick="exportPlugin()">Export for Roblox</button>
-        
+
         <script>
             function exportPlugin() {{
                 const pluginData = {json.dumps(plugin)};
@@ -940,19 +1109,19 @@ def plugin_detail(plugin_id):
                 navigator.clipboard.writeText(scriptCode);
                 alert('Plugin code copied to clipboard!');
             }}
-            
+
             function generateRobloxScript(plugin) {{
                 let script = '{{\\n';
                 script += '  id = "' + plugin.id + '",\\n';
                 script += '  name = "' + plugin.name + '",\\n';
                 script += '  author = "' + (plugin.author || 'Anonymous') + '",\\n';
-                
+
                 if (plugin.icon) {{
                     script += '  icon = "' + plugin.icon + '",\\n';
                 }}
-                
+
                 script += '  sections = {{\\n';
-                
+
                 for (const [section, bypasses] of Object.entries(plugin.sections || {{}})) {{
                     script += '    ["' + section + '"] = {{\\n';
                     bypasses.forEach(bypass => {{
@@ -960,17 +1129,17 @@ def plugin_detail(plugin_id):
                     }});
                     script += '    }},\\n';
                 }}
-                
+
                 script += '  }}\\n';
                 script += '}}';
-                
+
                 return script;
             }}
         </script>
     </body>
     </html>
     """
-    
+
     return html
 
 @app.route('/templates/<path:filename>')
@@ -1000,7 +1169,7 @@ def status_check():
     })
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response, 200
-    
+
 @app.route('/health')
 def health():
     return jsonify({"status": "healthy", "timestamp": datetime.now().isoformat()}), 200
@@ -1009,21 +1178,22 @@ def health():
 def get_scripts():
     search = request.args.get('search', '').lower()
     processed_scripts = process_script_data(scripts_data.copy())
-    
+    safe_scripts = [sanitize_script(s) for s in processed_scripts]
+
     if search:
         filtered_scripts = [
-            script for script in processed_scripts 
+            script for script in safe_scripts
             if search in script['title'].lower() or search in script['game'].lower()
         ]
         return jsonify(filtered_scripts)
-    return jsonify(processed_scripts)
+    return jsonify(safe_scripts)
 
 @app.route('/api/scripts/<int:script_id>')
 def get_script_detail(script_id):
     processed_scripts = process_script_data(scripts_data.copy())
     script = next((s for s in processed_scripts if s['id'] == script_id), None)
     if script:
-        return jsonify(script)
+        return jsonify(sanitize_script(script))
     return jsonify({"error": "Script not found"}), 404
 
 @app.route('/api/plugins', methods=['GET'])
