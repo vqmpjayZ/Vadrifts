@@ -121,21 +121,21 @@ body {
 }
 
 @keyframes floatParticle {
-  0% { 
-    transform: translateY(100vh) translateX(0) scale(0); 
-    opacity: 0; 
+  0% {
+    transform: translateY(100vh) translateX(0) scale(0);
+    opacity: 0;
   }
-  5% { 
-    opacity: 0.7; 
+  5% {
+    opacity: 0.7;
     transform: translateY(95vh) translateX(10px) scale(1);
   }
-  95% { 
-    opacity: 0.5; 
+  95% {
+    opacity: 0.5;
     transform: translateY(5vh) translateX(60px) scale(0.8);
   }
-  100% { 
-    transform: translateY(-5vh) translateX(80px) scale(0); 
-    opacity: 0; 
+  100% {
+    transform: translateY(-5vh) translateX(80px) scale(0);
+    opacity: 0;
   }
 }
 
@@ -542,6 +542,16 @@ body {
   box-shadow: 0 10px 30px rgba(124, 58, 237, 0.35);
 }
 
+.key-provider-btn.linkvertise {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  box-shadow: 0 10px 30px rgba(5, 150, 105, 0.35);
+}
+
+.key-provider-btn.linkvertise:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 40px rgba(5, 150, 105, 0.5);
+}
+
 .key-provider-btn.lootlabs:hover {
   transform: translateY(-3px);
   box-shadow: 0 15px 40px rgba(124, 58, 237, 0.5);
@@ -716,7 +726,7 @@ body {
     grid-template-columns: 1fr;
     gap: 30px;
   }
-  
+
   .script-preview {
     position: static;
     max-width: 400px;
@@ -733,29 +743,29 @@ body {
     transform: none;
     padding: 16px 18px;
   }
-  
+
   .nav-content { justify-content: space-between; gap: 15px; }
   .nav-links { gap: 15px; }
   .nav-link { font-size: 12px; padding: 6px 10px; }
   .nav-logo { font-size: 20px; gap: 8px; }
   .nav-logo-img { width: 24px; height: 24px; }
-  
+
   .container {
     padding: 100px 15px 30px;
   }
-  
+
   .key-content {
     padding: 30px 20px;
   }
-  
+
   .key-title {
     font-size: 28px;
   }
-  
+
   .script-name {
     font-size: 22px;
   }
-  
+
   .info-badges {
     flex-direction: column;
   }
@@ -885,8 +895,8 @@ body {
 </div>
 
 <script>
-let currentScript = null;
-let colorsApplied = false;
+var currentScript = null;
+var colorsApplied = false;
 
 function initLucideIcons() {
   if (window.lucide && lucide.createIcons) {
@@ -897,15 +907,15 @@ function initLucideIcons() {
 }
 
 function createParticles() {
-  const particlesContainer = document.getElementById('particles');
-  const particleCount = 25;
-  for (let i = 0; i < particleCount; i++) {
-    const particle = document.createElement('div');
+  var particlesContainer = document.getElementById('particles');
+  var particleCount = 25;
+  for (var i = 0; i < particleCount; i++) {
+    var particle = document.createElement('div');
     particle.className = 'particle';
     particle.style.left = Math.random() * 100 + '%';
     particle.style.animationDelay = -Math.random() * 25 + 's';
     particle.style.animationDuration = (20 + Math.random() * 10) + 's';
-    const size = 2 + Math.random() * 3;
+    var size = 2 + Math.random() * 3;
     particle.style.width = size + 'px';
     particle.style.height = size + 'px';
     particlesContainer.appendChild(particle);
@@ -913,14 +923,14 @@ function createParticles() {
 }
 
 function rgbToHex(r, g, b) {
-  return '#' + [r, g, b].map(x => {
-    const hex = x.toString(16);
+  return '#' + [r, g, b].map(function(x) {
+    var hex = x.toString(16);
     return hex.length === 1 ? '0' + hex : hex;
   }).join('');
 }
 
 function hexToRgb(hex) {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result ? {
     r: parseInt(result[1], 16),
     g: parseInt(result[2], 16),
@@ -929,58 +939,58 @@ function hexToRgb(hex) {
 }
 
 function adjustColor(hex, percent) {
-  const rgb = hexToRgb(hex);
+  var rgb = hexToRgb(hex);
   if (!rgb) return hex;
-  const adjust = (color) => {
-    const adjusted = color + Math.round((255 - color) * (percent / 100));
+  var adjust = function(color) {
+    var adjusted = color + Math.round((255 - color) * (percent / 100));
     return Math.min(255, Math.max(0, adjusted));
   };
   return rgbToHex(adjust(rgb.r), adjust(rgb.g), adjust(rgb.b));
 }
 
 function extractAndApplyColors(imageUrl) {
-  const img = new Image();
+  var img = new Image();
   img.crossOrigin = 'Anonymous';
   img.src = imageUrl || '';
-  img.onload = () => {
-    const canvas = document.createElement('canvas');
-    const size = 120;
+  img.onload = function() {
+    var canvas = document.createElement('canvas');
+    var size = 120;
     canvas.width = size;
     canvas.height = size;
-    const ctx = canvas.getContext('2d');
+    var ctx = canvas.getContext('2d');
     ctx.drawImage(img, 0, 0, size, size);
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const pixels = imageData.data;
-    const colorMap = {};
-    const skip = 10;
-    for (let i = 0; i < pixels.length; i += skip * 4) {
-      const r = pixels[i];
-      const g = pixels[i + 1];
-      const b = pixels[i + 2];
-      const brightness = (r * 0.299 + g * 0.587 + b * 0.114);
+    var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    var pixels = imageData.data;
+    var colorMap = {};
+    var skip = 10;
+    for (var i = 0; i < pixels.length; i += skip * 4) {
+      var r = pixels[i];
+      var g = pixels[i + 1];
+      var b = pixels[i + 2];
+      var brightness = (r * 0.299 + g * 0.587 + b * 0.114);
       if (brightness < 25 || brightness > 235) continue;
-      const saturation = Math.max(r, g, b) - Math.min(r, g, b);
+      var saturation = Math.max(r, g, b) - Math.min(r, g, b);
       if (saturation < 15) continue;
-      const key = `${Math.floor(r / 25) * 25},${Math.floor(g / 25) * 25},${Math.floor(b / 25) * 25}`;
+      var key = Math.floor(r / 25) * 25 + ',' + Math.floor(g / 25) * 25 + ',' + Math.floor(b / 25) * 25;
       colorMap[key] = (colorMap[key] || 0) + 1;
     }
-    const sortedColors = Object.entries(colorMap)
-      .sort((a, b) => b[1] - a[1])
+    var sortedColors = Object.entries(colorMap)
+      .sort(function(a, b) { return b[1] - a[1]; })
       .slice(0, 3)
-      .map(entry => {
-        const parts = entry[0].split(',').map(Number);
+      .map(function(entry) {
+        var parts = entry[0].split(',').map(Number);
         return rgbToHex(parts[0], parts[1], parts[2]);
       });
     if (sortedColors.length >= 2) {
       applyColorScheme(sortedColors[0], sortedColors[1]);
     } else if (sortedColors.length === 1) {
-      const color2 = adjustColor(sortedColors[0], 25);
+      var color2 = adjustColor(sortedColors[0], 25);
       applyColorScheme(sortedColors[0], color2);
     } else {
       applyColorScheme('#7209b7', '#9c88ff');
     }
   };
-  img.onerror = () => {
+  img.onerror = function() {
     applyColorScheme('#7209b7', '#9c88ff');
   };
 }
@@ -989,39 +999,39 @@ function applyColorScheme(color1, color2) {
   if (colorsApplied) return;
   colorsApplied = true;
 
-  const root = document.documentElement;
-  const light1 = document.getElementById('mainLight1');
-  const light2 = document.getElementById('mainLight2');
-  const accentLight = document.getElementById('accentLight');
-  const particles = document.getElementById('particles');
+  var root = document.documentElement;
+  var light1 = document.getElementById('mainLight1');
+  var light2 = document.getElementById('mainLight2');
+  var accentLight = document.getElementById('accentLight');
+  var particles = document.getElementById('particles');
 
-  light1.style.background = `radial-gradient(circle, ${color1} 0%, ${color1}cc 15%, ${color1}88 30%, ${color1}44 50%, transparent 65%)`;
-  light2.style.background = `radial-gradient(circle, ${color2} 0%, ${color2}cc 15%, ${color2}88 30%, ${color2}44 50%, transparent 65%)`;
-  accentLight.style.background = `radial-gradient(circle, ${color1}33 0%, ${color2}22 40%, transparent 60%)`;
+  light1.style.background = 'radial-gradient(circle, ' + color1 + ' 0%, ' + color1 + 'cc 15%, ' + color1 + '88 30%, ' + color1 + '44 50%, transparent 65%)';
+  light2.style.background = 'radial-gradient(circle, ' + color2 + ' 0%, ' + color2 + 'cc 15%, ' + color2 + '88 30%, ' + color2 + '44 50%, transparent 65%)';
+  accentLight.style.background = 'radial-gradient(circle, ' + color1 + '33 0%, ' + color2 + '22 40%, transparent 60%)';
 
-  const gradient = `linear-gradient(90deg, #ffffff 0%, ${color1} 50%, ${color2} 100%)`;
-  const gradientButton = `linear-gradient(135deg, ${color1} 0%, ${color2} 100%)`;
+  var gradient = 'linear-gradient(90deg, #ffffff 0%, ' + color1 + ' 50%, ' + color2 + ' 100%)';
+  var gradientButton = 'linear-gradient(135deg, ' + color1 + ' 0%, ' + color2 + ' 100%)';
   root.style.setProperty('--gradient-primary', gradient);
   root.style.setProperty('--gradient-button', gradientButton);
   root.style.setProperty('--accent-color', color1);
 
-  const rgb1 = hexToRgb(color1);
+  var rgb1 = hexToRgb(color1);
   if (rgb1) {
-    root.style.setProperty('--accent-color-rgba', `rgba(${rgb1.r}, ${rgb1.g}, ${rgb1.b}, 0.9)`);
-    root.style.setProperty('--box-shadow-primary', `0 10px 25px rgba(${rgb1.r}, ${rgb1.g}, ${rgb1.b}, 0.35)`);
-    root.style.setProperty('--box-shadow-primary-hover', `0 15px 40px rgba(${rgb1.r}, ${rgb1.g}, ${rgb1.b}, 0.55)`);
-    root.style.setProperty('--accent-glow', `rgba(${rgb1.r}, ${rgb1.g}, ${rgb1.b}, 0.5)`);
+    root.style.setProperty('--accent-color-rgba', 'rgba(' + rgb1.r + ', ' + rgb1.g + ', ' + rgb1.b + ', 0.9)');
+    root.style.setProperty('--box-shadow-primary', '0 10px 25px rgba(' + rgb1.r + ', ' + rgb1.g + ', ' + rgb1.b + ', 0.35)');
+    root.style.setProperty('--box-shadow-primary-hover', '0 15px 40px rgba(' + rgb1.r + ', ' + rgb1.g + ', ' + rgb1.b + ', 0.55)');
+    root.style.setProperty('--accent-glow', 'rgba(' + rgb1.r + ', ' + rgb1.g + ', ' + rgb1.b + ', 0.5)');
   }
 
-  const particleElements = document.querySelectorAll('.particle');
-  particleElements.forEach((particle, index) => {
-    const particleColor = index % 2 === 0 ? color1 : color2;
+  var particleElements = document.querySelectorAll('.particle');
+  particleElements.forEach(function(particle, index) {
+    var particleColor = index % 2 === 0 ? color1 : color2;
     particle.style.background = particleColor;
-    particle.style.boxShadow = `0 0 12px ${particleColor}, 0 0 6px ${particleColor}`;
+    particle.style.boxShadow = '0 0 12px ' + particleColor + ', 0 0 6px ' + particleColor;
   });
 
-  requestAnimationFrame(() => {
-    setTimeout(() => {
+  requestAnimationFrame(function() {
+    setTimeout(function() {
       light1.style.opacity = '0.35';
       light2.style.opacity = '0.3';
       accentLight.style.opacity = '0.15';
@@ -1031,10 +1041,10 @@ function applyColorScheme(color1, color2) {
 }
 
 function showDefaultLights() {
-  const light1 = document.getElementById('mainLight1');
-  const light2 = document.getElementById('mainLight2');
-  const accentLight = document.getElementById('accentLight');
-  const particles = document.getElementById('particles');
+  var light1 = document.getElementById('mainLight1');
+  var light2 = document.getElementById('mainLight2');
+  var accentLight = document.getElementById('accentLight');
+  var particles = document.getElementById('particles');
   light1.style.opacity = '0.35';
   light2.style.opacity = '0.3';
   accentLight.style.opacity = '0.15';
@@ -1042,13 +1052,13 @@ function showDefaultLights() {
 }
 
 function getScriptIdFromURL() {
-  const urlParams = new URLSearchParams(window.location.search);
+  var urlParams = new URLSearchParams(window.location.search);
   return urlParams.get('script');
 }
 
 async function loadScript() {
-  const scriptId = getScriptIdFromURL();
-  
+  var scriptId = getScriptIdFromURL();
+
   if (!scriptId) {
     showError();
     showDefaultLights();
@@ -1056,7 +1066,7 @@ async function loadScript() {
   }
 
   try {
-    const response = await fetch(`/api/scripts/${scriptId}`);
+    var response = await fetch('/api/scripts/' + scriptId);
     if (!response.ok) {
       throw new Error('Script not found');
     }
@@ -1072,12 +1082,12 @@ function displayScript(script, scriptId) {
   document.getElementById('loadingState').style.display = 'none';
   document.getElementById('mainContent').style.display = 'block';
 
-  document.getElementById('pageTitle').textContent = `Get Key - ${script.title} - Vadrifts`;
+  document.getElementById('pageTitle').textContent = 'Get Key - ' + script.title + ' - Vadrifts';
   document.getElementById('scriptImage').src = script.thumbnail || '';
   document.getElementById('scriptGame').textContent = script.game || '';
   document.getElementById('scriptTitle').textContent = script.title || '';
   document.getElementById('scriptDesc').textContent = script.description || '';
-  document.getElementById('backBtn').href = `/script/${scriptId}`;
+  document.getElementById('backBtn').href = '/script/' + scriptId;
 
   setupKeyOptions(script);
   extractAndApplyColors(script.thumbnail);
@@ -1085,66 +1095,61 @@ function displayScript(script, scriptId) {
 }
 
 function setupKeyOptions(script) {
-  const container = document.getElementById('keyOptions');
+  var container = document.getElementById('keyOptions');
   container.innerHTML = '';
+  var options = [];
 
-  const options = [];
-
-  if (script.key_link && script.key_link.includes('work.ink')) {
+  if (script.has_workink) {
     options.push({
       type: 'workink',
       name: 'Work.ink',
       tag: 'Recommended',
-      link: script.key_link,
-      icon: 'external-link',
       logo: 'https://s3-eu-west-1.amazonaws.com/tpd/logos/60f32c3fa0f0500001ab7c87/0x0.png'
     });
   }
 
-  if (script.lootlabs_link) {
+  if (script.has_lootlabs) {
     options.push({
       type: 'lootlabs',
       name: 'LootLabs',
       tag: 'Alternative',
-      link: script.lootlabs_link,
-      icon: 'external-link',
       logo: 'https://i.imgur.com/DmPISjf.png'
     });
   }
 
-  if (script.key_type === 'work.ink' && options.length === 0) {
+  if (script.has_linkvertise) {
     options.push({
-      type: 'workink',
-      name: 'Work.ink',
-      tag: 'Recommended',
-      link: script.key_link,
-      icon: 'external-link',
-      logo: 'https://s3-eu-west-1.amazonaws.com/tpd/logos/60f32c3fa0f0500001ab7c87/0x0.png'
+      type: 'linkvertise',
+      name: 'Linkvertise',
+      tag: 'Alternative',
+      logo: 'https://cdn3.emoji.gg/emojis/20379-linkvertise.png'
     });
   }
 
-  if (options.length === 0 && script.key_link) {
+  if (options.length === 0 && script.has_generic_key) {
     options.push({
       type: 'workink',
       name: 'Get Key',
       tag: '',
-      link: script.key_link,
-      icon: 'external-link',
       logo: 'https://s3-eu-west-1.amazonaws.com/tpd/logos/60f32c3fa0f0500001ab7c87/0x0.png'
     });
   }
 
-  options.forEach(opt => {
-    const btn = document.createElement('button');
-    btn.className = `key-provider-btn ${opt.type}`;
-    btn.innerHTML = `
-      ${opt.logo ? `<img src="${opt.logo}" class="provider-logo" alt="${opt.name} logo">` : `<i data-lucide="${opt.icon}"></i>`}
-      <div class="provider-info">
-        <span class="provider-name">${opt.name}</span>
-        ${opt.tag ? `<span class="provider-tag">${opt.tag}</span>` : ''}
-      </div>
-    `;
-    btn.onclick = () => startVerification(opt);
+  if (options.length === 0) {
+    container.innerHTML = '<p style="color:#888;text-align:center;">No verification methods available for this script.</p>';
+    return;
+  }
+
+  options.forEach(function(opt) {
+    var btn = document.createElement('button');
+    btn.className = 'key-provider-btn ' + opt.type;
+    btn.innerHTML =
+      (opt.logo ? '<img src="' + opt.logo + '" class="provider-logo" alt="' + opt.name + ' logo">' : '<i data-lucide="external-link"></i>') +
+      '<div class="provider-info">' +
+        '<span class="provider-name">' + opt.name + '</span>' +
+        (opt.tag ? '<span class="provider-tag">' + opt.tag + '</span>' : '') +
+      '</div>';
+    btn.onclick = function() { startVerification(opt); };
     container.appendChild(btn);
   });
 
@@ -1152,36 +1157,37 @@ function setupKeyOptions(script) {
 }
 
 async function startVerification(provider) {
-  const btns = document.querySelectorAll('.key-provider-btn');
-  btns.forEach(btn => btn.disabled = true);
-
+  var btns = document.querySelectorAll('.key-provider-btn');
+  btns.forEach(function(btn) { btn.disabled = true; });
   showStatus('Starting verification...', 'loading');
 
   try {
-    const response = await fetch('/start-verification');
-    const data = await response.json();
+    var timerRes = await fetch('/start-verification');
+    if (!timerRes.ok) throw new Error('Failed to start timer');
 
-    if (response.ok) {
-      showStatus('Redirecting to verification partner...', 'loading');
-      
-      setTimeout(() => {
-        window.location.href = provider.link;
-      }, 800);
-    } else {
-      throw new Error('Failed to start verification');
-    }
+    var scriptId = getScriptIdFromURL();
+    var providerType = provider.type;
+
+    var cpRes = await fetch('/checkpoint/start?script=' + scriptId + '&provider=' + providerType);
+    var cpData = await cpRes.json();
+
+    if (!cpRes.ok || !cpData.token) throw new Error('Failed to create checkpoint');
+
+    showStatus('Redirecting to verification...', 'loading');
+
+    window.location.href = '/checkpoint/load?t=' + encodeURIComponent(cpData.token);
+
   } catch (error) {
-    console.error('Verification error:', error);
     showStatus('Failed to start verification. Please try again.', 'error');
-    btns.forEach(btn => btn.disabled = false);
+    btns.forEach(function(btn) { btn.disabled = false; });
   }
 }
-  
+
 function showStatus(message, type) {
-  const statusEl = document.getElementById('statusMsg');
-  statusEl.className = `status-msg show ${type}`;
+  var statusEl = document.getElementById('statusMsg');
+  statusEl.className = 'status-msg show ' + type;
   if (type === 'loading') {
-    statusEl.innerHTML = `<span class="loading-spinner"></span> ${message}`;
+    statusEl.innerHTML = '<span class="loading-spinner"></span> ' + message;
   } else {
     statusEl.textContent = message;
   }
@@ -1193,10 +1199,10 @@ function showError() {
   initLucideIcons();
 }
 
-let lastScrollTop = 0;
+var lastScrollTop = 0;
 window.addEventListener('scroll', function() {
-  let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-  const navbar = document.querySelector('.navbar');
+  var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+  var navbar = document.querySelector('.navbar');
   if (scrollTop > 100) {
     navbar.classList.add('scrolled');
   } else {
@@ -1206,7 +1212,7 @@ window.addEventListener('scroll', function() {
 });
 
 createParticles();
-window.addEventListener('load', () => {
+window.addEventListener('load', function() {
   loadScript();
   initLucideIcons();
 });
