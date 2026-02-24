@@ -20,8 +20,8 @@ scripts_data = [
             "Chat tools AND MORE!!",
         ],
         "script": '''loadstring(game:HttpGet("https://raw.githubusercontent.com/vqmpjayZ/Bypass/main/vadrifts.lua"))()''',
-        "key_type": "work.ink",
         "key_link": "https://work.ink/20yd/vadrifts.byp",
+        'linkvertise_link': None,
         "lootlabs_link": None
     },
     {
@@ -46,9 +46,8 @@ scripts_data = [
             "Supports All executors",
         ],
         "script": '''loadstring(game:HttpGet("https://raw.githubusercontent.com/vqmpjayZ/Vadrifts-Hub/refs/heads/main/Games/Starving-Artists/source.lua"))()''',
-        "key_type": "work.ink",
-        "key_link": "https://work.ink/20yd/Vadrifts-StarvingArtists",
-        "lootlabs_link": None
+        "key_type": "discord",
+        "key_link": "https://discord.com/invite/WDbJ5wE2cR"
     },
     {
         "id": 4580204640,
