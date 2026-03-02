@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 from threading import Timer
 
 from config import *
-from discord_bot import start_bot
+from discord_bot import start_bot, load_discord_keys, save_discord_keys, GUILD_ID
 from stickied_message_bot import start_stickied_bot
 from youtube_grabber import YouTubeChannelFinder
 from image_converter import convert_image_endpoint
@@ -46,6 +46,8 @@ TURNSTILE_SECRET_KEY = os.environ.get("TURNSTILE_SECRET_KEY")
 
 JSONBIN_API_KEY = os.environ.get("JSONBIN_API_KEY")
 JSONBIN_BIN_ID = os.environ.get("JSONBIN_BIN_ID")
+
+DISCORD_KEY_API_SECRET = os.environ.get("DISCORD_KEY_API_SECRET")
 
 feature_credits = {}
 
@@ -184,6 +186,17 @@ def require_api_key(f):
             return jsonify({"error": "Unauthorized"}), 401
         return f(*args, **kwargs)
     return decorated_function
+
+def check_discord_membership(discord_id):
+    try:
+        headers = {
+            "Authorization": f"Bot {DISCORD_TOKEN}"
+        }
+        url = f"https://discord.com/api/v10/guilds/{GUILD_ID}/members/{discord_id}"
+        resp = requests.get(url, headers=headers, timeout=10)
+        return resp.status_code == 200
+    except:
+        return False
 
 @app.route('/api/feature-config/<feature_id>')
 def get_feature_config(feature_id):
@@ -888,7 +901,7 @@ def checkpoint_status():
         return jsonify({"completed": True, "token": token})
 
     return jsonify({"completed": False})
-    
+
 @app.route('/verify')
 def verify_page():
     client_ip = get_client_ip()
@@ -1021,6 +1034,50 @@ def validate_key_route():
     client_ip = get_client_ip()
     is_valid = key_system.validate_key(client_ip, key)
     return "true" if is_valid else "false"
+
+@app.route('/api/validate-discord-key', methods=['POST'])
+def validate_discord_key():
+    data = request.get_json()
+
+    if not data:
+        return jsonify({"valid": False, "message": "No data provided"})
+
+    secret = data.get("secret", "")
+    key = data.get("key", "")
+    hwid = data.get("hwid", "")
+
+    if secret != DISCORD_KEY_API_SECRET:
+        return jsonify({"valid": False, "message": "Unauthorized"})
+
+    if not key or not hwid:
+        return jsonify({"valid": False, "message": "Missing key or HWID"})
+
+    keys = load_discord_keys()
+    key_data = keys.get(key)
+
+    if not key_data:
+        return jsonify({"valid": False, "message": "Invalid key"})
+
+    if time.time() > key_data.get("expires_at", 0):
+        del keys[key]
+        save_discord_keys(keys)
+        return jsonify({"valid": False, "message": "Key expired. Run /getkey in Discord."})
+
+    discord_id = key_data.get("discord_id")
+    if not check_discord_membership(discord_id):
+        del keys[key]
+        save_discord_keys(keys)
+        return jsonify({"valid": False, "message": "You must be in the Discord server."})
+
+    if key_data.get("hwid") and key_data["hwid"] != hwid:
+        return jsonify({"valid": False, "message": "Key is locked to a different device. Use /resetkey in Discord."})
+
+    if not key_data.get("hwid"):
+        key_data["hwid"] = hwid
+        keys[key] = key_data
+        save_discord_keys(keys)
+
+    return jsonify({"valid": True, "message": "Authenticated"})
 
 @app.route('/plugin/<plugin_id>')
 def plugin_detail(plugin_id):
