@@ -16,6 +16,9 @@ HOME_META_TAGS = '''
     <meta property="og:url" content="https://vadrifts.onrender.com">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Vadrifts">
+    <meta property="og:image" content="https://i.imgur.com/ePueN25.png">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:image" content="https://i.imgur.com/ePueN25.png">
     <meta name="theme-color" content="#9c88ff">'''
 
 SCRIPTS_META_TAGS = '''
@@ -24,6 +27,9 @@ SCRIPTS_META_TAGS = '''
     <meta property="og:url" content="https://vadrifts.onrender.com/scripts">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Vadrifts">
+    <meta property="og:image" content="https://i.imgur.com/ePueN25.png">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:image" content="https://i.imgur.com/ePueN25.png">
     <meta name="theme-color" content="#9c88ff">'''
 
 PLUGINS_META_TAGS = '''
@@ -32,4 +38,7 @@ PLUGINS_META_TAGS = '''
     <meta property="og:url" content="https://vadrifts.onrender.com/plugins">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Vadrifts">
+    <meta property="og:image" content="https://i.imgur.com/ePueN25.png">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:image" content="https://i.imgur.com/ePueN25.png">
     <meta name="theme-color" content="#9c88ff">'''
