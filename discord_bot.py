@@ -5,7 +5,6 @@ import asyncio
 import random
 import re
 import json
-import hashlib
 import secrets
 import time
 import os
@@ -20,9 +19,8 @@ GUILD_ID = 1241797935100989594
 DELAY_SECONDS = 1
 BOOST_TEST_CHANNEL_ID = 1270301984897110148
 
-KEYS_FILE = "discord_keys.json"
-KEY_EXPIRY_HOURS = 24
-VERIFIED_ROLE_NAME = "Verified"
+DISCORD_KEYS_FILE = "discord_keys.json"
+DISCORD_KEY_EXPIRY_HOURS = 24
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -37,43 +35,47 @@ cute_symbols = [">///<", "^-^", "o///o", "x3"]
 submitted_hwids = {}
 
 
-def load_keys():
-    if os.path.exists(KEYS_FILE):
-        with open(KEYS_FILE, "r") as f:
-            return json.load(f)
+def load_discord_keys():
+    if os.path.exists(DISCORD_KEYS_FILE):
+        try:
+            with open(DISCORD_KEYS_FILE, "r") as f:
+                return json.load(f)
+        except:
+            return {}
     return {}
 
 
-def save_keys(data):
-    with open(KEYS_FILE, "w") as f:
+def save_discord_keys(data):
+    with open(DISCORD_KEYS_FILE, "w") as f:
         json.dump(data, f, indent=2)
 
 
-def generate_key():
+def generate_discord_key():
     return secrets.token_hex(16)
 
 
-def delete_keys_by_discord_id(discord_id):
-    keys = load_keys()
-    to_delete = [k for k, v in keys.items() if v.get("discord_id") == str(discord_id)]
+def delete_discord_keys_by_id(discord_id):
+    keys = load_discord_keys()
+    discord_id = str(discord_id)
+    to_delete = [k for k, v in keys.items() if v.get("discord_id") == discord_id]
     for k in to_delete:
         del keys[k]
-    save_keys(keys)
+    save_discord_keys(keys)
     return len(to_delete)
 
 
-def create_key_for_user(discord_id, username):
-    delete_keys_by_discord_id(discord_id)
-    key = generate_key()
-    keys = load_keys()
+def create_discord_key_for_user(discord_id, username):
+    delete_discord_keys_by_id(discord_id)
+    key = generate_discord_key()
+    keys = load_discord_keys()
     keys[key] = {
         "discord_id": str(discord_id),
         "username": username,
         "created_at": time.time(),
-        "expires_at": time.time() + (KEY_EXPIRY_HOURS * 3600),
+        "expires_at": time.time() + (DISCORD_KEY_EXPIRY_HOURS * 3600),
         "hwid": None
     }
-    save_keys(keys)
+    save_discord_keys(keys)
     return key
 
 
@@ -167,11 +169,10 @@ async def getkey(interaction: discord.Interaction):
         await interaction.response.send_message("This command is currently restricted to administrators.", ephemeral=True)
         return
 
-    key = create_key_for_user(interaction.user.id, interaction.user.name)
-    expires_at = time.time() + (KEY_EXPIRY_HOURS * 3600)
-    expires_timestamp = int(expires_at)
+    key = create_discord_key_for_user(interaction.user.id, interaction.user.name)
+    expires_timestamp = int(time.time() + (DISCORD_KEY_EXPIRY_HOURS * 3600))
 
-    embed = discord.Embed(title="🔑 Your Script Key", color=discord.Color.green())
+    embed = discord.Embed(title="\U0001f511 Your Script Key", color=discord.Color.green())
     embed.description = f"```{key}```"
     embed.add_field(name="Expires", value=f"<t:{expires_timestamp}:R>", inline=True)
     embed.add_field(name="Tied To", value=f"<@{interaction.user.id}>", inline=True)
@@ -187,9 +188,9 @@ async def resetkey(interaction: discord.Interaction):
         await interaction.response.send_message("This command is currently restricted to administrators.", ephemeral=True)
         return
 
-    count = delete_keys_by_discord_id(interaction.user.id)
+    count = delete_discord_keys_by_id(interaction.user.id)
     if count > 0:
-        await interaction.response.send_message("♻️ Your old key has been wiped. Use `/getkey` to generate a fresh one.", ephemeral=True)
+        await interaction.response.send_message("\u267b\ufe0f Your old key has been wiped. Use `/getkey` to generate a fresh one.", ephemeral=True)
     else:
         await interaction.response.send_message("You don't have any active keys. Use `/getkey` to generate one.", ephemeral=True)
 
@@ -201,9 +202,9 @@ async def revokekey(interaction: discord.Interaction, user: discord.Member):
         await interaction.response.send_message("Only the owner can use this command.", ephemeral=True)
         return
 
-    count = delete_keys_by_discord_id(user.id)
+    count = delete_discord_keys_by_id(user.id)
     if count > 0:
-        await interaction.response.send_message(f"🗑️ Revoked {count} key(s) for {user.mention}.", ephemeral=True)
+        await interaction.response.send_message(f"\U0001f5d1\ufe0f Revoked {count} key(s) for {user.mention}.", ephemeral=True)
     else:
         await interaction.response.send_message(f"{user.mention} has no active keys.", ephemeral=True)
 
@@ -214,13 +215,14 @@ async def keystats(interaction: discord.Interaction):
         await interaction.response.send_message("Only the owner can use this command.", ephemeral=True)
         return
 
-    keys = load_keys()
+    keys = load_discord_keys()
+    now = time.time()
     total = len(keys)
-    active = sum(1 for v in keys.values() if v.get("expires_at", 0) > time.time())
+    active = sum(1 for v in keys.values() if v.get("expires_at", 0) > now)
     expired = total - active
     hwid_locked = sum(1 for v in keys.values() if v.get("hwid") is not None)
 
-    embed = discord.Embed(title="📊 Key System Stats", color=discord.Color.blurple())
+    embed = discord.Embed(title="\U0001f4ca Key System Stats", color=discord.Color.blurple())
     embed.add_field(name="Total Keys", value=str(total), inline=True)
     embed.add_field(name="Active", value=str(active), inline=True)
     embed.add_field(name="Expired", value=str(expired), inline=True)
@@ -236,11 +238,11 @@ BOOST_TYPES = {discord.MessageType.premium_guild_subscription}
 async def on_member_remove(member):
     if member.guild.id != GUILD_ID:
         return
-    count = delete_keys_by_discord_id(member.id)
+    count = delete_discord_keys_by_id(member.id)
     if count > 0:
         log_channel = bot.get_channel(LOG_CHANNEL_ID)
         if log_channel:
-            embed = discord.Embed(title="🔑 Key Auto-Revoked", color=discord.Color.red())
+            embed = discord.Embed(title="\U0001f511 Key Auto-Revoked", color=discord.Color.red())
             embed.add_field(name="User", value=f"{member.name} ({member.id})", inline=False)
             embed.add_field(name="Reason", value="Left the server", inline=False)
             embed.add_field(name="Keys Revoked", value=str(count), inline=False)
