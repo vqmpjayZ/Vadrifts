@@ -4,6 +4,11 @@ from discord.ext import commands
 import asyncio
 import random
 import re
+import json
+import hashlib
+import secrets
+import time
+import os
 from datetime import datetime, timedelta
 from config import DISCORD_TOKEN
 
@@ -14,6 +19,10 @@ OWNER_ID = 1144213765424947251
 GUILD_ID = 1241797935100989594
 DELAY_SECONDS = 1
 BOOST_TEST_CHANNEL_ID = 1270301984897110148
+
+KEYS_FILE = "discord_keys.json"
+KEY_EXPIRY_HOURS = 24
+VERIFIED_ROLE_NAME = "Verified"
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -27,12 +36,54 @@ last_meow_count = None
 cute_symbols = [">///<", "^-^", "o///o", "x3"]
 submitted_hwids = {}
 
+
+def load_keys():
+    if os.path.exists(KEYS_FILE):
+        with open(KEYS_FILE, "r") as f:
+            return json.load(f)
+    return {}
+
+
+def save_keys(data):
+    with open(KEYS_FILE, "w") as f:
+        json.dump(data, f, indent=2)
+
+
+def generate_key():
+    return secrets.token_hex(16)
+
+
+def delete_keys_by_discord_id(discord_id):
+    keys = load_keys()
+    to_delete = [k for k, v in keys.items() if v.get("discord_id") == str(discord_id)]
+    for k in to_delete:
+        del keys[k]
+    save_keys(keys)
+    return len(to_delete)
+
+
+def create_key_for_user(discord_id, username):
+    delete_keys_by_discord_id(discord_id)
+    key = generate_key()
+    keys = load_keys()
+    keys[key] = {
+        "discord_id": str(discord_id),
+        "username": username,
+        "created_at": time.time(),
+        "expires_at": time.time() + (KEY_EXPIRY_HOURS * 3600),
+        "hwid": None
+    }
+    save_keys(keys)
+    return key
+
+
 async def send_good_boy_after_delay(user_id, channel):
     await asyncio.sleep(DELAY_SECONDS)
     if user_id in recent_boosts:
         await channel.send(f"<@{user_id}> good boy")
         recent_boosts.pop(user_id, None)
         pending_tasks.pop(user_id, None)
+
 
 class HWIDModal(discord.ui.Modal, title="Enter Your HWID"):
     hwid = discord.ui.TextInput(label="Paste your HWID here", style=discord.TextStyle.short, placeholder="Example: ABCDEFGH-1234-IJKL-5678-MNOPQRSTUVW", required=True)
@@ -81,6 +132,7 @@ class HWIDModal(discord.ui.Modal, title="Enter Your HWID"):
             except:
                 pass
 
+
 class AuthButtonView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
@@ -97,6 +149,7 @@ class AuthButtonView(discord.ui.View):
     async def enter_hwid(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_modal(HWIDModal())
 
+
 @bot.tree.command(name="authenticate", description="Authenticate your Premium access.", guild=discord.Object(id=GUILD_ID))
 async def authenticate(interaction: discord.Interaction):
     if interaction.channel.id != AUTH_CHANNEL_ID:
@@ -107,7 +160,92 @@ async def authenticate(interaction: discord.Interaction):
     view = AuthButtonView()
     await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
+
+@bot.tree.command(name="getkey", description="Generate your unique script key.", guild=discord.Object(id=GUILD_ID))
+async def getkey(interaction: discord.Interaction):
+    if not interaction.user.guild_permissions.administrator:
+        await interaction.response.send_message("This command is currently restricted to administrators.", ephemeral=True)
+        return
+
+    key = create_key_for_user(interaction.user.id, interaction.user.name)
+    expires_at = time.time() + (KEY_EXPIRY_HOURS * 3600)
+    expires_timestamp = int(expires_at)
+
+    embed = discord.Embed(title="🔑 Your Script Key", color=discord.Color.green())
+    embed.description = f"```{key}```"
+    embed.add_field(name="Expires", value=f"<t:{expires_timestamp}:R>", inline=True)
+    embed.add_field(name="Tied To", value=f"<@{interaction.user.id}>", inline=True)
+    embed.add_field(name="HWID Lock", value="Locks on first use", inline=True)
+    embed.set_footer(text="Leave the server = key dies. Do not share.")
+
+    await interaction.response.send_message(embed=embed, ephemeral=True)
+
+
+@bot.tree.command(name="resetkey", description="Reset your key and HWID lock.", guild=discord.Object(id=GUILD_ID))
+async def resetkey(interaction: discord.Interaction):
+    if not interaction.user.guild_permissions.administrator:
+        await interaction.response.send_message("This command is currently restricted to administrators.", ephemeral=True)
+        return
+
+    count = delete_keys_by_discord_id(interaction.user.id)
+    if count > 0:
+        await interaction.response.send_message("♻️ Your old key has been wiped. Use `/getkey` to generate a fresh one.", ephemeral=True)
+    else:
+        await interaction.response.send_message("You don't have any active keys. Use `/getkey` to generate one.", ephemeral=True)
+
+
+@bot.tree.command(name="revokekey", description="[Owner] Revoke a user's key.", guild=discord.Object(id=GUILD_ID))
+@app_commands.describe(user="The user whose key to revoke")
+async def revokekey(interaction: discord.Interaction, user: discord.Member):
+    if interaction.user.id != OWNER_ID:
+        await interaction.response.send_message("Only the owner can use this command.", ephemeral=True)
+        return
+
+    count = delete_keys_by_discord_id(user.id)
+    if count > 0:
+        await interaction.response.send_message(f"🗑️ Revoked {count} key(s) for {user.mention}.", ephemeral=True)
+    else:
+        await interaction.response.send_message(f"{user.mention} has no active keys.", ephemeral=True)
+
+
+@bot.tree.command(name="keystats", description="[Owner] View key system stats.", guild=discord.Object(id=GUILD_ID))
+async def keystats(interaction: discord.Interaction):
+    if interaction.user.id != OWNER_ID:
+        await interaction.response.send_message("Only the owner can use this command.", ephemeral=True)
+        return
+
+    keys = load_keys()
+    total = len(keys)
+    active = sum(1 for v in keys.values() if v.get("expires_at", 0) > time.time())
+    expired = total - active
+    hwid_locked = sum(1 for v in keys.values() if v.get("hwid") is not None)
+
+    embed = discord.Embed(title="📊 Key System Stats", color=discord.Color.blurple())
+    embed.add_field(name="Total Keys", value=str(total), inline=True)
+    embed.add_field(name="Active", value=str(active), inline=True)
+    embed.add_field(name="Expired", value=str(expired), inline=True)
+    embed.add_field(name="HWID Locked", value=str(hwid_locked), inline=True)
+
+    await interaction.response.send_message(embed=embed, ephemeral=True)
+
+
 BOOST_TYPES = {discord.MessageType.premium_guild_subscription}
+
+
+@bot.event
+async def on_member_remove(member):
+    if member.guild.id != GUILD_ID:
+        return
+    count = delete_keys_by_discord_id(member.id)
+    if count > 0:
+        log_channel = bot.get_channel(LOG_CHANNEL_ID)
+        if log_channel:
+            embed = discord.Embed(title="🔑 Key Auto-Revoked", color=discord.Color.red())
+            embed.add_field(name="User", value=f"{member.name} ({member.id})", inline=False)
+            embed.add_field(name="Reason", value="Left the server", inline=False)
+            embed.add_field(name="Keys Revoked", value=str(count), inline=False)
+            await log_channel.send(embed=embed)
+
 
 @bot.event
 async def on_message(message):
@@ -177,6 +315,7 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
+
 @bot.event
 async def on_ready():
     print(f'Main bot logged in as {bot.user}')
@@ -187,17 +326,19 @@ async def on_ready():
         print(f"Synced {len(synced)} guild commands")
     except discord.HTTPException as e:
         if e.status == 429:
-            print("⚠️ Rate limited - commands already synced, skipping")
+            print("Rate limited - commands already synced, skipping")
         else:
             print(f"Command sync error: {e}")
     except Exception as e:
         print(f"Command sync failed: {e}")
+
 
 def start_bot():
     try:
         bot.run(DISCORD_TOKEN)
     except Exception as e:
         print(f"Main bot error: {e}")
+
 
 if __name__ == "__main__":
     start_bot()
