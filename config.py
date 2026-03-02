@@ -10,35 +10,19 @@ if not os.path.exists(DATA_DIR):
 
 PLUGINS_FILE = os.path.join(DATA_DIR, 'plugins_data.json')
 
-HOME_META_TAGS = '''
-    <meta property="og:title" content="Vadrifts - Roblox Scripts & Tools">
-    <meta property="og:description" content="Vadrift's all-in-one website!">
-    <meta property="og:url" content="https://vadrifts.onrender.com">
+def make_meta(title, description, path=""):
+    url = f"https://vadrifts.onrender.com{path}"
+    return f'''
+    <meta property="og:title" content="{title}">
+    <meta property="og:description" content="{description}">
+    <meta property="og:url" content="{url}">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Vadrifts">
     <meta property="og:image" content="https://i.imgur.com/ePueN25.png">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:image" content="https://i.imgur.com/ePueN25.png">
-    <meta name="theme-color" content="#9c88ff">'''
+    <meta name="theme-color" content="#2f3136">
 
-SCRIPTS_META_TAGS = '''
-    <meta property="og:title" content="Vadrifts Scripts - Collection">
-    <meta property="og:description" content="Check out our collection of all Vadrifts Scripts!">
-    <meta property="og:url" content="https://vadrifts.onrender.com/scripts">
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="Vadrifts">
-    <meta property="og:image" content="https://i.imgur.com/ePueN25.png">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:image" content="https://i.imgur.com/ePueN25.png">
-    <meta name="theme-color" content="#9c88ff">'''
-
-PLUGINS_META_TAGS = '''
-    <meta property="og:title" content="Vadrifts Plugins - Community">
-    <meta property="og:description" content="Create and share custom bypass plugins!">
-    <meta property="og:url" content="https://vadrifts.onrender.com/plugins">
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="Vadrifts">
-    <meta property="og:image" content="https://i.imgur.com/ePueN25.png">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:image" content="https://i.imgur.com/ePueN25.png">
-    <meta name="theme-color" content="#9c88ff">'''
+HOME_META_TAGS = make_meta("Vadrifts - Roblox Scripts & Tools", "Vadrift's all-in-one website!")
+SCRIPTS_META_TAGS = make_meta("Vadrifts Scripts - Collection", "Check out our collection of all Vadrifts Scripts!", "/scripts")
+PLUGINS_META_TAGS = make_meta("Vadrifts Plugins - Community", "Create and share custom bypass plugins!", "/plugins")
