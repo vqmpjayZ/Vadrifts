@@ -1289,6 +1289,8 @@ if __name__ == '__main__':
     bot_thread = threading.Thread(target=start_bot, daemon=True)
     bot_thread.start()
 
+    time.sleep(10)
+
     stickied_bot_thread = threading.Thread(target=start_stickied_bot, daemon=True)
     stickied_bot_thread.start()
 
