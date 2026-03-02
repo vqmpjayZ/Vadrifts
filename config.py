@@ -21,7 +21,7 @@ def make_meta(title, description, path=""):
     <meta property="og:image" content="https://i.imgur.com/ePueN25.png">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:image" content="https://i.imgur.com/ePueN25.png">
-    <meta name="theme-color" content="#919191">'''
+    <meta name="theme-color" content="#636363">'''
 
 HOME_META_TAGS = make_meta("Vadrifts - Roblox Scripts & Tools", "Vadrift's all-in-one website!")
 SCRIPTS_META_TAGS = make_meta("Vadrifts Scripts - Collection", "Check out our collection of all Vadrifts Scripts!", "/scripts")
