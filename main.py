@@ -12,8 +12,8 @@ from datetime import datetime, timedelta
 from threading import Timer
 
 from config import *
-from discord_bot import start_bot, load_discord_keys, save_discord_keys, GUILD_ID
-from stickied_message_bot import start_stickied_bot
+# from discord_bot import start_bot, load_discord_keys, save_discord_keys, GUILD_ID
+# from stickied_message_bot import start_stickied_bot
 from youtube_grabber import YouTubeChannelFinder
 from image_converter import convert_image_endpoint
 from plugins_manager import PluginsManager
@@ -187,16 +187,16 @@ def require_api_key(f):
         return f(*args, **kwargs)
     return decorated_function
 
-def check_discord_membership(discord_id):
-    try:
-        headers = {
-            "Authorization": f"Bot {DISCORD_TOKEN}"
-        }
-        url = f"https://discord.com/api/v10/guilds/{GUILD_ID}/members/{discord_id}"
-        resp = requests.get(url, headers=headers, timeout=10)
-        return resp.status_code == 200
-    except:
-        return False
+# def check_discord_membership(discord_id):
+#     try:
+#         headers = {
+#             "Authorization": f"Bot {DISCORD_TOKEN}"
+#         }
+#         url = f"https://discord.com/api/v10/guilds/{GUILD_ID}/members/{discord_id}"
+#         resp = requests.get(url, headers=headers, timeout=10)
+#         return resp.status_code == 200
+#     except:
+#         return False
 
 @app.route('/api/feature-config/<feature_id>')
 def get_feature_config(feature_id):
@@ -1035,49 +1035,49 @@ def validate_key_route():
     is_valid = key_system.validate_key(client_ip, key)
     return "true" if is_valid else "false"
 
-@app.route('/api/validate-discord-key', methods=['POST'])
-def validate_discord_key():
-    data = request.get_json()
-
-    if not data:
-        return jsonify({"valid": False, "message": "No data provided"})
-
-    secret = data.get("secret", "")
-    key = data.get("key", "")
-    hwid = data.get("hwid", "")
-
-    if secret != DISCORD_KEY_API_SECRET:
-        return jsonify({"valid": False, "message": "Unauthorized"})
-
-    if not key or not hwid:
-        return jsonify({"valid": False, "message": "Missing key or HWID"})
-
-    keys = load_discord_keys()
-    key_data = keys.get(key)
-
-    if not key_data:
-        return jsonify({"valid": False, "message": "Invalid key"})
-
-    if time.time() > key_data.get("expires_at", 0):
-        del keys[key]
-        save_discord_keys(keys)
-        return jsonify({"valid": False, "message": "Key expired. Run /getkey in Discord."})
-
-    discord_id = key_data.get("discord_id")
-    if not check_discord_membership(discord_id):
-        del keys[key]
-        save_discord_keys(keys)
-        return jsonify({"valid": False, "message": "You must be in the Discord server."})
-
-    if key_data.get("hwid") and key_data["hwid"] != hwid:
-        return jsonify({"valid": False, "message": "Key is locked to a different device. Use /resetkey in Discord."})
-
-    if not key_data.get("hwid"):
-        key_data["hwid"] = hwid
-        keys[key] = key_data
-        save_discord_keys(keys)
-
-    return jsonify({"valid": True, "message": "Authenticated"})
+# @app.route('/api/validate-discord-key', methods=['POST'])
+# def validate_discord_key():
+#     data = request.get_json()
+#
+#     if not data:
+#         return jsonify({"valid": False, "message": "No data provided"})
+#
+#     secret = data.get("secret", "")
+#     key = data.get("key", "")
+#     hwid = data.get("hwid", "")
+#
+#     if secret != DISCORD_KEY_API_SECRET:
+#         return jsonify({"valid": False, "message": "Unauthorized"})
+#
+#     if not key or not hwid:
+#         return jsonify({"valid": False, "message": "Missing key or HWID"})
+#
+#     keys = load_discord_keys()
+#     key_data = keys.get(key)
+#
+#     if not key_data:
+#         return jsonify({"valid": False, "message": "Invalid key"})
+#
+#     if time.time() > key_data.get("expires_at", 0):
+#         del keys[key]
+#         save_discord_keys(keys)
+#         return jsonify({"valid": False, "message": "Key expired. Run /getkey in Discord."})
+#
+#     discord_id = key_data.get("discord_id")
+#     if not check_discord_membership(discord_id):
+#         del keys[key]
+#         save_discord_keys(keys)
+#         return jsonify({"valid": False, "message": "You must be in the Discord server."})
+#
+#     if key_data.get("hwid") and key_data["hwid"] != hwid:
+#         return jsonify({"valid": False, "message": "Key is locked to a different device. Use /resetkey in Discord."})
+#
+#     if not key_data.get("hwid"):
+#         key_data["hwid"] = hwid
+#         keys[key] = key_data
+#         save_discord_keys(keys)
+#
+#     return jsonify({"valid": True, "message": "Authenticated"})
 
 @app.route('/plugin/<plugin_id>')
 def plugin_detail(plugin_id):
@@ -1284,18 +1284,16 @@ def find_channels():
     return youtube_finder.find_multiple_channels(usernames)
 
 if __name__ == '__main__':
-    import threading
+    # --- Discord bots moved to separate server ---
+    # import threading
+    # bot_thread = threading.Thread(target=start_bot, daemon=True)
+    # bot_thread.start()
+    # time.sleep(10)
+    # stickied_bot_thread = threading.Thread(target=start_stickied_bot, daemon=True)
+    # stickied_bot_thread.start()
 
-    bot_thread = threading.Thread(target=start_bot, daemon=True)
-    bot_thread.start()
-
-    time.sleep(10)
-
-    stickied_bot_thread = threading.Thread(target=start_stickied_bot, daemon=True)
-    stickied_bot_thread.start()
-
-    ping_thread = threading.Thread(target=server_pinger, daemon=True)
-    ping_thread.start()
+    # ping_thread = threading.Thread(target=server_pinger, daemon=True)
+    # ping_thread.start()
 
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
