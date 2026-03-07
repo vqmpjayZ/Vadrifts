@@ -739,6 +739,7 @@ def validate_key_route():
 @app.route('/api/validate-discord-key', methods=['POST'])
 def validate_discord_key():
     data = request.get_json()
+
     if not data:
         return jsonify({"valid": False, "message": "No data provided"})
 
@@ -747,22 +748,39 @@ def validate_discord_key():
     hwid = data.get("hwid", "")
 
     if secret != DISCORD_KEY_API_SECRET:
+        logger.warning(f"Discord key validation: wrong secret")
         return jsonify({"valid": False, "message": "Unauthorized"})
+
     if not key or not hwid:
         return jsonify({"valid": False, "message": "Missing key or HWID"})
 
     keys = load_discord_keys()
+    logger.info(f"Discord key validation: loaded {len(keys)} keys from MongoDB")
+    logger.info(f"Discord key validation: looking for key '{key[:8]}...'")
+    logger.info(f"Discord key validation: available keys = {[k[:8]+'...' for k in keys.keys()]}")
+
     key_data = keys.get(key)
+
     if not key_data:
+        logger.warning(f"Discord key validation: key not found")
         return jsonify({"valid": False, "message": "Invalid key"})
 
+    logger.info(f"Discord key validation: key found, checking expiry")
+
     if time.time() > key_data.get("expires_at", 0):
+        logger.warning(f"Discord key validation: key expired")
         del keys[key]
         save_discord_keys(keys)
         return jsonify({"valid": False, "message": "Key expired. Run /getkey in Discord."})
 
     discord_id = key_data.get("discord_id")
-    if not check_discord_membership(discord_id):
+    logger.info(f"Discord key validation: checking membership for discord_id={discord_id}, guild={GUILD_ID}")
+    logger.info(f"Discord key validation: using token '{DISCORD_TOKEN[:10]}...' (truncated)")
+
+    is_member = check_discord_membership(discord_id)
+    logger.info(f"Discord key validation: membership check = {is_member}")
+
+    if not is_member:
         del keys[key]
         save_discord_keys(keys)
         return jsonify({"valid": False, "message": "You must be in the Discord server."})
@@ -775,6 +793,7 @@ def validate_discord_key():
         keys[key] = key_data
         save_discord_keys(keys)
 
+    logger.info(f"Discord key validation: SUCCESS")
     return jsonify({"valid": True, "message": "Authenticated"})
 
 
