@@ -936,49 +936,49 @@ def validate_key_route():
     is_valid = key_system.validate_key(client_ip, key)
     return "true" if is_valid else "false"
 
-# @app.route('/api/validate-discord-key', methods=['POST'])
-# def validate_discord_key():
-#     data = request.get_json()
-#
-#     if not data:
-#         return jsonify({"valid": False, "message": "No data provided"})
-#
-#     secret = data.get("secret", "")
-#     key = data.get("key", "")
-#     hwid = data.get("hwid", "")
-#
-#     if secret != DISCORD_KEY_API_SECRET:
-#         return jsonify({"valid": False, "message": "Unauthorized"})
-#
-#     if not key or not hwid:
-#         return jsonify({"valid": False, "message": "Missing key or HWID"})
-#
-#     keys = load_discord_keys()
-#     key_data = keys.get(key)
-#
-#     if not key_data:
-#         return jsonify({"valid": False, "message": "Invalid key"})
-#
-#     if time.time() > key_data.get("expires_at", 0):
-#         del keys[key]
-#         save_discord_keys(keys)
-#         return jsonify({"valid": False, "message": "Key expired. Run /getkey in Discord."})
-#
-#     discord_id = key_data.get("discord_id")
-#     if not check_discord_membership(discord_id):
-#         del keys[key]
-#         save_discord_keys(keys)
-#         return jsonify({"valid": False, "message": "You must be in the Discord server."})
-#
-#     if key_data.get("hwid") and key_data["hwid"] != hwid:
-#         return jsonify({"valid": False, "message": "Key is locked to a different device. Use /resetkey in Discord."})
-#
-#     if not key_data.get("hwid"):
-#         key_data["hwid"] = hwid
-#         keys[key] = key_data
-#         save_discord_keys(keys)
-#
-#     return jsonify({"valid": True, "message": "Authenticated"})
+ @app.route('/api/validate-discord-key', methods=['POST'])
+ def validate_discord_key():
+     data = request.get_json()
+
+     if not data:
+         return jsonify({"valid": False, "message": "No data provided"})
+
+     secret = data.get("secret", "")
+     key = data.get("key", "")
+     hwid = data.get("hwid", "")
+
+     if secret != DISCORD_KEY_API_SECRET:
+         return jsonify({"valid": False, "message": "Unauthorized"})
+
+     if not key or not hwid:
+         return jsonify({"valid": False, "message": "Missing key or HWID"})
+
+     keys = load_discord_keys()
+     key_data = keys.get(key)
+
+     if not key_data:
+         return jsonify({"valid": False, "message": "Invalid key"})
+
+     if time.time() > key_data.get("expires_at", 0):
+         del keys[key]
+         save_discord_keys(keys)
+         return jsonify({"valid": False, "message": "Key expired. Run /getkey in Discord."})
+
+     discord_id = key_data.get("discord_id")
+     if not check_discord_membership(discord_id):
+         del keys[key]
+         save_discord_keys(keys)
+         return jsonify({"valid": False, "message": "You must be in the Discord server."})
+
+     if key_data.get("hwid") and key_data["hwid"] != hwid:
+         return jsonify({"valid": False, "message": "Key is locked to a different device. Use /resetkey in Discord."})
+
+     if not key_data.get("hwid"):
+         key_data["hwid"] = hwid
+         keys[key] = key_data
+         save_discord_keys(keys)
+
+     return jsonify({"valid": True, "message": "Authenticated"})
 
 @app.route('/plugin/<plugin_id>')
 def plugin_detail(plugin_id):
