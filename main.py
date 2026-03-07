@@ -94,6 +94,24 @@ def is_valid_referrer(referer):
     ]
     return any(domain in referer for domain in allowed_referrers)
 
+@app.route('/debug-keys')
+def debug_keys():
+    keys = load_discord_keys()
+    safe_keys = {}
+    for k, v in keys.items():
+        safe_keys[k[:8] + "..."] = {
+            "discord_id": v.get("discord_id"),
+            "expires_at": v.get("expires_at"),
+            "expired": time.time() > v.get("expires_at", 0),
+            "hwid": v.get("hwid"),
+            "username": v.get("username")
+        }
+    return jsonify({
+        "total_keys": len(keys),
+        "guild_id_configured": GUILD_ID,
+        "discord_token_set": bool(DISCORD_TOKEN),
+        "keys": safe_keys
+    })
 
 def verify_turnstile(token, ip):
     try:
