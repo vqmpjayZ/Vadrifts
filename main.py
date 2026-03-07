@@ -3,22 +3,25 @@ import logging
 import json
 import secrets
 import time
+import atexit
+import signal
 import requests
 from functools import wraps
 from flask import Flask, request, jsonify, send_file, redirect, send_from_directory, make_response
 from datetime import datetime, timedelta
-from collections import defaultdict
+from threading import Timer
 
 from config import *
-from discord_bot import load_discord_keys, save_discord_keys, GUILD_ID
+from discord_bot import start_bot, load_discord_keys, save_discord_keys, GUILD_ID
+from stickied_message_bot import start_stickied_bot
 from youtube_grabber import YouTubeChannelFinder
 from image_converter import convert_image_endpoint
 from plugins_manager import PluginsManager
 from scripts_data import scripts_data, process_script_data
-from utils import inject_meta_tags
+from utils import inject_meta_tags, server_pinger
+from collections import defaultdict
 from key_system import KeySystemManager
 from verification_timer import VerificationTimer
-from analytics_db import log_execution as log_execution_to_db, get_analytics as get_analytics_from_db
 
 logging.basicConfig(
     level=logging.INFO,
@@ -41,6 +44,9 @@ API_SECRET = "vadriftsisalwaysinseason"
 TURNSTILE_SITE_KEY = os.environ.get("TURNSTILE_SITE_KEY")
 TURNSTILE_SECRET_KEY = os.environ.get("TURNSTILE_SECRET_KEY")
 
+JSONBIN_API_KEY = os.environ.get("JSONBIN_API_KEY")
+JSONBIN_BIN_ID = os.environ.get("JSONBIN_BIN_ID")
+
 DISCORD_KEY_API_SECRET = os.environ.get("DISCORD_KEY_API_SECRET")
 
 feature_credits = {}
@@ -54,10 +60,6 @@ FEATURE_CONFIG = {
         "workink_url": "https://work.ink/20yd/Vadrifts-StarvingArtists"
     }
 }
-
-usage_data = {}
-copy_usage_data = {}
-
 
 def sanitize_script(script):
     safe = dict(script)
@@ -74,13 +76,84 @@ def sanitize_script(script):
     safe.pop('linkvertise_link', None)
     return safe
 
+def cleanup_old_logs(logs):
+    if not logs:
+        return []
+
+    cutoff = datetime.now() - timedelta(days=30)
+    cleaned = []
+    removed = 0
+
+    for log in logs:
+        try:
+            timestamp = datetime.fromisoformat(log['timestamp'])
+            if timestamp >= cutoff:
+                cleaned.append(log)
+            else:
+                removed += 1
+        except:
+            cleaned.append(log)
+
+    if removed > 0:
+        logger.info(f"Cleaned up {removed} logs older than 30 days")
+
+    return cleaned
+
+def load_analytics_from_jsonbin():
+    if not JSONBIN_API_KEY or not JSONBIN_BIN_ID:
+        logger.warning("JSONBin credentials not configured")
+        return None
+
+    try:
+        response = requests.get(
+            f"https://api.jsonbin.io/v3/b/{JSONBIN_BIN_ID}/latest",
+            headers={"X-Master-Key": JSONBIN_API_KEY}
+        )
+        if response.status_code == 200:
+            data = response.json()
+            record = data.get('record', {})
+            if 'execution_logs' in record:
+                record['execution_logs'] = cleanup_old_logs(record['execution_logs'])
+            return record
+        else:
+            logger.error(f"JSONBin load failed: {response.status_code}")
+            return None
+    except Exception as e:
+        logger.error(f"JSONBin load error: {str(e)}")
+        return None
+
+def save_analytics_to_jsonbin(data):
+    if not JSONBIN_API_KEY or not JSONBIN_BIN_ID:
+        logger.warning("JSONBin credentials not configured")
+        return False
+
+    if 'execution_logs' in data:
+        data['execution_logs'] = cleanup_old_logs(data['execution_logs'])
+
+    try:
+        response = requests.put(
+            f"https://api.jsonbin.io/v3/b/{JSONBIN_BIN_ID}",
+            headers={
+                "Content-Type": "application/json",
+                "X-Master-Key": JSONBIN_API_KEY
+            },
+            json=data
+        )
+        if response.status_code == 200:
+            logger.info("Analytics saved to JSONBin")
+            return True
+        else:
+            logger.error(f"JSONBin save failed: {response.status_code}")
+            return False
+    except Exception as e:
+        logger.error(f"JSONBin save error: {str(e)}")
+        return False
 
 def get_client_ip():
     client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
     if client_ip and ',' in client_ip:
         client_ip = client_ip.split(',')[0].strip()
     return client_ip
-
 
 def is_valid_referrer(referer):
     allowed_referrers = [
@@ -91,7 +164,6 @@ def is_valid_referrer(referer):
         'link-hub.net', 'link-center.net', 'up-to-down.net'
     ]
     return any(domain in referer for domain in allowed_referrers)
-
 
 def verify_turnstile(token, ip):
     try:
@@ -106,7 +178,6 @@ def verify_turnstile(token, ip):
         logger.error(f"Turnstile verification error: {str(e)}")
         return False
 
-
 def require_api_key(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -115,7 +186,6 @@ def require_api_key(f):
             return jsonify({"error": "Unauthorized"}), 401
         return f(*args, **kwargs)
     return decorated_function
-
 
 def check_discord_membership(discord_id):
     try:
@@ -128,14 +198,12 @@ def check_discord_membership(discord_id):
     except:
         return False
 
-
 @app.route('/api/feature-config/<feature_id>')
 def get_feature_config(feature_id):
     if feature_id not in FEATURE_CONFIG:
         return jsonify({"error": "Feature not found"}), 404
 
     return jsonify(FEATURE_CONFIG[feature_id])
-
 
 @app.route('/unlock/<feature_id>')
 def feature_unlock_page(feature_id):
@@ -169,7 +237,6 @@ def feature_unlock_page(feature_id):
         logger.error("feature-unlock.html template not found")
         return jsonify({"error": "Template not found"}), 404
 
-
 @app.route('/start-unlock/<feature_id>')
 def start_feature_unlock(feature_id):
     if feature_id not in FEATURE_CONFIG:
@@ -180,7 +247,6 @@ def start_feature_unlock(feature_id):
     logger.info(f"Feature unlock timer started for IP: {client_ip}, feature: {feature_id}")
 
     return jsonify({"success": True})
-
 
 @app.route('/complete-unlock/<feature_id>')
 def complete_feature_unlock(feature_id):
@@ -261,7 +327,6 @@ def complete_feature_unlock(feature_id):
     except FileNotFoundError:
         return jsonify({"error": "Template not found"}), 404
 
-
 @app.route('/docs/arrayfield')
 def arrayfield_docs():
     try:
@@ -269,7 +334,6 @@ def arrayfield_docs():
     except FileNotFoundError:
         logger.error("arrayfield-docs.html template not found")
         return jsonify({"error": "Documentation page not found"}), 404
-
 
 @app.route('/check-credits/<feature_id>')
 def check_feature_credits(feature_id):
@@ -280,7 +344,6 @@ def check_feature_credits(feature_id):
 
     credits = feature_credits[client_ip].get(feature_id, 0)
     return jsonify({"credits": credits})
-
 
 @app.route('/use-credit/<feature_id>')
 def use_feature_credit(feature_id):
@@ -300,7 +363,6 @@ def use_feature_credit(feature_id):
 
     return jsonify({"success": True, "remaining": current - 1})
 
-
 @app.route('/')
 def home():
     try:
@@ -313,7 +375,6 @@ def home():
         logger.error("home.html template not found")
         return jsonify({"error": "Home page not found"}), 404
 
-
 @app.route('/scripts')
 def scripts_page():
     try:
@@ -324,7 +385,6 @@ def scripts_page():
     except FileNotFoundError:
         logger.error("scripts.html template not found")
         return jsonify({"error": "Scripts page not found"}), 404
-
 
 @app.route('/start-verification')
 def start_verification():
@@ -337,7 +397,6 @@ def start_verification():
         "message": "Timer started"
     })
 
-
 @app.route('/plugins')
 def plugins_page():
     try:
@@ -349,7 +408,6 @@ def plugins_page():
         logger.error("plugins.html template not found")
         return jsonify({"error": "Plugins page not found"}), 404
 
-
 @app.route('/plugin-details')
 def plugin_details():
     try:
@@ -357,7 +415,6 @@ def plugin_details():
     except FileNotFoundError:
         logger.error("plugin-details.html template not found")
         return jsonify({"error": "Plugin details page not found"}), 404
-
 
 @app.route('/api/plugins/<plugin_id>/raw')
 def get_plugin_raw(plugin_id):
@@ -416,7 +473,6 @@ return Plugin'''
         response.headers['Content-Type'] = 'text/plain; charset=utf-8'
         return response, 500
 
-
 @app.route('/script/<int:script_id>')
 def script_detail(script_id):
     script = next((s for s in scripts_data if s['id'] == script_id), None)
@@ -446,7 +502,6 @@ def script_detail(script_id):
         logger.error("script-detail.html template not found")
         return jsonify({"error": "Script detail page not found"}), 404
 
-
 @app.route('/converter')
 def converter():
     try:
@@ -455,6 +510,89 @@ def converter():
         logger.error("converter.html template not found")
         return jsonify({"error": "Converter page not found"}), 404
 
+usage_data = {}
+copy_usage_data = {}
+execution_logs = []
+cloud_data_loaded = False
+_save_timer = None
+_unsaved_changes = False
+_last_save_time = 0
+
+def force_save():
+    global _unsaved_changes, _last_save_time
+
+    if not execution_logs:
+        return False
+
+    success = save_analytics_to_jsonbin({
+        'execution_logs': execution_logs,
+        'last_updated': datetime.now().isoformat()
+    })
+
+    if success:
+        _unsaved_changes = False
+        _last_save_time = time.time()
+        logger.info(f"Saved {len(execution_logs)} logs to JSONBin")
+
+    return success
+
+def debounced_save():
+    global _last_save_time
+
+    if time.time() - _last_save_time < 60:
+        return
+
+    if _unsaved_changes:
+        force_save()
+
+def start_periodic_save():
+    global _save_timer
+
+    def save_loop():
+        global _save_timer
+        if _unsaved_changes:
+            logger.info("Periodic save triggered")
+            force_save()
+
+        _save_timer = Timer(120, save_loop)
+        _save_timer.daemon = True
+        _save_timer.start()
+
+    if _save_timer:
+        _save_timer.cancel()
+
+    _save_timer = Timer(120, save_loop)
+    _save_timer.daemon = True
+    _save_timer.start()
+    logger.info("Periodic save loop started (every 2 minutes)")
+
+def shutdown_handler(signum, frame):
+    logger.info(f"Received signal {signum} - saving before shutdown...")
+    force_save()
+    exit(0)
+
+signal.signal(signal.SIGTERM, shutdown_handler)
+signal.signal(signal.SIGINT, shutdown_handler)
+
+def save_on_exit():
+    logger.info("Server shutting down - saving analytics...")
+    force_save()
+
+atexit.register(save_on_exit)
+
+def ensure_cloud_data_loaded():
+    global execution_logs, cloud_data_loaded
+
+    if cloud_data_loaded:
+        return
+
+    cloud_data = load_analytics_from_jsonbin()
+    if cloud_data and 'execution_logs' in cloud_data:
+        execution_logs = cloud_data['execution_logs']
+        logger.info(f"Loaded {len(execution_logs)} logs from JSONBin")
+
+    cloud_data_loaded = True
+    start_periodic_save()
 
 @app.route('/check-usage', methods=['GET'])
 def check_usage():
@@ -472,7 +610,6 @@ def check_usage():
 
     return jsonify(usage_data[hwid])
 
-
 @app.route('/update-usage', methods=['GET'])
 def update_usage():
     hwid = request.args.get('hwid')
@@ -485,7 +622,6 @@ def update_usage():
     usage_data[hwid] = {'used': int(used), 'date': today}
 
     return jsonify({"success": True})
-
 
 @app.route('/check-copy-usage', methods=['GET'])
 def check_copy_usage():
@@ -503,7 +639,6 @@ def check_copy_usage():
 
     return jsonify(copy_usage_data[hwid])
 
-
 @app.route('/update-copy-usage', methods=['GET'])
 def update_copy_usage():
     hwid = request.args.get('hwid')
@@ -518,25 +653,101 @@ def update_copy_usage():
 
     return jsonify({"success": True})
 
-
 @app.route('/log-execution', methods=['GET'])
 def log_execution():
+    global execution_logs, _unsaved_changes
+    ensure_cloud_data_loaded()
+
     hwid = request.args.get('hwid')
     script = request.args.get('script', 'Unknown')
-    if hwid:
-        log_execution_to_db(hwid, script)
-    return jsonify({"success": True})
 
+    if hwid:
+        execution_logs.append({
+            'hwid': hwid,
+            'script': script,
+            'timestamp': datetime.now().isoformat()
+        })
+
+        if len(execution_logs) > 10000:
+            execution_logs = execution_logs[-10000:]
+
+        _unsaved_changes = True
+        debounced_save()
+
+    return jsonify({"success": True})
 
 @app.route('/analytics-data', methods=['GET'])
 def analytics_data():
-    return jsonify(get_analytics_from_db())
+    ensure_cloud_data_loaded()
 
+    now = datetime.now()
+    week_ago = now - timedelta(days=7)
+    two_weeks_ago = now - timedelta(days=14)
+    month_ago = now - timedelta(days=30)
+    two_months_ago = now - timedelta(days=60)
+
+    week_execs = []
+    prev_week_execs = []
+    month_execs = []
+    prev_month_execs = []
+    script_counts = defaultdict(int)
+    unique_users_week = set()
+    unique_users_month = set()
+
+    daily_data = defaultdict(int)
+    script_daily_data = defaultdict(lambda: defaultdict(int))
+
+    for log in execution_logs:
+        timestamp = datetime.fromisoformat(log['timestamp'])
+        script_counts[log['script']] += 1
+
+        day_key = timestamp.strftime('%Y-%m-%d')
+        daily_data[day_key] += 1
+        script_daily_data[log['script']][day_key] += 1
+
+        if timestamp >= week_ago:
+            week_execs.append(log)
+            unique_users_week.add(log['hwid'])
+        elif timestamp >= two_weeks_ago:
+            prev_week_execs.append(log)
+
+        if timestamp >= month_ago:
+            month_execs.append(log)
+            unique_users_month.add(log['hwid'])
+        elif timestamp >= two_months_ago:
+            prev_month_execs.append(log)
+
+    last_30_days = [(now - timedelta(days=i)).strftime('%Y-%m-%d') for i in range(29, -1, -1)]
+    chart_data = [daily_data.get(day, 0) for day in last_30_days]
+
+    script_chart_data = {}
+    for script in script_counts.keys():
+        script_chart_data[script] = [script_daily_data[script].get(day, 0) for day in last_30_days]
+
+    return jsonify({
+        'total_executions': len(execution_logs),
+        'week_executions': len(week_execs),
+        'month_executions': len(month_execs),
+        'prev_week_executions': len(prev_week_execs),
+        'prev_month_executions': len(prev_month_execs),
+        'unique_users_week': len(unique_users_week),
+        'unique_users_month': len(unique_users_month),
+        'script_breakdown': dict(script_counts),
+        'chart_labels': last_30_days,
+        'chart_data': chart_data,
+        'script_daily_data': script_chart_data
+    })
 
 @app.route('/analytics-sync', methods=['POST'])
 def analytics_sync():
-    return jsonify({'success': True, 'message': 'Data saves in real-time via MongoDB'})
+    ensure_cloud_data_loaded()
 
+    success = force_save()
+
+    if success:
+        return jsonify({'success': True, 'message': f'Synced {len(execution_logs)} logs to cloud'})
+    else:
+        return jsonify({'success': False, 'error': 'Failed to sync'}), 500
 
 @app.route('/analytics')
 def analytics_page():
@@ -546,7 +757,6 @@ def analytics_page():
         logger.error("analytics.html template not found")
         return jsonify({"error": "Analytics page not found"}), 404
 
-
 @app.route('/key-system')
 def key_system_page():
     try:
@@ -554,7 +764,6 @@ def key_system_page():
     except FileNotFoundError:
         logger.error("key-system.html template not found")
         return jsonify({"error": "Key system page not found"}), 404
-
 
 @app.route('/checkpoint/start')
 def checkpoint_start():
@@ -585,7 +794,6 @@ def checkpoint_start():
 
     logger.info(f"Checkpoint token created for IP: {client_ip}, script: {script_id}, provider: {provider}")
     return jsonify({"token": token})
-
 
 @app.route('/checkpoint/load')
 def checkpoint_load():
@@ -636,7 +844,6 @@ def checkpoint_load():
     logger.info(f"Checkpoint loaded for IP: {client_ip}, redirecting to provider")
     return redirect(link)
 
-
 @app.route('/checkpoint/done')
 def checkpoint_done():
     client_ip = get_client_ip()
@@ -683,6 +890,17 @@ def checkpoint_done():
     logger.info(f"Checkpoint completed for IP: {client_ip}, redirecting to verify")
     return redirect(f'/verify?token={token}')
 
+@app.route('/checkpoint/status')
+def checkpoint_status():
+    client_ip = get_client_ip()
+    data = completed_checkpoints.get(client_ip)
+
+    if data and time.time() <= data['expires']:
+        token = data['token']
+        del completed_checkpoints[client_ip]
+        return jsonify({"completed": True, "token": token})
+
+    return jsonify({"completed": False})
 
 @app.route('/verify')
 def verify_page():
@@ -748,7 +966,6 @@ def verify_page():
     logger.info(f"Verification token created for IP: {client_ip} after {timer_check['elapsed']:.1f}s")
     return html_content
 
-
 @app.route('/create')
 def create_key():
     token = request.args.get('token')
@@ -793,7 +1010,6 @@ def create_key():
     logger.info(f"Created key slug for IP: {client_ip}")
     return f"https://{host}/getkey/{slug}"
 
-
 @app.route('/getkey/<slug>')
 def get_key(slug):
     ip = key_system.get_ip_from_slug(slug)
@@ -808,7 +1024,6 @@ def get_key(slug):
     logger.info(f"Key generated for IP: {ip} - Key: {key}")
     return key
 
-
 @app.route('/validate')
 def validate_key_route():
     key = request.args.get('key')
@@ -819,7 +1034,6 @@ def validate_key_route():
     client_ip = get_client_ip()
     is_valid = key_system.validate_key(client_ip, key)
     return "true" if is_valid else "false"
-
 
 @app.route('/api/validate-discord-key', methods=['POST'])
 def validate_discord_key():
@@ -864,7 +1078,6 @@ def validate_discord_key():
         save_discord_keys(keys)
 
     return jsonify({"valid": True, "message": "Authenticated"})
-
 
 @app.route('/plugin/<plugin_id>')
 def plugin_detail(plugin_id):
@@ -986,28 +1199,23 @@ def plugin_detail(plugin_id):
 
     return html
 
-
 @app.route('/templates/<path:filename>')
 def serve_templates(filename):
     return send_from_directory('templates', filename)
-
 
 @app.route('/static/<path:filename>')
 def serve_static(filename):
     return send_from_directory('static', filename)
 
-
 @app.route('/discord')
 def discord_invite():
     return redirect("https://discord.com/invite/WDbJ5wE2cR")
-
 
 @app.route('/.well-known/discord')
 def discord_verification():
     response = make_response('dh=6a7d0bee33f82bdb67f20d7ac5d8254e1a36cb64')
     response.headers['Content-Type'] = 'text/plain'
     return response
-
 
 @app.route('/status-check')
 def status_check():
@@ -1019,11 +1227,9 @@ def status_check():
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response, 200
 
-
 @app.route('/health')
 def health():
     return jsonify({"status": "healthy", "timestamp": datetime.now().isoformat()}), 200
-
 
 @app.route('/api/scripts')
 def get_scripts():
@@ -1039,7 +1245,6 @@ def get_scripts():
         return jsonify(filtered_scripts)
     return jsonify(safe_scripts)
 
-
 @app.route('/api/scripts/<int:script_id>')
 def get_script_detail(script_id):
     processed_scripts = process_script_data(scripts_data.copy())
@@ -1048,36 +1253,29 @@ def get_script_detail(script_id):
         return jsonify(sanitize_script(script))
     return jsonify({"error": "Script not found"}), 404
 
-
 @app.route('/api/plugins', methods=['GET'])
 def get_plugins():
     return plugins_manager.get_all_plugins()
-
 
 @app.route('/api/plugins', methods=['POST'])
 def create_plugin():
     return plugins_manager.create_plugin(request)
 
-
 @app.route('/api/plugins/<plugin_id>', methods=['GET'])
 def get_plugin(plugin_id):
     return plugins_manager.get_plugin(plugin_id)
-
 
 @app.route('/api/plugins/<plugin_id>', methods=['PUT'])
 def update_plugin(plugin_id):
     return plugins_manager.update_plugin(plugin_id, request)
 
-
 @app.route('/api/plugins/<plugin_id>', methods=['DELETE'])
 def delete_plugin(plugin_id):
     return plugins_manager.delete_plugin(plugin_id)
 
-
 @app.route('/convert-image')
 def convert_image():
     return convert_image_endpoint(request)
-
 
 @app.route('/api/find-channels', methods=['POST'])
 def find_channels():
@@ -1085,7 +1283,25 @@ def find_channels():
     usernames = data.get('usernames', [])
     return youtube_finder.find_multiple_channels(usernames)
 
-
 if __name__ == '__main__':
+    import threading
+
     port = int(os.environ.get("PORT", 5000))
+
+    def start_bots_delayed():
+        time.sleep(5)
+        bot_thread = threading.Thread(target=start_bot, daemon=True)
+        bot_thread.start()
+
+        time.sleep(10)
+
+        stickied_bot_thread = threading.Thread(target=start_stickied_bot, daemon=True)
+        stickied_bot_thread.start()
+
+    bots_thread = threading.Thread(target=start_bots_delayed, daemon=True)
+    bots_thread.start()
+
+    ping_thread = threading.Thread(target=server_pinger, daemon=True)
+    ping_thread.start()
+
     app.run(host='0.0.0.0', port=port, debug=False)
