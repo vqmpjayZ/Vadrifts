@@ -3,14 +3,11 @@ import logging
 import json
 import secrets
 import time
-import atexit
-import signal
 import requests
 from functools import wraps
 from flask import Flask, request, jsonify, send_file, redirect, send_from_directory, make_response
 from datetime import datetime, timedelta
-from threading import Timer
-
+from analytics_db import log_execution as log_execution_to_db, get_analytics as get_analytics_from_db
 from config import *
 # from discord_bot import start_bot, load_discord_keys, save_discord_keys, GUILD_ID
 # from stickied_message_bot import start_stickied_bot
@@ -41,12 +38,6 @@ checkpoint_tokens = {}
 active_checkpoints = {}
 
 API_SECRET = "vadriftsisalwaysinseason"
-TURNSTILE_SITE_KEY = os.environ.get("TURNSTILE_SITE_KEY")
-TURNSTILE_SECRET_KEY = os.environ.get("TURNSTILE_SECRET_KEY")
-
-JSONBIN_API_KEY = os.environ.get("JSONBIN_API_KEY")
-JSONBIN_BIN_ID = os.environ.get("JSONBIN_BIN_ID")
-
 DISCORD_KEY_API_SECRET = os.environ.get("DISCORD_KEY_API_SECRET")
 
 feature_credits = {}
@@ -512,11 +503,6 @@ def converter():
 
 usage_data = {}
 copy_usage_data = {}
-execution_logs = []
-cloud_data_loaded = False
-_save_timer = None
-_unsaved_changes = False
-_last_save_time = 0
 
 def force_save():
     global _unsaved_changes, _last_save_time
@@ -571,14 +557,9 @@ def shutdown_handler(signum, frame):
     force_save()
     exit(0)
 
-signal.signal(signal.SIGTERM, shutdown_handler)
-signal.signal(signal.SIGINT, shutdown_handler)
-
 def save_on_exit():
     logger.info("Server shutting down - saving analytics...")
     force_save()
-
-atexit.register(save_on_exit)
 
 def ensure_cloud_data_loaded():
     global execution_logs, cloud_data_loaded
@@ -655,99 +636,19 @@ def update_copy_usage():
 
 @app.route('/log-execution', methods=['GET'])
 def log_execution():
-    global execution_logs, _unsaved_changes
-    ensure_cloud_data_loaded()
-
     hwid = request.args.get('hwid')
     script = request.args.get('script', 'Unknown')
-
     if hwid:
-        execution_logs.append({
-            'hwid': hwid,
-            'script': script,
-            'timestamp': datetime.now().isoformat()
-        })
-
-        if len(execution_logs) > 10000:
-            execution_logs = execution_logs[-10000:]
-
-        _unsaved_changes = True
-        debounced_save()
-
+        log_execution_to_db(hwid, script)
     return jsonify({"success": True})
 
 @app.route('/analytics-data', methods=['GET'])
 def analytics_data():
-    ensure_cloud_data_loaded()
-
-    now = datetime.now()
-    week_ago = now - timedelta(days=7)
-    two_weeks_ago = now - timedelta(days=14)
-    month_ago = now - timedelta(days=30)
-    two_months_ago = now - timedelta(days=60)
-
-    week_execs = []
-    prev_week_execs = []
-    month_execs = []
-    prev_month_execs = []
-    script_counts = defaultdict(int)
-    unique_users_week = set()
-    unique_users_month = set()
-
-    daily_data = defaultdict(int)
-    script_daily_data = defaultdict(lambda: defaultdict(int))
-
-    for log in execution_logs:
-        timestamp = datetime.fromisoformat(log['timestamp'])
-        script_counts[log['script']] += 1
-
-        day_key = timestamp.strftime('%Y-%m-%d')
-        daily_data[day_key] += 1
-        script_daily_data[log['script']][day_key] += 1
-
-        if timestamp >= week_ago:
-            week_execs.append(log)
-            unique_users_week.add(log['hwid'])
-        elif timestamp >= two_weeks_ago:
-            prev_week_execs.append(log)
-
-        if timestamp >= month_ago:
-            month_execs.append(log)
-            unique_users_month.add(log['hwid'])
-        elif timestamp >= two_months_ago:
-            prev_month_execs.append(log)
-
-    last_30_days = [(now - timedelta(days=i)).strftime('%Y-%m-%d') for i in range(29, -1, -1)]
-    chart_data = [daily_data.get(day, 0) for day in last_30_days]
-
-    script_chart_data = {}
-    for script in script_counts.keys():
-        script_chart_data[script] = [script_daily_data[script].get(day, 0) for day in last_30_days]
-
-    return jsonify({
-        'total_executions': len(execution_logs),
-        'week_executions': len(week_execs),
-        'month_executions': len(month_execs),
-        'prev_week_executions': len(prev_week_execs),
-        'prev_month_executions': len(prev_month_execs),
-        'unique_users_week': len(unique_users_week),
-        'unique_users_month': len(unique_users_month),
-        'script_breakdown': dict(script_counts),
-        'chart_labels': last_30_days,
-        'chart_data': chart_data,
-        'script_daily_data': script_chart_data
-    })
+    return jsonify(get_analytics_from_db())
 
 @app.route('/analytics-sync', methods=['POST'])
 def analytics_sync():
-    ensure_cloud_data_loaded()
-
-    success = force_save()
-
-    if success:
-        return jsonify({'success': True, 'message': f'Synced {len(execution_logs)} logs to cloud'})
-    else:
-        return jsonify({'success': False, 'error': 'Failed to sync'}), 500
+    return jsonify({'success': True, 'message': 'Data saves in real-time via MongoDB'})
 
 @app.route('/analytics')
 def analytics_page():
