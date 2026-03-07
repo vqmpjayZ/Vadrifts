@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
-GUILD_ID = os.environ.get("DISCORD_GUILD_ID", "1234567890")
+GUILD_ID = os.environ.get("DISCORD_GUILD_ID", "1241797935100989594")
 
 youtube_finder = YouTubeChannelFinder()
 plugins_manager = PluginsManager()
