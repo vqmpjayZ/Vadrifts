@@ -22,11 +22,12 @@ from analytics_db import log_execution as log_execution_to_db, get_analytics as 
 from guild_key_system import (
     get_guild_config, save_guild_config, init_guild_config,
     create_session, get_session, update_session,
-    find_session_by_ip_and_guild, get_pending_session,
+    find_session_by_ip_and_profile, get_pending_session,
     create_guild_key, validate_guild_key,
     delete_guild_keys_by_user, get_guild_key_stats,
     cleanup_expired_guild_keys, get_destination_url,
-    SERVER_BASE_URL
+    get_script_profile, get_profile_by_secret,
+    SERVER_BASE_URL, MIN_COMPLETION_SECONDS
 )
 
 logging.basicConfig(
@@ -1014,6 +1015,14 @@ def ks_gateway(session_token):
             'error', 'Session Expired'
         ), 403
 
+    profile = get_script_profile(session['profile_id'])
+    if not profile or not profile.get('enabled'):
+        return _render_result(
+            '❌', 'Key System Disabled',
+            'This script profile is not active.',
+            'error', 'Disabled'
+        ), 403
+
     guild_config = get_guild_config(session['guild_id'])
     if not guild_config or not guild_config.get('enabled'):
         return _render_result(
@@ -1034,13 +1043,14 @@ def ks_gateway(session_token):
     html = html.replace('{{SESSION_TOKEN}}', session_token)
     html = html.replace('{{GUILD_ID}}', session['guild_id'])
     html = html.replace('{{GUILD_NAME}}', guild_config.get('guild_name', 'Server'))
+    html = html.replace('{{PROFILE_NAME}}', profile.get('name', 'Script'))
 
     html = html.replace('{{WORKINK_DISABLED}}',
-        '' if guild_config.get('workink_url') else 'disabled')
+        '' if profile.get('workink_url') else 'disabled')
     html = html.replace('{{LOOTLABS_DISABLED}}',
-        '' if guild_config.get('lootlabs_url') else 'disabled')
+        '' if profile.get('lootlabs_url') else 'disabled')
     html = html.replace('{{LINKVERTISE_DISABLED}}',
-        '' if guild_config.get('linkvertise_url') else 'disabled')
+        '' if profile.get('linkvertise_url') else 'disabled')
 
     return html
 
@@ -1084,14 +1094,14 @@ def ks_redirect(session_token, provider):
             'error'
         ), 403
 
-    guild_config = get_guild_config(session['guild_id'])
-    if not guild_config:
-        return _render_result('❌', 'Error', 'Server config not found.', 'error'), 404
+    profile = get_script_profile(session['profile_id'])
+    if not profile:
+        return _render_result('❌', 'Error', 'Script profile not found.', 'error'), 404
 
     provider_map = {
-        'workink': guild_config.get('workink_url'),
-        'lootlabs': guild_config.get('lootlabs_url'),
-        'linkvertise': guild_config.get('linkvertise_url'),
+        'workink': profile.get('workink_url'),
+        'lootlabs': profile.get('lootlabs_url'),
+        'linkvertise': profile.get('linkvertise_url'),
     }
 
     url = provider_map.get(provider)
@@ -1107,8 +1117,8 @@ def ks_redirect(session_token, provider):
     return redirect(url)
 
 
-@app.route('/ks/done/<guild_id>')
-def ks_done(guild_id):
+@app.route('/ks/done/<guild_id>/<profile_id>')
+def ks_done(guild_id, profile_id):
     guild_config = get_guild_config(guild_id)
     if not guild_config or not guild_config.get('enabled'):
         return _render_result(
@@ -1117,19 +1127,33 @@ def ks_done(guild_id):
             'error', 'Error'
         ), 404
 
+    profile = get_script_profile(profile_id)
+    if not profile or not profile.get('enabled'):
+        return _render_result(
+            '❌', 'Invalid Profile',
+            'Script profile not found or disabled.',
+            'error', 'Error'
+        ), 404
+
+    if profile.get('guild_id') != str(guild_id):
+        return _render_result(
+            '❌', 'Mismatch',
+            'Profile does not belong to this server.',
+            'error', 'Error'
+        ), 403
+
     client_ip = get_client_ip()
     referer = request.headers.get('Referer', '')
 
-    session = find_session_by_ip_and_guild(client_ip, guild_id)
+    session = find_session_by_ip_and_profile(client_ip, guild_id, profile_id)
     if not session:
-        logger.warning(f"KS done: no matching session for IP={client_ip}, guild={guild_id}")
+        logger.warning(f"KS done: no matching session for IP={client_ip}, guild={guild_id}, profile={profile_id}")
         return _render_result(
             '❌', 'No Active Session',
             'No verification session found. Please start from Discord.',
             'error', 'Access Denied'
         ), 403
 
-    min_time = guild_config.get('min_completion_seconds', 25)
     timer_started_at = session.get('timer_started_at')
 
     if not timer_started_at:
@@ -1140,12 +1164,11 @@ def ks_done(guild_id):
         ), 403
 
     elapsed = time.time() - timer_started_at
-    if elapsed < min_time:
-        logger.warning(f"KS done: too fast. {elapsed:.1f}s < {min_time}s, IP={client_ip}")
+    if elapsed < MIN_COMPLETION_SECONDS:
+        logger.warning(f"KS done: too fast. {elapsed:.1f}s < {MIN_COMPLETION_SECONDS}s, IP={client_ip}")
         return _render_result(
             '⚠️', 'Too Fast',
-            f'Verification completed too quickly ({elapsed:.0f}s). '
-            f'You need at least {min_time}s. Please try again properly.',
+            f'Verification completed too quickly ({elapsed:.0f}s). Please try again properly.',
             'error', 'Verification Failed'
         ), 403
 
@@ -1165,7 +1188,7 @@ def ks_done(guild_id):
         "completed_at": time.time()
     })
 
-    logger.info(f"KS done: session completed. user={session['discord_name']}, guild={guild_id}, elapsed={elapsed:.1f}s")
+    logger.info(f"KS done: session completed. user={session['discord_name']}, guild={guild_id}, profile={profile_id}, elapsed={elapsed:.1f}s")
 
     return _render_result(
         '✅', 'Verification Complete!',
