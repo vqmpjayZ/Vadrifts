@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Key System - {{GUILD_NAME}}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #0a0a0f;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(156, 136, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(156, 136, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+
+        .bg-glow {
+            position: fixed;
+            width: 600px; height: 600px;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        .bg-glow-1 { top: -200px; left: -100px; background: #7209b7; }
+        .bg-glow-2 { bottom: -200px; right: -100px; background: #9c88ff; }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 90%;
+            max-width: 480px;
+            animation: fadeSlideIn 0.6s ease;
+        }
+
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: rgba(20, 20, 30, 0.85);
+            border: 1px solid rgba(156, 136, 255, 0.15);
+            border-radius: 16px;
+            padding: 36px 32px;
+            backdrop-filter: blur(20px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .header .icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+        }
+
+        .header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+
+        .header p {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .guild-name {
+            color: #9c88ff;
+            font-weight: 600;
+        }
+
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .step {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+        .step.active {
+            background: #9c88ff;
+            color: #fff;
+        }
+
+        .step.inactive {
+            background: rgba(156, 136, 255, 0.1);
+            color: #666;
+            border: 1px solid rgba(156, 136, 255, 0.2);
+        }
+
+        .step.done {
+            background: #22c55e;
+            color: #fff;
+        }
+
+        .step-line {
+            width: 40px;
+            height: 2px;
+            background: rgba(156, 136, 255, 0.2);
+        }
+
+        .providers {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .provider-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            background: rgba(156, 136, 255, 0.08);
+            border: 1px solid rgba(156, 136, 255, 0.2);
+            border-radius: 12px;
+            color: #e0e0e0;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+            text-decoration: none;
+            user-select: none;
+        }
+
+        .provider-btn:hover {
+            background: rgba(156, 136, 255, 0.15);
+            border-color: rgba(156, 136, 255, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .provider-btn.disabled {
+            opacity: 0.35;
+            pointer-events: none;
+            cursor: default;
+        }
+
+        .provider-btn .provider-icon {
+            font-size: 20px;
+            width: 28px;
+            text-align: center;
+        }
+
+        .provider-btn .provider-tag {
+            margin-left: auto;
+            font-size: 10px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .status-bar {
+            text-align: center;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-top: 16px;
+        }
+
+        .status-bar.loading {
+            background: rgba(156, 136, 255, 0.1);
+            color: #9c88ff;
+        }
+
+        .status-bar.ready {
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+        }
+
+        .status-bar.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        .note {
+            text-align: center;
+            font-size: 11px;
+            color: #555;
+            margin-top: 16px;
+            line-height: 1.5;
+        }
+
+        .hidden { display: none !important; }
+
+        @media (max-width: 500px) {
+            .card { padding: 28px 20px; }
+            .header h1 { font-size: 19px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <div class="icon">🔑</div>
+                <h1>Key Verification</h1>
+                <p>Complete a task for <span class="guild-name">{{GUILD_NAME}}</span></p>
+            </div>
+
+            <div class="step-indicator">
+                <div class="step active" id="step1">1</div>
+                <div class="step-line"></div>
+                <div class="step inactive" id="step2">2</div>
+                <div class="step-line"></div>
+                <div class="step inactive" id="step3">3</div>
+            </div>
+
+            <div id="provider-section">
+                <div class="providers">
+                    <a class="provider-btn {{WORKINK_DISABLED}}" id="btn-workink" href="javascript:void(0)" data-provider="workink">
+                        <span class="provider-icon">⚡</span>
+                        <span>Work.ink</span>
+                        <span class="provider-tag">Fastest</span>
+                    </a>
+                    <a class="provider-btn {{LOOTLABS_DISABLED}}" id="btn-lootlabs" href="javascript:void(0)" data-provider="lootlabs">
+                        <span class="provider-icon">🎁</span>
+                        <span>LootLabs</span>
+                        <span class="provider-tag">Alternative</span>
+                    </a>
+                    <a class="provider-btn {{LINKVERTISE_DISABLED}}" id="btn-linkvertise" href="javascript:void(0)" data-provider="linkvertise">
+                        <span class="provider-icon">🔗</span>
+                        <span>Linkvertise</span>
+                        <span class="provider-tag">Alternative</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="status-bar loading" id="status">
+                ⏳ Initializing session...
+            </div>
+
+            <div class="note">
+                Complete the task, then return to Discord and click <strong>Claim Key</strong>.<br>
+                Do not close this page until you're redirected.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const SESSION_TOKEN = "{{SESSION_TOKEN}}";
+            const GUILD_ID = "{{GUILD_ID}}";
+
+            let timerReady = false;
+
+            // Start timer on load
+            fetch('/ks/timer/' + SESSION_TOKEN)
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        timerReady = true;
+                        document.getElementById('status').className = 'status-bar ready';
+                        document.getElementById('status').textContent = '✅ Ready — choose a provider above';
+                        document.getElementById('step1').className = 'step done';
+                        document.getElementById('step2').className = 'step active';
+                    } else {
+                        document.getElementById('status').className = 'status-bar error';
+                        document.getElementById('status').textContent = '❌ ' + (data.error || 'Session error');
+                    }
+                })
+                .catch(() => {
+                    document.getElementById('status').className = 'status-bar error';
+                    document.getElementById('status').textContent = '❌ Failed to connect';
+                });
+
+            // Provider click handlers
+            document.querySelectorAll('.provider-btn:not(.disabled)').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (!timerReady) return;
+
+                    const provider = this.dataset.provider;
+                    document.getElementById('status').className = 'status-bar loading';
+                    document.getElementById('status').textContent = '⏳ Redirecting to ' + provider + '...';
+
+                    // Disable all buttons
+                    document.querySelectorAll('.provider-btn').forEach(b => {
+                        b.classList.add('disabled');
+                    });
+
+                    // Redirect after brief delay
+                    setTimeout(() => {
+                        window.location.href = '/ks/redirect/' + SESSION_TOKEN + '/' + provider;
+                    }, 500);
+                });
+            });
+
+            // Anti-inspect (basic)
+            document.addEventListener('contextmenu', e => e.preventDefault());
+            document.addEventListener('keydown', e => {
+                if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C'))) {
+                    e.preventDefault();
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
