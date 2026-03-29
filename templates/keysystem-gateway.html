@@ -273,15 +273,13 @@
 
     <script>
         (function() {
-            const SESSION_TOKEN = "{{SESSION_TOKEN}}";
-            const GUILD_ID = "{{GUILD_ID}}";
+            var SESSION_TOKEN = "{{SESSION_TOKEN}}";
+            var GUILD_ID = "{{GUILD_ID}}";
+            var timerReady = false;
 
-            let timerReady = false;
-
-            // Start timer on load
             fetch('/ks/timer/' + SESSION_TOKEN)
-                .then(r => r.json())
-                .then(data => {
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
                     if (data.success) {
                         timerReady = true;
                         document.getElementById('status').className = 'status-bar ready';
@@ -293,36 +291,34 @@
                         document.getElementById('status').textContent = '❌ ' + (data.error || 'Session error');
                     }
                 })
-                .catch(() => {
+                .catch(function() {
                     document.getElementById('status').className = 'status-bar error';
                     document.getElementById('status').textContent = '❌ Failed to connect';
                 });
 
-            // Provider click handlers
-            document.querySelectorAll('.provider-btn:not(.disabled)').forEach(btn => {
-                btn.addEventListener('click', function(e) {
+            var buttons = document.querySelectorAll('.provider-btn:not(.disabled)');
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].addEventListener('click', function(e) {
                     e.preventDefault();
                     if (!timerReady) return;
 
-                    const provider = this.dataset.provider;
+                    var provider = this.dataset.provider;
                     document.getElementById('status').className = 'status-bar loading';
                     document.getElementById('status').textContent = '⏳ Redirecting to ' + provider + '...';
 
-                    // Disable all buttons
-                    document.querySelectorAll('.provider-btn').forEach(b => {
-                        b.classList.add('disabled');
-                    });
+                    var allBtns = document.querySelectorAll('.provider-btn');
+                    for (var j = 0; j < allBtns.length; j++) {
+                        allBtns[j].classList.add('disabled');
+                    }
 
-                    // Redirect after brief delay
-                    setTimeout(() => {
+                    setTimeout(function() {
                         window.location.href = '/ks/redirect/' + SESSION_TOKEN + '/' + provider;
                     }, 500);
                 });
-            });
+            }
 
-            // Anti-inspect (basic)
-            document.addEventListener('contextmenu', e => e.preventDefault());
-            document.addEventListener('keydown', e => {
+            document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+            document.addEventListener('keydown', function(e) {
                 if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C'))) {
                     e.preventDefault();
                 }
