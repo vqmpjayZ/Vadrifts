@@ -1,329 +1,524 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Key System - {{GUILD_NAME}}</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+import os
+import time
+import secrets
+import string
+import logging
+from pymongo import MongoClient, ASCENDING
 
-        body {
-            background: #0a0a0f;
-            color: #e0e0e0;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
+logger = logging.getLogger(__name__)
+
+MONGODB_URI = os.environ.get("MONGODB_URI")
+DISCORD_TOKEN = os.environ.get("DISCORD_TOKEN")
+SERVER_BASE_URL = os.environ.get("SERVER_BASE_URL", "https://vadrifts.onrender.com")
+
+MIN_COMPLETION_SECONDS = 25
+
+guild_configs_collection = None
+guild_sessions_collection = None
+guild_keys_collection = None
+script_profiles_collection = None
+
+if MONGODB_URI:
+    try:
+        _client = MongoClient(MONGODB_URI)
+        _db = _client["vadrifts"]
+        guild_configs_collection = _db["guild_key_configs"]
+        guild_sessions_collection = _db["guild_key_sessions"]
+        guild_keys_collection = _db["guild_keys"]
+        script_profiles_collection = _db["script_profiles"]
+
+        guild_sessions_collection.create_index("expires_at", expireAfterSeconds=0)
+        guild_sessions_collection.create_index([("guild_id", ASCENDING), ("discord_id", ASCENDING)])
+        guild_sessions_collection.create_index([("guild_id", ASCENDING), ("ip", ASCENDING), ("completed", ASCENDING)])
+        guild_keys_collection.create_index("expires_at")
+        guild_keys_collection.create_index([("guild_id", ASCENDING), ("discord_id", ASCENDING), ("profile_id", ASCENDING)])
+        guild_configs_collection.create_index("api_secret", unique=True, sparse=True)
+        script_profiles_collection.create_index([("guild_id", ASCENDING), ("name", ASCENDING)], unique=True)
+        script_profiles_collection.create_index("api_secret", unique=True, sparse=True)
+
+        _client.admin.command('ping')
+        logger.info("Connected to MongoDB for guild key system")
+    except Exception as e:
+        logger.error(f"MongoDB guild key system connection failed: {e}")
+else:
+    logger.warning("MONGODB_URI not set for guild key system")
+
+
+def _generate_api_secret():
+    return secrets.token_urlsafe(32)
+
+
+def _generate_key_string():
+    parts = []
+    for _ in range(4):
+        parts.append(''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(5)))
+    return '-'.join(parts)
+
+
+def _generate_profile_id():
+    return ''.join(secrets.choice(string.ascii_lowercase + string.digits) for _ in range(12))
+
+
+def get_destination_url(guild_id, profile_id):
+    return f"{SERVER_BASE_URL}/ks/done/{guild_id}/{profile_id}"
+
+
+def get_guild_config(guild_id):
+    if guild_configs_collection is None:
+        return None
+    try:
+        doc = guild_configs_collection.find_one({"_id": str(guild_id)})
+        if doc:
+            config = {k: v for k, v in doc.items() if k != "_id"}
+            config["guild_id"] = doc["_id"]
+            return config
+        return None
+    except Exception as e:
+        logger.error(f"Failed to get guild config: {e}")
+        return None
+
+
+def save_guild_config(guild_id, config_data):
+    if guild_configs_collection is None:
+        return False
+    try:
+        doc = dict(config_data)
+        doc.pop("guild_id", None)
+        guild_configs_collection.update_one(
+            {"_id": str(guild_id)},
+            {"$set": doc},
+            upsert=True
+        )
+        return True
+    except Exception as e:
+        logger.error(f"Failed to save guild config: {e}")
+        return False
+
+
+def init_guild_config(guild_id, guild_name, admin_id):
+    existing = get_guild_config(guild_id)
+
+    config = {
+        "guild_name": guild_name,
+        "admin_id": str(admin_id),
+        "enabled": True,
+        "created_at": existing.get("created_at", time.time()) if existing else time.time(),
+        "updated_at": time.time()
+    }
+
+    success = save_guild_config(guild_id, config)
+    if success:
+        config["guild_id"] = str(guild_id)
+        return config
+    return None
+
+
+def delete_guild_config(guild_id):
+    if guild_configs_collection is None:
+        return False
+    try:
+        guild_configs_collection.delete_one({"_id": str(guild_id)})
+        if script_profiles_collection:
+            script_profiles_collection.delete_many({"guild_id": str(guild_id)})
+        return True
+    except Exception as e:
+        logger.error(f"Failed to delete guild config: {e}")
+        return False
+
+
+def create_script_profile(guild_id, name, key_type, key_duration_hours=24, required_role_id=None):
+    if script_profiles_collection is None:
+        return None
+    try:
+        profile_id = _generate_profile_id()
+        api_secret = _generate_api_secret()
+
+        profile = {
+            "_id": profile_id,
+            "guild_id": str(guild_id),
+            "name": name,
+            "key_type": key_type,
+            "api_secret": api_secret,
+            "key_duration_hours": key_duration_hours,
+            "required_role_id": str(required_role_id) if required_role_id else None,
+            "workink_url": "",
+            "lootlabs_url": "",
+            "linkvertise_url": "",
+            "require_membership": True,
+            "enabled": True,
+            "created_at": time.time(),
+            "updated_at": time.time()
         }
 
-        .bg-grid {
-            position: fixed;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(156, 136, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(156, 136, 255, 0.03) 1px, transparent 1px);
-            background-size: 40px 40px;
-            pointer-events: none;
+        script_profiles_collection.insert_one(profile)
+        profile["profile_id"] = profile_id
+        return profile
+    except Exception as e:
+        logger.error(f"Failed to create script profile: {e}")
+        return None
+
+
+def get_script_profile(profile_id):
+    if script_profiles_collection is None:
+        return None
+    try:
+        doc = script_profiles_collection.find_one({"_id": profile_id})
+        if doc:
+            profile = {k: v for k, v in doc.items() if k != "_id"}
+            profile["profile_id"] = doc["_id"]
+            return profile
+        return None
+    except Exception as e:
+        logger.error(f"Failed to get script profile: {e}")
+        return None
+
+
+def get_script_profiles(guild_id):
+    if script_profiles_collection is None:
+        return []
+    try:
+        profiles = []
+        for doc in script_profiles_collection.find({"guild_id": str(guild_id)}):
+            profile = {k: v for k, v in doc.items() if k != "_id"}
+            profile["profile_id"] = doc["_id"]
+            profiles.append(profile)
+        return profiles
+    except Exception as e:
+        logger.error(f"Failed to get script profiles: {e}")
+        return []
+
+
+def update_script_profile(profile_id, updates):
+    if script_profiles_collection is None:
+        return False
+    try:
+        updates["updated_at"] = time.time()
+        script_profiles_collection.update_one(
+            {"_id": profile_id},
+            {"$set": updates}
+        )
+        return True
+    except Exception as e:
+        logger.error(f"Failed to update script profile: {e}")
+        return False
+
+
+def delete_script_profile(profile_id):
+    if script_profiles_collection is None:
+        return False
+    try:
+        script_profiles_collection.delete_one({"_id": profile_id})
+        if guild_keys_collection:
+            guild_keys_collection.delete_many({"profile_id": profile_id})
+        return True
+    except Exception as e:
+        logger.error(f"Failed to delete script profile: {e}")
+        return False
+
+
+def get_profile_by_secret(api_secret):
+    if script_profiles_collection is None:
+        return None
+    try:
+        doc = script_profiles_collection.find_one({"api_secret": api_secret})
+        if doc:
+            profile = {k: v for k, v in doc.items() if k != "_id"}
+            profile["profile_id"] = doc["_id"]
+            return profile
+        return None
+    except Exception as e:
+        logger.error(f"Failed to lookup profile by secret: {e}")
+        return None
+
+
+def get_profile_by_name(guild_id, name):
+    if script_profiles_collection is None:
+        return None
+    try:
+        doc = script_profiles_collection.find_one({
+            "guild_id": str(guild_id),
+            "name": {"$regex": f"^{name}$", "$options": "i"}
+        })
+        if doc:
+            profile = {k: v for k, v in doc.items() if k != "_id"}
+            profile["profile_id"] = doc["_id"]
+            return profile
+        return None
+    except Exception as e:
+        logger.error(f"Failed to lookup profile by name: {e}")
+        return None
+
+
+def create_session(guild_id, discord_id, discord_name, profile_id):
+    if guild_sessions_collection is None:
+        return None
+    try:
+        guild_sessions_collection.delete_many({
+            "guild_id": str(guild_id),
+            "discord_id": str(discord_id),
+            "profile_id": profile_id,
+            "completed": False
+        })
+
+        token = secrets.token_urlsafe(32)
+        now = time.time()
+        session = {
+            "_id": token,
+            "guild_id": str(guild_id),
+            "discord_id": str(discord_id),
+            "discord_name": discord_name,
+            "profile_id": profile_id,
+            "ip": None,
+            "timer_started": False,
+            "timer_started_at": None,
+            "completed": False,
+            "completed_at": None,
+            "key_claimed": False,
+            "created_at": now,
+            "expires_at": now + 1800
         }
+        guild_sessions_collection.insert_one(session)
+        return token
+    except Exception as e:
+        logger.error(f"Failed to create session: {e}")
+        return None
 
-        .bg-glow {
-            position: fixed;
-            width: 600px; height: 600px;
-            border-radius: 50%;
-            filter: blur(120px);
-            opacity: 0.15;
-            pointer-events: none;
+
+def get_session(token):
+    if guild_sessions_collection is None:
+        return None
+    try:
+        doc = guild_sessions_collection.find_one({"_id": token})
+        if not doc:
+            return None
+        if time.time() > doc.get("expires_at", 0):
+            guild_sessions_collection.delete_one({"_id": token})
+            return None
+        session = {k: v for k, v in doc.items() if k != "_id"}
+        session["token"] = doc["_id"]
+        return session
+    except Exception as e:
+        logger.error(f"Failed to get session: {e}")
+        return None
+
+
+def update_session(token, updates):
+    if guild_sessions_collection is None:
+        return False
+    try:
+        guild_sessions_collection.update_one(
+            {"_id": token},
+            {"$set": updates}
+        )
+        return True
+    except Exception as e:
+        logger.error(f"Failed to update session: {e}")
+        return False
+
+
+def find_session_by_ip_and_profile(ip, guild_id, profile_id):
+    if guild_sessions_collection is None:
+        return None
+    try:
+        doc = guild_sessions_collection.find_one(
+            {
+                "guild_id": str(guild_id),
+                "profile_id": profile_id,
+                "ip": ip,
+                "completed": False,
+                "timer_started": True,
+                "expires_at": {"$gt": time.time()}
+            },
+            sort=[("created_at", -1)]
+        )
+        if doc:
+            session = {k: v for k, v in doc.items() if k != "_id"}
+            session["token"] = doc["_id"]
+            return session
+        return None
+    except Exception as e:
+        logger.error(f"Failed to find session by IP: {e}")
+        return None
+
+
+def get_pending_session(discord_id, guild_id, profile_id):
+    if guild_sessions_collection is None:
+        return None
+    try:
+        doc = guild_sessions_collection.find_one(
+            {
+                "guild_id": str(guild_id),
+                "discord_id": str(discord_id),
+                "profile_id": profile_id,
+                "completed": True,
+                "key_claimed": False,
+                "expires_at": {"$gt": time.time()}
+            },
+            sort=[("completed_at", -1)]
+        )
+        if doc:
+            session = {k: v for k, v in doc.items() if k != "_id"}
+            session["token"] = doc["_id"]
+            return session
+        return None
+    except Exception as e:
+        logger.error(f"Failed to get pending session: {e}")
+        return None
+
+
+def create_guild_key(guild_id, discord_id, discord_name, duration_hours, profile_id):
+    if guild_keys_collection is None:
+        return None
+    try:
+        guild_keys_collection.delete_many({
+            "guild_id": str(guild_id),
+            "discord_id": str(discord_id),
+            "profile_id": profile_id
+        })
+
+        key = _generate_key_string()
+        now = time.time()
+        key_doc = {
+            "_id": key,
+            "guild_id": str(guild_id),
+            "discord_id": str(discord_id),
+            "discord_name": discord_name,
+            "profile_id": profile_id,
+            "hwid": None,
+            "created_at": now,
+            "expires_at": now + (duration_hours * 3600)
         }
+        guild_keys_collection.insert_one(key_doc)
+        return key
+    except Exception as e:
+        logger.error(f"Failed to create guild key: {e}")
+        return None
 
-        .bg-glow-1 { top: -200px; left: -100px; background: #7209b7; }
-        .bg-glow-2 { bottom: -200px; right: -100px; background: #9c88ff; }
 
-        .container {
-            position: relative;
-            z-index: 1;
-            width: 90%;
-            max-width: 480px;
-            animation: fadeSlideIn 0.6s ease;
+def validate_guild_key(key, hwid, api_secret):
+    if guild_keys_collection is None:
+        return False, "Key system unavailable"
+
+    try:
+        profile = get_profile_by_secret(api_secret)
+        if not profile:
+            logger.warning(f"Guild key validation: no profile found for secret")
+            return False, "Invalid API secret"
+
+        profile_id = profile["profile_id"]
+        guild_id = profile["guild_id"]
+
+        key_doc = guild_keys_collection.find_one({"_id": key})
+        if not key_doc:
+            logger.warning(f"Guild key validation: key not found '{key[:8]}...'")
+            return False, "Invalid key"
+
+        if key_doc.get("profile_id") != profile_id:
+            logger.warning(f"Guild key validation: profile mismatch")
+            return False, "Invalid key"
+
+        if key_doc.get("guild_id") != guild_id:
+            logger.warning(f"Guild key validation: guild mismatch")
+            return False, "Invalid key"
+
+        if time.time() > key_doc.get("expires_at", 0):
+            guild_keys_collection.delete_one({"_id": key})
+            logger.warning(f"Guild key validation: key expired")
+            return False, "Key expired. Get a new one from Discord."
+
+        stored_hwid = key_doc.get("hwid")
+        if stored_hwid and stored_hwid != hwid:
+            logger.warning(f"Guild key validation: HWID mismatch")
+            return False, "Key locked to another device."
+
+        if not stored_hwid:
+            guild_keys_collection.update_one(
+                {"_id": key},
+                {"$set": {"hwid": hwid}}
+            )
+            logger.info(f"Guild key validation: HWID locked")
+
+        if profile.get("require_membership", True):
+            discord_id = key_doc.get("discord_id")
+            if discord_id and DISCORD_TOKEN:
+                try:
+                    import requests as req
+                    headers = {"Authorization": f"Bot {DISCORD_TOKEN}"}
+                    url = f"https://discord.com/api/v10/guilds/{guild_id}/members/{discord_id}"
+                    resp = req.get(url, headers=headers, timeout=10)
+                    if resp.status_code != 200:
+                        guild_keys_collection.delete_one({"_id": key})
+                        logger.warning(f"Guild key validation: not in server")
+                        return False, "You must be in the Discord server."
+                except Exception as ex:
+                    logger.error(f"Guild key validation: membership check failed: {ex}")
+
+        logger.info(f"Guild key validation: SUCCESS for key '{key[:8]}...'")
+        return True, "Authenticated"
+
+    except Exception as e:
+        logger.error(f"Key validation error: {e}")
+        return False, "Validation error"
+
+
+def delete_guild_keys_by_user(guild_id, discord_id, profile_id=None):
+    if guild_keys_collection is None:
+        return 0
+    try:
+        query = {
+            "guild_id": str(guild_id),
+            "discord_id": str(discord_id)
         }
+        if profile_id:
+            query["profile_id"] = profile_id
+        result = guild_keys_collection.delete_many(query)
+        return result.deleted_count
+    except Exception as e:
+        logger.error(f"Failed to delete keys: {e}")
+        return 0
 
-        @keyframes fadeSlideIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
 
-        .card {
-            background: rgba(20, 20, 30, 0.85);
-            border: 1px solid rgba(156, 136, 255, 0.15);
-            border-radius: 16px;
-            padding: 36px 32px;
-            backdrop-filter: blur(20px);
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 28px;
-        }
-
-        .header .icon {
-            font-size: 36px;
-            margin-bottom: 12px;
-        }
-
-        .header h1 {
-            font-size: 22px;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 6px;
-        }
-
-        .header p {
-            font-size: 13px;
-            color: #888;
-        }
-
-        .guild-name {
-            color: #9c88ff;
-            font-weight: 600;
-        }
-
-        .step-indicator {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 24px;
-        }
-
-        .step {
-            width: 32px; height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 13px;
-            font-weight: 700;
-            transition: all 0.3s;
-        }
-
-        .step.active {
-            background: #9c88ff;
-            color: #fff;
-        }
-
-        .step.inactive {
-            background: rgba(156, 136, 255, 0.1);
-            color: #666;
-            border: 1px solid rgba(156, 136, 255, 0.2);
-        }
-
-        .step.done {
-            background: #22c55e;
-            color: #fff;
-        }
-
-        .step-line {
-            width: 40px;
-            height: 2px;
-            background: rgba(156, 136, 255, 0.2);
-        }
-
-        .providers {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .provider-btn {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 14px 18px;
-            background: rgba(156, 136, 255, 0.08);
-            border: 1px solid rgba(156, 136, 255, 0.2);
-            border-radius: 12px;
-            color: #e0e0e0;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.25s;
-            text-decoration: none;
-            user-select: none;
-        }
-
-        .provider-btn:hover {
-            background: rgba(156, 136, 255, 0.15);
-            border-color: rgba(156, 136, 255, 0.4);
-            transform: translateY(-1px);
-        }
-
-        .provider-btn.disabled {
-            opacity: 0.35;
-            pointer-events: none;
-            cursor: default;
-        }
-
-        .provider-btn .provider-icon {
-            font-size: 20px;
-            width: 28px;
-            text-align: center;
-        }
-
-        .provider-btn .provider-tag {
-            margin-left: auto;
-            font-size: 10px;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .status-bar {
-            text-align: center;
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: 500;
-            margin-top: 16px;
-        }
-
-        .status-bar.loading {
-            background: rgba(156, 136, 255, 0.1);
-            color: #9c88ff;
-        }
-
-        .status-bar.ready {
-            background: rgba(34, 197, 94, 0.1);
-            color: #22c55e;
-        }
-
-        .status-bar.error {
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-        }
-
-        .note {
-            text-align: center;
-            font-size: 11px;
-            color: #555;
-            margin-top: 16px;
-            line-height: 1.5;
-        }
-
-        .hidden { display: none !important; }
-
-        @media (max-width: 500px) {
-            .card { padding: 28px 20px; }
-            .header h1 { font-size: 19px; }
-        }
-    </style>
-</head>
-<body>
-    <div class="bg-grid"></div>
-    <div class="bg-glow bg-glow-1"></div>
-    <div class="bg-glow bg-glow-2"></div>
-
-    <div class="container">
-        <div class="card">
-            <div class="header">
-                <div class="icon">🔑</div>
-                <h1>Key Verification</h1>
-                <p>Complete a task for <span class="guild-name">{{GUILD_NAME}}</span></p>
-            </div>
-
-            <div class="step-indicator">
-                <div class="step active" id="step1">1</div>
-                <div class="step-line"></div>
-                <div class="step inactive" id="step2">2</div>
-                <div class="step-line"></div>
-                <div class="step inactive" id="step3">3</div>
-            </div>
-
-            <div id="provider-section">
-                <div class="providers">
-                    <a class="provider-btn {{WORKINK_DISABLED}}" id="btn-workink" href="javascript:void(0)" data-provider="workink">
-                        <span class="provider-icon">⚡</span>
-                        <span>Work.ink</span>
-                        <span class="provider-tag">Fastest</span>
-                    </a>
-                    <a class="provider-btn {{LOOTLABS_DISABLED}}" id="btn-lootlabs" href="javascript:void(0)" data-provider="lootlabs">
-                        <span class="provider-icon">🎁</span>
-                        <span>LootLabs</span>
-                        <span class="provider-tag">Alternative</span>
-                    </a>
-                    <a class="provider-btn {{LINKVERTISE_DISABLED}}" id="btn-linkvertise" href="javascript:void(0)" data-provider="linkvertise">
-                        <span class="provider-icon">🔗</span>
-                        <span>Linkvertise</span>
-                        <span class="provider-tag">Alternative</span>
-                    </a>
-                </div>
-            </div>
-
-            <div class="status-bar loading" id="status">
-                ⏳ Initializing session...
-            </div>
-
-            <div class="note">
-                Complete the task, then return to Discord and click <strong>Claim Key</strong>.<br>
-                Do not close this page until you're redirected.
-            </div>
-        </div>
-    </div>
-
-    <script>
-        (function() {
-            var SESSION_TOKEN = "{{SESSION_TOKEN}}";
-            var GUILD_ID = "{{GUILD_ID}}";
-            var timerReady = false;
-
-            fetch('/ks/timer/' + SESSION_TOKEN)
-                .then(function(r) { return r.json(); })
-                .then(function(data) {
-                    if (data.success) {
-                        timerReady = true;
-                        document.getElementById('status').className = 'status-bar ready';
-                        document.getElementById('status').textContent = '✅ Ready — choose a provider above';
-                        document.getElementById('step1').className = 'step done';
-                        document.getElementById('step2').className = 'step active';
-                    } else {
-                        document.getElementById('status').className = 'status-bar error';
-                        document.getElementById('status').textContent = '❌ ' + (data.error || 'Session error');
-                    }
-                })
-                .catch(function() {
-                    document.getElementById('status').className = 'status-bar error';
-                    document.getElementById('status').textContent = '❌ Failed to connect';
-                });
-
-            var buttons = document.querySelectorAll('.provider-btn:not(.disabled)');
-            for (var i = 0; i < buttons.length; i++) {
-                buttons[i].addEventListener('click', function(e) {
-                    e.preventDefault();
-                    if (!timerReady) return;
-
-                    var provider = this.dataset.provider;
-                    document.getElementById('status').className = 'status-bar loading';
-                    document.getElementById('status').textContent = '⏳ Redirecting to ' + provider + '...';
-
-                    var allBtns = document.querySelectorAll('.provider-btn');
-                    for (var j = 0; j < allBtns.length; j++) {
-                        allBtns[j].classList.add('disabled');
-                    }
-
-                    setTimeout(function() {
-                        window.location.href = '/ks/redirect/' + SESSION_TOKEN + '/' + provider;
-                    }, 500);
-                });
+def get_guild_key_stats(guild_id, profile_id=None):
+    if guild_keys_collection is None:
+        return {"total": 0, "active": 0, "expired": 0, "hwid_locked": 0}
+    try:
+        now = time.time()
+        match_query = {"guild_id": str(guild_id)}
+        if profile_id:
+            match_query["profile_id"] = profile_id
+        pipeline = [
+            {"$match": match_query},
+            {"$group": {
+                "_id": None,
+                "total": {"$sum": 1},
+                "active": {"$sum": {"$cond": [{"$gt": ["$expires_at", now]}, 1, 0]}},
+                "expired": {"$sum": {"$cond": [{"$lte": ["$expires_at", now]}, 1, 0]}},
+                "hwid_locked": {"$sum": {"$cond": [{"$ne": ["$hwid", None]}, 1, 0]}}
+            }}
+        ]
+        result = list(guild_keys_collection.aggregate(pipeline))
+        if result:
+            r = result[0]
+            return {
+                "total": r.get("total", 0),
+                "active": r.get("active", 0),
+                "expired": r.get("expired", 0),
+                "hwid_locked": r.get("hwid_locked", 0)
             }
+        return {"total": 0, "active": 0, "expired": 0, "hwid_locked": 0}
+    except Exception as e:
+        logger.error(f"Failed to get stats: {e}")
+        return {"total": 0, "active": 0, "expired": 0, "hwid_locked": 0}
 
-            document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C'))) {
-                    e.preventDefault();
-                }
-            });
-        })();
-    </script>
-</body>
-</html>
+
+def cleanup_expired_guild_keys():
+    if guild_keys_collection is None:
+        return 0
+    try:
+        result = guild_keys_collection.delete_many({
+            "expires_at": {"$lte": time.time()}
+        })
+        return result.deleted_count
+    except Exception as e:
+        logger.error(f"Failed to cleanup keys: {e}")
+        return 0
