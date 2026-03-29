@@ -444,14 +444,21 @@ def validate_guild_key(key, hwid, api_secret):
                 try:
                     import requests as req
                     headers = {"Authorization": f"Bot {DISCORD_TOKEN}"}
-                    url = f"https://discord.com/api/v10/guilds/{guild_id}/members/{discord_id}"
-                    resp = req.get(url, headers=headers, timeout=10)
+                    check_url = f"https://discord.com/api/v10/guilds/{guild_id}/members/{discord_id}"
+                    logger.info(f"Membership check: guild={guild_id} user={discord_id}")
+                    resp = req.get(check_url, headers=headers, timeout=10)
+                    logger.info(f"Membership check: status={resp.status_code}")
+                    if resp.status_code == 403:
+                        logger.warning(f"Membership check: 403 Forbidden - bot lacks permissions or Server Members Intent not enabled")
+                    elif resp.status_code == 401:
+                        logger.warning(f"Membership check: 401 Unauthorized - bad bot token")
+                    elif resp.status_code == 404:
+                        logger.warning(f"Membership check: 404 - user not in guild or bot not in guild")
                     if resp.status_code != 200:
                         guild_keys_collection.delete_one({"_id": key})
-                        logger.warning(f"Guild key validation: not in server")
                         return False, "You must be in the Discord server."
                 except Exception as ex:
-                    logger.error(f"Guild key validation: membership check failed: {ex}")
+                    logger.error(f"Membership check error: {ex}")
 
         logger.info(f"Guild key validation: SUCCESS for key '{key[:8]}...'")
         return True, "Authenticated"
