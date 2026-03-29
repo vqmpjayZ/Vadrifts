@@ -1209,7 +1209,6 @@ def ks_status(session_token):
         "timer_started": session.get("timer_started", False)
     })
 
-
 @app.route('/api/validate-guild-key', methods=['POST', 'GET'])
 def validate_guild_key_route():
     if request.method == 'POST':
