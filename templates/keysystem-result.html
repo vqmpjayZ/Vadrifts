@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{PAGE_TITLE}}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #0a0a0f;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(156, 136, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(156, 136, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 90%;
+            max-width: 440px;
+            animation: fadeSlideIn 0.5s ease;
+        }
+
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: rgba(20, 20, 30, 0.85);
+            border: 1px solid rgba(156, 136, 255, 0.15);
+            border-radius: 16px;
+            padding: 40px 32px;
+            text-align: center;
+            backdrop-filter: blur(20px);
+        }
+
+        .icon { font-size: 48px; margin-bottom: 16px; }
+
+        h1 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .success h1 { color: #22c55e; }
+        .error h1 { color: #ef4444; }
+
+        p {
+            font-size: 14px;
+            color: #999;
+            line-height: 1.6;
+        }
+
+        .highlight { color: #9c88ff; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="container">
+        <div class="card {{PAGE_CLASS}}">
+            <div class="icon">{{ICON}}</div>
+            <h1>{{TITLE}}</h1>
+            <p>{{MESSAGE}}</p>
+        </div>
+    </div>
+</body>
+</html>
