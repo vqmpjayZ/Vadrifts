@@ -1210,22 +1210,26 @@ def ks_status(session_token):
     })
 
 
-@app.route('/api/validate-guild-key', methods=['POST'])
+@app.route('/api/validate-guild-key', methods=['POST', 'GET'])
 def validate_guild_key_route():
-    data = request.get_json()
-    if not data:
-        return jsonify({"valid": False, "message": "No data provided"})
-
-    key = data.get("key", "")
-    hwid = data.get("hwid", "")
-    secret = data.get("secret", "")
+    if request.method == 'POST':
+        data = request.get_json()
+        if not data:
+            return jsonify({"valid": False, "message": "No data provided"})
+        key = data.get("key", "")
+        hwid = data.get("hwid", "")
+        secret = data.get("secret", "")
+    else:
+        key = request.args.get("key", "")
+        hwid = request.args.get("hwid", "")
+        secret = request.args.get("secret", "")
 
     if not key or not hwid or not secret:
         return jsonify({"valid": False, "message": "Missing key, HWID, or secret"})
 
     valid, message = validate_guild_key(key, hwid, secret)
+    logger.info(f"Guild key validation ({request.method}): key='{key[:8]}...' valid={valid} message='{message}'")
     return jsonify({"valid": valid, "message": message})
-
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
