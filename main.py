@@ -160,6 +160,44 @@ def check_discord_membership(discord_id):
     except:
         return False
 
+@app.route('/debug-guild-keys')
+def debug_guild_keys():
+    from guild_key_system import guild_keys_collection, script_profiles_collection
+    
+    profiles = []
+    if script_profiles_collection is not None:
+        for doc in script_profiles_collection.find():
+            profiles.append({
+                "profile_id": doc["_id"],
+                "guild_id": doc.get("guild_id"),
+                "name": doc.get("name"),
+                "key_type": doc.get("key_type"),
+                "secret_preview": doc.get("api_secret", "")[:12] + "...",
+                "enabled": doc.get("enabled"),
+                "require_membership": doc.get("require_membership")
+            })
+
+    keys = []
+    if guild_keys_collection is not None:
+        for doc in guild_keys_collection.find():
+            keys.append({
+                "key_preview": doc["_id"][:8] + "...",
+                "guild_id": doc.get("guild_id"),
+                "profile_id": doc.get("profile_id"),
+                "discord_id": doc.get("discord_id"),
+                "discord_name": doc.get("discord_name"),
+                "hwid": doc.get("hwid"),
+                "expired": time.time() > doc.get("expires_at", 0),
+                "expires_at": doc.get("expires_at")
+            })
+
+    return jsonify({
+        "profiles": profiles,
+        "keys": keys,
+        "total_profiles": len(profiles),
+        "total_keys": len(keys)
+    })
+    
 
 @app.route('/api/feature-config/<feature_id>')
 def get_feature_config(feature_id):
