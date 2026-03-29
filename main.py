@@ -19,6 +19,15 @@ from utils import inject_meta_tags
 from key_system import KeySystemManager
 from verification_timer import VerificationTimer
 from analytics_db import log_execution as log_execution_to_db, get_analytics as get_analytics_from_db
+from guild_key_system import (
+    get_guild_config, save_guild_config, init_guild_config,
+    create_session, get_session, update_session,
+    find_session_by_ip_and_guild, get_pending_session,
+    create_guild_key, validate_guild_key,
+    delete_guild_keys_by_user, get_guild_key_stats,
+    cleanup_expired_guild_keys, get_destination_url,
+    SERVER_BASE_URL
+)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -94,6 +103,7 @@ def is_valid_referrer(referer):
     ]
     return any(domain in referer for domain in allowed_referrers)
 
+
 @app.route('/debug-keys')
 def debug_keys():
     keys = load_discord_keys()
@@ -112,6 +122,7 @@ def debug_keys():
         "discord_token_set": bool(DISCORD_TOKEN),
         "keys": safe_keys
     })
+
 
 def verify_turnstile(token, ip):
     try:
@@ -977,6 +988,220 @@ def find_channels():
     data = request.get_json()
     usernames = data.get('usernames', [])
     return youtube_finder.find_multiple_channels(usernames)
+
+
+def _render_result(icon, title, message, page_class="success", page_title="Key System"):
+    try:
+        with open('templates/keysystem-result.html', 'r', encoding='utf-8') as f:
+            html = f.read()
+        html = html.replace('{{ICON}}', icon)
+        html = html.replace('{{TITLE}}', title)
+        html = html.replace('{{MESSAGE}}', message)
+        html = html.replace('{{PAGE_CLASS}}', page_class)
+        html = html.replace('{{PAGE_TITLE}}', page_title)
+        return html
+    except FileNotFoundError:
+        return f"<h1>{title}</h1><p>{message}</p>", 500
+
+
+@app.route('/ks/gateway/<session_token>')
+def ks_gateway(session_token):
+    session = get_session(session_token)
+    if not session:
+        return _render_result(
+            '❌', 'Invalid Session',
+            'This session has expired or does not exist. Run the key command again in Discord.',
+            'error', 'Session Expired'
+        ), 403
+
+    guild_config = get_guild_config(session['guild_id'])
+    if not guild_config or not guild_config.get('enabled'):
+        return _render_result(
+            '❌', 'Key System Disabled',
+            'The key system is not active for this server.',
+            'error', 'Disabled'
+        ), 403
+
+    client_ip = get_client_ip()
+    update_session(session_token, {"ip": client_ip})
+
+    try:
+        with open('templates/keysystem-gateway.html', 'r', encoding='utf-8') as f:
+            html = f.read()
+    except FileNotFoundError:
+        return "Gateway template not found", 500
+
+    html = html.replace('{{SESSION_TOKEN}}', session_token)
+    html = html.replace('{{GUILD_ID}}', session['guild_id'])
+    html = html.replace('{{GUILD_NAME}}', guild_config.get('guild_name', 'Server'))
+
+    html = html.replace('{{WORKINK_DISABLED}}',
+        '' if guild_config.get('workink_url') else 'disabled')
+    html = html.replace('{{LOOTLABS_DISABLED}}',
+        '' if guild_config.get('lootlabs_url') else 'disabled')
+    html = html.replace('{{LINKVERTISE_DISABLED}}',
+        '' if guild_config.get('linkvertise_url') else 'disabled')
+
+    return html
+
+
+@app.route('/ks/timer/<session_token>')
+def ks_timer(session_token):
+    session = get_session(session_token)
+    if not session:
+        return jsonify({"success": False, "error": "Invalid session"})
+
+    client_ip = get_client_ip()
+
+    if session.get('ip') and session['ip'] != client_ip:
+        logger.warning(f"KS timer IP mismatch: session={session['ip']}, request={client_ip}")
+        return jsonify({"success": False, "error": "Session mismatch"})
+
+    update_session(session_token, {
+        "timer_started": True,
+        "timer_started_at": time.time(),
+        "ip": client_ip
+    })
+
+    logger.info(f"KS timer started: guild={session['guild_id']}, user={session['discord_name']}, ip={client_ip}")
+    return jsonify({"success": True})
+
+
+@app.route('/ks/redirect/<session_token>/<provider>')
+def ks_redirect(session_token, provider):
+    session = get_session(session_token)
+    if not session:
+        return _render_result(
+            '❌', 'Invalid Session',
+            'Session expired. Run the key command again in Discord.',
+            'error'
+        ), 403
+
+    if not session.get('timer_started'):
+        return _render_result(
+            '❌', 'Timer Not Started',
+            'Please load the gateway page first.',
+            'error'
+        ), 403
+
+    guild_config = get_guild_config(session['guild_id'])
+    if not guild_config:
+        return _render_result('❌', 'Error', 'Server config not found.', 'error'), 404
+
+    provider_map = {
+        'workink': guild_config.get('workink_url'),
+        'lootlabs': guild_config.get('lootlabs_url'),
+        'linkvertise': guild_config.get('linkvertise_url'),
+    }
+
+    url = provider_map.get(provider)
+    if not url:
+        return _render_result(
+            '❌', 'Provider Unavailable',
+            'This verification provider is not configured.',
+            'error'
+        ), 404
+
+    update_session(session_token, {"provider_used": provider})
+    logger.info(f"KS redirect: user={session['discord_name']}, provider={provider}")
+    return redirect(url)
+
+
+@app.route('/ks/done/<guild_id>')
+def ks_done(guild_id):
+    guild_config = get_guild_config(guild_id)
+    if not guild_config or not guild_config.get('enabled'):
+        return _render_result(
+            '❌', 'Invalid Server',
+            'Key system not found or disabled.',
+            'error', 'Error'
+        ), 404
+
+    client_ip = get_client_ip()
+    referer = request.headers.get('Referer', '')
+
+    session = find_session_by_ip_and_guild(client_ip, guild_id)
+    if not session:
+        logger.warning(f"KS done: no matching session for IP={client_ip}, guild={guild_id}")
+        return _render_result(
+            '❌', 'No Active Session',
+            'No verification session found. Please start from Discord.',
+            'error', 'Access Denied'
+        ), 403
+
+    min_time = guild_config.get('min_completion_seconds', 25)
+    timer_started_at = session.get('timer_started_at')
+
+    if not timer_started_at:
+        return _render_result(
+            '❌', 'Timer Error',
+            'Verification timer was not started. Please try again.',
+            'error', 'Error'
+        ), 403
+
+    elapsed = time.time() - timer_started_at
+    if elapsed < min_time:
+        logger.warning(f"KS done: too fast. {elapsed:.1f}s < {min_time}s, IP={client_ip}")
+        return _render_result(
+            '⚠️', 'Too Fast',
+            f'Verification completed too quickly ({elapsed:.0f}s). '
+            f'You need at least {min_time}s. Please try again properly.',
+            'error', 'Verification Failed'
+        ), 403
+
+    if referer and not is_valid_referrer(referer):
+        logger.warning(f"KS done: suspicious referer from IP={client_ip}: {referer}")
+        return _render_result(
+            '❌', 'Invalid Access',
+            'You must complete the verification task through the provided link.',
+            'error', 'Access Denied'
+        ), 403
+
+    if not referer:
+        logger.info(f"KS done: no referer (likely mobile), allowing. IP={client_ip}")
+
+    update_session(session['token'], {
+        "completed": True,
+        "completed_at": time.time()
+    })
+
+    logger.info(f"KS done: session completed. user={session['discord_name']}, guild={guild_id}, elapsed={elapsed:.1f}s")
+
+    return _render_result(
+        '✅', 'Verification Complete!',
+        'Return to Discord and click <span class="highlight">Claim Key</span> to get your key.',
+        'success', 'Verified!'
+    )
+
+
+@app.route('/ks/status/<session_token>')
+def ks_status(session_token):
+    session = get_session(session_token)
+    if not session:
+        return jsonify({"exists": False, "completed": False})
+    return jsonify({
+        "exists": True,
+        "completed": session.get("completed", False),
+        "key_claimed": session.get("key_claimed", False),
+        "timer_started": session.get("timer_started", False)
+    })
+
+
+@app.route('/api/validate-guild-key', methods=['POST'])
+def validate_guild_key_route():
+    data = request.get_json()
+    if not data:
+        return jsonify({"valid": False, "message": "No data provided"})
+
+    key = data.get("key", "")
+    hwid = data.get("hwid", "")
+    secret = data.get("secret", "")
+
+    if not key or not hwid or not secret:
+        return jsonify({"valid": False, "message": "Missing key, HWID, or secret"})
+
+    valid, message = validate_guild_key(key, hwid, secret)
+    return jsonify({"valid": valid, "message": message})
 
 
 if __name__ == '__main__':
