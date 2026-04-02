@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Key System - {{GUILD_NAME}}</title>
+  <script defer src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
@@ -72,17 +73,17 @@
 
     @keyframes drift1 {
       0%, 100% { transform: translate(0,0) scale(1); }
-      33%  { transform: translate(100px,-60px) scale(1.1); }
-      66%  { transform: translate(-60px,80px) scale(0.9); }
+      33% { transform: translate(100px,-60px) scale(1.1); }
+      66% { transform: translate(-60px,80px) scale(0.9); }
     }
     @keyframes drift2 {
       0%, 100% { transform: translate(0,0) scale(1); }
-      33%  { transform: translate(-80px,-70px) scale(1.15); }
-      66%  { transform: translate(100px,60px) scale(0.85); }
+      33% { transform: translate(-80px,-70px) scale(1.15); }
+      66% { transform: translate(100px,60px) scale(0.85); }
     }
     @keyframes drift3 {
       0%, 100% { transform: translate(-50%,-50%) scale(1); }
-      50%  { transform: translate(-50%,-50%) scale(1.15); }
+      50% { transform: translate(-50%,-50%) scale(1.15); }
     }
 
     .particles {
@@ -103,9 +104,9 @@
     }
 
     @keyframes rise {
-      0%   { transform: translateY(100vh) translateX(0) scale(0); opacity: 0; }
-      5%   { opacity: 0.6; transform: translateY(95vh) translateX(10px) scale(1); }
-      95%  { opacity: 0.4; transform: translateY(5vh) translateX(50px) scale(0.8); }
+      0% { transform: translateY(100vh) translateX(0) scale(0); opacity: 0; }
+      5% { opacity: 0.6; transform: translateY(95vh) translateX(10px) scale(1); }
+      95% { opacity: 0.4; transform: translateY(5vh) translateX(50px) scale(0.8); }
       100% { transform: translateY(-5vh) translateX(70px) scale(0); opacity: 0; }
     }
 
@@ -119,7 +120,7 @@
 
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(30px); }
-      to   { opacity: 1; transform: translateY(0); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .card {
@@ -146,16 +147,21 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 32px;
       animation: bob 3s ease-in-out infinite;
       box-shadow:
         0 15px 35px rgba(114,9,183,0.35),
         0 0 50px rgba(114,9,183,0.15);
     }
 
+    .logo-wrapper i {
+      width: 32px;
+      height: 32px;
+      color: #fff;
+    }
+
     @keyframes bob {
       0%, 100% { transform: translateY(0) scale(1); }
-      50%  { transform: translateY(-6px) scale(1.02); }
+      50% { transform: translateY(-6px) scale(1.02); }
     }
 
     .header h1 {
@@ -226,7 +232,7 @@
     }
     @keyframes warnPulse {
       0%, 100% { box-shadow: 0 0 15px rgba(251,191,36,0.04); }
-      50%  { box-shadow: 0 0 25px rgba(251,191,36,0.1); }
+      50% { box-shadow: 0 0 25px rgba(251,191,36,0.1); }
     }
 
     .vpn-warning-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
@@ -239,19 +245,24 @@
     .vpn-warning-text strong { color: #fbbf24; font-weight: 600; }
 
     .instruction-box {
-      background: linear-gradient(135deg, rgba(156,136,255,0.07), rgba(156,136,255,0.02));
-      border: 1px solid rgba(156,136,255,0.15);
+      background: linear-gradient(135deg, rgba(16,185,129,0.07), rgba(16,185,129,0.02));
+      border: 1px solid rgba(16,185,129,0.18);
       border-radius: 14px;
       padding: 16px 20px;
       margin-bottom: 22px;
     }
 
     .instruction-title {
-      color: var(--accent-2);
+      color: #10b981;
       font-size: 11px; font-weight: 700;
       text-transform: uppercase; letter-spacing: 0.5px;
       margin-bottom: 10px;
       display: flex; align-items: center; gap: 8px;
+    }
+
+    .instruction-title i {
+      width: 16px;
+      height: 16px;
     }
 
     .instruction-steps {
@@ -269,11 +280,11 @@
       content: counter(inst);
       position: absolute; left: 0; top: 2px;
       width: 20px; height: 20px;
-      background: rgba(156,136,255,0.12);
-      border: 1px solid rgba(156,136,255,0.3);
+      background: rgba(16,185,129,0.12);
+      border: 1px solid rgba(16,185,129,0.35);
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 11px; font-weight: 700; color: var(--accent-2);
+      font-size: 11px; font-weight: 700; color: #10b981;
     }
 
     .providers {
@@ -343,11 +354,12 @@
       transform: none !important;
     }
 
-    .provider-icon {
-      font-size: 22px;
-      width: 30px;
-      text-align: center;
+    .provider-logo {
+      width: 26px;
+      height: 26px;
+      object-fit: contain;
       flex-shrink: 0;
+      border-radius: 4px;
     }
 
     .provider-info {
@@ -376,7 +388,7 @@
 
     @keyframes slideIn {
       from { opacity: 0; transform: translateY(-8px); }
-      to   { opacity: 1; transform: translateY(0); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .status-bar.loading {
@@ -427,6 +439,11 @@
       font-weight: 500;
     }
 
+    .info-badge i {
+      width: 14px;
+      height: 14px;
+    }
+
     .note {
       text-align: center;
       font-size: 11px;
@@ -441,7 +458,8 @@
     @media (max-width: 560px) {
       .card { padding: 30px 22px; border-radius: 20px; }
       .header h1 { font-size: 22px; }
-      .logo-wrapper { width: 60px; height: 60px; font-size: 28px; border-radius: 15px; }
+      .logo-wrapper { width: 60px; height: 60px; border-radius: 15px; }
+      .logo-wrapper i { width: 28px; height: 28px; }
       .provider-btn { padding: 14px 16px; }
       .info-badges { flex-direction: column; align-items: center; }
       .vpn-warning { padding: 12px 14px; }
@@ -462,7 +480,9 @@
     <div class="card">
 
       <div class="header">
-        <div class="logo-wrapper">🔑</div>
+        <div class="logo-wrapper">
+          <i data-lucide="key-round"></i>
+        </div>
         <h1>Key Verification</h1>
         <p>Complete a task for <span class="guild-name">{{GUILD_NAME}}</span></p>
       </div>
@@ -488,7 +508,7 @@
 
       <div class="instruction-box">
         <div class="instruction-title">
-          <span>📋</span>
+          <i data-lucide="list-ordered"></i>
           <span>How it works</span>
         </div>
         <ol class="instruction-steps">
@@ -502,7 +522,7 @@
         <div class="providers">
           <a class="provider-btn workink {{WORKINK_DISABLED}}" id="btn-workink"
              href="javascript:void(0)" data-provider="workink">
-            <span class="provider-icon">⚡</span>
+            <img src="https://s3-eu-west-1.amazonaws.com/tpd/logos/60f32c3fa0f0500001ab7c87/0x0.png" class="provider-logo" alt="Work.ink">
             <div class="provider-info">
               <span class="provider-name">Work.ink</span>
               <span class="provider-tag">Recommended · Fastest</span>
@@ -510,7 +530,7 @@
           </a>
           <a class="provider-btn lootlabs {{LOOTLABS_DISABLED}}" id="btn-lootlabs"
              href="javascript:void(0)" data-provider="lootlabs">
-            <span class="provider-icon">🎁</span>
+            <img src="https://i.imgur.com/DmPISjf.png" class="provider-logo" alt="LootLabs">
             <div class="provider-info">
               <span class="provider-name">LootLabs</span>
               <span class="provider-tag">Alternative</span>
@@ -518,7 +538,7 @@
           </a>
           <a class="provider-btn linkvertise {{LINKVERTISE_DISABLED}}" id="btn-linkvertise"
              href="javascript:void(0)" data-provider="linkvertise">
-            <span class="provider-icon">🔗</span>
+            <img src="https://cdn3.emoji.gg/emojis/20379-linkvertise.png" class="provider-logo" alt="Linkvertise">
             <div class="provider-info">
               <span class="provider-name">Linkvertise</span>
               <span class="provider-tag">Alternative</span>
@@ -533,8 +553,14 @@
       </div>
 
       <div class="info-badges">
-        <div class="info-badge">🕐 Takes ~2 minutes</div>
-        <div class="info-badge">🛡️ Secure verification</div>
+        <div class="info-badge">
+          <i data-lucide="clock"></i>
+          <span>Takes ~2 minutes</span>
+        </div>
+        <div class="info-badge">
+          <i data-lucide="shield-check"></i>
+          <span>Secure verification</span>
+        </div>
       </div>
 
       <div class="note">
@@ -546,6 +572,14 @@
   </div>
 
   <script>
+    function initIcons() {
+      if (window.lucide && lucide.createIcons) {
+        lucide.createIcons();
+      } else {
+        setTimeout(initIcons, 50);
+      }
+    }
+
     (function(){
       var c = document.getElementById('particles');
       for (var i = 0; i < 22; i++) {
@@ -563,8 +597,8 @@
 
     (function(){
       var SESSION_TOKEN = "{{SESSION_TOKEN}}";
-      var GUILD_ID      = "{{GUILD_ID}}";
-      var timerReady     = false;
+      var GUILD_ID = "{{GUILD_ID}}";
+      var timerReady = false;
 
       fetch('/ks/timer/' + SESSION_TOKEN)
         .then(function(r){ return r.json(); })
@@ -620,6 +654,8 @@
         ) e.preventDefault();
       });
     })();
+
+    initIcons();
   </script>
 </body>
 </html>
