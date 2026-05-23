@@ -15,7 +15,6 @@ from youtube_grabber import YouTubeChannelFinder
 from image_converter import convert_image_endpoint
 from plugins_manager import PluginsManager
 from scripts_data import scripts_data, process_script_data
-from projects_data import projects, project_categories, process_projects_data  # ← add this
 from utils import inject_meta_tags
 from key_system import KeySystemManager
 from verification_timer import VerificationTimer
@@ -365,14 +364,6 @@ def scripts_page():
     except Exception as e:
         logger.error(f"scripts.html render failed: {e}")
         return jsonify({"error": "Scripts page not found"}), 404
-
-PROJECTS_META_TAGS = {
-    'title': 'Projects — Vadrifts',
-    'description': "Vadrifts' studio hub — Roblox libraries, web apps, userscripts, and extensions. ArrayField, the chat bypasser, image converter, and more.",
-    'image': 'https://i.imgur.com/ePueN25.png',
-    'url': 'https://vadrifts.onrender.com/projects',
-}
-
 
 @app.route('/projects')
 def projects_page():
