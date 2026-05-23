@@ -5,7 +5,7 @@ import secrets
 import time
 import requests
 from functools import wraps
-from flask import Flask, request, jsonify, send_file, redirect, send_from_directory, make_response
+from flask import Flask, request, jsonify, send_file, redirect, send_from_directory, make_response, render_template
 from datetime import datetime, timedelta
 from collections import defaultdict
 
@@ -349,22 +349,20 @@ def use_feature_credit(feature_id):
 @app.route('/')
 def home():
     try:
-        with open('templates/home.html', 'r', encoding='utf-8') as f:
-            html_content = f.read()
+        html_content = render_template('home.html')
         return inject_meta_tags(html_content, HOME_META_TAGS)
-    except FileNotFoundError:
-        logger.error("home.html template not found")
+    except Exception as e:
+        logger.error(f"home.html render failed: {e}")
         return jsonify({"error": "Home page not found"}), 404
 
 
 @app.route('/scripts')
 def scripts_page():
     try:
-        with open('templates/scripts.html', 'r', encoding='utf-8') as f:
-            html_content = f.read()
+        html_content = render_template('scripts.html')
         return inject_meta_tags(html_content, SCRIPTS_META_TAGS)
-    except FileNotFoundError:
-        logger.error("scripts.html template not found")
+    except Exception as e:
+        logger.error(f"scripts.html render failed: {e}")
         return jsonify({"error": "Scripts page not found"}), 404
 
 
@@ -379,11 +377,10 @@ def start_verification():
 @app.route('/plugins')
 def plugins_page():
     try:
-        with open('templates/plugins.html', 'r', encoding='utf-8') as f:
-            html_content = f.read()
+        html_content = render_template('plugins.html')
         return inject_meta_tags(html_content, PLUGINS_META_TAGS)
-    except FileNotFoundError:
-        logger.error("plugins.html template not found")
+    except Exception as e:
+        logger.error(f"plugins.html render failed: {e}")
         return jsonify({"error": "Plugins page not found"}), 404
 
 
@@ -455,8 +452,7 @@ def script_detail(script_id):
     if not script:
         return jsonify({"error": "Script not found"}), 404
     try:
-        with open('templates/script-detail.html', 'r', encoding='utf-8') as f:
-            html_content = f.read()
+        html_content = render_template('script-detail.html')
         meta_tags = f'''
     <meta property="og:title" content="{script['title']} - Vadrifts">
     <meta property="og:description" content="{script['description']}">
@@ -566,9 +562,9 @@ def analytics_page():
 @app.route('/key-system')
 def key_system_page():
     try:
-        return send_file('templates/key-system.html')
-    except FileNotFoundError:
-        logger.error("key-system.html template not found")
+        return render_template('key-system.html')
+    except Exception as e:
+        logger.error(f"key-system.html render failed: {e}")
         return jsonify({"error": "Key system page not found"}), 404
 
 
