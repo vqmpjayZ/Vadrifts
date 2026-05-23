@@ -138,91 +138,7 @@
         transform: translateY(-5vh) translateX(80px) scale(0); 
         opacity: 0; 
         }
-        }
-        
-        .navbar {
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 100;
-        background: rgba(0,0,0,0.4);
-        backdrop-filter: blur(20px);
-        border: 1px solid rgba(255,255,255,0.12);
-        border-radius: 20px;
-        padding: 24px 32px;
-        animation: slideInDown 0.8s ease-out;
-        max-width: 1000px;
-        width: 90%;
-        transition: all 0.3s ease;
-        }
-        
-        .navbar.scrolled { top: 15px; }
-        .navbar.scrolled:hover { top: 20px; }
-        
-        .navbar:hover {
-        background: rgba(0,0,0,0.65);
-        border-color: rgba(255,255,255,0.25);
-        transform: translateX(-50%) translateY(0);
-        }
-        
-        @keyframes slideInDown {
-        from { opacity: 0; transform: translateX(-50%) translateY(-50px); }
-        to { opacity: 1; transform: translateX(-50%) translateY(0); }
-        }
-        
-        .nav-content {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        height: 100%;
-        }
-        
-        .nav-logo {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 24px;
-        font-weight: 700;
-        background: var(--gradient-primary);
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        text-decoration: none;
-        transition: transform 0.3s ease, filter 0.3s ease;
-        }
-        
-        .nav-logo:hover {
-        transform: translateY(-3px);
-        filter: drop-shadow(0 0 15px var(--accent-glow));
-        }
-        
-        .nav-logo-img { width: 28px; height: 28px; flex-shrink: 0; }
-        
-        .nav-links {
-        display: flex;
-        gap: 30px;
-        align-items: center;
-        height: 100%;
-        }
-        
-        .nav-link {
-        color: #ccc;
-        text-decoration: none;
-        font-weight: 500;
-        font-size: 14px;
-        transition: all 0.3s ease;
-        padding: 8px 12px;
-        display: flex;
-        align-items: center;
-        height: 100%;
-        }
-        
-        .nav-link:hover {
-        color: #ffffff;
-        text-shadow: 0 0 8px rgba(255,255,255,0.6);
-        }
-        
+        }        
         .container {
         max-width: 1000px;
         margin: 0 auto;
@@ -588,33 +504,7 @@
         opacity: 1;
         }
         
-        @media (max-width: 768px) {
-        .navbar {
-        top: 25px;
-        left: 10px;
-        right: 10px;
-        width: auto;
-        transform: none;
-        padding: 16px 18px;
-        animation: slideInDownMobile 0.8s ease-out;
-        }
-        .navbar.scrolled { top: 20px; }
-        .navbar.scrolled:hover { top: 20px; }
-        .navbar:hover {
-        background: rgba(0,0,0,0.6);
-        border-color: rgba(255,255,255,0.4);
-        transform: none;
-        }
-        @keyframes slideInDownMobile {
-        from { opacity: 0; transform: translateY(-50px); }
-        to { opacity: 1; transform: translateY(0); }
-        }
-        .nav-content { justify-content: space-between; gap: 15px; }
-        .nav-links { gap: 15px; }
-        .nav-link { font-size: 12px; padding: 6px 10px; }
-        .nav-logo { font-size: 20px; gap: 8px; }
-        .nav-logo-img { width: 24px; height: 24px; }
-        .script-title { font-size: 32px; }
+        @media (max-width: 768px) {        .script-title { font-size: 32px; }
         .script-content { grid-template-columns: 1fr; gap: 30px; }
         .script-actions { flex-direction: column; align-items: center; }
         .action-btn { width: 100%; max-width: 300px; }
@@ -638,16 +528,7 @@
         width: 600px;
         height: 600px;
         }
-        }
-        
-        @media (max-width: 480px) {
-        .nav-links { gap: 10px; }
-        .nav-link { font-size: 11px; padding: 5px 8px; }
-        .navbar { left: 10px; right: 10px; padding: 10px 15px; top: 30px; }
-        .navbar.scrolled { top: 25px; }
-        .navbar.scrolled:hover { top: 25px; }
-        }
-    </style>
+        }    </style>
 </head>
 
 <body>
@@ -665,17 +546,7 @@
         <div id="accentLight"></div>
     </div>
     <div class="particles" id="particles"></div>
-    <nav class="navbar">
-        <div class="nav-content">
-            <a href="/" class="nav-logo">
-                <img src="https://i.imgur.com/ePueN25.png" alt="Vadrifts Logo" class="nav-logo-img"> Vadrifts
-            </a>
-            <div class="nav-links">
-                <a href="/scripts" class="nav-link active">Scripts</a>
-                <a href="/plugins" class="nav-link">Plugins</a>
-            </div>
-        </div>
-    </nav>
+    {% include '_navbar.html' %}
     <div class="container">
         <div id="loadingState" class="loading">
             <div class="loading-spinner"></div>
@@ -1037,19 +908,7 @@ Script Code
         });
         }
         
-        let lastScrollTop = 0;
-        window.addEventListener('scroll', function() {
-        let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        const navbar = document.querySelector('.navbar');
-        if (scrollTop > 100) {
-        navbar.classList.add('scrolled');
-        } else {
-        navbar.classList.remove('scrolled');
-        }
-        lastScrollTop = scrollTop;
-        });
-        
-        createParticles();
+createParticles();
         window.addEventListener('load', () => {
         loadScript();
         initLucideIcons();
