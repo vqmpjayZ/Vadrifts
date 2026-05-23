@@ -6,13 +6,17 @@
   {% include '_navbar.html' %} into any page is enough — no extra
   CSS or JS needs to live on the host page.
 
-  Active tab is auto-detected from request.path:
-    - "Scripts" highlights on /scripts and /script/<id>
-    - "Plugins" highlights on /plugins and /plugin/<id>
+  Studio-era nav (Aug 2025 redesign):
+    Logo · Projects · Discord
+  - Scripts / Plugins live inside /projects now (cards link out).
+  - Discord is an external link (new tab, never gets .active).
+  - No hamburger menu yet — only 2 items, would be overkill.
+    If we hit 4+ items, add a burger here.
 
-  Adding a new tab? Add an <a class="nav-link"> below and (optionally)
-  extend the active-state logic. Every page that includes this file
-  picks up the change automatically.
+  Active tab is auto-detected from request.path:
+    - "Projects" highlights on /projects, /scripts, /script/<id>,
+      /plugins, /plugin/<id>, /converter, /docs/arrayfield
+      (anything that lives under the Projects umbrella).
 #}
 <style>
   /* ===== navbar (desktop) ===== */
@@ -156,6 +160,14 @@
 </style>
 
 {% set _p = request.path %}
+{# Anything that lives under the Projects umbrella counts as active. #}
+{% set _projects_active = (
+  _p == '/projects'
+  or _p == '/scripts' or _p.startswith('/script/')
+  or _p == '/plugins' or _p.startswith('/plugin/')
+  or _p == '/converter'
+  or _p.startswith('/docs/')
+) %}
 <nav class="navbar">
   <div class="nav-content">
     <a href="/" class="nav-logo">
@@ -163,8 +175,11 @@
       Vadrifts
     </a>
     <div class="nav-links">
-      <a href="/scripts" class="nav-link{% if _p == '/scripts' or _p.startswith('/script/') %} active{% endif %}">Scripts</a>
-      <a href="/plugins" class="nav-link{% if _p == '/plugins' or _p.startswith('/plugin/') %} active{% endif %}">Plugins</a>
+      <a href="/projects" class="nav-link{% if _projects_active %} active{% endif %}">Projects</a>
+      <a href="https://discord.com/invite/WDbJ5wE2cR"
+         class="nav-link"
+         target="_blank"
+         rel="noopener noreferrer">Discord</a>
     </div>
   </div>
 </nav>
