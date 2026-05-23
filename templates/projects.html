@@ -19,11 +19,6 @@
       position: relative;
     }
 
-    /* ==========================================================
-       Background lights + particles — kept in sync with home.html
-       (will be extracted into _background.html during the home
-       rebuild pass; for now this is an exact mirror).
-       ========================================================== */
     .bg-lights {
       position: fixed; top: 0; left: 0;
       width: 100%; height: 100%;
@@ -74,9 +69,6 @@
       100% { transform: translateY(-200px) translateX(40px); opacity: 0.3; }
     }
 
-    /* ==========================================================
-       Page header
-       ========================================================== */
     .page-header {
       position: relative;
       z-index: 10;
@@ -106,9 +98,6 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* ==========================================================
-       Spotlight strip — wide horizontal banner, auto-cycles
-       ========================================================== */
     .spotlight {
       position: relative;
       z-index: 10;
@@ -141,8 +130,7 @@
       object-fit: cover;
       transform: scale(1.05);
     }
-    /* Ken-Burns: slow drift + scale, only on the active slide.
-       Reset transform when slide leaves so re-entry looks fresh. */
+    
     .spotlight-slide.is-active .spotlight-image {
       animation: kenBurns 10s ease-in-out forwards;
     }
@@ -253,9 +241,6 @@
       background: linear-gradient(90deg, #7209b7, #ff9f43);
     }
 
-    /* ==========================================================
-       Filter chip row
-       ========================================================== */
     .filter-row {
       position: relative;
       z-index: 10;
@@ -325,9 +310,6 @@
     }
     .filter-search input::placeholder { color: #888; }
 
-    /* ==========================================================
-       Project card grid — wider than tall, FLIP animated
-       ========================================================== */
     .grid-wrap {
       position: relative;
       z-index: 10;
@@ -370,7 +352,7 @@
       box-shadow: 0 20px 40px rgba(114, 9, 183, 0.25);
     }
     .project-card::before {
-      /* soft glow border on hover */
+      
       content: '';
       position: absolute;
       inset: -1px;
@@ -404,7 +386,7 @@
       filter: drop-shadow(0 8px 24px rgba(114, 9, 183, 0.35));
       transition: transform 0.6s ease, filter 0.4s ease;
     }
-    /* Per-project hover animations (logo only, not whole card) */
+    
     .project-card:hover .logo-spin-slow img { animation: logoSpinSlow 6s linear infinite; }
     .project-card:hover .logo-pulse img     { animation: logoPulse 1.6s ease-in-out infinite; }
     .project-card:hover .logo-tilt img      { animation: logoTilt 3s ease-in-out infinite; }
@@ -483,7 +465,6 @@
       color: #cccccc;
     }
 
-    /* Empty-state when a filter yields nothing */
     .grid-empty {
       grid-column: 1 / -1;
       text-align: center;
@@ -493,9 +474,6 @@
     }
     .grid-empty.is-hidden { display: none; }
 
-    /* ==========================================================
-       Tablet / mobile refinements
-       ========================================================== */
     @media (max-width: 768px) {
       .page-header { padding-top: 120px; }
       .spotlight-frame { aspect-ratio: 4 / 5; }
@@ -516,7 +494,6 @@
 </head>
 <body>
 
-  <!-- background visuals -->
   <div class="bg-lights">
     <div class="light light-1"></div>
     <div class="light light-2"></div>
@@ -539,9 +516,6 @@
     </p>
   </header>
 
-  <!-- ==========================================================
-       Spotlight strip
-       ========================================================== -->
   {% set spotlights = projects | selectattr('spotlight') | list %}
   {% if spotlights %}
   <section class="spotlight" aria-label="Featured projects">
@@ -584,9 +558,6 @@
   </section>
   {% endif %}
 
-  <!-- ==========================================================
-       Filter chip row
-       ========================================================== -->
   <nav class="filter-row" id="filterRow" aria-label="Project filters">
     {% for c in categories %}
     <button class="filter-chip{% if loop.first %} is-active{% endif %}"
@@ -602,9 +573,6 @@
     </label>
   </nav>
 
-  <!-- ==========================================================
-       Card grid (FLIP-animated on filter/search)
-       ========================================================== -->
   <section class="grid-wrap">
     <div class="grid" id="projectGrid">
       {% for p in projects %}
@@ -639,9 +607,7 @@
   </section>
 
   <script>
-    /* -----------------------------------------------------------
-       Particle generator (matches home.html density/feel).
-       ----------------------------------------------------------- */
+    
     (function spawnParticles() {
       var host = document.getElementById('particles');
       if (!host) return;
@@ -656,10 +622,6 @@
       }
     })();
 
-    /* -----------------------------------------------------------
-       Spotlight strip — auto-cycles every 8s, click a dot to jump.
-       Pauses on hover so the user can read.
-       ----------------------------------------------------------- */
     (function spotlight() {
       var frame = document.getElementById('spotlightFrame');
       if (!frame) return;
@@ -688,7 +650,7 @@
       dots.forEach(function (d) {
         d.addEventListener('click', function () {
           show(parseInt(d.dataset.index, 10));
-          start(); // restart the timer from this slide
+          start();
         });
       });
       frame.addEventListener('mouseenter', stop);
@@ -696,13 +658,6 @@
       start();
     })();
 
-    /* -----------------------------------------------------------
-       Filter + search + FLIP animation
-       FLIP = First/Last/Invert/Play. Record positions before the
-       layout change, apply the change, read new positions, then
-       transform each card back to its old spot and let the
-       existing CSS transition animate it home.
-       ----------------------------------------------------------- */
     (function filters() {
       var grid    = document.getElementById('projectGrid');
       var chips   = document.querySelectorAll('.filter-chip');
@@ -725,7 +680,6 @@
       function applyFilter() {
         var cards = Array.prototype.slice.call(grid.children);
 
-        // FIRST — record positions of currently-visible cards
         var firsts = new Map();
         cards.forEach(function (c) {
           if (!c.classList.contains('is-hidden')) {
@@ -733,7 +687,6 @@
           }
         });
 
-        // Apply visibility change
         var anyVisible = false;
         cards.forEach(function (c) {
           if (matches(c)) {
@@ -745,18 +698,17 @@
         });
         empty.classList.toggle('is-hidden', anyVisible);
 
-        // LAST + INVERT + PLAY
         cards.forEach(function (c) {
           if (c.classList.contains('is-hidden')) return;
           var first = firsts.get(c);
           var last  = c.getBoundingClientRect();
-          if (!first) return; // newly-visible card just appears in place
+          if (!first) return;
           var dx = first.left - last.left;
           var dy = first.top  - last.top;
           if (dx === 0 && dy === 0) return;
           c.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
           c.style.transition = 'none';
-          // next frame: clear transform, let CSS transition animate
+
           requestAnimationFrame(function () {
             c.style.transition = '';
             c.style.transform = '';
