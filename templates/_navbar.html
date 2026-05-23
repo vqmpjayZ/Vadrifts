@@ -1,3 +1,19 @@
+{#
+  Vadrifts shared navbar — fully self-contained.
+
+  Contains the markup, all styling (desktop + tablet + mobile), the
+  slide-in keyframes, and the scroll-to-shrink behavior. Dropping
+  {% include '_navbar.html' %} into any page is enough — no extra
+  CSS or JS needs to live on the host page.
+
+  Active tab is auto-detected from request.path:
+    - "Scripts" highlights on /scripts and /script/<id>
+    - "Plugins" highlights on /plugins and /plugin/<id>
+
+  Adding a new tab? Add an <a class="nav-link"> below and (optionally)
+  extend the active-state logic. Every page that includes this file
+  picks up the change automatically.
+#}
 <style>
   /* ===== navbar (desktop) ===== */
   .navbar {
@@ -140,14 +156,6 @@
 </style>
 
 {% set _p = request.path %}
-
-{% set _projects_active = (
-  _p == '/projects'
-  or _p == '/scripts' or _p.startswith('/script/')
-  or _p == '/plugins' or _p.startswith('/plugin/')
-  or _p == '/converter'
-  or _p.startswith('/docs/')
-) %}
 <nav class="navbar">
   <div class="nav-content">
     <a href="/" class="nav-logo">
@@ -155,11 +163,8 @@
       Vadrifts
     </a>
     <div class="nav-links">
-      <a href="/projects" class="nav-link{% if _projects_active %} active{% endif %}">Projects</a>
-      <a href="https://discord.com/invite/WDbJ5wE2cR"
-         class="nav-link"
-         target="_blank"
-         rel="noopener noreferrer">Discord</a>
+      <a href="/scripts" class="nav-link{% if _p == '/scripts' or _p.startswith('/script/') %} active{% endif %}">Scripts</a>
+      <a href="/plugins" class="nav-link{% if _p == '/plugins' or _p.startswith('/plugin/') %} active{% endif %}">Plugins</a>
     </div>
   </div>
 </nav>
