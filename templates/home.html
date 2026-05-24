@@ -1529,6 +1529,733 @@
         padding: 20px 0;
       }
     }
+
+        /* ============== Vadrifts: home redesign extensions ============== */
+    /* ============== NEW: hero "just landed" badge ============== */
+    .status-badge-new {
+      gap: 8px;
+      border: 1px solid rgba(255, 159, 67, 0.45);
+      background: linear-gradient(120deg, rgba(114, 9, 183, 0.18), rgba(255, 159, 67, 0.16));
+      box-shadow: 0 0 32px rgba(255, 159, 67, 0.18);
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+    .status-badge-new:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 42px rgba(255, 159, 67, 0.32);
+      border-color: rgba(255, 159, 67, 0.7);
+    }
+    .new-pulse {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #ff9f43;
+      box-shadow: 0 0 0 0 rgba(255, 159, 67, 0.7);
+      animation: newPulse 1.6s ease-out infinite;
+    }
+    .new-eyebrow {
+      font-size: 11px; font-weight: 800; letter-spacing: 1.4px;
+      background: linear-gradient(90deg, #ff9f43, #c77dff);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-right: 4px;
+    }
+    @keyframes newPulse {
+      0%   { box-shadow: 0 0 0 0 rgba(255, 159, 67, 0.7); }
+      70%  { box-shadow: 0 0 0 12px rgba(255, 159, 67, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 159, 67, 0); }
+    }
+
+    /* ============== NEW: spotlight card (dark section) ============== */
+    .spotlight-section { padding-bottom: 90px; }
+    .spotlight-card {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 50px;
+      align-items: center;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 50px;
+      border-radius: 28px;
+      background: linear-gradient(135deg, rgba(114, 9, 183, 0.12), rgba(255, 159, 67, 0.05));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      position: relative;
+      overflow: hidden;
+    }
+    .spotlight-card::before {
+      content: '';
+      position: absolute; inset: -2px;
+      background: linear-gradient(135deg, rgba(114, 9, 183, 0.4), transparent 40%, rgba(255, 159, 67, 0.3));
+      border-radius: 28px;
+      z-index: -1;
+      opacity: 0.4;
+    }
+    .spotlight-visual {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      aspect-ratio: 16 / 10;
+      cursor: pointer;
+      transform-style: preserve-3d;
+      transition: transform 0.4s cubic-bezier(.2,.8,.2,1);
+      will-change: transform;
+      background: #0c0014;
+    }
+    .spotlight-visual:hover { transform: perspective(900px) translateY(-4px); }
+    .spotlight-image-link {
+      display: block; width: 100%; height: 100%;
+      text-decoration: none;
+    }
+    .spotlight-img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.6s cubic-bezier(.2,.8,.2,1);
+    }
+    .spotlight-visual:hover .spotlight-img { transform: scale(1.04); }
+    .spotlight-shine {
+      position: absolute;
+      top: 0; left: -120%;
+      width: 80%; height: 100%;
+      background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.18) 50%, transparent 70%);
+      transform: skewX(-18deg);
+      animation: shineSweep 5s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 3;
+    }
+    @keyframes shineSweep {
+      0%, 70%   { left: -120%; }
+      85%       { left: 130%; }
+      100%      { left: 130%; }
+    }
+    .spotlight-ribbon {
+      position: absolute;
+      top: 14px; left: 14px;
+      z-index: 4;
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 12px;
+      font-size: 11px; font-weight: 800; letter-spacing: 1.6px;
+      color: #fff;
+      background: linear-gradient(90deg, #7b2cbf, #ff9f43);
+      border-radius: 20px;
+      box-shadow: 0 6px 22px rgba(123, 44, 191, 0.45);
+    }
+    .ribbon-pulse {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.85);
+      animation: newPulse 1.6s ease-out infinite;
+    }
+    .spotlight-text { color: #fff; }
+    .spotlight-eyebrow-row {
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+    .spotlight-tag {
+      font-size: 11px; font-weight: 800; letter-spacing: 1.6px;
+      padding: 5px 12px; border-radius: 20px;
+      background: rgba(255, 159, 67, 0.14);
+      color: #ffb674;
+      border: 1px solid rgba(255, 159, 67, 0.35);
+    }
+    .spotlight-meta {
+      font-size: 12px; color: #999; font-family: 'JetBrains Mono', monospace;
+    }
+    .spotlight-heading {
+      font-size: clamp(34px, 4.2vw, 48px);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 14px;
+      background: linear-gradient(90deg, #fff, #c77dff);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .spotlight-sub {
+      font-size: 16px; color: #c8c0d8; line-height: 1.6;
+      margin-bottom: 18px;
+    }
+    .spotlight-bullets {
+      list-style: none; padding: 0; margin: 0 0 26px 0;
+    }
+    .spotlight-bullets li {
+      position: relative;
+      padding: 6px 0 6px 22px;
+      color: #bbb; font-size: 14px; line-height: 1.55;
+    }
+    .spotlight-bullets li::before {
+      content: '';
+      position: absolute; left: 0; top: 13px;
+      width: 8px; height: 8px; border-radius: 50%;
+      background: linear-gradient(135deg, #7b2cbf, #ff9f43);
+    }
+    .spotlight-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+    .spotlight-cta-primary, .spotlight-cta-secondary {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 22px;
+      font-size: 14px; font-weight: 600;
+      text-decoration: none;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+    .spotlight-cta-primary {
+      color: #fff;
+      background: linear-gradient(135deg, #7209b7, #c478d4);
+      box-shadow: 0 8px 28px rgba(114, 9, 183, 0.35);
+    }
+    .spotlight-cta-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 36px rgba(114, 9, 183, 0.55);
+    }
+    .spotlight-cta-secondary {
+      color: #c8c0d8;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .spotlight-cta-secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+    @media (max-width: 880px) {
+      .spotlight-card { grid-template-columns: 1fr; padding: 30px; gap: 30px; }
+      .spotlight-section { padding-bottom: 60px; }
+    }
+
+    /* ============== NEW: testimonials ============== */
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 22px;
+      max-width: 1180px;
+      margin: 40px auto 0;
+      padding: 0 20px;
+    }
+    .testimonial-card {
+      position: relative;
+      padding: 30px 26px 26px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+      backdrop-filter: blur(14px);
+    }
+    .testimonial-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(199, 125, 255, 0.4);
+      box-shadow: 0 16px 40px rgba(114, 9, 183, 0.22);
+    }
+    .t-quote-mark {
+      position: absolute;
+      top: 8px; right: 18px;
+      font-family: Georgia, serif;
+      font-size: 80px;
+      line-height: 1;
+      color: rgba(199, 125, 255, 0.18);
+      pointer-events: none;
+    }
+    .t-text {
+      color: #d9d3e8;
+      font-size: 15px; line-height: 1.6;
+      margin-bottom: 20px;
+      position: relative; z-index: 1;
+    }
+    .t-author { display: flex; align-items: center; gap: 12px; }
+    .t-avatar {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-weight: 800; font-size: 16px;
+      flex-shrink: 0;
+    }
+    .t-name { font-weight: 700; color: #fff; font-size: 14px; }
+    .t-role { font-size: 12px; color: #999; }
+
+    /* ============== NEW: github commits ============== */
+    .commits-card {
+      max-width: 880px;
+      margin: 40px auto 0;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+      backdrop-filter: blur(14px);
+    }
+    .commits-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 22px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(0, 0, 0, 0.25);
+    }
+    .commits-header-left {
+      display: flex; align-items: center; gap: 10px;
+      color: #fff; font-weight: 600; font-size: 14px;
+      font-family: 'JetBrains Mono', 'Inter', monospace;
+    }
+    .commits-header-left svg { color: #c8c0d8; }
+    .commits-header-link {
+      color: #c77dff; text-decoration: none; font-size: 13px;
+      transition: color 0.2s ease;
+    }
+    .commits-header-link:hover { color: #fff; }
+    .commits-list { list-style: none; padding: 0; margin: 0; }
+    .commit-row {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 22px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      transition: background 0.2s ease;
+      text-decoration: none;
+      color: inherit;
+    }
+    .commit-row:last-child { border-bottom: none; }
+    .commit-row:hover { background: rgba(199, 125, 255, 0.05); }
+    .commit-sha {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #ff9f43;
+      background: rgba(255, 159, 67, 0.1);
+      padding: 4px 8px;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+    .commit-msg {
+      color: #d9d3e8;
+      font-size: 14px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .commit-time {
+      color: #888; font-size: 12px; flex-shrink: 0;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .commit-loading {
+      justify-content: center; color: #888; font-size: 13px;
+      grid-template-columns: auto auto;
+    }
+    .commit-spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(199, 125, 255, 0.2);
+      border-top-color: #c77dff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @media (max-width: 600px) {
+      .commit-row { grid-template-columns: auto 1fr; }
+      .commit-time { grid-column: 2; padding-top: 4px; }
+    }
+
+    /* ============== NEW: suggestion box ============== */
+    .suggest-wrapper { max-width: 1180px; margin: 0 auto; padding: 0 20px; }
+    .suggest-card {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 40px;
+      padding: 44px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, rgba(114, 9, 183, 0.1), rgba(76, 201, 240, 0.05));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(14px);
+    }
+    .suggest-eyebrow {
+      font-size: 11px; font-weight: 800; letter-spacing: 1.6px;
+      color: #4cc9f0;
+      margin-bottom: 12px;
+    }
+    .suggest-title {
+      font-size: clamp(30px, 4vw, 42px);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 14px;
+      background: linear-gradient(90deg, #fff 0%, #c77dff 100%);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .suggest-blurb { color: #c8c0d8; font-size: 15px; line-height: 1.6; margin-bottom: 18px; }
+    .suggest-meta { color: #888; font-size: 13px; }
+    .suggest-form { display: flex; flex-direction: column; gap: 12px; }
+    .suggest-form textarea {
+      width: 100%;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.35);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      line-height: 1.55;
+      resize: vertical;
+      min-height: 130px;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+    .suggest-form textarea:focus {
+      outline: none;
+      border-color: rgba(199, 125, 255, 0.5);
+      box-shadow: 0 0 0 4px rgba(199, 125, 255, 0.12);
+    }
+    .suggest-form textarea::placeholder { color: #777; }
+    .suggest-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .suggest-counter { color: #888; font-size: 12px; font-family: 'JetBrains Mono', monospace; }
+    .suggest-submit {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 22px;
+      font-size: 14px; font-weight: 600;
+      background: linear-gradient(135deg, #7209b7, #c478d4);
+      color: #fff; border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(114, 9, 183, 0.35);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .suggest-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(114, 9, 183, 0.5);
+    }
+    .suggest-submit:active { transform: translateY(0); }
+    .suggest-alt { color: #888; font-size: 13px; }
+    .suggest-alt a { color: #c77dff; text-decoration: none; }
+    .suggest-alt a:hover { color: #fff; }
+    .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+    @media (max-width: 880px) {
+      .suggest-card { grid-template-columns: 1fr; padding: 30px; gap: 22px; }
+    }
+
+    /* ============== NEW: toast ============== */
+    .toast {
+      position: fixed;
+      bottom: 30px; left: 50%;
+      transform: translateX(-50%) translateY(140%);
+      padding: 14px 22px;
+      background: rgba(15, 5, 25, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(199, 125, 255, 0.4);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      transition: transform 0.4s cubic-bezier(.2,.8,.2,1);
+      max-width: 90vw;
+      text-align: center;
+    }
+    .toast.is-visible { transform: translateX(-50%) translateY(0); }
+        /* === v2 home additions === */
+    /* ============== v2 hero — latest drop pill ============== */
+    .latest-drop-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 7px 16px;
+      font-size: 12px; font-weight: 700; letter-spacing: 0.4px;
+      color: #b6ffcd;
+      background: rgba(34, 197, 94, 0.08);
+      border: 1px solid rgba(34, 197, 94, 0.32);
+      border-radius: 100px;
+      text-decoration: none;
+      backdrop-filter: blur(10px);
+      transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+      margin-bottom: 22px;
+    }
+    .latest-drop-pill:hover {
+      transform: translateY(-2px);
+      background: rgba(34, 197, 94, 0.14);
+      border-color: rgba(34, 197, 94, 0.55);
+      box-shadow: 0 8px 28px rgba(34, 197, 94, 0.22);
+    }
+    .ldp-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.65);
+      animation: ldpPulse 1.7s ease-out infinite;
+    }
+    @keyframes ldpPulse {
+      0%   { box-shadow: 0 0 0 0   rgba(34, 197, 94, 0.7); }
+      70%  { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+      100% { box-shadow: 0 0 0 0   rgba(34, 197, 94, 0); }
+    }
+
+    /* ============== v2 hero spotlight (no card wrapper — let lights breathe) ============== */
+    .header-with-spotlight { padding-bottom: 60px; }
+    .hero-spotlight {
+      display: grid;
+      grid-template-columns: 1.05fr 1fr;
+      gap: 44px;
+      align-items: center;
+      max-width: 1040px;
+      margin: 42px auto 36px;
+      padding: 0;
+      background: none;
+      border: none;
+      box-shadow: none;
+      text-align: left;
+      animation: heroSpotIn 1.1s cubic-bezier(.2,.8,.2,1) 0.2s both;
+    }
+    @keyframes heroSpotIn {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .hs-visual {
+      position: relative;
+      border-radius: 18px;
+      overflow: hidden;
+      aspect-ratio: 16 / 11;
+      cursor: pointer;
+      background: #0a0010;
+      transition: transform 0.4s cubic-bezier(.2,.8,.2,1), box-shadow 0.4s ease;
+      box-shadow:
+        0 24px 60px rgba(114, 9, 183, 0.35),
+        0 0 0 1px rgba(199, 125, 255, 0.18);
+    }
+    .hs-visual:hover {
+      transform: translateY(-4px);
+      box-shadow:
+        0 32px 70px rgba(114, 9, 183, 0.5),
+        0 0 0 1px rgba(199, 125, 255, 0.35);
+    }
+    .hs-img-link { display: block; width: 100%; height: 100%; }
+    .hs-img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.6s cubic-bezier(.2,.8,.2,1);
+    }
+    .hs-visual:hover .hs-img { transform: scale(1.04); }
+    .hs-shine {
+      position: absolute;
+      top: 0; left: -120%;
+      width: 80%; height: 100%;
+      background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.16) 50%, transparent 70%);
+      transform: skewX(-18deg);
+      animation: shineSweep 5s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 3;
+    }
+    .hs-new {
+      position: absolute;
+      top: 12px; left: 12px;
+      z-index: 4;
+      padding: 5px 11px;
+      font-size: 10px; font-weight: 800; letter-spacing: 1.4px;
+      color: #fff;
+      background: linear-gradient(90deg, #ff5e8a, #ff9f43);
+      border-radius: 100px;
+      box-shadow: 0 6px 20px rgba(255, 94, 138, 0.5);
+    }
+    .hs-text { padding: 4px 12px 4px 0; }
+    .hs-eyebrow {
+      font-size: 11px; font-weight: 800; letter-spacing: 1.8px;
+      color: #c77dff;
+      margin-bottom: 10px;
+    }
+    .hs-title {
+      font-size: clamp(28px, 3.4vw, 38px);
+      font-weight: 800;
+      line-height: 1.1;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+    .hs-blurb {
+      color: #c8c0d8;
+      font-size: 14px; line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    .hs-chips {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      margin-bottom: 22px;
+    }
+    .hs-chip {
+      padding: 4px 10px;
+      font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
+      color: #c8c0d8;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 100px;
+    }
+    .hs-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .hs-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 11px 18px;
+      font-size: 13px; font-weight: 600;
+      text-decoration: none;
+      border-radius: 10px;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+    }
+    .hs-btn-primary {
+      color: #fff;
+      background: linear-gradient(135deg, #7209b7, #c478d4);
+      box-shadow: 0 8px 24px rgba(114, 9, 183, 0.35);
+    }
+    .hs-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(114, 9, 183, 0.5); }
+    .hs-btn-secondary {
+      color: #d9d3e8;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.13);
+    }
+    .hs-btn-secondary:hover { transform: translateY(-2px); background: rgba(255, 255, 255, 0.1); color: #fff; }
+    @media (max-width: 860px) {
+      .hero-spotlight { grid-template-columns: 1fr; gap: 22px; padding: 0; max-width: 540px; }
+      .hs-text { padding: 0 4px; text-align: center; }
+      .hs-chips { justify-content: center; }
+      .hs-actions { justify-content: center; }
+    }
+
+    /* ============== v2 commits — multiline w/ description ============== */
+    .commit-row {
+      grid-template-columns: auto 1fr auto;
+      align-items: start;
+    }
+    .commit-main { min-width: 0; }
+    .commit-headline {
+      color: #fff;
+      font-size: 14px;
+      font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+    }
+    .commit-body {
+      color: #999;
+      font-size: 12.5px;
+      line-height: 1.5;
+      margin-top: 4px;
+      white-space: pre-wrap;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .commit-repo {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 6px;
+      font-size: 11.5px;
+      color: #c77dff;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .commit-repo svg { opacity: 0.7; }
+
+    /* ============== v2 suggestion box — fancier ============== */
+    .suggest-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(114, 9, 183, 0.16) 0%, rgba(15, 5, 25, 0.6) 55%, rgba(76, 201, 240, 0.08) 100%);
+      border: 1px solid rgba(199, 125, 255, 0.22);
+      box-shadow: 0 24px 60px rgba(114, 9, 183, 0.18);
+    }
+    .suggest-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.5;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .suggest-orb-1 { width: 260px; height: 260px; background: #7b2cbf; top: -60px; right: -60px; }
+    .suggest-orb-2 { width: 220px; height: 220px; background: #4cc9f0; bottom: -80px; left: -50px; opacity: 0.35; }
+    .suggest-left, .suggest-right { position: relative; z-index: 1; }
+
+    .suggest-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 12px;
+      border-radius: 100px;
+      background: rgba(199, 125, 255, 0.1);
+      border: 1px solid rgba(199, 125, 255, 0.3);
+      color: #c77dff;
+      font-size: 10.5px; font-weight: 800; letter-spacing: 1.8px;
+      margin-bottom: 16px;
+    }
+    .eyebrow-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #c77dff;
+      box-shadow: 0 0 8px #c77dff;
+      animation: ldpPulse 1.7s ease-out infinite;
+    }
+    .suggest-stats {
+      list-style: none; padding: 0; margin: 24px 0 0 0;
+      display: flex; gap: 26px; flex-wrap: wrap;
+    }
+    .suggest-stats li { display: flex; flex-direction: column; }
+    .ss-num {
+      font-size: 22px; font-weight: 800;
+      background: linear-gradient(90deg, #fff, #c77dff);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1.1;
+    }
+    .ss-lbl {
+      font-size: 11px; font-weight: 600; letter-spacing: 1px;
+      color: #888;
+      margin-top: 4px;
+      text-transform: uppercase;
+    }
+
+    .suggest-type-chips {
+      display: flex; gap: 8px;
+      flex-wrap: wrap;
+    }
+    .stype-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 13px;
+      font-size: 12px; font-weight: 600;
+      background: rgba(255, 255, 255, 0.04);
+      color: #b8b0c8;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      font-family: inherit;
+    }
+    .stype-chip:hover { color: #fff; border-color: rgba(199, 125, 255, 0.35); }
+    .stype-chip.is-active {
+      color: #fff;
+      background: linear-gradient(135deg, rgba(114, 9, 183, 0.4), rgba(199, 125, 255, 0.25));
+      border-color: rgba(199, 125, 255, 0.55);
+      box-shadow: 0 4px 18px rgba(114, 9, 183, 0.35);
+    }
+    .suggest-textarea-wrap {
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+    .suggest-textarea-wrap:focus-within {
+      border-color: rgba(199, 125, 255, 0.55);
+      box-shadow: 0 0 0 4px rgba(199, 125, 255, 0.12);
+    }
+    .suggest-form textarea {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+    }
+    .suggest-form textarea:focus { box-shadow: none; }
+    .suggest-textarea-shine {
+      position: absolute;
+      top: 0; left: -120%;
+      width: 60%; height: 100%;
+      background: linear-gradient(110deg, transparent 30%, rgba(199, 125, 255, 0.07) 50%, transparent 70%);
+      transform: skewX(-15deg);
+      pointer-events: none;
+    }
+    .suggest-textarea-wrap:focus-within .suggest-textarea-shine {
+      animation: shineSweep 2.2s ease-in-out 1;
+    }
+    .suggest-submit:disabled,
+    .suggest-submit[data-cooldown="true"] {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: 0 4px 12px rgba(114, 9, 183, 0.2) !important;
+    }
+
+    /* ============== v2 toast — variants ============== */
+    .toast.is-error { border-color: rgba(255, 94, 138, 0.45); }
+    .toast.is-warn  { border-color: rgba(255, 159, 67, 0.45); }
+
 		</style>
 	</head>
 	<body>
@@ -1543,42 +2270,63 @@
 		</div>
 		<div class="particles" id="particles"></div>
 		{% include '_navbar.html' %}
-		<div class="header">
-			<div class="status-badge">
-				<span class="status-dot"></span>
-				#1 Best Roblox Scripts
-			</div>
+		<!-- ============== HERO (with embedded spotlight) ============== -->
+		<div class="header header-with-spotlight">
+			<a href="/docs/arrayfield" class="latest-drop-pill" aria-label="Open ArrayField docs">
+				<span class="ldp-dot"></span>
+				Latest drop
+			</a>
 			<h1>Vadrifts Reimagined</h1>
 			<p class="description">
-				After the fall and rise again,
-				<span class="highlight">Vadrifts returns</span>
-				for the second time.        From the ashes of
-				<span class="highlight">Vastral</span>
-				and
-				<span class="highlight">Valorium</span>, we're back with
-				<span class="highlight">better scripts</span>, stronger community, and the same legendary
-				<span class="highlight">bypassing power</span>
-				you remember.
+				One home for everything we build &mdash;
+				<span class="highlight">Roblox tools</span>,
+				<span class="highlight">web apps</span>,
+				<span class="highlight">userscripts</span>, and
+				<span class="highlight">extensions</span>. Clean, free, actively maintained, built in the open.
 			</p>
-			<div class="rating-stars">
-				<div class="stars-display">
-					<span class="star filled">★</span>
-					<span class="star filled">★</span>
-					<span class="star filled">★</span>
-					<span class="star filled">★</span>
-					<span class="star filled">★</span>
+
+			<!-- embedded latest-drop card -->
+			<div class="hero-spotlight" id="heroSpotlight">
+				<div class="hs-visual">
+					<div class="hs-shine"></div>
+					<span class="hs-new">NEW</span>
+					<a href="/docs/arrayfield" class="hs-img-link" aria-label="Open ArrayField docs">
+						<img src="https://i.imgur.com/W9FaXAY.png" alt="ArrayField" class="hs-img">
+					</a>
 				</div>
-				<span class="rating-text">9.9/10 Community Rating</span>
+				<div class="hs-text">
+					<div class="hs-eyebrow">LATEST ADDITION</div>
+					<h2 class="hs-title">ArrayField Docs</h2>
+					<p class="hs-blurb">Our Roblox UI library, fully documented. A modification of old Arrayfield (itself a mod of old Rayfield) — the deepest feature set of any library in the scene. Tabs, sections, dropdowns, sliders, color pickers, key binds, notifications.</p>
+					<div class="hs-chips">
+						<span class="hs-chip">LIBRARY</span>
+						<span class="hs-chip">ROBLOX</span>
+						<span class="hs-chip">DOCS</span>
+					</div>
+					<div class="hs-actions">
+						<a href="/docs/arrayfield" class="hs-btn hs-btn-primary">
+							Read Docs
+							<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+						</a>
+						<a href="https://github.com/vqmpjayZ/laboratory" target="_blank" rel="noopener" class="hs-btn hs-btn-secondary">
+							<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55v-2.05c-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.05-.72.08-.71.08-.71 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.47.11-3.07 0 0 .97-.31 3.18 1.18.92-.26 1.91-.39 2.9-.39s1.98.13 2.9.39c2.21-1.49 3.18-1.18 3.18-1.18.62 1.6.23 2.78.11 3.07.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.41-5.26 5.69.41.36.78 1.06.78 2.14v3.18c0 .31.21.66.79.55C20.21 21.39 23.5 17.07 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>
+							View Source
+						</a>
+					</div>
+				</div>
 			</div>
+
 			<div class="stats-section" id="stats-section"></div>
 			<div class="action-buttons">
-				<a href="#scripts" class="get-started-btn">Get Started</a>
+				<a href="/projects" class="get-started-btn">Browse Projects</a>
 				<a href="https://discord.com/invite/WDbJ5wE2cR" class="discord-btn" target="_blank">
 					<img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/discord-white-icon.png" alt="Discord" class="discord-icon">
 					Join Discord
 				</a>
 			</div>
 		</div>
+
+		<!-- ============== WHAT WE OFFER (dark, moved back) ============== -->
 		<div class="section dark">
 			<div class="section-content">
 				<h2 class="section-title white">What We Offer</h2>
@@ -1586,187 +2334,136 @@
 				<div class="why-grid">
 					<div class="why-card">
 						<div class="why-icon">
-							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-								<polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"></polygon>
-							</svg>
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"></polygon></svg>
 						</div>
 						<h3 class="why-title">Lightning Fast</h3>
-						<p class="why-description">Optimized performance means faster load times and smooth execution without lag or crashes.</p>
+						<p class="why-description">Tight code, lean pages, snappy execution. Nothing waits on a loading bar that didn't need to be there.</p>
 					</div>
 					<div class="why-card">
 						<div class="why-icon">
-							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-								<path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"></path>
-							</svg>
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
 						</div>
 						<h3 class="why-title">Trusted Owner</h3>
-						<p class="why-description">Led by experienced developers with a proven track record in the Roblox scripting community.</p>
+						<p class="why-description">Same hands behind every project. No mystery contributors, no random fork drama, no rebrand-and-bail.</p>
 					</div>
 					<div class="why-card">
 						<div class="why-icon">
-							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-								<circle cx="12" cy="12" r="10"></circle>
-								<circle cx="12" cy="12" r="6"></circle>
-								<circle cx="12" cy="12" r="2"></circle>
-							</svg>
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
 						</div>
 						<h3 class="why-title">User-Friendly</h3>
-						<p class="why-description">Intuitive interfaces and easy-to-use features make our scripts accessible for everyone.</p>
+						<p class="why-description">Built for people who'd rather use the thing than read a wiki. Pick it up, get the result, close the tab.</p>
 					</div>
 					<div class="why-card">
 						<div class="why-icon">
-							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-								<path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v5Z"></path>
-								<path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"></path>
-							</svg>
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v5Z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg>
 						</div>
 						<h3 class="why-title">Active Support</h3>
-						<p class="why-description">24/7 community support and regular developer updates keep everything running smoothly.</p>
+						<p class="why-description">A real community in Discord — not a ticket queue. Help, suggestions, and feature requests get seen.</p>
 					</div>
 					<div class="why-card">
 						<div class="why-icon">
-							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-								<rect width="14" height="20" x="5" y="2" rx="2" ry="2"></rect>
-								<path d="M12 18h.01"></path>
-							</svg>
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
 						</div>
-						<h3 class="why-title">Mobile Friendly</h3>
-						<p class="why-description">All our scripts work perfectly on mobile devices and support all major executors.</p>
+						<h3 class="why-title">Free Forever</h3>
+						<p class="why-description">Everything Vadrifts puts out is free to use. No paywalls, no upload caps, no fake "premium" gates.</p>
 					</div>
 					<div class="why-card">
 						<div class="why-icon">
-							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-								<path d="M9 12l2 2 4-4"></path>
-								<path d="M21 12c.552 0 1-.448 1-1V8a2 2 0 0 0-2-2h-5L9.5 4.5A2 2 0 0 0 8.086 4H4a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-1c0-.552-.448-1-1-1z"></path>
-							</svg>
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
 						</div>
-						<h3 class="why-title">Works on All Executors</h3>
-						<p class="why-description">Compatible with every executor - even the worst ones like Solara and Xeno work perfectly with our scripts.</p>
+						<h3 class="why-title">Built in the Open</h3>
+						<p class="why-description">Source lives on GitHub. Read it, audit it, file an issue, drop a PR. What you see is what runs.</p>
 					</div>
 				</div>
 				<div class="offer-cta">
-					<h3 class="offer-cta-title">What Are You Waiting For!</h3>
-					<p class="offer-cta-subtitle">Experience the best Roblox Scripts on the Market!</p>
+					<h3 class="offer-cta-title">Want to see everything we've made?</h3>
+					<p class="offer-cta-subtitle">The projects page has the full catalog &mdash; Roblox, web, and beyond.</p>
 				</div>
 			</div>
 		</div>
-		<div class="section" id="scripts">
-			<h2 class="section-title">Featured Scripts</h2>
-			<p class="section-subtitle">Discover our most powerful and popular scripts</p>
-			<div class="scripts-showcase">
-				<div class="featured-script">
-					<div class="featured-image">
-						<img src="https://i.imgur.com/jI8qDiR.jpeg" alt="Vadrifts.byp">
-						<span class="featured-badge">
-							<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
-								<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path>
-							</svg>
-							Hot
-						</span>
-					</div>
-					<div class="featured-content">
-						<h3 class="featured-title">Vadrifts.byp</h3>
-						<p class="featured-description">
-							The ultimate Roblox chat bypasser that's completely undetected. Advanced filtering technology with 700+ premade bypasses, anti-admin protection, and works on all executors including mobile devices.
-						</p>
-						<div class="featured-stats">
-							<div class="stat">
-								<span class="stat-value">2.8K+</span>
-								<span class="stat-name">Current Users</span>
-							</div>
-							<div class="stat">
-								<span class="stat-value">4.7</span>
-								<span class="stat-name">Rating</span>
-							</div>
-							<div class="stat">
-								<span class="stat-value">100%</span>
-								<span class="stat-name">Undetected</span>
-							</div>
-						</div>
-						<div class="featured-actions">
-							<a href="https://vadrifts.onrender.com/script/1" class="primary-btn">
-								<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-									<path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path>
-								</svg>
-								Get Script
-							</a>
-						</div>
-					</div>
-				</div>
-				<div class="scripts-grid">
-					<div class="script-card">
-						<div class="script-thumbnail">
-							<img src="https://tr.rbxcdn.com/180DAY-808f20386cb8582fcd0075aae67cd039/768/432/Image/Webp/noFilter" alt="Starving Artists">
-							<div class="script-status">Free</div>
-						</div>
-						<div class="script-info">
-							<div class="script-game">Starving Artists</div>
-							<h4 class="script-name">Starving Artists Script</h4>
-							<p class="script-description">A free Starving Artists script with simple Discord key system. Generate images using URL input with reliable, undetected, and customizable image generation plus auto booth claiming.</p>
-							<div class="script-footer">
-								<div class="script-rating">
-									<div class="script-stars">
-										<span class="script-star filled">★</span>
-										<span class="script-star filled">★</span>
-										<span class="script-star filled">★</span>
-										<span class="script-star filled">★</span>
-										<span class="script-star filled">★</span>
-									</div>
-									<span class="script-rating-text">5.0</span>
-								</div>
-								<a href="https://vadrifts.onrender.com/script/8916037983" class="script-btn">Get Script</a>
-							</div>
-						</div>
-					</div>
-					<div class="script-card">
-						<div class="script-thumbnail">
-							<img src="https://tr.rbxcdn.com/180DAY-8598e6c1626e3ccf16eb8b3acbd618fe/768/432/Image/Webp/noFilter" alt="Horrific Housing">
-							<div class="script-status">Keyless</div>
-						</div>
-						<div class="script-info">
-							<div class="script-game">Horrific Housing</div>
-							<h4 class="script-name">Horrific Housing Script</h4>
-							<p class="script-description">Best keyless Horrific Housing script with infinite tokens, unlock all items for free, ESP, reach, item grabber, weapon exploit, godmode, fly, teleportation and much more!</p>
-							<div class="script-footer">
-								<div class="script-rating">
-									<div class="script-stars">
-										<span class="script-star filled">★</span>
-										<span class="script-star filled">★</span>
-										<span class="script-star filled">★</span>
-										<span class="script-star filled">★</span>
-										<span class="script-star filled">★</span>
-									</div>
-									<span class="script-rating-text">4.9</span>
-								</div>
-								<a href="https://vadrifts.onrender.com/script/263761432" class="script-btn">Get Script</a>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="view-all-section">
-					<h3 class="view-all-title">Ready for More?</h3>
-					<p class="view-all-subtitle">Explore our complete collection of scripts</p>
-					<a href="/scripts" class="view-all-btn">
-						<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-							<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
-						</svg>
-						View All Scripts
-					</a>
-				</div>
-			</div>
-		</div>
+
+		<!-- ============== LATEST CHANGES (account-wide GitHub feed) ============== -->
 		<div class="section">
-			<h2 class="section-title">Our Beloved Showcasers</h2>
-			<p class="section-subtitle">Showing love to the amazing content creators who showcase our scripts. Want to be featured? Submit a request on our Discord!</p>
-			<div class="showcasers-container">
-				<div class="showcasers-track" id="showcasers-track">
-					<div class="loading-placeholder">
-						<div class="spinner"></div>
-						<p>Finding showcasers...</p>
+			<h2 class="section-title">Latest Changes</h2>
+			<p class="section-subtitle">Straight from the repos &mdash; no marketing fluff.</p>
+			<div class="commits-card">
+				<div class="commits-header">
+					<div class="commits-header-left">
+						<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55v-2.05c-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.05-.72.08-.71.08-.71 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.47.11-3.07 0 0 .97-.31 3.18 1.18.92-.26 1.91-.39 2.9-.39s1.98.13 2.9.39c2.21-1.49 3.18-1.18 3.18-1.18.62 1.6.23 2.78.11 3.07.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.41-5.26 5.69.41.36.78 1.06.78 2.14v3.18c0 .31.21.66.79.55C20.21 21.39 23.5 17.07 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>
+						<span>@vqmpjayZ &middot; all repos</span>
+					</div>
+					<a href="https://github.com/vqmpjayZ?tab=repositories" target="_blank" rel="noopener" class="commits-header-link">View all →</a>
+				</div>
+				<ul class="commits-list" id="commitsList">
+					<li class="commit-row commit-loading">
+						<div class="commit-spinner"></div>
+						<span>Loading latest commits…</span>
+					</li>
+				</ul>
+			</div>
+		</div>
+
+		<!-- ============== SUGGESTION BOX (redesigned + rate limited) ============== -->
+		<div class="section" id="suggest">
+			<div class="suggest-wrapper">
+				<div class="suggest-card">
+					<div class="suggest-orb suggest-orb-1"></div>
+					<div class="suggest-orb suggest-orb-2"></div>
+
+					<div class="suggest-left">
+						<div class="suggest-eyebrow">
+							<span class="eyebrow-dot"></span>
+							YOUR TURN
+						</div>
+						<h2 class="suggest-title">Got an idea?</h2>
+						<p class="suggest-blurb">A script we should write, a tool we should build, a feature for ArrayField, a bug we somehow missed. Drop it here &mdash; lands straight in Discord, we actually read it.</p>
+						<ul class="suggest-stats">
+							<li><span class="ss-num">&lt;24h</span><span class="ss-lbl">avg reply time</span></li>
+							<li><span class="ss-num">100%</span><span class="ss-lbl">read rate</span></li>
+							<li><span class="ss-num">free</span><span class="ss-lbl">always</span></li>
+						</ul>
+					</div>
+
+					<div class="suggest-right">
+						<form class="suggest-form" id="suggestForm" onsubmit="return submitSuggestion(event);">
+							<div class="suggest-type-chips" role="tablist" aria-label="Suggestion type">
+								<button type="button" class="stype-chip is-active" data-stype="idea">
+									<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21h6"/><path d="M12 17v4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/></svg>
+									Idea
+								</button>
+								<button type="button" class="stype-chip" data-stype="bug">
+									<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="6" width="8" height="14" rx="4"/><path d="M19 7l-3 2M5 7l3 2M12 6V2M19 13h3M2 13h3M19 19l-2-1M5 19l2-1"/></svg>
+									Bug
+								</button>
+								<button type="button" class="stype-chip" data-stype="feedback">
+									<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+									Feedback
+								</button>
+							</div>
+							<label for="suggestText" class="visually-hidden">Your suggestion</label>
+							<div class="suggest-textarea-wrap">
+								<textarea id="suggestText" name="suggestion" placeholder="What's on your mind? The more specific, the better." required maxlength="800" rows="5"></textarea>
+								<div class="suggest-textarea-shine"></div>
+							</div>
+							<div class="suggest-row">
+								<div class="suggest-counter"><span id="suggestCount">0</span> / 800</div>
+								<button type="submit" class="suggest-submit" id="suggestSubmit">
+									<span class="ss-submit-label">Send to Discord</span>
+									<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg>
+								</button>
+							</div>
+							<div class="suggest-alt">
+								Or
+								<a href="https://github.com/vqmpjayZ/Vadrifts/issues/new" target="_blank" rel="noopener">open a GitHub issue</a>
+							</div>
+						</form>
 					</div>
 				</div>
 			</div>
 		</div>
+		<div class="toast" id="toast"></div>
+
+		<!-- ============== FAQ ============== -->
 		<div class="section dark faq-section">
 			<div class="section-content">
 				<h2 class="section-title white">Frequently Asked Questions</h2>
@@ -1776,94 +2473,75 @@
 						<div class="faq-question">
 							<h3>Why Vadrifts?</h3>
 							<div class="faq-arrow">
-								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-									<path d="m6 9 6 6 6-6"></path>
-								</svg>
+								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
 							</div>
 						</div>
 						<div class="faq-answer">
-							<p>Vadrifts offers the most reliable and feature-rich scripting tools on the market. Our focus on stability, performance, and user experience makes us the preferred choice for thousands of users. After rising from the ashes of Vastral and Valorium, we've learned from past mistakes and built something even better. Our scripts work on ALL executors, are completely undetected, and come with 24/7 community support.</p>
+							<p>Vadrifts is one team's home for everything we put out &mdash; Roblox scripts, web apps, userscripts, extensions. The bar stays the same across every project: clean, free, fast, and actively maintained. We rose from the ashes of Vastral and Valorium with the same legendary bypassing power you remember, but now there's a whole lot more going on alongside it.</p>
 						</div>
 					</div>
 					<div class="faq-item" data-faq="2">
 						<div class="faq-question">
-							<h3>Is it Safe?</h3>
+							<h3>Is it actually user-friendly?</h3>
 							<div class="faq-arrow">
-								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-									<path d="m6 9 6 6 6-6"></path>
-								</svg>
+								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
 							</div>
 						</div>
 						<div class="faq-answer">
-							<p>Yes, all Vadrifts scripts are completely safe and undetected. We use advanced obfuscation techniques and constantly update our scripts to stay ahead of detection systems. Our chat bypasser has been undetected for over 8 months, and our other scripts have perfect safety records. We never log your data or include any malicious code. Your account safety is our top priority.</p>
+							<p>Yes. Every project is built for people who'd rather use the thing than read a wiki. ArrayField, our scripts, the image converter &mdash; pick it up, get the result, close the tab. No fake onboarding flows, no twelve-step setup, no premium walls hiding the actual feature you came for.</p>
 						</div>
 					</div>
 					<div class="faq-item" data-faq="3">
 						<div class="faq-question">
-							<h3>Where do I get the key?</h3>
+							<h3>Is it safe?</h3>
 							<div class="faq-arrow">
-								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-									<path d="m6 9 6 6 6-6"></path>
-								</svg>
+								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
 							</div>
 						</div>
 						<div class="faq-answer">
-							<p>Most of our scripts use a simple Discord key system. Just join our Discord server at
-								<a href="https://discord.com/invite/WDbJ5wE2cR" target="_blank" class="faq-link">discord.gg/WDbJ5wE2cR</a>
-								and follow the instructions in the key channel. Keys are completely free and take less than 30 seconds to get. Some scripts like our Horrific Housing script are completely keyless for your convenience.</p>
+							<p>Yes. Our Roblox scripts are obfuscated, undetected, and updated constantly &mdash; the chat bypasser has been clean for over 8 months. The web apps and tools never log your data and the source is right there on GitHub if you want to audit it yourself. Your account safety is our top priority.</p>
 						</div>
 					</div>
 					<div class="faq-item" data-faq="4">
 						<div class="faq-question">
-							<h3>Do scripts work on mobile?</h3>
+							<h3>Where do I get a key (for the Roblox scripts)?</h3>
 							<div class="faq-arrow">
-								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-									<path d="m6 9 6 6 6-6"></path>
-								</svg>
+								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
 							</div>
 						</div>
 						<div class="faq-answer">
-							<p>Yes! All Vadrifts scripts are designed to be mobile-friendly and work perfectly on mobile executors like Solara, Xeno, and others. We specifically optimize our UIs for smaller screens and touch controls. Whether you're on PC or mobile, you'll get the same powerful experience.</p>
+							<p>Most of our Roblox scripts use a simple Discord key system. Join <a href="https://discord.com/invite/WDbJ5wE2cR" target="_blank" class="faq-link">discord.gg/WDbJ5wE2cR</a> and follow the instructions in the key channel. Keys are free and take less than 30 seconds. Some scripts (like our Horrific Housing one) are completely keyless. Our non-Roblox projects don't use keys at all &mdash; just open and use.</p>
 						</div>
 					</div>
 					<div class="faq-item" data-faq="5">
 						<div class="faq-question">
-							<h3>I need help!</h3>
+							<h3>Do these work on mobile?</h3>
 							<div class="faq-arrow">
-								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-									<path d="m6 9 6 6 6-6"></path>
-								</svg>
+								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
 							</div>
 						</div>
 						<div class="faq-answer">
-							<p>No problem! Join our
-								<a href="https://discord.com/invite/WDbJ5wE2cR" target="_blank" class="faq-link">Discord server</a>
-								for 24/7 support from our active community and staff members. We have dedicated support channels, detailed setup guides, and helpful community members who are always ready to assist. You can also check our
-								<a href="/scripts" class="faq-link">scripts page</a>
-								for tutorials and documentation.</p>
+							<p>Yes. The site is fully responsive, our Roblox scripts work with mobile executors (Delta, Codex, Krnl mobile, etc.), and the web apps are tested down to small phone screens. Some of the heavier tools obviously prefer a real keyboard, but nothing is gated behind desktop-only.</p>
 						</div>
 					</div>
 					<div class="faq-item" data-faq="6">
 						<div class="faq-question">
-							<h3>How often are scripts updated?</h3>
+							<h3>How do I suggest a project or report a bug?</h3>
 							<div class="faq-arrow">
-								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-									<path d="m6 9 6 6 6-6"></path>
-								</svg>
+								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
 							</div>
 						</div>
 						<div class="faq-answer">
-							<p>We actively maintain all our scripts and push updates regularly. Our chat bypasser gets updated weekly with new bypasses and improvements. Game-specific scripts are updated whenever the game receives major updates. We monitor game changes closely and usually have fixes deployed within 24-48 hours of any breaking changes.</p>
+							<p>Use the suggestion box right above &mdash; it pings us in Discord directly. For anything code-related you can also <a href="https://github.com/vqmpjayZ/Vadrifts/issues/new" target="_blank" class="faq-link">open a GitHub issue</a>. We read everything; we just can't always reply the same hour.</p>
 						</div>
 					</div>
 				</div>
 				<div class="faq-footer">
-					<p>Still have questions?
-						<a href="https://discord.com/invite/WDbJ5wE2cR" target="_blank" class="faq-discord-link">Join our Discord</a>
-						for more help.</p>
+					<p>Still have questions? Hop in our <a href="https://discord.com/invite/WDbJ5wE2cR" target="_blank" class="faq-link">Discord</a> &mdash; we're around.</p>
 				</div>
 			</div>
 		</div>
+
 		<div class="footer">
 			<div class="footer-content">
 				<div class="footer-left">
@@ -1889,9 +2567,9 @@
 
     const SITE_CONFIG = {
       stats: [
-        { id: 'users', value: FALLBACK_COUNT, label: 'Total Users', suffix: '+', useCommas: true },
-        { id: 'scripts', value: 4, label: 'Scripts', suffix: '+', useCommas: false },
-        { id: 'executor', value: 100, label: 'Executor Support', suffix: '%', useCommas: false }
+        { id: 'users', value: FALLBACK_COUNT, label: 'Community', suffix: '+', useCommas: true },
+        { id: 'scripts', value: 4, label: 'Projects', suffix: '+', useCommas: false },
+        { id: 'executor', value: 100, label: 'Open Source', suffix: '%', useCommas: false }
       ],
       showcasers: [
         'MastersMZ', '1F0YT', 'ReverseScripts', 'Sr_LDS', 'Ras-Scripts'
@@ -2206,5 +2884,237 @@ class AutoShowcasersManager {
     });
   
 		</script>
+		<script>
+		  /* ============== v2 latest changes — account-wide via events ============== */
+		  (function () {
+		    var list = document.getElementById('commitsList');
+		    if (!list) return;
+		    function timeAgo(iso) {
+		      var diff = (Date.now() - new Date(iso).getTime()) / 1000;
+		      if (diff < 60)         return Math.floor(diff) + 's ago';
+		      if (diff < 3600)       return Math.floor(diff / 60) + 'm ago';
+		      if (diff < 86400)      return Math.floor(diff / 3600) + 'h ago';
+		      if (diff < 86400 * 7)  return Math.floor(diff / 86400) + 'd ago';
+		      if (diff < 86400 * 30) return Math.floor(diff / (86400 * 7)) + 'w ago';
+		      return Math.floor(diff / (86400 * 30)) + 'mo ago';
+		    }
+		    function esc(s) {
+		      return String(s == null ? '' : s)
+		        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+		        .replace(/"/g, '&quot;');
+		    }
+		    /* fetch public events for the whole account, then flatten PushEvent commits */
+		    fetch('https://api.github.com/users/vqmpjayZ/events/public?per_page=30')
+		      .then(function (r) { if (!r.ok) throw new Error('gh ' + r.status); return r.json(); })
+		      .then(function (events) {
+		        var rows = [];
+		        for (var i = 0; i < events.length && rows.length < 6; i++) {
+		          var ev = events[i];
+		          if (ev.type !== 'PushEvent' || !ev.payload || !ev.payload.commits) continue;
+		          var repo = ev.repo && ev.repo.name ? ev.repo.name : '';
+		          var when = ev.created_at;
+		          /* events list newest commit last; reverse so headline = newest */
+		          var commits = ev.payload.commits.slice().reverse();
+		          for (var j = 0; j < commits.length && rows.length < 6; j++) {
+		            var c = commits[j];
+		            var msg = (c.message || '').trim();
+		            var split = msg.split(/\n\s*\n/);
+		            var headline = (split[0] || '').split('\n')[0];
+		            var body = split.slice(1).join('\n\n').trim();
+		            rows.push({
+		              sha: (c.sha || '').slice(0, 7),
+		              url: 'https://github.com/' + repo + '/commit/' + c.sha,
+		              repo: repo,
+		              repoShort: (repo.split('/')[1] || repo),
+		              headline: headline,
+		              body: body,
+		              when: when
+		            });
+		          }
+		        }
+		        if (rows.length === 0) {
+		          list.innerHTML = '<li class="commit-row" style="grid-template-columns:1fr;text-align:center;color:#888;justify-content:center;">No public pushes recently. <a href="https://github.com/vqmpjayZ" target="_blank" style="color:#c77dff;">Visit GitHub →</a></li>';
+		          return;
+		        }
+		        list.innerHTML = rows.map(function (r) {
+		          return '<a class="commit-row" href="' + esc(r.url) + '" target="_blank" rel="noopener">' +
+		            '<span class="commit-sha">' + esc(r.sha) + '</span>' +
+		            '<div class="commit-main">' +
+		              '<div class="commit-headline" title="' + esc(r.headline) + '">' + esc(r.headline) + '</div>' +
+		              (r.body ? '<div class="commit-body">' + esc(r.body) + '</div>' : '') +
+		              '<div class="commit-repo">' +
+		                '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/></svg>' +
+		                esc(r.repoShort) +
+		              '</div>' +
+		            '</div>' +
+		            '<span class="commit-time">' + (r.when ? esc(timeAgo(r.when)) : '') + '</span>' +
+		          '</a>';
+		        }).join('');
+		      })
+		      .catch(function () {
+		        list.innerHTML = '<li class="commit-row" style="grid-template-columns:1fr;text-align:center;color:#888;justify-content:center;">Could not load commits. <a href="https://github.com/vqmpjayZ" target="_blank" style="color:#c77dff;">View on GitHub →</a></li>';
+		      });
+		  })();
+
+		  /* ============== v2 hero spotlight — subtle tilt ============== */
+		  (function () {
+		    var card = document.getElementById('heroSpotlight');
+		    var visual = card ? card.querySelector('.hs-visual') : null;
+		    if (!visual) return;
+		    visual.addEventListener('mousemove', function (e) {
+		      var r = visual.getBoundingClientRect();
+		      var x = (e.clientX - r.left) / r.width - 0.5;
+		      var y = (e.clientY - r.top) / r.height - 0.5;
+		      visual.style.transform = 'perspective(900px) rotateY(' + (x * 5) + 'deg) rotateX(' + (-y * 5) + 'deg) translateY(-3px)';
+		    });
+		    visual.addEventListener('mouseleave', function () { visual.style.transform = ''; });
+		  })();
+
+		  /* ============== v2 toast ============== */
+		  var __toastTimer;
+		  function showToast(msg, variant) {
+		    var t = document.getElementById('toast');
+		    if (!t) return;
+		    t.textContent = msg;
+		    t.classList.remove('is-error','is-warn');
+		    if (variant === 'error') t.classList.add('is-error');
+		    if (variant === 'warn')  t.classList.add('is-warn');
+		    t.classList.add('is-visible');
+		    clearTimeout(__toastTimer);
+		    __toastTimer = setTimeout(function () { t.classList.remove('is-visible'); }, 3800);
+		  }
+
+		  /* ============== v2 suggestion box — chips + autoresize + rate limit ============== */
+		  (function () {
+		    var chips = document.querySelectorAll('.stype-chip');
+		    chips.forEach(function (c) {
+		      c.addEventListener('click', function () {
+		        chips.forEach(function (x) { x.classList.remove('is-active'); });
+		        c.classList.add('is-active');
+		      });
+		    });
+		    var ta = document.getElementById('suggestText');
+		    var counter = document.getElementById('suggestCount');
+		    if (!ta) return;
+		    /* autoresize */
+		    ta.addEventListener('input', function () {
+		      if (counter) counter.textContent = ta.value.length;
+		      ta.style.height = 'auto';
+		      ta.style.height = Math.min(ta.scrollHeight, 320) + 'px';
+		    });
+		  })();
+
+		  /* rate limit config */
+		  var SUGGEST_COOLDOWN_MS    = 45 * 1000;          /* 45s between sends */
+		  var SUGGEST_HOURLY_CAP     = 6;                  /* max 6 / hour      */
+		  var SUGGEST_MIN_LENGTH     = 8;                  /* min chars         */
+		  var SUGGEST_HOURLY_WINDOW  = 60 * 60 * 1000;
+
+		  function _getRecord() {
+		    try {
+		      var raw = localStorage.getItem('vadrifts_suggest_log');
+		      return raw ? JSON.parse(raw) : { last: 0, hourly: [] };
+		    } catch (e) { return { last: 0, hourly: [] }; }
+		  }
+		  function _saveRecord(rec) {
+		    try { localStorage.setItem('vadrifts_suggest_log', JSON.stringify(rec)); } catch (e) {}
+		  }
+		  function _formatSeconds(ms) {
+		    var s = Math.max(1, Math.ceil(ms / 1000));
+		    if (s < 60) return s + 's';
+		    var m = Math.ceil(s / 60);
+		    return m + 'm';
+		  }
+		  function _setCooldown(btn, ms) {
+		    if (!btn) return;
+		    btn.setAttribute('data-cooldown', 'true');
+		    var label = btn.querySelector('.ss-submit-label');
+		    var originalText = label ? label.textContent : btn.textContent;
+		    var end = Date.now() + ms;
+		    function tick() {
+		      var left = end - Date.now();
+		      if (left <= 0) {
+		        btn.removeAttribute('data-cooldown');
+		        if (label) label.textContent = originalText || 'Send to Discord';
+		        return;
+		      }
+		      if (label) label.textContent = 'Wait ' + _formatSeconds(left);
+		      requestAnimationFrame(tick);
+		    }
+		    requestAnimationFrame(tick);
+		  }
+
+		  function submitSuggestion(e) {
+		    e.preventDefault();
+		    var ta = document.getElementById('suggestText');
+		    var btn = document.getElementById('suggestSubmit');
+		    var text = (ta.value || '').trim();
+		    if (!text) return false;
+		    if (text.length < SUGGEST_MIN_LENGTH) {
+		      showToast('Add a few more words — keep it meaningful.', 'warn');
+		      return false;
+		    }
+		    var rec = _getRecord();
+		    var now = Date.now();
+		    /* clean hourly window */
+		    rec.hourly = (rec.hourly || []).filter(function (t) { return now - t < SUGGEST_HOURLY_WINDOW; });
+		    /* cooldown check */
+		    var since = now - (rec.last || 0);
+		    if (since < SUGGEST_COOLDOWN_MS) {
+		      var wait = SUGGEST_COOLDOWN_MS - since;
+		      showToast('Slow down — try again in ' + _formatSeconds(wait) + '.', 'warn');
+		      _setCooldown(btn, wait);
+		      return false;
+		    }
+		    /* hourly cap */
+		    if (rec.hourly.length >= SUGGEST_HOURLY_CAP) {
+		      var oldest = rec.hourly[0];
+		      var resetIn = SUGGEST_HOURLY_WINDOW - (now - oldest);
+		      showToast('Hourly limit hit — try again in ' + _formatSeconds(resetIn) + '.', 'error');
+		      return false;
+		    }
+		    /* honeypot: ignore submissions w/ identical text in last record */
+		    if (rec.lastText && rec.lastText === text) {
+		      showToast('Already sent that one. Tweak it or add detail.', 'warn');
+		      return false;
+		    }
+
+		    /* type chip */
+		    var activeChip = document.querySelector('.stype-chip.is-active');
+		    var stype = activeChip ? activeChip.getAttribute('data-stype') : 'idea';
+		    var prefix = stype === 'bug' ? '[BUG] ' : (stype === 'feedback' ? '[FEEDBACK] ' : '[IDEA] ');
+		    var payload = prefix + text;
+
+		    /* clipboard copy */
+		    var copied = false;
+		    try {
+		      if (navigator.clipboard && navigator.clipboard.writeText) {
+		        navigator.clipboard.writeText(payload);
+		        copied = true;
+		      }
+		    } catch (e2) {}
+
+		    showToast(copied
+		      ? 'Copied! Opening Discord — paste it in #suggestions.'
+		      : 'Opening Discord — paste your idea in #suggestions.');
+		    rec.last = now;
+		    rec.hourly.push(now);
+		    rec.lastText = text;
+		    _saveRecord(rec);
+
+		    ta.value = '';
+		    ta.style.height = '';
+		    var counter = document.getElementById('suggestCount');
+		    if (counter) counter.textContent = '0';
+		    _setCooldown(btn, SUGGEST_COOLDOWN_MS);
+
+		    setTimeout(function () {
+		      window.open('https://discord.com/invite/WDbJ5wE2cR', '_blank', 'noopener');
+		    }, 400);
+		    return false;
+		  }
+		</script>
+
+
 	</body>
 </html>
