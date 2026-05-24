@@ -15,6 +15,7 @@ from youtube_grabber import YouTubeChannelFinder
 from image_converter import convert_image_endpoint
 from plugins_manager import PluginsManager
 from scripts_data import scripts_data, process_script_data
+from projects_data import projects, project_categories, process_projects_data, get_spotlight_projects
 from utils import inject_meta_tags
 from key_system import KeySystemManager
 from verification_timer import VerificationTimer
@@ -373,6 +374,7 @@ def projects_page():
             'projects.html',
             projects=processed,
             categories=project_categories,
+            spotlights=get_spotlight_projects(processed),
         )
         return inject_meta_tags(html_content, PROJECTS_META_TAGS)
     except Exception as e:
