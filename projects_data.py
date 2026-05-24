@@ -38,7 +38,7 @@ projects = [
         "title": "Image Converter",
         "category": "webapp",
         "description": "Drag a file, pick a format, download. Web app for fast PNG ↔ JPG ↔ WEBP ↔ AVIF conversions, no upload limits.",
-        "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ7ZGXZbvAayG-OlsNXKP8ji-YJCNpUyF7-8Q&s",
+        "logo": "https://i.imgur.com/f582ocU.png",
         "icon": "https://www.free-image-converter.com/images/preview/features2.png",
         "logo_animation": "spin-slow",
         "stack": ["Python", "Flask", "Pillow"],
