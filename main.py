@@ -15,6 +15,8 @@ from youtube_grabber import YouTubeChannelFinder
 from image_converter import convert_image_endpoint
 from plugins_manager import PluginsManager
 from scripts_data import scripts_data, process_script_data
+import sys as _sys, os as _os
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), 'templates'))
 from projects_data import projects, project_categories, process_projects_data, get_spotlight_projects
 from utils import inject_meta_tags
 from key_system import KeySystemManager
