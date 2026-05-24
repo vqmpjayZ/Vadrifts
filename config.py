@@ -26,3 +26,4 @@ def make_meta(title, description, path=""):
 HOME_META_TAGS = make_meta("Vadrifts - Roblox Scripts & Tools", "Vadrift's all-in-one website!")
 SCRIPTS_META_TAGS = make_meta("Vadrifts Scripts - Collection", "Check out our collection of all Vadrifts Scripts!", "/scripts")
 PLUGINS_META_TAGS = make_meta("Vadrifts Plugins - Community", "Create and share custom bypass plugins!", "/plugins")
+PROJECTS_META_TAGS = make_meta("Vadrifts Projects", "Everything Vadrifts has built — Roblox scripts, web apps, userscripts, and more.", "/projects")
