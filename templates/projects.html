@@ -80,11 +80,24 @@
       font-size: clamp(38px, 6vw, 64px);
       font-weight: 800;
       letter-spacing: -0.02em;
-      background: linear-gradient(90deg, #ffffff 0%, #c478d4 60%, #ff9f43 100%);
+      background: linear-gradient(
+        90deg,
+        #ffffff 0%,
+        #c478d4 25%,
+        #ff9f43 50%,
+        #c478d4 75%,
+        #ffffff 100%
+      );
+      background-size: 200% auto;
       background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       margin-bottom: 14px;
+      animation: titleShimmer 8s linear infinite;
+    }
+    @keyframes titleShimmer {
+      from { background-position: 0% center; }
+      to   { background-position: 200% center; }
     }
     .page-header p {
       color: #b8b8b8;
@@ -92,6 +105,18 @@
       max-width: 620px;
       margin: 0 auto;
       line-height: 1.55;
+    }
+    .page-header p .accent-purple {
+      color: #c478d4;
+      font-weight: 600;
+    }
+    .page-header p .accent-orange {
+      color: #ff9f43;
+      font-weight: 600;
+    }
+    .page-header p .accent-soft {
+      color: #e8e8e8;
+      font-weight: 500;
     }
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(20px); }
@@ -104,6 +129,8 @@
       max-width: 1200px;
       margin: 20px auto 60px;
       padding: 0 20px;
+      opacity: 0;
+      animation: fadeInUp 1.2s ease-out 0.3s both;
     }
     .spotlight-frame {
       position: relative;
@@ -117,26 +144,24 @@
     .spotlight-slide {
       position: absolute; inset: 0;
       opacity: 0;
-      transition: opacity 1.2s ease;
+      transform: translateX(40px);
+      transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
       pointer-events: none;
+    }
+    .spotlight-slide.is-leaving {
+      opacity: 0;
+      transform: translateX(-40px);
     }
     .spotlight-slide.is-active {
       opacity: 1;
+      transform: translateX(0);
       pointer-events: auto;
     }
     .spotlight-image {
       position: absolute; inset: 0;
       width: 100%; height: 100%;
       object-fit: cover;
-      transform: scale(1.05);
-    }
-    
-    .spotlight-slide.is-active .spotlight-image {
-      animation: kenBurns 10s ease-in-out forwards;
-    }
-    @keyframes kenBurns {
-      0%   { transform: scale(1.05) translate(0, 0); }
-      100% { transform: scale(1.18) translate(-2%, -1%); }
     }
     .spotlight-overlay {
       position: absolute; inset: 0;
@@ -228,17 +253,31 @@
       gap: 8px;
     }
     .spotlight-dot {
-      width: 28px; height: 4px;
+      position: relative;
+      width: 36px; height: 4px;
       border-radius: 4px;
-      background: rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.18);
       border: 0;
       padding: 0;
       cursor: pointer;
-      transition: background 0.3s ease, width 0.3s ease;
+      overflow: hidden;
+      transition: background 0.3s ease;
+    }
+    .spotlight-dot::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      width: 0%;
+      background: linear-gradient(90deg, #7209b7, #ff9f43);
+      border-radius: 4px;
+      transition: width 0.2s linear;
+    }
+    .spotlight-dot.is-active::after {
+      width: 100%;
+      transition: width 8s linear;
     }
     .spotlight-dot.is-active {
-      width: 44px;
-      background: linear-gradient(90deg, #7209b7, #ff9f43);
+      background: rgba(255,255,255,0.08);
     }
 
     .filter-row {
@@ -251,6 +290,8 @@
       gap: 12px;
       flex-wrap: wrap;
       align-items: center;
+      opacity: 0;
+      animation: fadeInUp 1.2s ease-out 0.6s both;
     }
     .filter-chip {
       position: relative;
@@ -327,18 +368,18 @@
 
     .project-card {
       position: relative;
-      display: grid;
-      grid-template-columns: 42% 1fr;
-      gap: 18px;
-      align-items: center;
-      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      padding: 0;
       border-radius: 18px;
       background: linear-gradient(160deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
       border: 1px solid rgba(255, 255, 255, 0.06);
       text-decoration: none;
       color: inherit;
       overflow: hidden;
-      aspect-ratio: 16 / 9;
+      opacity: 0;
+      animation: fadeInUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation-delay: calc(0.7s + var(--card-index, 0) * 0.09s);
       transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
                   border-color 0.3s ease,
                   box-shadow 0.3s ease,
@@ -352,7 +393,6 @@
       box-shadow: 0 20px 40px rgba(114, 9, 183, 0.25);
     }
     .project-card::before {
-      
       content: '';
       position: absolute;
       inset: -1px;
@@ -369,43 +409,83 @@
     }
     .project-card:hover::before { opacity: 1; }
 
-    .project-logo {
+    .project-banner {
       position: relative;
       width: 100%;
-      aspect-ratio: 1 / 1;
-      max-width: 140px;
-      justify-self: center;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      aspect-ratio: 16 / 7;
+      overflow: visible;
+      background:
+        radial-gradient(circle at 30% 40%, rgba(114, 9, 183, 0.35), transparent 60%),
+        radial-gradient(circle at 75% 65%, rgba(255, 159, 67, 0.22), transparent 60%),
+        linear-gradient(160deg, #18091f 0%, #0c0612 100%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     }
-    .project-logo img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      filter: drop-shadow(0 8px 24px rgba(114, 9, 183, 0.35));
-      transition: transform 0.6s ease, filter 0.4s ease;
-    }
-    
-    .project-card:hover .logo-spin-slow img { animation: logoSpinSlow 6s linear infinite; }
-    .project-card:hover .logo-pulse img     { animation: logoPulse 1.6s ease-in-out infinite; }
-    .project-card:hover .logo-tilt img      { animation: logoTilt 3s ease-in-out infinite; }
-    .project-card:hover .logo-float img     { animation: logoFloat 3s ease-in-out infinite; }
-    .project-card:hover .logo-shine::after {
+    .project-banner::before {
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.55) 50%, transparent 70%);
-      transform: translateX(-100%);
-      animation: logoShine 1.4s ease-out;
-      mix-blend-mode: screen;
+      background: linear-gradient(180deg, transparent 55%, rgba(0,0,0,0.5) 100%);
+      pointer-events: none;
+      z-index: 2;
+    }
+    .project-banner img.banner-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1), filter 0.4s ease;
+      transform-origin: center;
+      z-index: 1;
+    }
+    .project-card:hover .project-banner img.banner-img {
+      transform: scale(1.06);
+    }
+
+    .project-icon {
+      position: absolute;
+      left: 18px;
+      bottom: -38px;
+      width: 84px;
+      height: 84px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 4;
       pointer-events: none;
     }
+    .project-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: transparent;
+      filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.6))
+              drop-shadow(0 2px 6px rgba(114, 9, 183, 0.35));
+      transition: transform 0.6s ease;
+    }
+
+    .project-card:hover .banner-spin-slow .project-icon img { animation: logoSpinSlow 6s linear infinite; }
+    .project-card:hover .banner-pulse .project-icon img     { animation: logoPulse 1.6s ease-in-out infinite; }
+    .project-card:hover .banner-tilt .project-icon img      { animation: logoTilt 3s ease-in-out infinite; }
+    .project-card:hover .banner-float .project-icon img     { animation: logoFloat 3s ease-in-out infinite; }
+    .banner-shine::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.35) 50%, transparent 70%);
+      transform: translateX(-100%);
+      mix-blend-mode: screen;
+      pointer-events: none;
+      z-index: 3;
+    }
+    .project-card:hover .banner-shine::after {
+      animation: logoShine 1.6s ease-out;
+    }
     @keyframes logoSpinSlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-    @keyframes logoPulse    { 0%,100% { transform: scale(1); filter: drop-shadow(0 8px 24px rgba(114,9,183,0.35)); }
-                              50%     { transform: scale(1.08); filter: drop-shadow(0 12px 30px rgba(255,159,67,0.55)); } }
-    @keyframes logoTilt     { 0%,100% { transform: rotateZ(-4deg); } 50% { transform: rotateZ(4deg); } }
-    @keyframes logoFloat    { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    @keyframes logoPulse    { 0%,100% { transform: scale(1); }
+                              50%     { transform: scale(1.12); } }
+    @keyframes logoTilt     { 0%,100% { transform: rotateZ(-6deg); } 50% { transform: rotateZ(6deg); } }
+    @keyframes logoFloat    { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
     @keyframes logoShine    { to { transform: translateX(100%); } }
 
     .project-body {
@@ -413,6 +493,10 @@
       flex-direction: column;
       gap: 8px;
       min-width: 0;
+      padding: 16px 18px 18px;
+    }
+    .project-body-with-icon {
+      padding-top: 54px;
     }
     .project-title-row {
       display: flex;
@@ -443,26 +527,10 @@
       line-height: 1.5;
       color: #b8b8b8;
       display: -webkit-box;
-      -webkit-line-clamp: 3;
+      -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
-    }
-    .project-stack {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: auto;
-      padding-top: 8px;
-    }
-    .stack-badge {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
-      font-weight: 600;
-      padding: 3px 8px;
-      border-radius: 6px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: #cccccc;
+      min-height: calc(1.5em * 2);
     }
 
     .grid-empty {
@@ -486,8 +554,8 @@
           rgba(0,0,0,0.20) 100%
         );
       }
-      .project-card { grid-template-columns: 1fr; aspect-ratio: auto; padding: 18px; }
-      .project-logo { max-width: 90px; }
+      .project-banner img { max-width: 70%; max-height: 75%; }
+      .project-body { padding: 14px 16px 16px; }
       .filter-search { margin-left: 0; width: 100%; }
     }
   </style>
@@ -510,8 +578,12 @@
   <header class="page-header">
     <h1>Projects</h1>
     <p>
-      Everything Vadrifts has built — Roblox libraries, web apps,
-      userscripts, extensions. One hub, real things, all still being
+      Everything <span class="accent-purple">Vadrifts</span> has built —
+      <span class="accent-soft">Roblox libraries</span>,
+      <span class="accent-soft">web apps</span>,
+      <span class="accent-soft">userscripts</span>,
+      <span class="accent-soft">extensions</span>.
+      One hub, <span class="accent-orange">real things</span>, all still being
       maintained.
     </p>
   </header>
@@ -578,25 +650,24 @@
       {% for p in projects %}
       <a class="project-card"
          href="{{ p.link }}"
+         style="--card-index: {{ loop.index0 }}"
          data-category="{{ p.category }}"
          data-title="{{ p.title | lower }}"
          data-desc="{{ p.description | lower }}"
          {% if p.is_external %}target="_blank" rel="noopener noreferrer"{% endif %}
          {% if p.status == 'coming-soon' %}aria-disabled="true" onclick="return false;"{% endif %}>
-        <div class="project-logo logo-{{ p.logo_animation or 'none' }}">
-          <img src="{{ p.logo }}" alt="{{ p.title }} logo" loading="lazy">
+        <div class="project-banner banner-{{ p.logo_animation or 'none' }}">
+          <img class="banner-img" src="{{ p.logo }}" alt="{{ p.title }} banner" loading="lazy">
+          <div class="project-icon">
+            <img src="{{ p.icon or p.logo }}" alt="{{ p.title }} icon" loading="lazy">
+          </div>
         </div>
-        <div class="project-body">
+        <div class="project-body project-body-with-icon">
           <div class="project-title-row">
             <span class="project-title">{{ p.title }}</span>
             <span class="project-status {{ p.status_class }}">{{ p.status_badge }}</span>
           </div>
           <p class="project-desc">{{ p.description }}</p>
-          <div class="project-stack">
-            {% for tag in p.stack %}
-            <span class="stack-badge">{{ tag }}</span>
-            {% endfor %}
-          </div>
         </div>
       </a>
       {% endfor %}
@@ -634,10 +705,17 @@
       var INTERVAL = 8000;
 
       function show(next) {
-        slides[idx].classList.remove('is-active');
-        dots[idx].classList.remove('is-active');
+        var prev = idx;
         idx = (next + slides.length) % slides.length;
+        if (prev === idx) return;
+        slides[prev].classList.add('is-leaving');
+        slides[prev].classList.remove('is-active');
+        dots[prev].classList.remove('is-active');
+        setTimeout(function () {
+          slides[prev].classList.remove('is-leaving');
+        }, 900);
         slides[idx].classList.add('is-active');
+        void dots[idx].offsetWidth;
         dots[idx].classList.add('is-active');
       }
       function start() {
