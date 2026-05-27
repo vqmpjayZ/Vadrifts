@@ -381,27 +381,144 @@
     .stats-section {
       display: flex;
       justify-content: center;
-      gap: 60px;
+      gap: 24px;
       margin: 40px 0 30px;
       animation: fadeInUp 1.2s ease-out 0.8s both;
+      flex-wrap: wrap;
     }
 
     .stat-item {
+      position: relative;
       text-align: center;
+      padding: 16px 26px;
+      border-radius: 16px;
+      background: linear-gradient(160deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+      border: 1px solid rgba(255,255,255,0.06);
+      cursor: pointer;
+      font: inherit;
+      color: inherit;
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                  border-color 0.3s ease,
+                  box-shadow 0.4s ease,
+                  background 0.4s ease;
+      isolation: isolate;
+      min-width: 140px;
+    }
+    .stat-item::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(120px 80px at var(--mx, 50%) var(--my, 50%),
+                                  rgba(196,120,212,0.18), transparent 70%);
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      pointer-events: none;
+      z-index: -1;
+    }
+    .stat-item:hover {
+      transform: translateY(-4px);
+      border-color: rgba(196,120,212,0.45);
+      box-shadow: 0 18px 38px rgba(114, 9, 183, 0.22);
+    }
+    .stat-item:hover::before { opacity: 1; }
+    .stat-item:focus-visible {
+      outline: none;
+      border-color: rgba(255, 159, 67, 0.6);
+      box-shadow: 0 0 0 3px rgba(255, 159, 67, 0.18);
+    }
+    .stat-item.is-pulsing { animation: statPulse 0.6s ease-out; }
+    @keyframes statPulse {
+      0%   { transform: translateY(-4px) scale(1); }
+      40%  { transform: translateY(-6px) scale(1.05); }
+      100% { transform: translateY(-4px) scale(1); }
     }
 
     .stat-number {
       font-size: 28px;
       font-weight: 800;
-      color: #9c88ff;
+      background: linear-gradient(90deg, #c478d4 0%, #ffffff 50%, #ff9f43 100%);
+      background-size: 200% auto;
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
       margin-bottom: 6px;
       letter-spacing: -0.5px;
+      transition: filter 0.3s ease;
+    }
+    .stat-item:hover .stat-number {
+      filter: drop-shadow(0 0 12px rgba(196, 120, 212, 0.45));
+      animation: statShimmer 3.5s linear infinite;
+    }
+    @keyframes statShimmer {
+      from { background-position: 0% center; }
+      to   { background-position: 200% center; }
     }
 
     .stat-label {
-      font-size: 13px;
-      color: #ccc;
-      font-weight: 400;
+      font-size: 12px;
+      color: #cfcfcf;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .stat-spark {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 3px;
+      height: 14px;
+      margin-top: 8px;
+      opacity: 0.55;
+      transition: opacity 0.3s ease;
+    }
+    .stat-item:hover .stat-spark { opacity: 1; }
+    .stat-spark span {
+      display: block;
+      width: 4px;
+      background: linear-gradient(180deg, #c478d4, #7209b7);
+      border-radius: 2px;
+      transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+      transform-origin: bottom;
+    }
+
+    .stat-tip {
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 10px);
+      transform: translate(-50%, 4px);
+      padding: 8px 12px;
+      background: rgba(10, 6, 18, 0.92);
+      border: 1px solid rgba(196, 120, 212, 0.35);
+      border-radius: 10px;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      color: #e8d8ff;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      backdrop-filter: blur(10px);
+    }
+    .stat-tip::after {
+      content: '';
+      position: absolute;
+      left: 50%; top: 100%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: rgba(196, 120, 212, 0.35);
+    }
+    .stat-item:hover .stat-tip,
+    .stat-item:focus-visible .stat-tip {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    @media (max-width: 720px) {
+      .stats-section { gap: 12px; }
+      .stat-item { min-width: 0; flex: 1 1 110px; padding: 14px 16px; }
+      .stat-number { font-size: 22px; }
     }
 
     .section {
@@ -2257,6 +2374,89 @@
     .toast.is-error { border-color: rgba(255, 94, 138, 0.45); }
     .toast.is-warn  { border-color: rgba(255, 159, 67, 0.45); }
 
+    .suggest-seeds {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 6px 0 14px;
+    }
+    .suggest-seed {
+      position: relative;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.03);
+      border: 1px dashed rgba(199, 125, 255, 0.25);
+      color: #c8c0d8;
+      font-size: 11.5px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      transition: color 0.25s ease, background 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+    }
+    .suggest-seed::before {
+      content: '+';
+      margin-right: 6px;
+      color: #ff9f43;
+      font-weight: 700;
+      transition: transform 0.3s ease;
+      display: inline-block;
+    }
+    .suggest-seed:hover {
+      color: #fff;
+      background: rgba(199, 125, 255, 0.08);
+      border-color: rgba(199, 125, 255, 0.55);
+      transform: translateY(-2px);
+    }
+    .suggest-seed:hover::before { transform: rotate(90deg); }
+    .suggest-seed.is-used {
+      color: #6b6b6b;
+      border-style: solid;
+      border-color: rgba(255,255,255,0.06);
+      cursor: default;
+      transform: none;
+    }
+    .suggest-seed.is-used::before { content: '\2713'; color: #4ade80; }
+
+    .suggest-progress {
+      position: relative;
+      height: 3px;
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border-radius: 0 0 14px 14px;
+      overflow: hidden;
+      margin-top: 0;
+    }
+    .suggest-progress > span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #7209b7 0%, #c478d4 60%, #ff9f43 100%);
+      transition: width 0.25s ease, filter 0.25s ease;
+    }
+    .suggest-progress.is-warn > span { filter: hue-rotate(-12deg) saturate(1.3); }
+    .suggest-progress.is-full > span { filter: saturate(1.6) brightness(1.15); }
+
+    .suggest-stats li {
+      transition: transform 0.3s ease, color 0.3s ease;
+      cursor: default;
+    }
+    .suggest-stats li:hover {
+      transform: translateY(-3px);
+    }
+    .suggest-stats li:hover .ss-num {
+      filter: drop-shadow(0 0 10px rgba(255, 159, 67, 0.45));
+    }
+
+    .stype-chip {
+      transition: color 0.25s ease, background 0.25s ease,
+                  border-color 0.25s ease, transform 0.2s ease,
+                  box-shadow 0.3s ease;
+    }
+    .stype-chip:not(.is-active):active { transform: scale(0.96); }
+    .stype-chip.is-active {
+      box-shadow: 0 6px 18px rgba(114, 9, 183, 0.35);
+    }
+
 		</style>
 	</head>
 	<body>
@@ -2441,10 +2641,12 @@
 									Feedback
 								</button>
 							</div>
+							<div class="suggest-seeds" id="suggestSeeds" role="list" aria-label="Quick starters"></div>
 							<label for="suggestText" class="visually-hidden">Your suggestion</label>
 							<div class="suggest-textarea-wrap">
 								<textarea id="suggestText" name="suggestion" placeholder="What's on your mind? The more specific, the better." required maxlength="800" rows="5"></textarea>
 								<div class="suggest-textarea-shine"></div>
+								<div class="suggest-progress" id="suggestProgress" aria-hidden="true"><span></span></div>
 							</div>
 							<div class="suggest-row">
 								<div class="suggest-counter"><span id="suggestCount">0</span> / 800</div>
@@ -2568,9 +2770,12 @@
 
     const SITE_CONFIG = {
       stats: [
-        { id: 'users', value: FALLBACK_COUNT, label: 'Community', suffix: '+', useCommas: true },
-        { id: 'scripts', value: 4, label: 'Projects', suffix: '+', useCommas: false },
-        { id: 'executor', value: 100, label: 'Open Source', suffix: '%', useCommas: false }
+        { id: 'users',    value: FALLBACK_COUNT, label: 'Community',  suffix: '+', useCommas: true,
+          tip: 'Live from Discord — click to join',  href: 'https://discord.com/invite/WDbJ5wE2cR', external: true },
+        { id: 'scripts',  value: 4,              label: 'Projects',   suffix: '+', useCommas: false,
+          tip: 'Browse everything we ship',         href: '/projects',  external: false },
+        { id: 'executor', value: 100,            label: 'Open Source', suffix: '%', useCommas: false,
+          tip: 'Every line on GitHub — click to peek', href: 'https://github.com/vqmpjayZ/Vadrifts', external: true }
       ],
       showcasers: [
         'MastersMZ', '1F0YT', 'ReverseScripts', 'Sr_LDS', 'Ras-Scripts'
@@ -2634,14 +2839,94 @@
       statsSection.innerHTML = '';
 
       SITE_CONFIG.stats.forEach(stat => {
-        const statItem = document.createElement('div');
+        const statItem = document.createElement('button');
+        statItem.type = 'button';
         statItem.className = 'stat-item';
+        statItem.setAttribute('data-href', stat.href || '');
+        statItem.setAttribute('data-external', stat.external ? 'true' : 'false');
+        statItem.setAttribute('aria-label', `${stat.label} — ${stat.tip || ''}`);
+
+        const spark = Array.from({ length: 7 }, () => {
+          const h = 30 + Math.random() * 70;
+          return `<span style="height:${h}%"></span>`;
+        }).join('');
+
         statItem.innerHTML = `
           <div class="stat-number" data-target="${stat.value}" data-suffix="${stat.suffix}" data-commas="${stat.useCommas}" data-id="${stat.id}">0</div>
           <div class="stat-label">${stat.label}</div>
+          <div class="stat-spark" aria-hidden="true">${spark}</div>
+          <div class="stat-tip">${stat.tip || ''}</div>
         `;
         statsSection.appendChild(statItem);
       });
+
+      const items = statsSection.querySelectorAll('.stat-item');
+      items.forEach(item => {
+        item.addEventListener('mousemove', (e) => {
+          const r = item.getBoundingClientRect();
+          item.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%');
+          item.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%');
+        });
+
+        item.addEventListener('mouseenter', () => {
+          const bars = item.querySelectorAll('.stat-spark span');
+          bars.forEach((b, i) => {
+            setTimeout(() => {
+              b.style.transform = `scaleY(${0.4 + Math.random() * 0.8})`;
+            }, i * 50);
+          });
+        });
+        item.addEventListener('mouseleave', () => {
+          item.querySelectorAll('.stat-spark span').forEach(b => { b.style.transform = ''; });
+        });
+
+        item.addEventListener('click', (e) => {
+          item.classList.remove('is-pulsing');
+          void item.offsetWidth;
+          item.classList.add('is-pulsing');
+          const numberEl = item.querySelector('.stat-number');
+          if (numberEl) replayCounter(numberEl);
+
+          const href = item.getAttribute('data-href');
+          const external = item.getAttribute('data-external') === 'true';
+          if (href) {
+            setTimeout(() => {
+              if (external) {
+                window.open(href, '_blank', 'noopener');
+              } else {
+                window.location.href = href;
+              }
+            }, 320);
+          }
+        });
+
+        item.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            item.click();
+          }
+        });
+      });
+    }
+
+    function replayCounter(counter) {
+      const target   = parseInt(counter.getAttribute('data-target'), 10);
+      const suffix   = counter.getAttribute('data-suffix') || '';
+      const useCommas = counter.getAttribute('data-commas') === 'true';
+      if (!Number.isFinite(target)) return;
+      const duration = 900;
+      const start = performance.now();
+      const initial = 0;
+
+      function step(now) {
+        const t = Math.min(1, (now - start) / duration);
+        const eased = 1 - Math.pow(1 - t, 3);
+        const current = Math.floor(initial + (target - initial) * eased);
+        counter.textContent = formatNumber(current, useCommas, suffix);
+        if (t < 1) requestAnimationFrame(step);
+        else counter.textContent = formatNumber(target, useCommas, suffix);
+      }
+      requestAnimationFrame(step);
     }
 
     function createParticles() {
@@ -2988,21 +3273,80 @@ class AutoShowcasersManager {
 		  /* ============== v2 suggestion box — chips + autoresize + rate limit ============== */
 		  (function () {
 		    var chips = document.querySelectorAll('.stype-chip');
+		    var seedHost = document.getElementById('suggestSeeds');
+		    var ta = document.getElementById('suggestText');
+		    var counter = document.getElementById('suggestCount');
+		    var progress = document.getElementById('suggestProgress');
+		    var fill = progress ? progress.querySelector('span') : null;
+		    var MAX = 800;
+		    var SEEDS = {
+		      idea: [
+		        'A library that auto-pulls remotes on rejoin',
+		        'Mobile-first UI for ArrayField scripts',
+		        'A theme switcher for the script hub'
+		      ],
+		      bug: [
+		        'Key system loops on this script: ',
+		        'ArrayField crashes when I open ',
+		        'Mobile executor breaks on '
+		      ],
+		      feedback: [
+		        'The pacing of releases feels ',
+		        'Docs would be smoother if ',
+		        'What I love about Vadrifts is '
+		      ]
+		    };
+
+		    function renderSeeds(type) {
+		      if (!seedHost) return;
+		      seedHost.innerHTML = '';
+		      (SEEDS[type] || []).forEach(function (txt) {
+		        var btn = document.createElement('button');
+		        btn.type = 'button';
+		        btn.className = 'suggest-seed';
+		        btn.setAttribute('role', 'listitem');
+		        btn.textContent = txt;
+		        btn.addEventListener('click', function () {
+		          if (!ta) return;
+		          ta.value = txt;
+		          ta.focus();
+		          try { ta.setSelectionRange(ta.value.length, ta.value.length); } catch (e) {}
+		          ta.dispatchEvent(new Event('input'));
+		          btn.classList.add('is-used');
+		        });
+		        seedHost.appendChild(btn);
+		      });
+		    }
+
 		    chips.forEach(function (c) {
 		      c.addEventListener('click', function () {
 		        chips.forEach(function (x) { x.classList.remove('is-active'); });
 		        c.classList.add('is-active');
+		        renderSeeds(c.getAttribute('data-stype'));
 		      });
 		    });
-		    var ta = document.getElementById('suggestText');
-		    var counter = document.getElementById('suggestCount');
+
+		    var firstActive = document.querySelector('.stype-chip.is-active');
+		    renderSeeds(firstActive ? firstActive.getAttribute('data-stype') : 'idea');
+
 		    if (!ta) return;
-		    /* autoresize */
+
+		    function syncProgress() {
+		      var len = ta.value.length;
+		      if (counter) counter.textContent = len;
+		      if (fill) fill.style.width = Math.min(100, (len / MAX) * 100) + '%';
+		      if (progress) {
+		        progress.classList.toggle('is-warn', len > MAX * 0.85 && len < MAX);
+		        progress.classList.toggle('is-full', len >= MAX);
+		      }
+		    }
+
 		    ta.addEventListener('input', function () {
-		      if (counter) counter.textContent = ta.value.length;
+		      syncProgress();
 		      ta.style.height = 'auto';
 		      ta.style.height = Math.min(ta.scrollHeight, 320) + 'px';
 		    });
+		    syncProgress();
 		  })();
 
 		  /* rate limit config */
@@ -3107,6 +3451,15 @@ class AutoShowcasersManager {
 		    ta.style.height = '';
 		    var counter = document.getElementById('suggestCount');
 		    if (counter) counter.textContent = '0';
+		    var progress = document.getElementById('suggestProgress');
+		    if (progress) {
+		      var fill = progress.querySelector('span');
+		      if (fill) fill.style.width = '0%';
+		      progress.classList.remove('is-warn', 'is-full');
+		    }
+		    document.querySelectorAll('.suggest-seed.is-used').forEach(function (s) {
+		      s.classList.remove('is-used');
+		    });
 		    _setCooldown(btn, SUGGEST_COOLDOWN_MS);
 
 		    setTimeout(function () {

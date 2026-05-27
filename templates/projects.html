@@ -144,19 +144,33 @@
     .spotlight-slide {
       position: absolute; inset: 0;
       opacity: 0;
-      transform: translateX(40px);
-      transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
-                  transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+      transform: scale(1.04);
+      filter: blur(6px);
+      transition: opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 1.4s cubic-bezier(0.22, 1, 0.36, 1),
+                  filter  0.85s cubic-bezier(0.22, 1, 0.36, 1);
       pointer-events: none;
-    }
-    .spotlight-slide.is-leaving {
-      opacity: 0;
-      transform: translateX(-40px);
+      will-change: opacity, transform, filter;
+      z-index: 0;
     }
     .spotlight-slide.is-active {
       opacity: 1;
-      transform: translateX(0);
+      transform: scale(1);
+      filter: blur(0);
       pointer-events: auto;
+      z-index: 1;
+    }
+    .spotlight-slide.is-leaving {
+      opacity: 0;
+      transform: scale(0.97);
+      filter: blur(5px);
+      z-index: 0;
+    }
+    .spotlight-image {
+      transition: transform 9s ease-out;
+    }
+    .spotlight-slide.is-active .spotlight-image {
+      transform: scale(1.08);
     }
     .spotlight-image {
       position: absolute; inset: 0;
@@ -362,6 +376,7 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 22px;
+      perspective: 1200px;
     }
     @media (max-width: 980px) { .grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 620px) { .grid { grid-template-columns: 1fr; } }
@@ -380,12 +395,24 @@
       opacity: 0;
       animation: fadeInUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
       animation-delay: calc(0.7s + var(--card-index, 0) * 0.09s);
-      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+      transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                  opacity 0.35s ease,
                   border-color 0.3s ease,
                   box-shadow 0.3s ease,
                   background 0.3s ease;
+      will-change: transform, opacity;
     }
     .project-card.is-hidden { display: none; }
+    .project-card.is-leaving {
+      opacity: 0;
+      transform: translateY(8px) scale(0.94);
+      pointer-events: none;
+    }
+    .project-card.is-entering {
+      opacity: 0;
+      transform: translateY(14px) scale(0.96);
+      animation: none;
+    }
     .project-card:hover {
       transform: translateY(-4px);
       border-color: rgba(196, 120, 212, 0.45);
@@ -703,20 +730,33 @@
       var idx = 0;
       var timer = null;
       var INTERVAL = 8000;
+      var TRANSITION = 900;
+      var animating = false;
+      var leavingTimer = null;
 
       function show(next) {
+        var target = (next + slides.length) % slides.length;
+        if (target === idx || animating) return;
+        animating = true;
+
         var prev = idx;
-        idx = (next + slides.length) % slides.length;
-        if (prev === idx) return;
+        idx = target;
+
+        clearTimeout(leavingTimer);
+        slides.forEach(function (s) { s.classList.remove('is-leaving'); });
+
         slides[prev].classList.add('is-leaving');
         slides[prev].classList.remove('is-active');
         dots[prev].classList.remove('is-active');
-        setTimeout(function () {
-          slides[prev].classList.remove('is-leaving');
-        }, 900);
+
         slides[idx].classList.add('is-active');
         void dots[idx].offsetWidth;
         dots[idx].classList.add('is-active');
+
+        leavingTimer = setTimeout(function () {
+          slides[prev].classList.remove('is-leaving');
+          animating = false;
+        }, TRANSITION);
       }
       function start() {
         stop();
@@ -744,6 +784,8 @@
       if (!grid) return;
 
       var state = { category: 'all', query: '' };
+      var EXIT_DURATION  = 280;
+      var ENTER_DURATION = 380;
 
       function matches(card) {
         if (state.category !== 'all' && card.dataset.category !== state.category) return false;
@@ -765,37 +807,64 @@
           }
         });
 
+        var toExit  = [];
+        var toEnter = [];
         var anyVisible = false;
+
         cards.forEach(function (c) {
-          if (matches(c)) {
-            c.classList.remove('is-hidden');
-            anyVisible = true;
-          } else {
-            c.classList.add('is-hidden');
-          }
+          var shouldShow = matches(c);
+          var isShown = !c.classList.contains('is-hidden');
+          if (shouldShow) anyVisible = true;
+          if (shouldShow && !isShown)  toEnter.push(c);
+          else if (!shouldShow && isShown) toExit.push(c);
         });
         empty.classList.toggle('is-hidden', anyVisible);
 
-        cards.forEach(function (c) {
-          if (c.classList.contains('is-hidden')) return;
-          var first = firsts.get(c);
-          var last  = c.getBoundingClientRect();
-          if (!first) return;
-          var dx = first.left - last.left;
-          var dy = first.top  - last.top;
-          if (dx === 0 && dy === 0) return;
-          c.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
-          c.style.transition = 'none';
+        toExit.forEach(function (c) { c.classList.add('is-leaving'); });
+
+        setTimeout(function () {
+          toExit.forEach(function (c) {
+            c.classList.add('is-hidden');
+            c.classList.remove('is-leaving');
+          });
+
+          toEnter.forEach(function (c, i) {
+            c.classList.remove('is-hidden');
+            c.classList.add('is-entering');
+            c.style.transitionDelay = (i * 40) + 'ms';
+          });
+
+          var visibleCards = cards.filter(function (c) { return !c.classList.contains('is-hidden'); });
+          visibleCards.forEach(function (c) {
+            var first = firsts.get(c);
+            if (!first) return;
+            var last = c.getBoundingClientRect();
+            var dx = first.left - last.left;
+            var dy = first.top  - last.top;
+            if (dx === 0 && dy === 0) return;
+            c.style.transition = 'none';
+            c.style.transform  = 'translate(' + dx + 'px,' + dy + 'px)';
+            requestAnimationFrame(function () {
+              c.style.transition = '';
+              c.style.transform  = '';
+            });
+          });
 
           requestAnimationFrame(function () {
-            c.style.transition = '';
-            c.style.transform = '';
+            requestAnimationFrame(function () {
+              toEnter.forEach(function (c) { c.classList.remove('is-entering'); });
+            });
           });
-        });
+
+          setTimeout(function () {
+            toEnter.forEach(function (c) { c.style.transitionDelay = ''; });
+          }, ENTER_DURATION + toEnter.length * 40 + 60);
+        }, toExit.length ? EXIT_DURATION : 0);
       }
 
       chips.forEach(function (chip) {
         chip.addEventListener('click', function () {
+          if (chip.classList.contains('is-active')) return;
           chips.forEach(function (c) { c.classList.remove('is-active'); });
           chip.classList.add('is-active');
           state.category = chip.dataset.category;
@@ -813,6 +882,28 @@
           }, 120);
         });
       }
+    })();
+
+    (function cardTilt() {
+      var cards = document.querySelectorAll('.project-card');
+      var canTilt = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+      if (!canTilt) return;
+      cards.forEach(function (card) {
+        var raf = null;
+        card.addEventListener('mousemove', function (e) {
+          var r = card.getBoundingClientRect();
+          var x = (e.clientX - r.left) / r.width  - 0.5;
+          var y = (e.clientY - r.top)  / r.height - 0.5;
+          if (raf) cancelAnimationFrame(raf);
+          raf = requestAnimationFrame(function () {
+            card.style.transform = 'translateY(-4px) rotateX(' + (-y * 4) + 'deg) rotateY(' + (x * 5) + 'deg)';
+          });
+        });
+        card.addEventListener('mouseleave', function () {
+          if (raf) cancelAnimationFrame(raf);
+          card.style.transform = '';
+        });
+      });
     })();
   </script>
 
