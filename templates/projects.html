@@ -517,22 +517,10 @@
                   filter 0.4s ease;
     }
 
-    @property --icon-rot {
-      syntax: '<angle>';
-      initial-value: 0deg;
-      inherits: false;
-    }
-
     .banner-spin-slow .project-icon img {
-      --icon-rot: 0deg;
-      transform: rotate(var(--icon-rot));
-      transition: --icon-rot 0.55s cubic-bezier(0.4, 0, 0.2, 1),
-                  filter 0.4s ease;
+      transition: transform 0s linear, filter 0.4s ease;
     }
     .project-card:hover .banner-spin-slow .project-icon img {
-      --icon-rot: 7200deg;
-      transition: --icon-rot 100s linear,
-                  filter 0.4s ease;
       filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.7))
               drop-shadow(0 0 16px rgba(199, 125, 255, 0.65));
     }
@@ -955,6 +943,64 @@
           if (raf) cancelAnimationFrame(raf);
           card.style.transform = '';
         });
+      });
+    })();
+    (function iconSpin() {
+      var SPEED = 50;
+      var WIND_BACK = 650;
+      document.querySelectorAll('.banner-spin-slow').forEach(function (banner) {
+        var img = banner.querySelector('.project-icon img');
+        if (!img) return;
+        var card = banner.closest('.project-card');
+        if (!card) return;
+
+        var rot = 0;
+        var rafSpin = null;
+        var rafBack = null;
+        var lastTime = 0;
+        var spinning = false;
+
+        function tick(now) {
+          if (!spinning) return;
+          if (!lastTime) lastTime = now;
+          var dt = now - lastTime;
+          lastTime = now;
+          rot += SPEED * dt / 1000;
+          img.style.transform = 'rotate(' + rot + 'deg)';
+          rafSpin = requestAnimationFrame(tick);
+        }
+
+        function start() {
+          if (rafBack) { cancelAnimationFrame(rafBack); rafBack = null; }
+          if (spinning) return;
+          spinning = true;
+          lastTime = 0;
+          rafSpin = requestAnimationFrame(tick);
+        }
+
+        function stop() {
+          spinning = false;
+          if (rafSpin) { cancelAnimationFrame(rafSpin); rafSpin = null; }
+          var startRot = rot;
+          var startTime = performance.now();
+          function step(now) {
+            var t = Math.min(1, (now - startTime) / WIND_BACK);
+            var eased = 1 - Math.pow(1 - t, 3);
+            rot = startRot * (1 - eased);
+            img.style.transform = 'rotate(' + rot + 'deg)';
+            if (t < 1) {
+              rafBack = requestAnimationFrame(step);
+            } else {
+              rot = 0;
+              img.style.transform = '';
+              rafBack = null;
+            }
+          }
+          rafBack = requestAnimationFrame(step);
+        }
+
+        card.addEventListener('mouseenter', start);
+        card.addEventListener('mouseleave', stop);
       });
     })();
   </script>
