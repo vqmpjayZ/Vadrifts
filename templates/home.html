@@ -2374,49 +2374,6 @@
     .toast.is-error { border-color: rgba(255, 94, 138, 0.45); }
     .toast.is-warn  { border-color: rgba(255, 159, 67, 0.45); }
 
-    .suggest-seeds {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 6px 0 14px;
-    }
-    .suggest-seed {
-      position: relative;
-      padding: 6px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.03);
-      border: 1px dashed rgba(199, 125, 255, 0.25);
-      color: #c8c0d8;
-      font-size: 11.5px;
-      font-weight: 500;
-      letter-spacing: 0.01em;
-      cursor: pointer;
-      transition: color 0.25s ease, background 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
-    }
-    .suggest-seed::before {
-      content: '+';
-      margin-right: 6px;
-      color: #ff9f43;
-      font-weight: 700;
-      transition: transform 0.3s ease;
-      display: inline-block;
-    }
-    .suggest-seed:hover {
-      color: #fff;
-      background: rgba(199, 125, 255, 0.08);
-      border-color: rgba(199, 125, 255, 0.55);
-      transform: translateY(-2px);
-    }
-    .suggest-seed:hover::before { transform: rotate(90deg); }
-    .suggest-seed.is-used {
-      color: #6b6b6b;
-      border-style: solid;
-      border-color: rgba(255,255,255,0.06);
-      cursor: default;
-      transform: none;
-    }
-    .suggest-seed.is-used::before { content: '\2713'; color: #4ade80; }
-
     .suggest-progress {
       position: relative;
       height: 3px;
@@ -2439,6 +2396,82 @@
     .suggest-stats li {
       transition: transform 0.3s ease, color 0.3s ease;
       cursor: default;
+    }
+
+    .suggest-card {
+      transition: border-color 0.5s ease, box-shadow 0.6s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .suggest-card:hover {
+      border-color: rgba(199, 125, 255, 0.45) !important;
+      box-shadow:
+        0 30px 80px rgba(114, 9, 183, 0.28),
+        0 0 0 1px rgba(199, 125, 255, 0.18) inset;
+      transform: translateY(-3px);
+    }
+    .suggest-orb {
+      transition: opacity 0.7s ease, transform 0.9s cubic-bezier(0.22, 1, 0.36, 1), filter 0.7s ease;
+    }
+    .suggest-card:hover .suggest-orb-1 {
+      opacity: 0.85;
+      transform: scale(1.12) translate(-10px, 14px);
+      filter: blur(2px) saturate(1.2);
+    }
+    .suggest-card:hover .suggest-orb-2 {
+      opacity: 0.55;
+      transform: scale(1.15) translate(10px, -10px);
+      filter: blur(2px) saturate(1.2);
+    }
+    .suggest-eyebrow .eyebrow-dot {
+      transition: box-shadow 0.4s ease, transform 0.4s ease;
+    }
+    .suggest-card:hover .eyebrow-dot {
+      box-shadow: 0 0 16px rgba(255, 159, 67, 0.85), 0 0 4px rgba(255, 159, 67, 0.9);
+      transform: scale(1.25);
+    }
+    .suggest-title {
+      background-size: 220% auto !important;
+      background-position: 0% center;
+      transition: background-position 1.2s ease;
+    }
+    .suggest-card:hover .suggest-title {
+      background-position: 100% center;
+    }
+    .suggest-textarea-wrap {
+      transition: border-color 0.4s ease, box-shadow 0.5s ease, background 0.5s ease;
+    }
+    .suggest-card:hover .suggest-textarea-wrap:not(:focus-within) {
+      border-color: rgba(199, 125, 255, 0.3);
+      box-shadow: 0 0 0 3px rgba(199, 125, 255, 0.06), 0 10px 30px rgba(114, 9, 183, 0.12);
+    }
+    .suggest-card:hover .suggest-textarea-shine {
+      animation: shineSweep 2.2s ease-in-out 1;
+    }
+    .stype-chip:not(.is-active) {
+      transition: color 0.25s ease, background 0.3s ease, border-color 0.3s ease, transform 0.25s ease;
+    }
+    .suggest-card:hover .stype-chip:not(.is-active) {
+      border-color: rgba(199, 125, 255, 0.25);
+    }
+    .stype-chip:not(.is-active):hover {
+      transform: translateY(-2px);
+      background: rgba(199, 125, 255, 0.1);
+    }
+    .suggest-submit {
+      position: relative;
+      overflow: hidden;
+    }
+    .suggest-submit::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.35) 50%, transparent 70%);
+      transform: translateX(-130%);
+      transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+      pointer-events: none;
+      mix-blend-mode: overlay;
+    }
+    .suggest-submit:hover::after {
+      transform: translateX(130%);
     }
     .suggest-stats li:hover {
       transform: translateY(-3px);
@@ -2641,7 +2674,6 @@
 									Feedback
 								</button>
 							</div>
-							<div class="suggest-seeds" id="suggestSeeds" role="list" aria-label="Quick starters"></div>
 							<label for="suggestText" class="visually-hidden">Your suggestion</label>
 							<div class="suggest-textarea-wrap">
 								<textarea id="suggestText" name="suggestion" placeholder="What's on your mind? The more specific, the better." required maxlength="800" rows="5"></textarea>
@@ -3273,62 +3305,17 @@ class AutoShowcasersManager {
 		  /* ============== v2 suggestion box — chips + autoresize + rate limit ============== */
 		  (function () {
 		    var chips = document.querySelectorAll('.stype-chip');
-		    var seedHost = document.getElementById('suggestSeeds');
+		    chips.forEach(function (c) {
+		      c.addEventListener('click', function () {
+		        chips.forEach(function (x) { x.classList.remove('is-active'); });
+		        c.classList.add('is-active');
+		      });
+		    });
 		    var ta = document.getElementById('suggestText');
 		    var counter = document.getElementById('suggestCount');
 		    var progress = document.getElementById('suggestProgress');
 		    var fill = progress ? progress.querySelector('span') : null;
 		    var MAX = 800;
-		    var SEEDS = {
-		      idea: [
-		        'A library that auto-pulls remotes on rejoin',
-		        'Mobile-first UI for ArrayField scripts',
-		        'A theme switcher for the script hub'
-		      ],
-		      bug: [
-		        'Key system loops on this script: ',
-		        'ArrayField crashes when I open ',
-		        'Mobile executor breaks on '
-		      ],
-		      feedback: [
-		        'The pacing of releases feels ',
-		        'Docs would be smoother if ',
-		        'What I love about Vadrifts is '
-		      ]
-		    };
-
-		    function renderSeeds(type) {
-		      if (!seedHost) return;
-		      seedHost.innerHTML = '';
-		      (SEEDS[type] || []).forEach(function (txt) {
-		        var btn = document.createElement('button');
-		        btn.type = 'button';
-		        btn.className = 'suggest-seed';
-		        btn.setAttribute('role', 'listitem');
-		        btn.textContent = txt;
-		        btn.addEventListener('click', function () {
-		          if (!ta) return;
-		          ta.value = txt;
-		          ta.focus();
-		          try { ta.setSelectionRange(ta.value.length, ta.value.length); } catch (e) {}
-		          ta.dispatchEvent(new Event('input'));
-		          btn.classList.add('is-used');
-		        });
-		        seedHost.appendChild(btn);
-		      });
-		    }
-
-		    chips.forEach(function (c) {
-		      c.addEventListener('click', function () {
-		        chips.forEach(function (x) { x.classList.remove('is-active'); });
-		        c.classList.add('is-active');
-		        renderSeeds(c.getAttribute('data-stype'));
-		      });
-		    });
-
-		    var firstActive = document.querySelector('.stype-chip.is-active');
-		    renderSeeds(firstActive ? firstActive.getAttribute('data-stype') : 'idea');
-
 		    if (!ta) return;
 
 		    function syncProgress() {
@@ -3457,9 +3444,6 @@ class AutoShowcasersManager {
 		      if (fill) fill.style.width = '0%';
 		      progress.classList.remove('is-warn', 'is-full');
 		    }
-		    document.querySelectorAll('.suggest-seed.is-used').forEach(function (s) {
-		      s.classList.remove('is-used');
-		    });
 		    _setCooldown(btn, SUGGEST_COOLDOWN_MS);
 
 		    setTimeout(function () {
