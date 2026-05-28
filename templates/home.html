@@ -2474,73 +2474,56 @@
       transform: translateX(130%);
     }
 
-    .suggest-preview {
-      position: relative;
-      margin-top: 14px;
-      border-radius: 12px;
-      background: linear-gradient(180deg, rgba(35, 39, 50, 0.72), rgba(24, 27, 38, 0.72));
-      border: 1px solid rgba(255, 255, 255, 0.08);
+    .discord-mock {
+      background: linear-gradient(180deg, rgba(35, 39, 50, 0.85), rgba(24, 27, 38, 0.85)) !important;
+      border: 1px solid rgba(255, 255, 255, 0.08) !important;
+      border-radius: 14px;
       overflow: hidden;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
-      transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
-                  box-shadow 0.5s ease,
-                  border-color 0.4s ease,
-                  opacity 0.5s ease;
-      transform-origin: top right;
+      transition: border-color 0.35s ease, box-shadow 0.35s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     }
-    .suggest-preview::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(120% 80% at 80% 0%, rgba(199, 125, 255, 0.12), transparent 60%);
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.6s ease;
+    .discord-mock:focus-within {
+      border-color: rgba(199, 125, 255, 0.5) !important;
+      box-shadow: 0 0 0 3px rgba(199, 125, 255, 0.14),
+                  0 22px 50px rgba(114, 9, 183, 0.22);
     }
-    .suggest-card:hover .suggest-preview {
-      border-color: rgba(199, 125, 255, 0.32);
-      box-shadow: 0 20px 50px rgba(114, 9, 183, 0.25);
+    .suggest-card:hover .discord-mock {
       transform: translateY(-2px);
-    }
-    .suggest-card:hover .suggest-preview::before { opacity: 1; }
-
-    .suggest-preview.is-sending {
-      animation: previewFly 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-    }
-    @keyframes previewFly {
-      0%   { opacity: 1; transform: translateY(0) scale(1); }
-      40%  { opacity: 1; transform: translateY(-6px) scale(1.02); }
-      100% { opacity: 0; transform: translateY(-60px) scale(0.85) rotate(-2deg); }
+      border-color: rgba(199, 125, 255, 0.32) !important;
     }
 
-    .sp-bar {
+    .dm-bar {
       display: flex;
       align-items: center;
       gap: 8px;
       padding: 9px 14px;
-      background: rgba(15, 17, 24, 0.6);
+      background: rgba(15, 17, 24, 0.55);
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
       font-size: 11px;
       font-weight: 600;
       color: #8b8e98;
       letter-spacing: 0.02em;
     }
-    .sp-bar-dot {
-      width: 9px; height: 9px;
+    .dm-bar-dot {
+      width: 9px;
+      height: 9px;
       border-radius: 50%;
     }
-    .sp-bar-r { background: #ff5f57; }
-    .sp-bar-y { background: #febc2e; }
-    .sp-bar-g { background: #28c840; }
-    .sp-bar-channel {
+    .dm-bar-r { background: #ff5f57; }
+    .dm-bar-y { background: #febc2e; }
+    .dm-bar-g { background: #28c840; }
+    .dm-channel {
       margin-left: 8px;
       display: inline-flex;
       align-items: center;
       gap: 2px;
       color: #c9cbd1;
     }
-    .sp-hash { color: #8b8e98; margin-right: 1px; font-weight: 700; }
-    .sp-bar-typing {
+    .dm-hash {
+      color: #8b8e98;
+      margin-right: 1px;
+      font-weight: 700;
+    }
+    .dm-typing {
       margin-left: auto;
       color: #c478d4;
       font-size: 10.5px;
@@ -2548,41 +2531,41 @@
       opacity: 0;
       transition: opacity 0.25s ease;
     }
-    .suggest-preview[data-typing="true"] .sp-bar-typing { opacity: 1; }
-    .sp-dot {
+    .discord-mock[data-typing="true"] .dm-typing { opacity: 1; }
+    .dm-dot {
       display: inline-block;
-      animation: dotBlink 1.4s infinite;
+      animation: dmDotBlink 1.4s infinite;
     }
-    .sp-dot:nth-child(2) { animation-delay: 0.2s; }
-    .sp-dot:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes dotBlink {
+    .dm-dot:nth-child(2) { animation-delay: 0.2s; }
+    .dm-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes dmDotBlink {
       0%, 60%, 100% { opacity: 0.2; }
       30%           { opacity: 1; }
     }
 
-    .sp-msg {
+    .dm-msg {
       display: grid;
       grid-template-columns: 44px 1fr;
       gap: 12px;
       padding: 14px 16px 16px;
       align-items: start;
     }
-    .sp-avatar {
+    .dm-avatar {
       position: relative;
-      width: 40px; height: 40px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       overflow: hidden;
       background: #2b2f3a;
-      flex-shrink: 0;
       transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    .suggest-preview[data-empty="false"] .sp-avatar { transform: scale(1.04); }
-    .suggest-card:hover .sp-avatar { transform: scale(1.08); }
-    .sp-avatar img {
-      width: 100%; height: 100%;
+    .discord-mock:focus-within .dm-avatar { transform: scale(1.08); }
+    .dm-avatar img {
+      width: 100%;
+      height: 100%;
       object-fit: cover;
     }
-    .sp-avatar::after {
+    .dm-avatar::after {
       content: '';
       position: absolute;
       inset: 0;
@@ -2590,29 +2573,32 @@
       background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.18), transparent 60%);
       pointer-events: none;
     }
-    .sp-online {
+    .dm-online {
       position: absolute;
-      bottom: -2px; right: -2px;
-      width: 13px; height: 13px;
+      bottom: -2px;
+      right: -2px;
+      width: 13px;
+      height: 13px;
       background: #28c840;
-      border: 3px solid rgba(35, 39, 50, 1);
+      border: 3px solid #232732;
       border-radius: 50%;
-      box-shadow: 0 0 8px rgba(40, 200, 64, 0.6);
+      box-shadow: 0 0 8px rgba(40, 200, 64, 0.55);
     }
 
-    .sp-body { min-width: 0; }
-    .sp-meta {
+    .dm-body { min-width: 0; }
+    .dm-meta {
       display: flex;
       align-items: center;
       gap: 8px;
       margin-bottom: 4px;
+      flex-wrap: wrap;
     }
-    .sp-author {
+    .dm-author {
       color: #ffffff;
       font-weight: 600;
-      font-size: 14px;
+      font-size: 14.5px;
     }
-    .sp-badge {
+    .dm-badge {
       display: inline-flex;
       align-items: center;
       padding: 1px 6px;
@@ -2623,69 +2609,38 @@
       font-weight: 700;
       letter-spacing: 0.04em;
     }
-    .sp-time {
+    .dm-time {
       color: #72767d;
       font-size: 11px;
     }
 
-    .sp-text {
+    .dm-content {
       color: #dcddde;
-      font-size: 14px;
-      line-height: 1.45;
+      font-size: 15px;
+      line-height: 1.55;
       word-break: break-word;
-      white-space: pre-wrap;
-      position: relative;
+      overflow-wrap: anywhere;
+      text-align: left;
     }
-    .sp-tag {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 5px;
-      font-size: 10.5px;
+    .dm-bold {
+      color: #ffffff;
       font-weight: 700;
-      letter-spacing: 0.06em;
-      margin-right: 6px;
-      vertical-align: 1px;
-      transition: background 0.35s ease, color 0.35s ease, box-shadow 0.35s ease;
+      user-select: none;
+      white-space: nowrap;
     }
-    .suggest-preview[data-stype="idea"] .sp-tag {
-      background: rgba(199, 125, 255, 0.18);
-      color: #d8a5ff;
-      box-shadow: inset 0 0 0 1px rgba(199, 125, 255, 0.35);
+    .dm-editor {
+      outline: none;
+      caret-color: #c478d4;
+      display: inline;
+      min-height: 1em;
     }
-    .suggest-preview[data-stype="bug"] .sp-tag {
-      background: rgba(255, 94, 138, 0.16);
-      color: #ff8aa3;
-      box-shadow: inset 0 0 0 1px rgba(255, 94, 138, 0.35);
-    }
-    .suggest-preview[data-stype="feedback"] .sp-tag {
-      background: rgba(88, 101, 242, 0.18);
-      color: #a4adff;
-      box-shadow: inset 0 0 0 1px rgba(88, 101, 242, 0.4);
-    }
-
-    .sp-empty-text {
+    .dm-editor:empty::before {
+      content: attr(data-placeholder);
       color: #5a5d65;
       font-style: italic;
+      pointer-events: none;
     }
-    .suggest-preview[data-empty="false"] .sp-empty-text { display: none; }
-    .suggest-preview[data-empty="true"]  .sp-tag        { display: none; }
-    .suggest-preview[data-empty="true"]  .sp-content    { display: none; }
 
-    .sp-cursor {
-      display: inline-block;
-      width: 2px;
-      height: 1em;
-      background: #c478d4;
-      vertical-align: -2px;
-      margin-left: 2px;
-      opacity: 0;
-      animation: cursorBlink 1.05s steps(2) infinite;
-    }
-    .suggest-preview[data-empty="false"] .sp-cursor { opacity: 1; }
-    @keyframes cursorBlink {
-      0%, 50% { opacity: 1; }
-      51%, 100% { opacity: 0; }
-    }
     .suggest-stats li:hover {
       transform: translateY(-3px);
     }
@@ -2888,38 +2843,30 @@
 								</button>
 							</div>
 							<label for="suggestText" class="visually-hidden">Your suggestion</label>
-							<div class="suggest-textarea-wrap">
-								<textarea id="suggestText" name="suggestion" placeholder="What's on your mind? The more specific, the better." required maxlength="800" rows="5"></textarea>
+							<div class="suggest-textarea-wrap discord-mock" data-stype="idea" data-typing="false">
+								<div class="dm-bar">
+									<span class="dm-bar-dot dm-bar-r"></span>
+									<span class="dm-bar-dot dm-bar-y"></span>
+									<span class="dm-bar-dot dm-bar-g"></span>
+									<span class="dm-channel"><span class="dm-hash">#</span>suggestions</span>
+									<span class="dm-typing">typing<span class="dm-dot">.</span><span class="dm-dot">.</span><span class="dm-dot">.</span></span>
+								</div>
+								<div class="dm-msg">
+									<div class="dm-avatar">
+										<img src="https://i.imgur.com/ePueN25.png" alt="">
+										<span class="dm-online"></span>
+									</div>
+									<div class="dm-body">
+										<div class="dm-meta">
+											<span class="dm-author">vadrifts</span>
+											<span class="dm-badge">APP</span>
+											<span class="dm-time" id="dmTime">today at 4:31 PM</span>
+										</div>
+										<div class="dm-content"><strong class="dm-bold">NEW SUGGESTION:&nbsp;</strong><span class="dm-editor" id="suggestText" role="textbox" contenteditable="true" aria-label="Write your suggestion" aria-multiline="true" data-placeholder="type your suggestion here..."></span></div>
+									</div>
+								</div>
 								<div class="suggest-textarea-shine"></div>
 								<div class="suggest-progress" id="suggestProgress" aria-hidden="true"><span></span></div>
-							</div>
-							<div class="suggest-preview" id="suggestPreview" data-empty="true" data-stype="idea" aria-hidden="true">
-								<div class="sp-bar">
-									<span class="sp-bar-dot sp-bar-r"></span>
-									<span class="sp-bar-dot sp-bar-y"></span>
-									<span class="sp-bar-dot sp-bar-g"></span>
-									<span class="sp-bar-channel"><span class="sp-hash">#</span>suggestions</span>
-									<span class="sp-bar-typing" id="suggestTyping">typing<span class="sp-dot">.</span><span class="sp-dot">.</span><span class="sp-dot">.</span></span>
-								</div>
-								<div class="sp-msg">
-									<div class="sp-avatar">
-										<img src="https://i.imgur.com/ePueN25.png" alt="">
-										<span class="sp-online"></span>
-									</div>
-									<div class="sp-body">
-										<div class="sp-meta">
-											<span class="sp-author">vadrifts</span>
-											<span class="sp-badge">APP</span>
-											<span class="sp-time" id="suggestTime">just now</span>
-										</div>
-										<div class="sp-text">
-											<span class="sp-tag" id="suggestPreviewTag">[IDEA]</span>
-											<span class="sp-content" id="suggestPreviewText"></span>
-											<span class="sp-empty-text">Start typing &mdash; previews land here in real time.</span>
-											<span class="sp-cursor" aria-hidden="true"></span>
-										</div>
-									</div>
-								</div>
 							</div>
 							<div class="suggest-row">
 								<div class="suggest-counter"><span id="suggestCount">0</span> / 800</div>
@@ -3550,20 +3497,14 @@ class AutoShowcasersManager {
 		    var counter = document.getElementById('suggestCount');
 		    var progress = document.getElementById('suggestProgress');
 		    var fill = progress ? progress.querySelector('span') : null;
-		    var preview = document.getElementById('suggestPreview');
-		    var previewText = document.getElementById('suggestPreviewText');
-		    var previewTag  = document.getElementById('suggestPreviewTag');
-		    var previewTime = document.getElementById('suggestTime');
+		    var wrap = document.querySelector('.discord-mock');
+		    var timeEl = document.getElementById('dmTime');
 		    var MAX = 800;
-
-		    var TAGS = { idea: '[IDEA]', bug: '[BUG]', feedback: '[FEEDBACK]' };
-		    var typingTimeout = null;
+		    var typingTimer = null;
 
 		    function setStype(type) {
-		      if (preview) preview.setAttribute('data-stype', type);
-		      if (previewTag) previewTag.textContent = TAGS[type] || '[IDEA]';
+		      if (wrap) wrap.setAttribute('data-stype', type);
 		    }
-
 		    chips.forEach(function (c) {
 		      c.addEventListener('click', function () {
 		        chips.forEach(function (x) { x.classList.remove('is-active'); });
@@ -3571,12 +3512,33 @@ class AutoShowcasersManager {
 		        setStype(c.getAttribute('data-stype'));
 		      });
 		    });
-		    var first = document.querySelector('.stype-chip.is-active');
-		    setStype(first ? first.getAttribute('data-stype') : 'idea');
+		    var firstActive = document.querySelector('.stype-chip.is-active');
+		    setStype(firstActive ? firstActive.getAttribute('data-stype') : 'idea');
 
 		    if (!ta) return;
 
-		    function syncProgress(len) {
+		    function getText() {
+		      return (ta.textContent || '');
+		    }
+		    function caretToEnd() {
+		      try {
+		        var range = document.createRange();
+		        var sel   = window.getSelection();
+		        range.selectNodeContents(ta);
+		        range.collapse(false);
+		        sel.removeAllRanges();
+		        sel.addRange(range);
+		      } catch (e) {}
+		    }
+		    function clampLength() {
+		      var v = getText();
+		      if (v.length > MAX) {
+		        ta.textContent = v.slice(0, MAX);
+		        caretToEnd();
+		      }
+		    }
+		    function syncProgress() {
+		      var len = getText().length;
 		      if (counter) counter.textContent = len;
 		      if (fill) fill.style.width = Math.min(100, (len / MAX) * 100) + '%';
 		      if (progress) {
@@ -3584,40 +3546,38 @@ class AutoShowcasersManager {
 		        progress.classList.toggle('is-full', len >= MAX);
 		      }
 		    }
-
 		    function refreshTime() {
-		      if (!previewTime) return;
+		      if (!timeEl) return;
 		      var d = new Date();
 		      var hh = d.getHours();
 		      var mm = d.getMinutes();
 		      var ampm = hh >= 12 ? 'PM' : 'AM';
 		      var h = ((hh + 11) % 12) + 1;
-		      previewTime.textContent = 'today at ' + h + ':' + (mm < 10 ? '0' + mm : mm) + ' ' + ampm;
+		      timeEl.textContent = 'today at ' + h + ':' + (mm < 10 ? '0' + mm : mm) + ' ' + ampm;
 		    }
 		    refreshTime();
-
-		    function syncPreview() {
-		      var v = ta.value;
-		      var len = v.length;
-		      syncProgress(len);
-		      if (preview) {
-		        preview.setAttribute('data-empty', len === 0 ? 'true' : 'false');
-		        preview.setAttribute('data-typing', 'true');
-		        clearTimeout(typingTimeout);
-		        typingTimeout = setTimeout(function () {
-		          preview.setAttribute('data-typing', 'false');
-		        }, 900);
-		      }
-		      if (previewText) previewText.textContent = v;
-		      refreshTime();
-		    }
+		    setInterval(refreshTime, 30000);
 
 		    ta.addEventListener('input', function () {
-		      syncPreview();
-		      ta.style.height = 'auto';
-		      ta.style.height = Math.min(ta.scrollHeight, 320) + 'px';
+		      clampLength();
+		      syncProgress();
+		      refreshTime();
+		      if (wrap) {
+		        wrap.setAttribute('data-typing', 'true');
+		        clearTimeout(typingTimer);
+		        typingTimer = setTimeout(function () {
+		          wrap.setAttribute('data-typing', 'false');
+		        }, 900);
+		      }
 		    });
-		    syncPreview();
+
+		    ta.addEventListener('paste', function (e) {
+		      e.preventDefault();
+		      var txt = (e.clipboardData || window.clipboardData).getData('text');
+		      document.execCommand('insertText', false, txt);
+		    });
+
+		    syncProgress();
 		  })();
 
 		  /* rate limit config */
@@ -3664,7 +3624,7 @@ class AutoShowcasersManager {
 		    e.preventDefault();
 		    var ta = document.getElementById('suggestText');
 		    var btn = document.getElementById('suggestSubmit');
-		    var text = (ta.value || '').trim();
+		    var text = (ta.textContent || '').trim();
 		    if (!text) return false;
 		    if (text.length < SUGGEST_MIN_LENGTH) {
 		      showToast('Add a few more words — keep it meaningful.', 'warn');
@@ -3699,7 +3659,7 @@ class AutoShowcasersManager {
 		    var activeChip = document.querySelector('.stype-chip.is-active');
 		    var stype = activeChip ? activeChip.getAttribute('data-stype') : 'idea';
 		    var prefix = stype === 'bug' ? '[BUG] ' : (stype === 'feedback' ? '[FEEDBACK] ' : '[IDEA] ');
-		    var payload = prefix + text;
+		    var payload = prefix + '**NEW SUGGESTION:** ' + text;
 
 		    /* clipboard copy */
 		    var copied = false;
@@ -3718,18 +3678,7 @@ class AutoShowcasersManager {
 		    rec.lastText = text;
 		    _saveRecord(rec);
 
-		    var preview = document.getElementById('suggestPreview');
-		    if (preview) {
-		      preview.classList.add('is-sending');
-		      setTimeout(function () {
-		        preview.classList.remove('is-sending');
-		        preview.setAttribute('data-empty', 'true');
-		        var pt = document.getElementById('suggestPreviewText');
-		        if (pt) pt.textContent = '';
-		      }, 700);
-		    }
-
-		    ta.value = '';
+		    ta.textContent = '';
 		    ta.style.height = '';
 		    var counter = document.getElementById('suggestCount');
 		    if (counter) counter.textContent = '0';
