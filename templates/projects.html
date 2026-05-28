@@ -457,6 +457,11 @@
       background: linear-gradient(180deg, transparent 55%, rgba(0,0,0,0.5) 100%);
       pointer-events: none;
       z-index: 2;
+      transform-origin: center;
+      transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .project-card:hover .project-banner::before {
+      transform: scale(1.1);
     }
     .project-banner::after {
       content: '';
@@ -512,10 +517,22 @@
                   filter 0.4s ease;
     }
 
+    @property --icon-rot {
+      syntax: '<angle>';
+      initial-value: 0deg;
+      inherits: false;
+    }
+
     .banner-spin-slow .project-icon img {
-      animation: logoSpinSlow 28s linear infinite;
+      --icon-rot: 0deg;
+      transform: rotate(var(--icon-rot));
+      transition: --icon-rot 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+                  filter 0.4s ease;
     }
     .project-card:hover .banner-spin-slow .project-icon img {
+      --icon-rot: 7200deg;
+      transition: --icon-rot 100s linear,
+                  filter 0.4s ease;
       filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.7))
               drop-shadow(0 0 16px rgba(199, 125, 255, 0.65));
     }
@@ -546,7 +563,7 @@
     .project-card:hover .banner-shine::after {
       transform: translateX(100%);
     }
-    @keyframes logoSpinSlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @keyframes logoSpinSlow { from { --icon-rot: 0deg; } to { --icon-rot: 360deg; } }
 
     .project-body {
       display: flex;
