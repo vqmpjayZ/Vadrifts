@@ -22,7 +22,7 @@ projects = [
         "category": "roblox",
         "description": "The full script collection — Vadrifts.byp, Starving Artists, Horrific Housing, and more, all in one hub.",
         "logo": "https://i.imgur.com/7vwMfnO.png",
-        "icon": "https://i.imgur.com/qTlJ8NW_d.png?maxwidth=520&shape=thumb&fidelity=high",
+        "icon": "https://i.imgur.com/MrhgZKc.png",
         "logo_animation": "spin-slow",
         "stack": ["Lua", "Roblox"],
         "link": "/scripts",
