@@ -664,11 +664,14 @@ input[type="url"]:focus, input[type="number"]:focus, .select:focus {
 }
 
 .preview-image {
+  width: min(480px, 100%);
   max-width: 100%;
-  max-height: 480px;
+  height: auto;
   image-rendering: pixelated;
+  image-rendering: crisp-edges;
   box-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 20px 60px rgba(0,0,0,.5);
   border-radius: 4px;
+  display: block;
 }
 
 .preview-grid {
@@ -844,6 +847,36 @@ input[type="url"]:focus, input[type="number"]:focus, .select:focus {
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 8px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
 
+
+@keyframes pixl-rise {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pixl-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.nav { animation: pixl-fade .6s ease-out both; }
+.hero-inner { animation: pixl-rise .8s cubic-bezier(.2,.7,.2,1) both; animation-delay: .05s; }
+.hero-grid { animation: pixl-fade 1.1s ease-out both; animation-delay: .25s; }
+.converter-card { animation: pixl-rise .8s cubic-bezier(.2,.7,.2,1) both; animation-delay: .2s; }
+
+.reveal {
+  animation: pixl-rise .8s cubic-bezier(.2,.7,.2,1) both;
+}
+.examples.reveal { animation-delay: .35s; }
+.how.reveal      { animation-delay: .45s; }
+.api.reveal      { animation-delay: .55s; }
+.footer.reveal   { animation-delay: .65s; }
+
+.step-block.appear { animation: pixl-rise .55s cubic-bezier(.2,.7,.2,1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .nav, .hero-inner, .hero-grid, .converter-card,
+  .reveal, .step-block.appear { animation: none !important; }
+}
+
 </style>
 </head>
 <body>
@@ -1004,7 +1037,7 @@ input[type="url"]:focus, input[type="number"]:focus, .select:focus {
 
           <button id="convertBtn" class="btn btn-primary btn-full" type="button">
             <svg class="btn-icon" viewBox="0 0 16 16"><use href="#pixl-arrow"/></svg>
-            <span>Convert</span>
+            <span id="convertLabel">Convert</span>
           </button>
 
           <div class="status" id="status" role="status" aria-live="polite"></div>
@@ -1026,7 +1059,7 @@ input[type="url"]:focus, input[type="number"]:focus, .select:focus {
       </div>
     </section>
 
-    <section class="examples" id="examples">
+    <section class="examples reveal" id="examples">
       <div class="section-head">
         <h2>Try an example</h2>
         <p>Click any image to load it into the converter.</p>
@@ -1034,7 +1067,7 @@ input[type="url"]:focus, input[type="number"]:focus, .select:focus {
       <div class="examples-grid" id="examplesGrid"></div>
     </section>
 
-    <section class="how" id="how">
+    <section class="how reveal" id="how">
       <div class="section-head">
         <h2>How it works</h2>
         <p>Four steps from raw image to ready-to-ship asset.</p>
@@ -1063,7 +1096,7 @@ input[type="url"]:focus, input[type="number"]:focus, .select:focus {
       </div>
     </section>
 
-    <section class="api" id="api">
+    <section class="api reveal" id="api">
       <div class="section-head">
         <h2>API</h2>
         <p>One endpoint, backward compatible. Omit everything and you still get a 32×32 JSON pixel grid.</p>
@@ -1096,7 +1129,7 @@ input[type="url"]:focus, input[type="number"]:focus, .select:focus {
     </section>
   </main>
 
-  <footer class="footer">
+  <footer class="footer reveal">
     <div class="footer-inner">
       <a class="brand brand-sm" href="#top">
         <svg class="brand-icon" viewBox="0 0 16 16"><use href="#pixl-arrow"/></svg>
@@ -1135,6 +1168,7 @@ const els = {
   format: byId('formatSelect'),
   simple: byId('simpleMode'),
   convert: byId('convertBtn'),
+  convertLabel: byId('convertLabel'),
   status: byId('status'),
   result: byId('result'),
   resultActions: byId('resultActions'),
@@ -1177,6 +1211,27 @@ function init() {
   els.convert.addEventListener('click', convert);
   renderExamples();
   updateEndpointPill();
+  updateConvertLabel();
+}
+
+function updateConvertLabel() {
+  if (!els.convertLabel) return;
+  const f = els.format.value;
+  const pretty = f === 'json' ? 'Pixel Grid' :
+                 f === 'jpeg' ? 'JPEG' :
+                 f.toUpperCase();
+  els.convertLabel.textContent = `Convert to ${pretty}`;
+}
+
+function animateReveal(el) {
+  if (!el) return;
+  const wasHidden = el.classList.contains('hidden');
+  el.classList.remove('hidden');
+  if (wasHidden) {
+    el.classList.remove('appear');
+    void el.offsetWidth;
+    el.classList.add('appear');
+  }
 }
 
 function bindTabs() {
@@ -1242,7 +1297,7 @@ function bindOutputControls() {
   els.width.addEventListener('input', () => onDimChange('w'));
   els.height.addEventListener('input', () => onDimChange('h'));
   els.lockBtn.addEventListener('click', toggleAspectLock);
-  els.format.addEventListener('change', updateEndpointPill);
+  els.format.addEventListener('change', () => { updateEndpointPill(); updateConvertLabel(); });
 
   els.presets.forEach(p => {
     p.addEventListener('click', () => {
@@ -1410,8 +1465,8 @@ function loadImageInto(src) {
     const img = els.cropImage;
     img.onload = () => {
       state.loadedNaturalSize = { w: img.naturalWidth, h: img.naturalHeight };
-      els.cropBlock.classList.remove('hidden');
-      els.outputBlock.classList.remove('hidden');
+      animateReveal(els.cropBlock);
+      animateReveal(els.outputBlock);
       state.cropper = new Cropper(img, {
         viewMode: 1,
         autoCropArea: 1,
@@ -1450,8 +1505,8 @@ function updateCropMeta() {
 }
 
 function revealOutput(showCrop = true) {
-  if (showCrop) els.cropBlock.classList.remove('hidden');
-  els.outputBlock.classList.remove('hidden');
+  if (showCrop) animateReveal(els.cropBlock);
+  animateReveal(els.outputBlock);
 }
 
 function updateEndpointPill() {
@@ -1525,6 +1580,9 @@ async function convert() {
       renderImageResult(blob, format, meta, elapsed);
     }
     setStatus(`Converted in ${elapsed}ms.`, 'ok');
+    setTimeout(() => {
+      if (els.result) els.result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 60);
   } catch (e) {
     setStatus(e.message || 'Conversion failed.', 'error');
   } finally {
