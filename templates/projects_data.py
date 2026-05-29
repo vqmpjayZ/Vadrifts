@@ -35,7 +35,7 @@ projects = [
     },
     {
         "id": "image-converter",
-        "title": "Image Converter",
+        "title": "PIXL - Image Converter",
         "category": "webapp",
         "description": "Drag a file, pick a format, download. Web app for fast PNG ↔ JPG ↔ WEBP ↔ AVIF conversions, no upload limits.",
         "logo": "https://i.imgur.com/FV12hnZ.png",

@@ -5,7 +5,7 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>Vadrifts</title>
-		<link rel="icon" href="https://i.imgur.com/ePueN25.png" type="image/png">
+		<link rel="icon" href="https://i.imgur.com/hQXlnOx.png" type="image/png">
 		<style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
@@ -1648,8 +1648,6 @@
       }
     }
 
-        /* ============== Vadrifts: home redesign extensions ============== */
-    /* ============== NEW: hero "just landed" badge ============== */
     .status-badge-new {
       gap: 8px;
       border: 1px solid rgba(255, 159, 67, 0.45);
@@ -1681,7 +1679,6 @@
       100% { box-shadow: 0 0 0 0 rgba(255, 159, 67, 0); }
     }
 
-    /* ============== NEW: spotlight card (dark section) ============== */
     .spotlight-section { padding-bottom: 90px; }
     .spotlight-card {
       display: grid;
@@ -1837,7 +1834,6 @@
       .spotlight-section { padding-bottom: 60px; }
     }
 
-    /* ============== NEW: testimonials ============== */
     .testimonials-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -1886,7 +1882,6 @@
     .t-name { font-weight: 700; color: #fff; font-size: 14px; }
     .t-role { font-size: 12px; color: #999; }
 
-    /* ============== NEW: github commits ============== */
     .commits-card {
       max-width: 880px;
       margin: 40px auto 0;
@@ -1964,7 +1959,6 @@
       .commit-time { grid-column: 2; padding-top: 4px; }
     }
 
-    /* ============== NEW: suggestion box ============== */
     .suggest-wrapper { max-width: 1180px; margin: 0 auto; padding: 0 20px; }
     .suggest-card {
       display: grid;
@@ -2039,7 +2033,6 @@
       .suggest-card { grid-template-columns: 1fr; padding: 30px; gap: 22px; }
     }
 
-    /* ============== NEW: toast ============== */
     .toast {
       position: fixed;
       bottom: 30px; left: 50%;
@@ -2059,8 +2052,6 @@
       text-align: center;
     }
     .toast.is-visible { transform: translateX(-50%) translateY(0); }
-        /* === v2 home additions === */
-    /* ============== v2 hero — latest drop pill ============== */
     .latest-drop-pill {
       display: inline-flex; align-items: center; gap: 8px;
       padding: 7px 16px;
@@ -2092,7 +2083,6 @@
       100% { box-shadow: 0 0 0 0   rgba(34, 197, 94, 0); }
     }
 
-    /* ============== v2 hero spotlight (no card wrapper — let lights breathe) ============== */
     .header-with-spotlight { padding-bottom: 60px; }
     .hero-spotlight {
       display: grid;
@@ -2217,7 +2207,6 @@
       .hs-actions { justify-content: center; }
     }
 
-    /* ============== v2 commits — multiline w/ description ============== */
     .commit-row {
       grid-template-columns: auto 1fr auto;
       align-items: start;
@@ -2253,7 +2242,6 @@
     }
     .commit-repo svg { opacity: 0.7; }
 
-    /* ============== v2 suggestion box — fancier ============== */
     .suggest-card {
       position: relative;
       overflow: hidden;
@@ -2370,7 +2358,6 @@
       box-shadow: 0 4px 12px rgba(114, 9, 183, 0.2) !important;
     }
 
-    /* ============== v2 toast — variants ============== */
     .toast.is-error { border-color: rgba(255, 94, 138, 0.45); }
     .toast.is-warn  { border-color: rgba(255, 159, 67, 0.45); }
 
@@ -3391,7 +3378,6 @@ class AutoShowcasersManager {
 
 		</script>
 		<script>
-		  /* ============== v2 latest changes — account-wide via events ============== */
 		  (function () {
 		    var list = document.getElementById('commitsList');
 		    if (!list) return;
@@ -3409,7 +3395,6 @@ class AutoShowcasersManager {
 		        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 		        .replace(/"/g, '&quot;');
 		    }
-		    /* fetch public events for the whole account, then flatten PushEvent commits */
 		    fetch('https://api.github.com/users/vqmpjayZ/events/public?per_page=30')
 		      .then(function (r) { if (!r.ok) throw new Error('gh ' + r.status); return r.json(); })
 		      .then(function (events) {
@@ -3419,7 +3404,6 @@ class AutoShowcasersManager {
 		          if (ev.type !== 'PushEvent' || !ev.payload || !ev.payload.commits) continue;
 		          var repo = ev.repo && ev.repo.name ? ev.repo.name : '';
 		          var when = ev.created_at;
-		          /* events list newest commit last; reverse so headline = newest */
 		          var commits = ev.payload.commits.slice().reverse();
 		          for (var j = 0; j < commits.length && rows.length < 6; j++) {
 		            var c = commits[j];
@@ -3462,7 +3446,6 @@ class AutoShowcasersManager {
 		      });
 		  })();
 
-		  /* ============== v2 hero spotlight — subtle tilt ============== */
 		  (function () {
 		    var card = document.getElementById('heroSpotlight');
 		    var visual = card ? card.querySelector('.hs-visual') : null;
@@ -3476,7 +3459,6 @@ class AutoShowcasersManager {
 		    visual.addEventListener('mouseleave', function () { visual.style.transform = ''; });
 		  })();
 
-		  /* ============== v2 toast ============== */
 		  var __toastTimer;
 		  function showToast(msg, variant) {
 		    var t = document.getElementById('toast');
@@ -3490,7 +3472,6 @@ class AutoShowcasersManager {
 		    __toastTimer = setTimeout(function () { t.classList.remove('is-visible'); }, 3800);
 		  }
 
-		  /* ============== v2 suggestion box — chips + autoresize + rate limit ============== */
 		  (function () {
 		    var chips = document.querySelectorAll('.stype-chip');
 		    var ta = document.getElementById('suggestText');
@@ -3580,10 +3561,9 @@ class AutoShowcasersManager {
 		    syncProgress();
 		  })();
 
-		  /* rate limit config */
-		  var SUGGEST_COOLDOWN_MS    = 45 * 1000;          /* 45s between sends */
-		  var SUGGEST_HOURLY_CAP     = 6;                  /* max 6 / hour      */
-		  var SUGGEST_MIN_LENGTH     = 8;                  /* min chars         */
+		  var SUGGEST_COOLDOWN_MS    = 45 * 1000;
+		  var SUGGEST_HOURLY_CAP     = 6;
+		  var SUGGEST_MIN_LENGTH     = 8;
 		  var SUGGEST_HOURLY_WINDOW  = 60 * 60 * 1000;
 
 		  function _getRecord() {
@@ -3632,9 +3612,7 @@ class AutoShowcasersManager {
 		    }
 		    var rec = _getRecord();
 		    var now = Date.now();
-		    /* clean hourly window */
 		    rec.hourly = (rec.hourly || []).filter(function (t) { return now - t < SUGGEST_HOURLY_WINDOW; });
-		    /* cooldown check */
 		    var since = now - (rec.last || 0);
 		    if (since < SUGGEST_COOLDOWN_MS) {
 		      var wait = SUGGEST_COOLDOWN_MS - since;
@@ -3642,26 +3620,22 @@ class AutoShowcasersManager {
 		      _setCooldown(btn, wait);
 		      return false;
 		    }
-		    /* hourly cap */
 		    if (rec.hourly.length >= SUGGEST_HOURLY_CAP) {
 		      var oldest = rec.hourly[0];
 		      var resetIn = SUGGEST_HOURLY_WINDOW - (now - oldest);
 		      showToast('Hourly limit hit — try again in ' + _formatSeconds(resetIn) + '.', 'error');
 		      return false;
 		    }
-		    /* honeypot: ignore submissions w/ identical text in last record */
 		    if (rec.lastText && rec.lastText === text) {
 		      showToast('Already sent that one. Tweak it or add detail.', 'warn');
 		      return false;
 		    }
 
-		    /* type chip */
 		    var activeChip = document.querySelector('.stype-chip.is-active');
 		    var stype = activeChip ? activeChip.getAttribute('data-stype') : 'idea';
 		    var prefix = stype === 'bug' ? '[BUG] ' : (stype === 'feedback' ? '[FEEDBACK] ' : '[IDEA] ');
 		    var payload = prefix + '**NEW SUGGESTION:** ' + text;
 
-		    /* clipboard copy */
 		    var copied = false;
 		    try {
 		      if (navigator.clipboard && navigator.clipboard.writeText) {
