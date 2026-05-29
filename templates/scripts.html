@@ -588,7 +588,183 @@
         flex-direction: column;
         gap: 10px;
       }
-    }  </style>
+    }
+
+    /* ===== section separator ===== */
+    .section-separator {
+      max-width: 1200px;
+      margin: 80px auto 50px;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      position: relative;
+      z-index: 10;
+    }
+    .section-separator .sep-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(114, 9, 183, 0.6), transparent);
+    }
+    .section-separator .sep-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 22px;
+      border-radius: 999px;
+      border: 1px solid rgba(114, 9, 183, 0.4);
+      background: rgba(114, 9, 183, 0.08);
+      backdrop-filter: blur(10px);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #c478d4;
+      box-shadow: 0 0 20px rgba(114, 9, 183, 0.15);
+      white-space: nowrap;
+    }
+    .section-separator .sep-label .sep-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #7209b7;
+      box-shadow: 0 0 10px rgba(114, 9, 183, 0.8);
+    }
+
+    /* ===== other projects section ===== */
+    .other-section {
+      max-width: 1200px;
+      margin: 0 auto 80px;
+      padding: 0 20px;
+      position: relative;
+      z-index: 10;
+    }
+    .other-heading {
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .other-heading h2 {
+      font-size: 36px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 0%, #c478d4 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+    .other-heading p {
+      color: #888;
+      font-size: 15px;
+      max-width: 640px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    .other-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 22px;
+      margin-top: 40px;
+    }
+    .other-card {
+      background: #0e0e0e;
+      border: 1px solid #1f1f1f;
+      border-radius: 16px;
+      padding: 24px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .other-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(114, 9, 183, 0.08), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+    .other-card:hover {
+      border-color: rgba(114, 9, 183, 0.5);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(114, 9, 183, 0.15);
+    }
+    .other-card:hover::before { opacity: 1; }
+    .other-card-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .other-card-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(114, 9, 183, 0.25), rgba(196, 120, 212, 0.15));
+      border: 1px solid rgba(114, 9, 183, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .other-status {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      padding: 5px 10px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .other-status.live {
+      background: rgba(74, 222, 128, 0.12);
+      color: #4ade80;
+      border: 1px solid rgba(74, 222, 128, 0.3);
+    }
+    .other-status.soon {
+      background: rgba(255, 159, 67, 0.12);
+      color: #ff9f43;
+      border: 1px solid rgba(255, 159, 67, 0.3);
+    }
+    .other-status.planning {
+      background: rgba(114, 9, 183, 0.15);
+      color: #c478d4;
+      border: 1px solid rgba(114, 9, 183, 0.4);
+    }
+    .other-card h3 {
+      font-size: 19px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+    .other-card .other-desc {
+      color: #999;
+      font-size: 13.5px;
+      line-height: 1.55;
+      margin-bottom: 14px;
+    }
+    .other-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .other-tag {
+      font-size: 11px;
+      padding: 4px 9px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #aaa;
+      font-weight: 500;
+    }
+    @media (max-width: 768px) {
+      .section-separator { margin: 50px auto 30px; }
+      .section-separator .sep-label { font-size: 11px; padding: 6px 16px; }
+      .other-heading h2 { font-size: 28px; }
+      .other-grid { grid-template-columns: 1fr; gap: 16px; }
+    }
+    </style>
 </head>
 <body>
   <div class="bg-lights">
@@ -633,6 +809,26 @@
         <p>Loading scripts...</p>
       </div>
     </div>
+  </div>
+
+  <div class="section-separator">
+    <div class="sep-line"></div>
+    <div class="sep-label">
+      <span class="sep-dot"></span>
+      Other Projects
+    </div>
+    <div class="sep-line"></div>
+  </div>
+
+  <div class="other-section">
+    <div class="other-heading">
+      <h2>Beyond the Scripts</h2>
+      <p>
+        Tools, dev utilities, and side projects that aren't about helping you win in-game &mdash;
+        stuff built for builders, tinkerers, and the people who like peeking under the hood.
+      </p>
+    </div>
+    <div class="other-grid" id="otherGrid"></div>
   </div>
 
   <div class="footer">
@@ -771,8 +967,80 @@
       }
     });
 
+    // ===== Other Projects (dev tools / side stuff — easy to extend) =====
+    // Add new entries here. status: "live" | "soon" | "planning"
+    const otherProjects = [
+      {
+        title: "ArrayField",
+        icon: "\u2728",
+        description: "Roblox UI library \u2014 a modified Rayfield with the deepest feature set of any library in the scene. For devs building tools, not players using them.",
+        tags: ["Lua", "Library", "Dev Tool"],
+        status: "live",
+        link: "/docs/arrayfield",
+        external: false
+      },
+      {
+        title: "Image Converter",
+        icon: "\ud83d\uddbc\ufe0f",
+        description: "Drag, pick a format, download. Fast PNG \u2194 JPG \u2194 WEBP \u2194 AVIF conversions in the browser \u2014 no upload caps, no accounts.",
+        tags: ["Web App", "Utility"],
+        status: "live",
+        link: "/converter",
+        external: false
+      },
+      {
+        title: "Audio Editor",
+        icon: "\ud83c\udfa7",
+        description: "In-browser waveform editor \u2014 trim, fade, crossfade, export. Zero installs, runs on WebAudio + Wavesurfer.",
+        tags: ["React", "WebAudio"],
+        status: "soon",
+        link: "#",
+        external: false
+      },
+      {
+        title: "Dev CLI Toolkit",
+        icon: "\u2699\ufe0f",
+        description: "Command-line utilities for the kind of repetitive stuff that eats your day \u2014 batch renaming, log parsing, quick file conversions.",
+        tags: ["CLI", "Dev Tool", "Planned"],
+        status: "planning",
+        link: "#",
+        external: false
+      }
+    ];
+
+    function renderOtherProjects() {
+      const grid = document.getElementById('otherGrid');
+      if (!grid) return;
+
+      const statusLabel = { live: "LIVE", soon: "COMING SOON", planning: "PLANNING" };
+
+      grid.innerHTML = otherProjects.map(p => {
+        const clickable = p.link && p.link !== '#';
+        const onclick = clickable
+          ? (p.external
+              ? `window.open('${p.link}', '_blank', 'noopener')`
+              : `window.location.href='${p.link}'`)
+          : '';
+        const cursor = clickable ? 'cursor:pointer;' : 'cursor:default;';
+        return `
+          <div class="other-card" style="${cursor}" ${clickable ? `onclick="${onclick}"` : ''}>
+            <div class="other-card-head">
+              <div class="other-card-icon">${p.icon}</div>
+              <span class="other-status ${p.status}">${statusLabel[p.status] || ''}</span>
+            </div>
+            <h3>${p.title}</h3>
+            <p class="other-desc">${p.description}</p>
+            <div class="other-tags">
+              ${(p.tags || []).map(t => `<span class="other-tag">${t}</span>`).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
     createParticles();
     loadScripts();
+    renderOtherProjects();
 
 </script>
 </body>

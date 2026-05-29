@@ -7,8 +7,9 @@
   CSS or JS needs to live on the host page.
 
   Active tab is auto-detected from request.path:
-    - "Scripts" highlights on /scripts and /script/<id>
-    - "Plugins" highlights on /plugins and /plugin/<id>
+    - "Projects" highlights ONLY on /projects (not /scripts, /script/<id>,
+      /plugins, /plugin/<id>, etc. — those are project sub-pages but the
+      tab should not look selected on them)
 
   Adding a new tab? Add an <a class="nav-link"> below and (optionally)
   extend the active-state logic. Every page that includes this file
@@ -111,7 +112,7 @@
     left: 12px;
     right: 12px;
     height: 2px;
-    background: linear-gradient(90deg, #7209b7, #ff9f43);
+    background: #7209b7;
     box-shadow: 0 0 10px rgba(114, 9, 183, 0.8);
   }
 
@@ -163,7 +164,7 @@
       Vadrifts
     </a>
     <div class="nav-links">
-      <a href="/projects" class="nav-link{% if _p == '/projects' or _p.startswith('/scripts') or _p.startswith('/script/') or _p.startswith('/plugins') or _p.startswith('/plugin/') %} active{% endif %}">Projects</a>
+      <a href="/projects" class="nav-link{% if _p == '/projects' %} active{% endif %}">Projects</a>
       <a href="https://discord.com/invite/WDbJ5wE2cR" target="_blank" rel="noopener" class="nav-link">Discord</a>
     </div>
   </div>
