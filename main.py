@@ -1030,7 +1030,7 @@ def delete_plugin(plugin_id):
     return plugins_manager.delete_plugin(plugin_id)
 
 
-@app.route('/convert-image')
+@app.route('/convert-image', methods=['GET', 'POST'])
 def convert_image():
     return convert_image_endpoint(request)
 
