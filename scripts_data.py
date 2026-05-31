@@ -111,45 +111,22 @@ scripts_data = [
     {
         "id": "arrayfield",
         "category": "dev",
-        "status": "live",
+        "status": "active",
         "title": "ArrayField",
-        "icon": "\u2728",
-        "description": "Roblox UI library \u2014 a modified Rayfield with the deepest feature set of any library in the scene. For devs building tools, not players using them.",
-        "tags": ["Lua", "Library", "Dev Tool"],
+        "tag": "UI Library",
+        "thumbnail": "https://i.imgur.com/ePueN25.png",
+        "description": "Modified Rayfield with the deepest feature set of any UI library in the scene. Built for devs making tools \u2014 dropdowns, sliders, color pickers, themes, save configs, and a stack of components Rayfield never shipped.",
+        "features": [
+            "Drop-in Rayfield replacement",
+            "Extended component set",
+            "Theme engine + custom palettes",
+            "Persistent config saving",
+            "Mobile + executor friendly",
+            "Notification system built-in",
+            "Lightweight, single loadstring"
+        ],
         "link": "/docs/arrayfield",
-        "external": False
-    },
-    {
-        "id": "image-converter",
-        "category": "dev",
-        "status": "live",
-        "title": "Image Converter",
-        "icon": "\U0001f5bc\ufe0f",
-        "description": "Drag, pick a format, download. Fast PNG \u2194 JPG \u2194 WEBP \u2194 AVIF conversions in the browser \u2014 no upload caps, no accounts.",
-        "tags": ["Web App", "Utility"],
-        "link": "/converter",
-        "external": False
-    },
-    {
-        "id": "audio-editor",
-        "category": "dev",
-        "status": "soon",
-        "title": "Audio Editor",
-        "icon": "\U0001f3a7",
-        "description": "In-browser waveform editor \u2014 trim, fade, crossfade, export. Zero installs, runs on WebAudio + Wavesurfer.",
-        "tags": ["React", "WebAudio"],
-        "link": "#",
-        "external": False
-    },
-    {
-        "id": "dev-cli-toolkit",
-        "category": "dev",
-        "status": "planning",
-        "title": "Dev CLI Toolkit",
-        "icon": "\u2699\ufe0f",
-        "description": "Command-line utilities for the kind of repetitive stuff that eats your day \u2014 batch renaming, log parsing, quick file conversions.",
-        "tags": ["CLI", "Dev Tool", "Planned"],
-        "link": "#",
+        "button_label": "View Docs",
         "external": False
     },
 ]
