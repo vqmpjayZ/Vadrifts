@@ -717,83 +717,11 @@
     }
     .other-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 22px;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 25px;
       margin-top: 40px;
     }
-    .other-card {
-      background: #0e0e0e;
-      border: 1px solid #1f1f1f;
-      border-radius: 16px;
-      padding: 24px;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-    .other-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(114, 9, 183, 0.08), transparent 60%);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      pointer-events: none;
-    }
-    .other-card:hover {
-      border-color: rgba(114, 9, 183, 0.5);
-      transform: translateY(-4px);
-      box-shadow: 0 12px 30px rgba(114, 9, 183, 0.15);
-    }
-    .other-card:hover::before { opacity: 1; }
-    .other-card-head {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 14px;
-    }
-    .other-card-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, rgba(114, 9, 183, 0.25), rgba(196, 120, 212, 0.15));
-      border: 1px solid rgba(114, 9, 183, 0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      flex-shrink: 0;
-    }
-    .other-status {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 1.2px;
-      padding: 5px 10px;
-      border-radius: 6px;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-    .other-status.live {
-      background: rgba(74, 222, 128, 0.12);
-      color: #4ade80;
-      border: 1px solid rgba(74, 222, 128, 0.3);
-    }
-    .other-status.soon {
-      background: rgba(255, 159, 67, 0.12);
-      color: #ff9f43;
-      border: 1px solid rgba(255, 159, 67, 0.3);
-    }
-    .other-status.planning {
-      background: rgba(114, 9, 183, 0.15);
-      color: #c478d4;
-      border: 1px solid rgba(114, 9, 183, 0.4);
-    }
 
-    .other-status.discontinued {
-      background: rgba(239, 68, 68, 0.12);
-      color: #f87171;
-      border: 1px solid rgba(239, 68, 68, 0.4);
-    }
 
     .script-card { position: relative; }
 
@@ -842,32 +770,6 @@
     .script-card.is-discontinued:hover {
       opacity: 1;
       filter: saturate(1);
-    }
-    .other-card h3 {
-      font-size: 19px;
-      font-weight: 700;
-      margin-bottom: 8px;
-      color: #fff;
-    }
-    .other-card .other-desc {
-      color: #999;
-      font-size: 13.5px;
-      line-height: 1.55;
-      margin-bottom: 14px;
-    }
-    .other-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-    .other-tag {
-      font-size: 11px;
-      padding: 4px 9px;
-      border-radius: 6px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: #aaa;
-      font-weight: 500;
     }
     @media (max-width: 768px) {
       .section-separator { margin: 50px auto 30px; }
@@ -926,7 +828,7 @@
     <div class="sep-line left"></div>
     <div class="sep-label">
       <span class="sep-dot"></span>
-      Other Projects
+      Dev Tools
       <span class="sep-dot"></span>
     </div>
     <div class="sep-line right"></div>
@@ -934,10 +836,11 @@
 
   <div class="other-section">
     <div class="other-heading">
-      <h2>Beyond the Scripts</h2>
+      <h2>Developer Resources</h2>
       <p>
-        Tools, dev utilities, and side projects that aren't about helping you win in-game &mdash;
-        stuff built for builders, tinkerers, and the people who like peeking under the hood.
+        Libraries, utilities, and drop-in modules for Roblox script developers &mdash;
+        UI frameworks, key systems, anti-loggers, debug tools, and the kind of building blocks
+        that make your own scripts feel polished.
       </p>
     </div>
     <div class="other-grid" id="otherGrid"></div>
@@ -970,13 +873,6 @@
       discontinued: "DISCONTINUED",
       patched: "PATCHED",
       updated: "UPDATED"
-    };
-
-    const otherStatusLabel = {
-      live: "LIVE",
-      soon: "COMING SOON",
-      planning: "PLANNING",
-      discontinued: "DISCONTINUED"
     };
 
     function createParticles() {
@@ -1113,28 +1009,43 @@
       }
 
       grid.innerHTML = projects.map(p => {
-        const clickable = p.link && p.link !== '#';
-        const onclick = clickable
-          ? (p.external
-              ? `window.open('${p.link}', '_blank', 'noopener')`
-              : `window.location.href='${p.link}'`)
+        const status = (p.status || 'active').toLowerCase();
+        const statusBadge = scriptStatusLabel[status]
+          ? `<span class="script-status ${status}">${scriptStatusLabel[status]}</span>`
           : '';
-        const cursor = clickable ? 'cursor:pointer;' : 'cursor:default;';
-        const status = (p.status || '').toLowerCase();
+        const cardClass = status === 'discontinued' ? 'script-card is-discontinued' : 'script-card';
+        const clickable = p.link && p.link !== '#';
+        const safeLink = (p.link || '').replace(/'/g, "\\'");
+        const navigate = clickable
+          ? (p.external
+              ? `window.open('${safeLink}', '_blank', 'noopener')`
+              : `window.location.href='${safeLink}'`)
+          : '';
+        const cardOnclick = clickable ? `onclick="${navigate}"` : '';
+        const btnOnclick = clickable ? `onclick="event.stopPropagation(); ${navigate}"` : 'disabled';
+        const buttonLabel = p.button_label || 'View Docs';
+        const features = Array.isArray(p.features) ? p.features : [];
+        const thumbStyle = p.thumbnail
+          ? `background-image: url('${p.thumbnail}'); background-size: cover; background-position: center;`
+          : '';
         return `
-          <div class="other-card" style="${cursor}" ${clickable ? `onclick="${onclick}"` : ''}>
-            <div class="other-card-head">
-              <div class="other-card-icon">${p.icon || ''}</div>
-              <span class="other-status ${status}">${otherStatusLabel[status] || ''}</span>
-            </div>
-            <h3>${p.title}</h3>
-            <p class="other-desc">${p.description}</p>
-            <div class="other-tags">
-              ${(p.tags || []).map(t => `<span class="other-tag">${t}</span>`).join('')}
-            </div>
+        <div class="${cardClass}" ${cardOnclick} style="${clickable ? '' : 'cursor:default;'}">
+          ${statusBadge}
+          <div class="script-thumbnail" style="${thumbStyle}"></div>
+          <div class="script-game">${p.tag || 'Dev Tool'}</div>
+          <h3 class="script-title">${p.title}</h3>
+          <p class="script-description">${p.description}</p>
+
+          <div class="script-features">
+            ${features.slice(0, 3).map(f => `<span class="feature-tag">${f}</span>`).join('')}
+            ${features.length > 3 ? `<span class="feature-tag">+${features.length - 3} more</span>` : ''}
           </div>
-        `;
-      }).join('');
+
+          <div class="script-actions">
+            <button class="view-btn" ${btnOnclick}>${buttonLabel}</button>
+          </div>
+        </div>
+      `;}).join('');
     }
 
     createParticles();
