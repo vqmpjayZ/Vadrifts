@@ -877,6 +877,653 @@ input[type="url"]:focus, input[type="number"]:focus, .select:focus {
   .reveal, .step-block.appear { animation: none !important; }
 }
 
+
+.stepper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  list-style: none;
+  padding: 10px;
+  margin: 0 0 28px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.stepper-item {
+  flex: 1 1 110px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--muted-2);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--sans);
+  position: relative;
+  transition: background .2s, color .2s;
+  min-width: 0;
+}
+.stepper-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+.stepper-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stepper-item.is-active {
+  background: linear-gradient(180deg, rgba(59,130,246,.16), rgba(59,130,246,.04));
+  color: #fff;
+  box-shadow: 0 0 0 1px rgba(96,165,250,.35) inset;
+}
+.stepper-item.is-active .stepper-num {
+  background: var(--blue);
+  border-color: var(--blue-2);
+  color: #fff;
+}
+.stepper-item.is-done { color: var(--blue-3); }
+.stepper-item.is-done .stepper-num {
+  background: rgba(59,130,246,.18);
+  border-color: rgba(96,165,250,.5);
+  color: var(--blue-2);
+}
+
+.step-header { margin-bottom: 16px; }
+.step-header .step-tag { margin-bottom: 6px; }
+.step-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.step-sub {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.output-stack .step-block { border-top: 1px solid var(--border); padding-top: 24px; margin-top: 24px; }
+.output-stack > .step-block:first-of-type { border-top: 1px solid var(--border); padding-top: 24px; margin-top: 24px; }
+
+.preset-label {
+  font-size: 11px;
+  color: var(--muted-2);
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin: 16px 0 8px;
+}
+
+.format-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+@media (max-width: 720px) {
+  .format-grid { grid-template-columns: repeat(2, 1fr); }
+}
+.format-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 14px 16px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--muted);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color .15s, background .15s, color .15s, transform .1s;
+  font-family: var(--sans);
+}
+.format-card:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+  background: var(--surface-2);
+}
+.format-card:active { transform: scale(.98); }
+.format-card.is-active {
+  color: #fff;
+  background: linear-gradient(180deg, rgba(59,130,246,.18), rgba(59,130,246,.06));
+  border-color: rgba(96,165,250,.6);
+  box-shadow: 0 0 0 1px rgba(96,165,250,.25) inset, var(--shadow-blue);
+}
+.format-name {
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+.format-card.is-active .format-name { color: var(--blue-3); }
+.format-desc {
+  font-size: 12px;
+  color: var(--muted-2);
+  font-family: var(--sans);
+}
+.format-card.is-active .format-desc { color: var(--blue-3); opacity: .85; }
+
+.behaviour-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+@media (max-width: 720px) {
+  .behaviour-grid { grid-template-columns: 1fr; }
+}
+.behaviour-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 14px 16px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--muted);
+  cursor: pointer;
+  position: relative;
+  transition: border-color .15s, background .15s, color .15s;
+}
+.behaviour-card input { position: absolute; opacity: 0; pointer-events: none; }
+.behaviour-card:hover { color: var(--text); border-color: var(--border-strong); background: var(--surface-2); }
+.behaviour-card:has(input:checked) {
+  color: #fff;
+  background: linear-gradient(180deg, rgba(59,130,246,.18), rgba(59,130,246,.06));
+  border-color: rgba(96,165,250,.6);
+  box-shadow: 0 0 0 1px rgba(96,165,250,.25) inset;
+}
+.behaviour-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: inherit;
+}
+.behaviour-card:has(input:checked) .behaviour-name { color: var(--blue-3); }
+.behaviour-desc {
+  font-size: 12.5px;
+  color: var(--muted-2);
+  line-height: 1.45;
+}
+.behaviour-card:has(input:checked) .behaviour-desc { color: var(--blue-3); opacity: .85; }
+
+.advanced {
+  margin-top: 18px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.advanced > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 13.5px;
+  font-weight: 600;
+  font-family: var(--sans);
+  user-select: none;
+}
+.advanced > summary::-webkit-details-marker { display: none; }
+.advanced > summary:hover { color: var(--text); }
+.advanced-chevron {
+  font-size: 18px;
+  line-height: 1;
+  color: var(--muted-2);
+  transition: transform .2s;
+}
+.advanced[open] > summary { color: var(--text); border-bottom: 1px solid var(--border); }
+.advanced[open] .advanced-chevron { transform: rotate(90deg); color: var(--blue-2); }
+.advanced-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.advanced-help {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--muted-2);
+  line-height: 1.5;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.tool-hero {
+  margin: 0 0 22px;
+  padding: 0;
+  text-align: left;
+}
+.tool-hero-eyebrow {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: .14em;
+  color: var(--blue-3);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.tool-hero-title {
+  margin: 0 0 8px;
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  line-height: 1.15;
+}
+.tool-hero-sub {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14.5px;
+  max-width: 60ch;
+  line-height: 1.55;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+@media (max-width: 980px) {
+  .workspace { grid-template-columns: 1fr; }
+}
+
+.tool-nav {
+  position: sticky;
+  top: 18px;
+  background: linear-gradient(180deg, var(--surface), var(--bg-2));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  box-shadow: var(--shadow-1);
+}
+@media (max-width: 980px) {
+  .tool-nav { position: static; padding: 14px; }
+}
+.tool-nav-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .12em;
+  color: var(--muted-2);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.tool-nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+@media (max-width: 980px) {
+  .tool-nav-list {
+    flex-direction: row;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 4px;
+    margin: 0 -14px;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}
+.tool-item {
+  all: unset;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--muted);
+  transition: background .15s, border-color .15s, color .15s, transform .1s;
+  font-family: var(--sans);
+}
+@media (max-width: 980px) {
+  .tool-item { flex: 0 0 auto; scroll-snap-align: start; }
+}
+.tool-item:hover {
+  background: var(--surface-2);
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+.tool-item:active { transform: scale(.98); }
+.tool-item:focus-visible {
+  outline: none;
+  border-color: var(--blue-2);
+  box-shadow: 0 0 0 3px rgba(59,130,246,.18);
+}
+.tool-item.is-active {
+  background: linear-gradient(180deg, rgba(59,130,246,.18), rgba(59,130,246,.04));
+  border-color: rgba(96,165,250,.55);
+  color: #fff;
+  box-shadow: 0 0 0 1px rgba(96,165,250,.25) inset;
+}
+.tool-glyph {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  color: var(--blue-2);
+}
+.tool-item.is-active .tool-glyph {
+  background: rgba(59,130,246,.16);
+  border-color: rgba(96,165,250,.45);
+  color: var(--blue-3);
+}
+.tool-glyph svg { width: 18px; height: 18px; }
+.tool-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.tool-item-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: inherit;
+  white-space: nowrap;
+}
+.tool-item-desc {
+  font-size: 11.5px;
+  color: var(--muted-2);
+  font-family: var(--mono);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tool-item.is-active .tool-item-desc { color: var(--blue-3); opacity: .8; }
+.tool-nav-foot {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-size: 11.5px;
+  color: var(--muted-2);
+  line-height: 1.5;
+  font-family: var(--sans);
+}
+@media (max-width: 980px) { .tool-nav-foot { display: none; } }
+
+.step-badge {
+  display: none;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.step-badge-primary {
+  color: var(--blue-3);
+  background: rgba(59,130,246,.14);
+  border: 1px solid rgba(96,165,250,.45);
+}
+.step-badge-optional {
+  color: var(--muted-2);
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+}
+
+.converter-card:not([data-tool="all"]) .step-block.is-primary {
+  border-color: rgba(96,165,250,.55);
+  box-shadow: 0 0 0 1px rgba(96,165,250,.18) inset, var(--shadow-blue);
+  border-top-color: rgba(96,165,250,.55);
+}
+.converter-card:not([data-tool="all"]) .step-block.is-primary .step-badge-primary {
+  display: inline-flex;
+  align-items: center;
+}
+.converter-card:not([data-tool="all"]) .step-block.is-secondary {
+  display: none;
+}
+.converter-card:not([data-tool="all"]) .step-block.is-secondary.is-revealed {
+  display: block;
+  opacity: .92;
+}
+.converter-card:not([data-tool="all"]) .step-block.is-secondary.is-revealed .step-badge-optional {
+  display: inline-flex;
+  align-items: center;
+}
+
+.also-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 24px 0 0;
+  padding: 12px 14px;
+  background: var(--bg-2);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+}
+.also-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+}
+.also-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.also-chip {
+  all: unset;
+  cursor: pointer;
+  padding: 6px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 600;
+  font-family: var(--sans);
+  transition: color .15s, border-color .15s, background .15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.also-chip::before {
+  content: '+';
+  color: var(--blue-2);
+  font-weight: 700;
+}
+.also-chip:hover { color: var(--text); border-color: var(--border-strong); background: var(--surface-2); }
+.also-chip.is-on {
+  color: #fff;
+  background: linear-gradient(180deg, rgba(59,130,246,.18), rgba(59,130,246,.06));
+  border-color: rgba(96,165,250,.55);
+}
+.also-chip.is-on::before { content: '\2212'; }
+
+@media (max-width: 980px) {
+  .workspace { grid-template-columns: 1fr; gap: 14px; }
+
+  .tool-hero { margin-bottom: 14px; }
+  .tool-hero-title { font-size: 22px; }
+  .tool-hero-sub { font-size: 13.5px; }
+
+  .tool-nav {
+    position: static;
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+  }
+  .tool-nav-title,
+  .tool-nav-foot { display: none; }
+
+  .tool-nav-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    gap: 8px;
+    padding: 4px 16px 8px;
+    margin: 0 -16px;
+  }
+  .tool-nav-list::-webkit-scrollbar { display: none; }
+
+  .tool-item {
+    all: unset;
+    box-sizing: border-box;
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px 8px 8px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--bg-2);
+    color: var(--muted);
+    cursor: pointer;
+    font-family: var(--sans);
+    transition: background .15s, border-color .15s, color .15s;
+  }
+  .tool-item:hover {
+    background: var(--surface-2);
+    border-color: var(--border-strong);
+    color: var(--text);
+  }
+  .tool-item.is-active {
+    background: linear-gradient(180deg, rgba(59,130,246,.22), rgba(59,130,246,.06));
+    border-color: rgba(96,165,250,.6);
+    color: #fff;
+    box-shadow: 0 0 0 1px rgba(96,165,250,.3) inset;
+  }
+  .tool-glyph {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--blue-2);
+    flex-shrink: 0;
+  }
+  .tool-item.is-active .tool-glyph {
+    background: rgba(59,130,246,.18);
+    border-color: rgba(96,165,250,.5);
+    color: var(--blue-3);
+  }
+  .tool-glyph svg { width: 14px; height: 14px; }
+  .tool-text {
+    flex-direction: row;
+    align-items: center;
+    gap: 0;
+  }
+  .tool-item-name {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+  }
+  .tool-item-desc { display: none; }
+
+  .stepper {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding: 8px;
+    margin-bottom: 18px;
+  }
+  .stepper::-webkit-scrollbar { display: none; }
+  .stepper-item {
+    flex: 0 0 auto;
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+  .stepper-label { font-size: 12px; }
+
+  .also-bar { margin-top: 18px; padding: 10px 12px; gap: 8px; }
+  .also-label { font-size: 10.5px; }
+  .also-chip { font-size: 12px; padding: 5px 10px; }
+}
+
+@media (max-width: 520px) {
+  .tool-nav-list { padding-left: 14px; padding-right: 14px; margin: 0 -14px; }
+  .tool-item { padding: 7px 12px 7px 7px; gap: 7px; }
+  .tool-glyph { width: 26px; height: 26px; }
+  .tool-item-name { font-size: 12.5px; }
+}
+
+.t-short { display: none; }
+@media (max-width: 980px) {
+  .t-long { display: none; }
+  .t-short { display: inline; }
+}
+
+@media (max-width: 980px) {
+  .tool-nav { position: relative; }
+  .tool-nav::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -16px;
+    bottom: 8px;
+    width: 44px;
+    pointer-events: none;
+    background: linear-gradient(to right, rgba(7,9,15,0), var(--bg) 80%);
+    z-index: 2;
+  }
+  .tool-nav::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -16px;
+    bottom: 8px;
+    width: 20px;
+    pointer-events: none;
+    background: linear-gradient(to left, rgba(7,9,15,0), var(--bg) 80%);
+    z-index: 2;
+  }
+
+  .card { padding: 18px 16px; }
+  .card-head {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 18px;
+    gap: 6px;
+  }
+  .card-head h2 { font-size: 19px; }
+  .endpoint-pill {
+    width: auto;
+    max-width: 100%;
+    font-size: 11.5px;
+    padding: 4px 9px;
+  }
+}
+
+@media (max-width: 520px) {
+  .tool-item { padding: 7px 11px 7px 6px; gap: 6px; }
+  .tool-glyph { width: 24px; height: 24px; border-radius: 7px; }
+  .tool-glyph svg { width: 13px; height: 13px; }
+  .tool-item-name { font-size: 12px; }
+  .tool-nav::after { width: 36px; }
+}
 </style>
 </head>
 <body>
@@ -934,126 +1581,279 @@ input[type="url"]:focus, input[type="number"]:focus, .select:focus {
     </section>
 
     <section class="converter-section" id="converter">
-      <div class="card converter-card">
-        <div class="card-head">
-          <h2>
-            <svg class="head-icon" viewBox="0 0 16 16"><use href="#pixl-arrow"/></svg>
-            Converter
-          </h2>
-          <span class="endpoint-pill" id="endpointPill">/convert-image</span>
-        </div>
+      <div class="tool-hero" id="toolHero">
+        <div class="tool-hero-eyebrow" id="toolHeroEyebrow">All-in-one image tool</div>
+        <h2 class="tool-hero-title" id="toolHeroTitle">Resize, crop, and convert any image</h2>
+        <p class="tool-hero-sub" id="toolHeroSub">Pick a tool on the left, or use them all in one go. Same engine, same file. No upload required twice.</p>
+      </div>
 
-        <div class="step-block">
-          <div class="step-tag">1 · Source</div>
-          <div class="tabs" role="tablist">
-            <button class="tab active" data-tab="url" type="button" role="tab" aria-selected="true">URL</button>
-            <button class="tab" data-tab="upload" type="button" role="tab" aria-selected="false">Upload</button>
+      <div class="workspace">
+        <aside class="tool-nav" id="toolNav" aria-label="Choose a tool">
+          <div class="tool-nav-title">Tools</div>
+          <div class="tool-nav-list">
+            <button class="tool-item is-active" type="button" data-tool="all" data-href="/converter">
+              <span class="tool-glyph" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+              </span>
+              <span class="tool-text">
+                <span class="tool-item-name"><span class="t-long">All-in-one</span><span class="t-short">All</span></span>
+                <span class="tool-item-desc">Every step, one flow</span>
+              </span>
+            </button>
+            <button class="tool-item" type="button" data-tool="convert" data-href="/convert">
+              <span class="tool-glyph" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h11"/><path d="M12 5l3 3-3 3"/><path d="M20 16H9"/><path d="M12 13l-3 3 3 3"/></svg>
+              </span>
+              <span class="tool-text">
+                <span class="tool-item-name"><span class="t-long">Convert format</span><span class="t-short">Convert</span></span>
+                <span class="tool-item-desc">PNG &middot; JPG &middot; WebP &middot; GIF &middot; BMP &middot; JSON</span>
+              </span>
+            </button>
+            <button class="tool-item" type="button" data-tool="resize" data-href="/resize">
+              <span class="tool-glyph" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 4v16"/><path d="M4 9h16"/></svg>
+              </span>
+              <span class="tool-text">
+                <span class="tool-item-name"><span class="t-long">Resize image</span><span class="t-short">Resize</span></span>
+                <span class="tool-item-desc">Any size up to 4096px</span>
+              </span>
+            </button>
+            <button class="tool-item" type="button" data-tool="crop" data-href="/crop">
+              <span class="tool-glyph" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v16a2 2 0 0 0 2 2h14"/><path d="M2 6h16a2 2 0 0 1 2 2v14"/></svg>
+              </span>
+              <span class="tool-text">
+                <span class="tool-item-name"><span class="t-long">Crop image</span><span class="t-short">Crop</span></span>
+                <span class="tool-item-desc">Free or aspect-locked</span>
+              </span>
+            </button>
+            <button class="tool-item" type="button" data-tool="pixelate" data-href="/pixelate">
+              <span class="tool-glyph" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="5" height="5"/><rect x="10" y="3" width="5" height="5"/><rect x="17" y="3" width="4" height="5"/><rect x="3" y="10" width="5" height="5"/><rect x="10" y="10" width="5" height="5"/><rect x="3" y="17" width="5" height="4"/></svg>
+              </span>
+              <span class="tool-text">
+                <span class="tool-item-name"><span class="t-long">Pixelate</span><span class="t-short">Pixelate</span></span>
+                <span class="tool-item-desc">Sprite / pixel-art mode</span>
+              </span>
+            </button>
+            <button class="tool-item" type="button" data-tool="grid" data-href="/pixel-grid">
+              <span class="tool-glyph" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/><path d="M4 14h16"/><path d="M9 4v16"/><path d="M14 4v16"/></svg>
+              </span>
+              <span class="tool-text">
+                <span class="tool-item-name"><span class="t-long">Pixel grid JSON</span><span class="t-short">Pixel grid</span></span>
+                <span class="tool-item-desc">RGB array for sprites</span>
+              </span>
+            </button>
           </div>
+          <div class="tool-nav-foot">Switch tools any time. Your image stays loaded.</div>
+        </aside>
 
-          <div class="tab-panel" data-panel="url">
-            <label class="field-label" for="imageUrl">Image URL</label>
-            <div class="input-row">
-              <input id="imageUrl" type="url" autocomplete="off" spellcheck="false"
-                     placeholder="https://example.com/image.png" />
-              <button id="pasteBtn" class="icon-btn" title="Paste from clipboard" type="button">PASTE</button>
-              <button id="loadUrlBtn" class="btn btn-ghost btn-compact" type="button">Load</button>
+        <div class="workspace-main">
+          <div class="card converter-card" id="converterCard" data-tool="all">
+            <div class="card-head">
+              <h2>
+                <svg class="head-icon" viewBox="0 0 16 16"><use href="#pixl-arrow"/></svg>
+                <span id="converterCardTitle">Converter</span>
+              </h2>
+              <span class="endpoint-pill" id="endpointPill">/convert-image</span>
             </div>
-          </div>
 
-          <div class="tab-panel hidden" data-panel="upload">
-            <label class="field-label">Drop a file or click to browse</label>
-            <div class="drop-zone" id="dropZone" tabindex="0" role="button" aria-label="Upload image">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="drop-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              <div class="drop-text">
-                <strong>Drop image here</strong>
-                <span>or click to choose · PNG · JPG · WebP · GIF · BMP</span>
+            <ol class="stepper" id="stepper" aria-label="Conversion steps">
+              <li class="stepper-item is-active" data-stepper="1"><span class="stepper-num">1</span><span class="stepper-label">Source</span></li>
+              <li class="stepper-item" data-stepper="2"><span class="stepper-num">2</span><span class="stepper-label">Crop</span></li>
+              <li class="stepper-item" data-stepper="3"><span class="stepper-num">3</span><span class="stepper-label">Size</span></li>
+              <li class="stepper-item" data-stepper="4"><span class="stepper-num">4</span><span class="stepper-label">Format</span></li>
+              <li class="stepper-item" data-stepper="5"><span class="stepper-num">5</span><span class="stepper-label">Finish</span></li>
+            </ol>
+
+            <div class="step-block" data-step-block="1" data-step-name="source">
+              <header class="step-header">
+                <div class="step-tag">Step 1 &middot; Source</div>
+                <h3 class="step-title">Choose your image</h3>
+                <p class="step-sub">Paste a URL or drop a file from your computer. PNG, JPG, WebP, GIF, and BMP all work.</p>
+              </header>
+              <div class="tabs" role="tablist">
+                <button class="tab active" data-tab="url" type="button" role="tab" aria-selected="true">URL</button>
+                <button class="tab" data-tab="upload" type="button" role="tab" aria-selected="false">Upload</button>
               </div>
-              <input id="fileInput" type="file" accept="image/*" hidden />
-            </div>
-          </div>
-        </div>
 
-        <div class="step-block hidden" id="cropBlock">
-          <div class="step-tag">2 · Crop</div>
-          <div class="crop-toolbar">
-            <button class="icon-btn" id="resetCrop" type="button">RESET</button>
-            <button class="icon-btn" id="fullCrop" type="button">FULL</button>
-            <div class="crop-spacer"></div>
-            <span class="crop-meta" id="cropMeta">—</span>
-          </div>
-          <div class="crop-stage">
-            <img id="cropImage" alt="" />
-          </div>
-        </div>
-
-        <div class="step-block hidden" id="outputBlock">
-          <div class="step-tag">3 · Output</div>
-
-          <div class="grid-2">
-            <div class="option-group">
-              <div class="option-label">Dimensions</div>
-              <div class="dim-row">
-                <input id="widthInput" type="number" min="1" max="4096" value="32" />
-                <button id="lockBtn" class="lock-btn locked" type="button" aria-label="Lock aspect ratio">
-                  <svg class="lock-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                  <svg class="lock-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
-                </button>
-                <input id="heightInput" type="number" min="1" max="4096" value="32" />
-                <span class="dim-suffix">px</span>
+              <div class="tab-panel" data-panel="url">
+                <label class="field-label" for="imageUrl">Image URL</label>
+                <div class="input-row">
+                  <input id="imageUrl" type="url" autocomplete="off" spellcheck="false"
+                         placeholder="https://example.com/image.png" />
+                  <button id="pasteBtn" class="icon-btn" title="Paste from clipboard" type="button">PASTE</button>
+                  <button id="loadUrlBtn" class="btn btn-ghost btn-compact" type="button">Load</button>
+                </div>
               </div>
-              <div class="preset-row">
-                <button class="preset" data-preset="32x32" type="button">32×32</button>
-                <button class="preset" data-preset="64x64" type="button">64×64</button>
-                <button class="preset" data-preset="128x128" type="button">128×128</button>
-                <button class="preset" data-preset="256x256" type="button">256×256</button>
-                <button class="preset" data-preset="512x512" type="button">512×512</button>
-                <button class="preset" data-preset="1024x1024" type="button">1024²</button>
+
+              <div class="tab-panel hidden" data-panel="upload">
+                <label class="field-label">Drop a file or click to browse</label>
+                <div class="drop-zone" id="dropZone" tabindex="0" role="button" aria-label="Upload image">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="drop-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  <div class="drop-text">
+                    <strong>Drop image here</strong>
+                    <span>or click to choose &middot; PNG &middot; JPG &middot; WebP &middot; GIF &middot; BMP</span>
+                  </div>
+                  <input id="fileInput" type="file" accept="image/*" hidden />
+                </div>
               </div>
             </div>
 
-            <div class="option-group">
-              <div class="option-label">Format</div>
-              <select id="formatSelect" class="select">
-                <option value="png">PNG · transparent</option>
-                <option value="jpeg">JPEG · smallest</option>
-                <option value="webp">WebP · modern</option>
-                <option value="bmp">BMP · raw</option>
-                <option value="gif">GIF · paletted</option>
-                <option value="json">Pixel Grid · JSON</option>
-              </select>
-              <div class="option-label" style="margin-top:14px">Resize behaviour</div>
-              <div class="option-row">
-                <label class="seg"><input type="radio" name="resizeMode" value="crop" checked /><span>Crop</span></label>
-                <label class="seg"><input type="radio" name="resizeMode" value="stretch" /><span>Stretch</span></label>
-                <label class="seg"><input type="radio" name="resizeMode" value="fit" /><span>Fit</span></label>
+            <div class="step-block hidden" id="cropBlock" data-step-block="2" data-step-name="crop">
+              <header class="step-header">
+                <div class="step-tag">Step 2 &middot; Crop <span class="step-badge step-badge-primary">Primary</span><span class="step-badge step-badge-optional">Optional</span></div>
+                <h3 class="step-title">Crop your image</h3>
+                <p class="step-sub">Drag the box to trim, or use Full to skip cropping entirely.</p>
+              </header>
+              <div class="crop-toolbar">
+                <button class="icon-btn" id="resetCrop" type="button">RESET</button>
+                <button class="icon-btn" id="fullCrop" type="button">FULL</button>
+                <div class="crop-spacer"></div>
+                <span class="crop-meta" id="cropMeta">&mdash;</span>
               </div>
-              <label class="toggle" style="margin-top:12px">
-                <input type="checkbox" id="simpleMode" />
-                <span class="toggle-track"><span class="toggle-thumb"></span></span>
-                <span class="toggle-text">Pixel art (nearest neighbour)</span>
-              </label>
-            </div>
-          </div>
-
-          <button id="convertBtn" class="btn btn-primary btn-full" type="button">
-            <svg class="btn-icon" viewBox="0 0 16 16"><use href="#pixl-arrow"/></svg>
-            <span id="convertLabel">Convert</span>
-          </button>
-
-          <div class="status" id="status" role="status" aria-live="polite"></div>
-
-          <div class="result hidden" id="result">
-            <div class="result-head">
-              <div class="result-meta">
-                <span class="meta-chip"><strong id="metaSize">—</strong> source</span>
-                <span class="meta-chip"><strong id="metaFinal">—</strong> output</span>
-                <span class="meta-chip"><strong id="metaMethod">—</strong> method</span>
-                <span class="meta-chip"><strong id="metaWeight">—</strong> size</span>
-                <span class="meta-chip"><strong id="metaTime">—</strong> ms</span>
+              <div class="crop-stage">
+                <img id="cropImage" alt="" />
               </div>
-              <div class="result-actions" id="resultActions"></div>
             </div>
-            <div class="preview-wrap" id="previewWrap"></div>
+
+            <div id="outputBlock" class="hidden output-stack">
+
+              <div class="also-bar" id="alsoBar" hidden>
+                <span class="also-label">Also adjust:</span>
+                <div class="also-chips" id="alsoChips"></div>
+              </div>
+
+              <div class="step-block" data-step-block="3" data-step-name="size">
+                <header class="step-header">
+                  <div class="step-tag">Step 3 &middot; Size <span class="step-badge step-badge-primary">Primary</span><span class="step-badge step-badge-optional">Optional</span></div>
+                  <h3 class="step-title">Set your dimensions</h3>
+                  <p class="step-sub">Type a custom size, or pick a sprite preset. Lock the ratio to scale proportionally.</p>
+                </header>
+                <div class="option-group">
+                  <div class="option-label">Width &times; Height</div>
+                  <div class="dim-row">
+                    <input id="widthInput" type="number" min="1" max="4096" value="32" />
+                    <button id="lockBtn" class="lock-btn locked" type="button" aria-label="Lock aspect ratio">
+                      <svg class="lock-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                      <svg class="lock-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
+                    </button>
+                    <input id="heightInput" type="number" min="1" max="4096" value="32" />
+                    <span class="dim-suffix">px</span>
+                  </div>
+                  <div class="preset-label">Quick presets</div>
+                  <div class="preset-row">
+                    <button class="preset" data-preset="32x32" type="button">32&times;32</button>
+                    <button class="preset" data-preset="64x64" type="button">64&times;64</button>
+                    <button class="preset" data-preset="128x128" type="button">128&times;128</button>
+                    <button class="preset" data-preset="256x256" type="button">256&times;256</button>
+                    <button class="preset" data-preset="512x512" type="button">512&times;512</button>
+                    <button class="preset" data-preset="1024x1024" type="button">1024&sup2;</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="step-block" data-step-block="4" data-step-name="format">
+                <header class="step-header">
+                  <div class="step-tag">Step 4 &middot; Format <span class="step-badge step-badge-primary">Primary</span><span class="step-badge step-badge-optional">Optional</span></div>
+                  <h3 class="step-title">Pick an output format</h3>
+                  <p class="step-sub">Each format is best for a different job. Click a card to choose.</p>
+                </header>
+                <div class="format-grid" id="formatGrid" role="radiogroup" aria-label="Output format">
+                  <button class="format-card is-active" data-format="png" type="button" role="radio" aria-checked="true">
+                    <span class="format-name">PNG</span>
+                    <span class="format-desc">Transparent &middot; lossless</span>
+                  </button>
+                  <button class="format-card" data-format="jpeg" type="button" role="radio" aria-checked="false">
+                    <span class="format-name">JPEG</span>
+                    <span class="format-desc">Smallest &middot; lossy</span>
+                  </button>
+                  <button class="format-card" data-format="webp" type="button" role="radio" aria-checked="false">
+                    <span class="format-name">WebP</span>
+                    <span class="format-desc">Modern &middot; efficient</span>
+                  </button>
+                  <button class="format-card" data-format="bmp" type="button" role="radio" aria-checked="false">
+                    <span class="format-name">BMP</span>
+                    <span class="format-desc">Raw &middot; uncompressed</span>
+                  </button>
+                  <button class="format-card" data-format="gif" type="button" role="radio" aria-checked="false">
+                    <span class="format-name">GIF</span>
+                    <span class="format-desc">Paletted &middot; 256 colors</span>
+                  </button>
+                  <button class="format-card" data-format="json" type="button" role="radio" aria-checked="false">
+                    <span class="format-name">JSON</span>
+                    <span class="format-desc">Pixel grid &middot; sprites</span>
+                  </button>
+                </div>
+                <select id="formatSelect" class="visually-hidden" aria-hidden="true" tabindex="-1">
+                  <option value="png">PNG &middot; transparent</option>
+                  <option value="jpeg">JPEG &middot; smallest</option>
+                  <option value="webp">WebP &middot; modern</option>
+                  <option value="bmp">BMP &middot; raw</option>
+                  <option value="gif">GIF &middot; paletted</option>
+                  <option value="json">Pixel Grid &middot; JSON</option>
+                </select>
+              </div>
+
+              <div class="step-block" data-step-block="5" data-step-name="behaviour">
+                <header class="step-header">
+                  <div class="step-tag">Step 5 &middot; Behaviour <span class="step-badge step-badge-primary">Primary</span><span class="step-badge step-badge-optional">Optional</span></div>
+                  <h3 class="step-title">How should we resize?</h3>
+                  <p class="step-sub">Tell PIXL what to do when the input shape doesn't match your output ratio.</p>
+                </header>
+                <div class="behaviour-grid">
+                  <label class="behaviour-card">
+                    <input type="radio" name="resizeMode" value="crop" checked />
+                    <span class="behaviour-name">Crop</span>
+                    <span class="behaviour-desc">Fills exactly. Trims any extra edges.</span>
+                  </label>
+                  <label class="behaviour-card">
+                    <input type="radio" name="resizeMode" value="stretch" />
+                    <span class="behaviour-name">Stretch</span>
+                    <span class="behaviour-desc">Fills exactly. May distort the image.</span>
+                  </label>
+                  <label class="behaviour-card">
+                    <input type="radio" name="resizeMode" value="fit" />
+                    <span class="behaviour-name">Fit</span>
+                    <span class="behaviour-desc">Keeps aspect. Adds transparent padding.</span>
+                  </label>
+                </div>
+
+                <details class="advanced" id="advancedBlock">
+                  <summary><span class="advanced-summary-text">Pixel art &amp; advanced</span><span class="advanced-chevron">&rsaquo;</span></summary>
+                  <div class="advanced-body">
+                    <label class="toggle">
+                      <input type="checkbox" id="simpleMode" />
+                      <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                      <span class="toggle-text">Pixel art mode (nearest neighbour)</span>
+                    </label>
+                    <p class="advanced-help">Best for sprites and low-res art. Keeps crisp edges instead of smoothing them.</p>
+                  </div>
+                </details>
+              </div>
+
+              <button id="convertBtn" class="btn btn-primary btn-full" type="button">
+                <svg class="btn-icon" viewBox="0 0 16 16"><use href="#pixl-arrow"/></svg>
+                <span id="convertLabel">Convert</span>
+              </button>
+
+              <div class="status" id="status" role="status" aria-live="polite"></div>
+
+              <div class="result hidden" id="result">
+                <div class="result-head">
+                  <div class="result-meta">
+                    <span class="meta-chip"><strong id="metaSize">&mdash;</strong> source</span>
+                    <span class="meta-chip"><strong id="metaFinal">&mdash;</strong> output</span>
+                    <span class="meta-chip"><strong id="metaMethod">&mdash;</strong> method</span>
+                    <span class="meta-chip"><strong id="metaWeight">&mdash;</strong> size</span>
+                    <span class="meta-chip"><strong id="metaTime">&mdash;</strong> ms</span>
+                  </div>
+                  <div class="result-actions" id="resultActions"></div>
+                </div>
+                <div class="preview-wrap" id="previewWrap"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -1740,6 +2540,244 @@ function downloadGridAsPng(pixels, w, h) {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   });
 }
+
+
+(function setupFriendlyConverter() {
+  const formatGrid = document.getElementById('formatGrid');
+  const formatSelect = document.getElementById('formatSelect');
+  if (formatGrid && formatSelect) {
+    const cards = formatGrid.querySelectorAll('.format-card');
+    function syncCards(value) {
+      cards.forEach(c => {
+        const on = c.dataset.format === value;
+        c.classList.toggle('is-active', on);
+        c.setAttribute('aria-checked', on ? 'true' : 'false');
+      });
+    }
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        const v = card.dataset.format;
+        if (formatSelect.value !== v) {
+          formatSelect.value = v;
+          formatSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        syncCards(v);
+      });
+    });
+    formatSelect.addEventListener('change', () => syncCards(formatSelect.value));
+    syncCards(formatSelect.value || 'png');
+  }
+
+  const stepperItems = document.querySelectorAll('.stepper-item');
+  const cropBlock = document.getElementById('cropBlock');
+  const outputBlock = document.getElementById('outputBlock');
+  function refreshStepper() {
+    const cropVisible = cropBlock && !cropBlock.classList.contains('hidden');
+    const outputVisible = outputBlock && !outputBlock.classList.contains('hidden');
+    stepperItems.forEach(item => {
+      item.classList.remove('is-active', 'is-done');
+    });
+    if (!cropVisible && !outputVisible) {
+      stepperItems[0]?.classList.add('is-active');
+    } else if (cropVisible && !outputVisible) {
+      stepperItems[0]?.classList.add('is-done');
+      stepperItems[1]?.classList.add('is-active');
+    } else if (outputVisible) {
+      stepperItems[0]?.classList.add('is-done');
+      stepperItems[1]?.classList.add('is-done');
+      stepperItems[2]?.classList.add('is-active');
+      stepperItems[3]?.classList.add('is-active');
+      stepperItems[4]?.classList.add('is-active');
+    }
+  }
+  refreshStepper();
+  if (cropBlock) new MutationObserver(refreshStepper).observe(cropBlock, { attributes: true, attributeFilter: ['class'] });
+  if (outputBlock) new MutationObserver(refreshStepper).observe(outputBlock, { attributes: true, attributeFilter: ['class'] });
+})();
+
+
+(function setupToolRouter() {
+  const TOOLS = {
+    all: {
+      title: 'Resize, crop, and convert any image',
+      eyebrow: 'All-in-one image tool',
+      sub: 'Pick a tool on the left, or use them all in one go. Same engine, same file. No upload required twice.',
+      cardTitle: 'Converter',
+      primary: null,
+      secondary: [],
+      defaultFormat: null,
+      defaultPixel: null
+    },
+    convert: {
+      title: 'Convert your image to any format',
+      eyebrow: 'Format converter',
+      sub: 'Drop in any image and ship it as PNG, JPEG, WebP, BMP, GIF, or a raw pixel-grid JSON. Free, fast, browser-based.',
+      cardTitle: 'Convert format',
+      primary: 'format',
+      secondary: ['crop', 'size', 'behaviour'],
+      defaultFormat: null,
+      defaultPixel: null
+    },
+    resize: {
+      title: 'Resize an image to any pixel size',
+      eyebrow: 'Image resizer',
+      sub: 'Any width, any height, up to 4096px. Lock the aspect ratio, or pick a sprite preset in one click.',
+      cardTitle: 'Resize image',
+      primary: 'size',
+      secondary: ['crop', 'format', 'behaviour'],
+      defaultFormat: null,
+      defaultPixel: null
+    },
+    crop: {
+      title: 'Crop an image to the perfect frame',
+      eyebrow: 'Image cropper',
+      sub: 'Drag the crop box, lock to your output aspect, or fill the frame in a click. Then ship it in any format you want.',
+      cardTitle: 'Crop image',
+      primary: 'crop',
+      secondary: ['size', 'format', 'behaviour'],
+      defaultFormat: null,
+      defaultPixel: null
+    },
+    pixelate: {
+      title: 'Pixelate any image into clean sprite art',
+      eyebrow: 'Pixel-art mode',
+      sub: 'Nearest-neighbour scaling, low-res presets, crisp edges. Perfect for game sprites, avatars, and 8-bit aesthetics.',
+      cardTitle: 'Pixelate',
+      primary: 'size',
+      secondary: ['crop', 'format', 'behaviour'],
+      defaultFormat: 'png',
+      defaultPixel: true
+    },
+    grid: {
+      title: 'Export an image as an RGB pixel grid',
+      eyebrow: 'Pixel grid JSON',
+      sub: 'Get the raw RGB grid as JSON, Lua, or hex. Pipe it straight into Roblox, a game engine, or your own renderer.',
+      cardTitle: 'Pixel grid JSON',
+      primary: 'size',
+      secondary: ['crop', 'format', 'behaviour'],
+      defaultFormat: 'json',
+      defaultPixel: null
+    }
+  };
+
+  const PATH_TO_TOOL = {
+    '/converter': 'all',
+    '/convert': 'convert',
+    '/convert-format': 'convert',
+    '/resize': 'resize',
+    '/crop': 'crop',
+    '/pixelate': 'pixelate',
+    '/pixel-art': 'pixelate',
+    '/pixel-grid': 'grid'
+  };
+
+  const card = document.getElementById('converterCard');
+  const heroEyebrow = document.getElementById('toolHeroEyebrow');
+  const heroTitle = document.getElementById('toolHeroTitle');
+  const heroSub = document.getElementById('toolHeroSub');
+  const cardTitle = document.getElementById('converterCardTitle');
+  const navItems = document.querySelectorAll('.tool-item');
+  const alsoBar = document.getElementById('alsoBar');
+  const alsoChips = document.getElementById('alsoChips');
+  const stepBlocks = document.querySelectorAll('.step-block[data-step-name]');
+  const simpleMode = document.getElementById('simpleMode');
+  const formatSelect = document.getElementById('formatSelect');
+  const advancedBlock = document.getElementById('advancedBlock');
+
+  const STEP_LABEL = {
+    crop: 'Crop',
+    size: 'Resize',
+    format: 'Change format',
+    behaviour: 'Fit / stretch'
+  };
+
+  let currentTool = 'all';
+  const revealed = new Set();
+
+  function applyTool(toolName, opts) {
+    opts = opts || {};
+    const conf = TOOLS[toolName] || TOOLS.all;
+    currentTool = toolName;
+    revealed.clear();
+
+    card.dataset.tool = toolName;
+    heroEyebrow.textContent = conf.eyebrow;
+    heroTitle.textContent = conf.title;
+    heroSub.textContent = conf.sub;
+    cardTitle.textContent = conf.cardTitle;
+
+    navItems.forEach(item => {
+      const active = item.dataset.tool === toolName;
+      item.classList.toggle('is-active', active);
+      item.setAttribute('aria-current', active ? 'page' : 'false');
+    });
+
+    stepBlocks.forEach(block => {
+      const name = block.dataset.stepName;
+      block.classList.remove('is-primary', 'is-secondary', 'is-revealed');
+      if (toolName === 'all') return;
+      if (name === conf.primary) {
+        block.classList.add('is-primary');
+      } else if (conf.secondary.includes(name)) {
+        block.classList.add('is-secondary');
+      }
+    });
+
+    alsoChips.innerHTML = '';
+    if (toolName === 'all' || !conf.secondary.length) {
+      alsoBar.hidden = true;
+    } else {
+      conf.secondary.forEach(name => {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'also-chip';
+        chip.dataset.also = name;
+        chip.textContent = STEP_LABEL[name] || name;
+        chip.addEventListener('click', () => toggleAlso(name, chip));
+        alsoChips.appendChild(chip);
+      });
+      alsoBar.hidden = false;
+    }
+
+    if (toolName === 'pixelate' && simpleMode && opts.respectUserToggles !== true) {
+      simpleMode.checked = true;
+      if (advancedBlock) advancedBlock.open = true;
+    }
+    if (conf.defaultFormat && formatSelect) {
+      formatSelect.value = conf.defaultFormat;
+      formatSelect.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  }
+
+  function toggleAlso(name, chip) {
+    const block = document.querySelector('.step-block[data-step-name="' + name + '"]');
+    if (!block) return;
+    if (revealed.has(name)) {
+      revealed.delete(name);
+      block.classList.remove('is-revealed');
+      chip.classList.remove('is-on');
+    } else {
+      revealed.add(name);
+      block.classList.add('is-revealed');
+      chip.classList.add('is-on');
+      block.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+
+  navItems.forEach(item => {
+    item.addEventListener('click', (e) => {
+      const tool = item.dataset.tool;
+      const href = item.dataset.href;
+      applyTool(tool);
+      if (href && window.history && window.history.replaceState) {
+        try { window.history.replaceState({}, '', href); } catch (_) {}
+      }
+    });
+  });
+
+  const initialTool = PATH_TO_TOOL[window.location.pathname] || 'all';
+  applyTool(initialTool);
+})();
 
 init();
 
