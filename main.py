@@ -990,7 +990,7 @@ def get_scripts():
     if search:
         filtered_scripts = [
             script for script in safe_scripts
-            if search in script['title'].lower() or search in script['game'].lower()
+            if search in script.get('title', '').lower() or search in script.get('game', '').lower()
         ]
         return jsonify(filtered_scripts)
     return jsonify(safe_scripts)
