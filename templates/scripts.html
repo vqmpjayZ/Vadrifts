@@ -593,42 +593,98 @@
     /* ===== section separator ===== */
     .section-separator {
       max-width: 1200px;
-      margin: 80px auto 50px;
+      margin: 100px auto 60px;
       padding: 0 20px;
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 26px;
       position: relative;
       z-index: 10;
+    }
+
+    .section-separator::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 320px;
+      height: 120px;
+      background: radial-gradient(ellipse at center, rgba(155, 81, 224, 0.22), transparent 65%);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: -1;
+      filter: blur(20px);
     }
     .section-separator .sep-line {
       flex: 1;
       height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(114, 9, 183, 0.6), transparent);
+      position: relative;
+      background: linear-gradient(90deg, transparent 0%, rgba(114, 9, 183, 0.15) 20%, rgba(196, 120, 212, 0.85) 50%, rgba(114, 9, 183, 0.15) 80%, transparent 100%);
+    }
+
+    .section-separator .sep-line::after {
+      content: '';
+      position: absolute;
+      inset: -1px 0;
+      background: linear-gradient(90deg, transparent, rgba(196, 120, 212, 0.45), transparent);
+      filter: blur(4px);
+      opacity: 0.8;
+    }
+
+    .section-separator .sep-line.left {
+      mask-image: linear-gradient(90deg, transparent, #000 90%);
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 90%);
+    }
+
+    .section-separator .sep-line.right {
+      mask-image: linear-gradient(90deg, #000, transparent 90%);
+      -webkit-mask-image: linear-gradient(90deg, #000, transparent 90%);
     }
     .section-separator .sep-label {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
-      padding: 8px 22px;
+      gap: 12px;
+      padding: 10px 26px;
       border-radius: 999px;
-      border: 1px solid rgba(114, 9, 183, 0.4);
-      background: rgba(114, 9, 183, 0.08);
-      backdrop-filter: blur(10px);
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 1.5px;
+      border: 1px solid rgba(196, 120, 212, 0.45);
+      background: linear-gradient(135deg, rgba(114, 9, 183, 0.18), rgba(196, 120, 212, 0.08));
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      font-size: 12.5px;
+      font-weight: 700;
+      letter-spacing: 2.4px;
       text-transform: uppercase;
-      color: #c478d4;
-      box-shadow: 0 0 20px rgba(114, 9, 183, 0.15);
+      color: #e9c4f5;
+      box-shadow: 0 0 30px rgba(114, 9, 183, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
       white-space: nowrap;
+      position: relative;
+    }
+
+    .section-separator .sep-label::before,
+    .section-separator .sep-label::after {
+      content: '';
+      width: 14px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(196, 120, 212, 0.6));
+    }
+
+    .section-separator .sep-label::after {
+      background: linear-gradient(90deg, rgba(196, 120, 212, 0.6), transparent);
     }
     .section-separator .sep-label .sep-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #7209b7;
-      box-shadow: 0 0 10px rgba(114, 9, 183, 0.8);
+      width: 9px;
+      height: 9px;
+      background: linear-gradient(135deg, #ffffff, #c478d4 60%, #7209b7);
+      transform: rotate(45deg);
+      border-radius: 2px;
+      box-shadow: 0 0 14px rgba(196, 120, 212, 0.95), 0 0 28px rgba(114, 9, 183, 0.6);
+      animation: sep-pulse 2.6s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes sep-pulse {
+      0%, 100% { transform: rotate(45deg) scale(1); box-shadow: 0 0 14px rgba(196, 120, 212, 0.95), 0 0 28px rgba(114, 9, 183, 0.6); }
+      50% { transform: rotate(45deg) scale(1.25); box-shadow: 0 0 22px rgba(196, 120, 212, 1), 0 0 44px rgba(114, 9, 183, 0.85); }
     }
 
     /* ===== other projects section ===== */
@@ -732,6 +788,61 @@
       color: #c478d4;
       border: 1px solid rgba(114, 9, 183, 0.4);
     }
+
+    .other-status.discontinued {
+      background: rgba(239, 68, 68, 0.12);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+    }
+
+    .script-card { position: relative; }
+
+    .script-status {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      z-index: 3;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.3px;
+      padding: 5px 10px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      pointer-events: none;
+    }
+
+    .script-status.discontinued {
+      background: rgba(239, 68, 68, 0.18);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.45);
+      box-shadow: 0 4px 14px rgba(239, 68, 68, 0.25);
+    }
+
+    .script-status.patched {
+      background: rgba(255, 159, 67, 0.18);
+      color: #ffb978;
+      border: 1px solid rgba(255, 159, 67, 0.45);
+      box-shadow: 0 4px 14px rgba(255, 159, 67, 0.22);
+    }
+
+    .script-status.updated {
+      background: rgba(74, 222, 128, 0.16);
+      color: #86efac;
+      border: 1px solid rgba(74, 222, 128, 0.45);
+      box-shadow: 0 4px 14px rgba(74, 222, 128, 0.22);
+    }
+
+    .script-card.is-discontinued {
+      opacity: 0.78;
+      filter: saturate(0.85);
+    }
+
+    .script-card.is-discontinued:hover {
+      opacity: 1;
+      filter: saturate(1);
+    }
     .other-card h3 {
       font-size: 19px;
       font-weight: 700;
@@ -811,13 +922,14 @@
     </div>
   </div>
 
-  <div class="section-separator">
-    <div class="sep-line"></div>
+  <div class="section-separator" aria-hidden="true">
+    <div class="sep-line left"></div>
     <div class="sep-label">
       <span class="sep-dot"></span>
       Other Projects
+      <span class="sep-dot"></span>
     </div>
-    <div class="sep-line"></div>
+    <div class="sep-line right"></div>
   </div>
 
   <div class="other-section">
@@ -851,7 +963,21 @@
 
   <script>
     let allScripts = [];
+    let allOther = [];
     let searchTimeout = null;
+
+    const scriptStatusLabel = {
+      discontinued: "DISCONTINUED",
+      patched: "PATCHED",
+      updated: "UPDATED"
+    };
+
+    const otherStatusLabel = {
+      live: "LIVE",
+      soon: "COMING SOON",
+      planning: "PLANNING",
+      discontinued: "DISCONTINUED"
+    };
 
     function createParticles() {
       const particlesContainer = document.getElementById('particles');
@@ -870,8 +996,11 @@
     async function loadScripts() {
       try {
         const response = await fetch('/api/scripts');
-        allScripts = await response.json();
+        const data = await response.json();
+        allScripts = data.filter(s => (s.category || 'script') === 'script');
+        allOther = data.filter(s => s.category === 'dev');
         displayScripts(allScripts);
+        renderOtherProjects(allOther);
       } catch (error) {
         console.error('Failed to load scripts:', error);
         displayError();
@@ -892,27 +1021,34 @@
         return;
       }
 
-      grid.innerHTML = scripts.map(script => `
-        <div class="script-card" onclick="viewScript(${script.id})">
+      grid.innerHTML = scripts.map(script => {
+        const status = (script.status || 'active').toLowerCase();
+        const statusBadge = scriptStatusLabel[status]
+          ? `<span class="script-status ${status}">${scriptStatusLabel[status]}</span>`
+          : '';
+        const cardClass = status === 'discontinued' ? 'script-card is-discontinued' : 'script-card';
+        return `
+        <div class="${cardClass}" onclick="viewScript(${JSON.stringify(script.id)})">
+          ${statusBadge}
           <div class="script-thumbnail" style="background-image: url('${script.thumbnail}'); background-size: cover; background-position: center;"></div>
           <div class="script-game">${script.game}</div>
           <h3 class="script-title">${script.title}</h3>
           <p class="script-description">${script.description}</p>
-          
+
           <div class="script-features">
-            ${script.features.slice(0, 3).map(feature => 
+            ${script.features.slice(0, 3).map(feature =>
               `<span class="feature-tag">${feature}</span>`
             ).join('')}
             ${script.features.length > 3 ? `<span class="feature-tag">+${script.features.length - 3} more</span>` : ''}
           </div>
-          
+
           <div class="script-actions">
-            <button class="view-btn" onclick="event.stopPropagation(); viewScript(${script.id})">
+            <button class="view-btn" onclick="event.stopPropagation(); viewScript(${JSON.stringify(script.id)})">
               View Script
             </button>
           </div>
         </div>
-      `).join('');
+      `;}).join('');
     }
 
     function displayError() {
@@ -967,54 +1103,16 @@
       }
     });
 
-    // ===== Other Projects (dev tools / side stuff — easy to extend) =====
-    // Add new entries here. status: "live" | "soon" | "planning"
-    const otherProjects = [
-      {
-        title: "ArrayField",
-        icon: "\u2728",
-        description: "Roblox UI library \u2014 a modified Rayfield with the deepest feature set of any library in the scene. For devs building tools, not players using them.",
-        tags: ["Lua", "Library", "Dev Tool"],
-        status: "live",
-        link: "/docs/arrayfield",
-        external: false
-      },
-      {
-        title: "Image Converter",
-        icon: "\ud83d\uddbc\ufe0f",
-        description: "Drag, pick a format, download. Fast PNG \u2194 JPG \u2194 WEBP \u2194 AVIF conversions in the browser \u2014 no upload caps, no accounts.",
-        tags: ["Web App", "Utility"],
-        status: "live",
-        link: "/converter",
-        external: false
-      },
-      {
-        title: "Audio Editor",
-        icon: "\ud83c\udfa7",
-        description: "In-browser waveform editor \u2014 trim, fade, crossfade, export. Zero installs, runs on WebAudio + Wavesurfer.",
-        tags: ["React", "WebAudio"],
-        status: "soon",
-        link: "#",
-        external: false
-      },
-      {
-        title: "Dev CLI Toolkit",
-        icon: "\u2699\ufe0f",
-        description: "Command-line utilities for the kind of repetitive stuff that eats your day \u2014 batch renaming, log parsing, quick file conversions.",
-        tags: ["CLI", "Dev Tool", "Planned"],
-        status: "planning",
-        link: "#",
-        external: false
-      }
-    ];
-
-    function renderOtherProjects() {
+    function renderOtherProjects(projects) {
       const grid = document.getElementById('otherGrid');
       if (!grid) return;
 
-      const statusLabel = { live: "LIVE", soon: "COMING SOON", planning: "PLANNING" };
+      if (!projects || projects.length === 0) {
+        grid.innerHTML = '';
+        return;
+      }
 
-      grid.innerHTML = otherProjects.map(p => {
+      grid.innerHTML = projects.map(p => {
         const clickable = p.link && p.link !== '#';
         const onclick = clickable
           ? (p.external
@@ -1022,11 +1120,12 @@
               : `window.location.href='${p.link}'`)
           : '';
         const cursor = clickable ? 'cursor:pointer;' : 'cursor:default;';
+        const status = (p.status || '').toLowerCase();
         return `
           <div class="other-card" style="${cursor}" ${clickable ? `onclick="${onclick}"` : ''}>
             <div class="other-card-head">
-              <div class="other-card-icon">${p.icon}</div>
-              <span class="other-status ${p.status}">${statusLabel[p.status] || ''}</span>
+              <div class="other-card-icon">${p.icon || ''}</div>
+              <span class="other-status ${status}">${otherStatusLabel[status] || ''}</span>
             </div>
             <h3>${p.title}</h3>
             <p class="other-desc">${p.description}</p>
@@ -1040,7 +1139,6 @@
 
     createParticles();
     loadScripts();
-    renderOtherProjects();
 
 </script>
 </body>
