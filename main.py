@@ -13,6 +13,10 @@ from config import *
 from discord_keys_db import load_discord_keys, save_discord_keys
 from youtube_grabber import YouTubeChannelFinder
 from image_converter import convert_image_endpoint
+from image_tools import (
+    pixelate_endpoint, invert_endpoint, mirror_endpoint,
+    rotate_endpoint, format_endpoint, remove_bg_endpoint,
+)
 from plugins_manager import PluginsManager
 from scripts_data import scripts_data, process_script_data
 import sys as _sys, os as _os
@@ -1033,6 +1037,36 @@ def delete_plugin(plugin_id):
 @app.route('/convert-image', methods=['GET', 'POST'])
 def convert_image():
     return convert_image_endpoint(request)
+
+
+@app.route('/api/image/pixelate', methods=['GET', 'POST'])
+def api_image_pixelate():
+    return pixelate_endpoint(request)
+
+
+@app.route('/api/image/invert', methods=['GET', 'POST'])
+def api_image_invert():
+    return invert_endpoint(request)
+
+
+@app.route('/api/image/mirror', methods=['GET', 'POST'])
+def api_image_mirror():
+    return mirror_endpoint(request)
+
+
+@app.route('/api/image/rotate', methods=['GET', 'POST'])
+def api_image_rotate():
+    return rotate_endpoint(request)
+
+
+@app.route('/api/image/format', methods=['GET', 'POST'])
+def api_image_format():
+    return format_endpoint(request)
+
+
+@app.route('/api/image/remove-bg', methods=['GET', 'POST'])
+def api_image_remove_bg():
+    return remove_bg_endpoint(request)
 
 
 @app.route('/api/find-channels', methods=['POST'])
