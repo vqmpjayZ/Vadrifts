@@ -432,6 +432,194 @@ details.advanced[open] { padding-bottom: 14px; }
 .api-desc { color: var(--muted); font-size: 14px; }
 
 .footer { text-align: center; padding: 24px; color: var(--muted-2); font-size: 13px; }
+
+html[data-theme="dark"] body {
+  background:
+    radial-gradient(1100px 700px at 50% -220px, rgba(59,130,246,.14), transparent 70%),
+    radial-gradient(800px 600px at 90% 20%, rgba(139,92,246,.10), transparent 70%),
+    radial-gradient(700px 500px at 10% 80%, rgba(34,211,238,.08), transparent 70%),
+    linear-gradient(180deg, #07090f 0%, #050810 100%);
+}
+html[data-theme="light"] body {
+  background:
+    radial-gradient(1100px 700px at 50% -220px, rgba(59,130,246,.18), transparent 70%),
+    radial-gradient(800px 600px at 90% 20%, rgba(139,92,246,.10), transparent 70%),
+    linear-gradient(180deg, #f6f8fc 0%, #ffffff 100%);
+}
+
+body::before {
+  content: "";
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--border) 60%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--border) 60%, transparent) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, #000 0%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, #000 0%, transparent 75%);
+  opacity: .35;
+}
+body::after {
+  content: "";
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image: radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--blue) 35%, transparent) 1px, transparent 0);
+  background-size: 22px 22px;
+  mask-image: radial-gradient(ellipse 60% 50% at 50% 40%, #000 0%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse 60% 50% at 50% 40%, #000 0%, transparent 80%);
+  opacity: .18;
+}
+.nav, .hero, .section, .footer { position: relative; z-index: 1; }
+
+.ambient { position: absolute; inset: -60px -20px auto -20px; height: 520px; pointer-events: none; z-index: 0; overflow: hidden; }
+.ambient .orb {
+  position: absolute; display: block; border-radius: 50%;
+  filter: blur(80px); opacity: .55; will-change: transform;
+}
+.ambient .orb-1 { width: 360px; height: 360px; left: 6%; top: -40px;
+  background: radial-gradient(circle, rgba(59,130,246,.55), transparent 60%);
+  animation: orbFloat 18s ease-in-out infinite; }
+.ambient .orb-2 { width: 420px; height: 420px; right: 4%; top: 30px;
+  background: radial-gradient(circle, rgba(139,92,246,.45), transparent 60%);
+  animation: orbFloat 22s ease-in-out infinite reverse; }
+.ambient .orb-3 { width: 300px; height: 300px; left: 42%; top: 140px;
+  background: radial-gradient(circle, rgba(34,211,238,.35), transparent 60%);
+  animation: orbFloat 26s ease-in-out infinite; }
+@keyframes orbFloat {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(20px, -30px, 0) scale(1.08); }
+}
+html[data-theme="light"] .ambient .orb { opacity: .35; }
+
+.workspace {
+  position: relative; z-index: 1;
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border-strong) 55%, transparent);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  box-shadow:
+    0 30px 80px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.04);
+  transition: grid-template-columns .35s ease, min-height .35s ease;
+}
+html[data-theme="light"] .workspace {
+  background: color-mix(in srgb, var(--surface) 85%, transparent);
+  box-shadow: 0 20px 60px rgba(30,50,90,.10), inset 0 1px 0 rgba(255,255,255,.6);
+}
+
+.workspace[data-state="empty"] { grid-template-columns: 1fr; min-height: 380px; }
+.workspace[data-state="empty"] .side,
+.workspace[data-state="empty"] .content-head,
+.workspace[data-state="empty"] .panel,
+.workspace[data-state="empty"] .status,
+.workspace[data-state="empty"] .result { display: none !important; }
+.workspace[data-state="empty"] .content { padding: 32px clamp(20px, 4vw, 48px) 36px; gap: 0; }
+.workspace[data-state="empty"] .source { margin: 0 auto; max-width: 720px; width: 100%; }
+
+.side {
+  background: color-mix(in srgb, var(--surface-2) 65%, transparent);
+  backdrop-filter: blur(10px);
+}
+
+.source {
+  background: color-mix(in srgb, var(--surface-2) 60%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border-strong) 50%, transparent);
+  backdrop-filter: blur(10px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+}
+.source-stack { display: flex; flex-direction: column; gap: 14px; }
+.source-label {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--muted-2);
+}
+.url-row input[type="url"] {
+  flex: 1; min-width: 0;
+  background: color-mix(in srgb, var(--bg-2) 78%, transparent);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-family: var(--mono);
+  font-size: 14px;
+  transition: border-color .18s ease, box-shadow .18s ease, background-color .18s ease;
+}
+.url-row input[type="url"]:focus {
+  outline: none;
+  border-color: var(--blue);
+  background: color-mix(in srgb, var(--bg-2) 92%, transparent);
+  box-shadow: 0 0 0 3px var(--blue-glow), 0 8px 30px -10px var(--blue-glow);
+}
+
+.drop-zone {
+  position: relative;
+  border: 1.5px dashed color-mix(in srgb, var(--blue-2) 55%, var(--border-strong));
+  border-radius: 16px;
+  padding: 38px 22px;
+  text-align: center;
+  cursor: pointer;
+  background:
+    radial-gradient(420px 180px at 50% -10%, color-mix(in srgb, var(--blue) 18%, transparent), transparent 70%),
+    color-mix(in srgb, var(--bg-2) 55%, transparent);
+  color: var(--muted);
+  overflow: hidden;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  transition: border-color .18s ease, background-color .18s ease, transform .18s ease, box-shadow .18s ease;
+}
+.drop-zone::before {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    conic-gradient(from 0deg, transparent 0deg, color-mix(in srgb, var(--blue) 30%, transparent) 80deg, transparent 160deg);
+  filter: blur(28px);
+  opacity: 0;
+  transition: opacity .25s ease;
+  pointer-events: none;
+}
+.drop-zone:hover, .drop-zone.is-drag, .drop-zone:focus-visible {
+  border-color: var(--blue);
+  color: var(--text);
+  transform: translateY(-1px);
+  box-shadow: 0 18px 40px -22px var(--blue-glow);
+}
+.drop-zone:hover::before, .drop-zone.is-drag::before { opacity: .9; }
+.drop-zone strong { position: relative; font-weight: 700; color: var(--text); font-size: 15px; }
+.drop-zone .hint { position: relative; font-size: 12.5px; color: var(--muted-2); }
+.drop-icon {
+  position: relative;
+  width: 46px; height: 46px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--blue) 18%, transparent);
+  color: var(--blue-2);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--blue) 35%, transparent);
+}
+.drop-icon svg { width: 22px; height: 22px; }
+
+.panel {
+  background: color-mix(in srgb, var(--surface-2) 60%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border-strong) 45%, transparent);
+  backdrop-filter: blur(10px);
+}
+
+.canvas-stage {
+  background:
+    var(--bg-2)
+    repeating-conic-gradient(color-mix(in srgb, var(--border) 80%, transparent) 0% 25%, transparent 0% 50%) 0 0/16px 16px;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--blue) 6%, transparent);
+}
+
+.tool-btn.is-active {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--blue) 16%, transparent), color-mix(in srgb, var(--blue) 6%, transparent));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--blue) 35%, transparent), 0 10px 30px -18px var(--blue-glow);
+}
+
+.btn-primary {
+  background: linear-gradient(180deg, var(--blue-2), var(--blue));
+  box-shadow: 0 10px 26px -10px var(--blue-glow), inset 0 1px 0 rgba(255,255,255,.18);
+}
+.btn-primary:hover { filter: brightness(1.06); box-shadow: 0 14px 34px -12px var(--blue-glow), inset 0 1px 0 rgba(255,255,255,.22); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient .orb { animation: none; }
+}
   </style>
 </head>
 <body>
@@ -465,11 +653,16 @@ details.advanced[open] { padding-bottom: 14px; }
 <section class="hero">
   <div class="badge"><span class="badge-dot"></span><span>crop · resize · pixelate · draw · remove bg</span></div>
   <h1>Any image in.<br/><span class="grad">Any image out.</span></h1>
-  <p class="lede">Pick a tool on the left. Drop a URL, upload, or just paste a copied image. Ship it.</p>
+  <p class="lede">Drop a URL, upload, or paste a copied image. Tools unlock once your image is loaded.</p>
 </section>
 
 <main class="section" id="converter">
-  <div class="workspace">
+  <div class="ambient" aria-hidden="true">
+    <span class="orb orb-1"></span>
+    <span class="orb orb-2"></span>
+    <span class="orb orb-3"></span>
+  </div>
+  <div class="workspace" data-state="empty">
 
     <aside class="side" aria-label="Tools">
       <div class="side-title">Tools</div>
@@ -517,33 +710,24 @@ details.advanced[open] { padding-bottom: 14px; }
       </div>
 
       <div class="source">
-        <div class="tabs" role="tablist">
-          <button class="tab active" data-tab="url" type="button">URL</button>
-          <button class="tab" data-tab="upload" type="button">Upload</button>
-          <button class="tab" data-tab="paste" type="button">Paste</button>
-        </div>
-
-        <div class="tab-panel active" data-panel="url">
-          <div class="input-row">
+        <div class="source-stack">
+          <label class="source-label" for="imageUrl">Image URL</label>
+          <div class="input-row url-row">
             <input id="imageUrl" type="url" placeholder="https://example.com/image.png" autocomplete="off" spellcheck="false" />
-            <button id="loadUrlBtn" class="btn btn-ghost btn-compact" type="button">Load</button>
+            <button id="loadUrlBtn" class="btn btn-primary btn-compact" type="button">Load</button>
           </div>
-        </div>
 
-        <div class="tab-panel" data-panel="upload">
           <div class="drop-zone" id="dropZone" tabindex="0" role="button" aria-label="Upload image">
-            <strong>Drop image here</strong>
-            <span class="hint">or click to choose · PNG · JPG · WebP · GIF · BMP</span>
+            <span class="drop-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M5 20h14"/></svg>
+            </span>
+            <strong>Drop an image, click to browse, or paste</strong>
+            <span class="hint">PNG · JPG · WebP · GIF · BMP · Ctrl/⌘ + V works anywhere</span>
             <input id="fileInput" type="file" accept="image/*" hidden />
           </div>
         </div>
 
-        <div class="tab-panel" data-panel="paste">
-          <div class="drop-zone" id="pasteZone" tabindex="0" role="button">
-            <strong>Press Ctrl + V (or ⌘ + V) anywhere on this page</strong>
-            <span class="hint">A copied image will load automatically.</span>
-          </div>
-        </div>
+        <div id="pasteZone" hidden></div>
 
         <div class="source-meta" id="sourceMeta" hidden>
           <div class="thumb"><img id="sourceThumb" alt=""/></div>
@@ -818,12 +1002,8 @@ crop_x,crop_y,crop_w,crop_h     pre-crop in source pixels</div>
 
   $$('.tool-btn').forEach(b => b.addEventListener('click', () => setTool(b.dataset.tool)));
 
-  $$('.tab').forEach(t => t.addEventListener('click', () => {
-    $$('.tab').forEach(x => x.classList.remove('active'));
-    t.classList.add('active');
-    const which = t.dataset.tab;
-    $$('.tab-panel').forEach(p => p.classList.toggle('active', p.dataset.panel === which));
-  }));
+  const workspaceEl = $('.workspace');
+  function setWorkspaceState(s) { if (workspaceEl) workspaceEl.dataset.state = s; }
 
   function setStatus(msg, kind='') {
     const el = $('#status');
@@ -911,6 +1091,7 @@ crop_x,crop_y,crop_w,crop_h     pre-crop in source pixels</div>
     refreshActivePanel();
     setStatus('');
     hideResult();
+    setWorkspaceState('empty');
   });
 
   function loadFile(f) {
@@ -955,6 +1136,7 @@ crop_x,crop_y,crop_w,crop_h     pre-crop in source pixels</div>
 
   function onSourceReady() {
     setStatus('Loaded.', 'ok');
+    setWorkspaceState('ready');
     $('#sourceName').textContent = state.sourceName || 'image';
     $('#sourceDims').textContent = state.sourceImg.naturalWidth + ' × ' + state.sourceImg.naturalHeight + ' px';
     $('#sourceThumb').src = state.sourceImg.src;
