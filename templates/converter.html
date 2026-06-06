@@ -383,6 +383,60 @@ h1, h2, h3 { letter-spacing: -.02em; margin: 0; }
   background: var(--border);
 }
 
+.source-loaded { display: none; }
+.converter-card.has-loaded-image .source-inputs { display: none; }
+.converter-card.has-loaded-image .source-loaded {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 14px;
+  background: linear-gradient(180deg, rgba(59,130,246,.06), rgba(59,130,246,.02));
+  border: 1px solid rgba(96,165,250,.25);
+  border-radius: var(--radius);
+}
+.source-loaded-info { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.source-thumb {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #0a0f1c;
+  image-rendering: pixelated;
+  flex-shrink: 0;
+  display: none;
+}
+.source-thumb[src] { display: block; }
+.source-loaded-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.source-loaded-label {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--blue-3);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.source-loaded-label::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--blue-2);
+  box-shadow: 0 0 8px rgba(96,165,250,.7);
+}
+.source-loaded-meta {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
 .field-label {
   display: block;
   font-size: 13px;
@@ -1834,6 +1888,17 @@ input[type="url"]:focus, input[type="number"]:focus, .select:focus {
                   </div>
                 </div>
               </div>
+
+              <div class="source-loaded" id="sourceLoaded">
+                <div class="source-loaded-info">
+                  <img id="sourceThumb" class="source-thumb" alt="" />
+                  <div class="source-loaded-text">
+                    <span class="source-loaded-label">Image loaded</span>
+                    <span class="source-loaded-meta" id="sourceLoadedMeta"></span>
+                  </div>
+                </div>
+                <button id="changeImageBtn" class="icon-btn" type="button">CHANGE IMAGE</button>
+              </div>
             </div>
 
             <div class="step-block hidden" id="cropBlock" data-step-block="2" data-step-name="crop">
@@ -2419,6 +2484,28 @@ function bindUploader() {
     const f = e.dataTransfer.files && e.dataTransfer.files[0];
     if (f) loadFromFile(f);
   });
+
+  const changeBtn = byId('changeImageBtn');
+  if (changeBtn) {
+    changeBtn.addEventListener('click', () => {
+      const card = document.getElementById('converterCard');
+      if (card) card.classList.remove('has-loaded-image');
+      state.loadedSource = null;
+      state.loadedFile = null;
+      state.loadedNaturalSize = null;
+      if (state.cropper) { state.cropper.destroy(); state.cropper = null; }
+      els.url.value = '';
+      if (els.fileInput) els.fileInput.value = '';
+      const thumb = document.getElementById('sourceThumb');
+      if (thumb) thumb.removeAttribute('src');
+      const meta = document.getElementById('sourceLoadedMeta');
+      if (meta) meta.textContent = '';
+      els.cropBlock.classList.add('hidden');
+      if (els.outputBlock) els.outputBlock.classList.add('hidden');
+      setStatus('');
+      els.url.focus();
+    });
+  }
 }
 
 function bindCropControls() {
@@ -2649,6 +2736,19 @@ function loadImageInto(src) {
       state.loadedNaturalSize = { w: img.naturalWidth, h: img.naturalHeight };
       const card = document.getElementById('converterCard');
       if (card) card.classList.add('has-loaded-image');
+      const thumb = document.getElementById('sourceThumb');
+      if (thumb) thumb.src = img.src;
+      const meta = document.getElementById('sourceLoadedMeta');
+      if (meta) {
+        if (state.loadedFile) {
+          meta.textContent = `${state.loadedFile.name} \u00b7 ${img.naturalWidth}\u00d7${img.naturalHeight}`;
+        } else if (state.loadedSource && state.loadedSource.url) {
+          const u = state.loadedSource.url.replace(/^https?:\/\//, '');
+          meta.textContent = `${u.length > 48 ? u.slice(0, 45) + '\u2026' : u} \u00b7 ${img.naturalWidth}\u00d7${img.naturalHeight}`;
+        } else {
+          meta.textContent = `${img.naturalWidth}\u00d7${img.naturalHeight}`;
+        }
+      }
       animateReveal(els.cropBlock);
       animateReveal(els.outputBlock);
       state.cropper = new Cropper(img, {
