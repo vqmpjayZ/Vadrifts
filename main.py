@@ -493,6 +493,12 @@ def script_detail(script_id):
 
 
 @app.route('/converter')
+@app.route('/convert')
+@app.route('/resize')
+@app.route('/crop')
+@app.route('/pixelate')
+@app.route('/pixel-art')
+@app.route('/pixel-grid')
 def converter():
     try:
         return send_file('templates/converter.html')
