@@ -1185,6 +1185,53 @@ input[type="url"]:focus, input[type="number"]:focus, .select:focus {
     padding-right: 14px;
   }
 }
+.tool-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 10px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+  transition: border-color .15s, box-shadow .15s, background .15s;
+}
+.tool-search:focus-within {
+  border-color: var(--blue-2);
+  background: var(--bg-2);
+  box-shadow: 0 0 0 3px rgba(59,130,246,.18);
+}
+.tool-search-icon {
+  width: 15px;
+  height: 15px;
+  color: var(--muted-2);
+  flex-shrink: 0;
+}
+.tool-search input {
+  all: unset;
+  flex: 1;
+  min-width: 0;
+  font: 500 13px var(--sans);
+  color: var(--text);
+  caret-color: var(--blue-2);
+}
+.tool-search input::placeholder { color: var(--muted-2); }
+.tool-search input::-webkit-search-cancel-button { -webkit-appearance: none; }
+.tool-nav-empty {
+  margin: 4px 4px 10px;
+  padding: 10px 12px;
+  font: 500 12.5px var(--mono);
+  color: var(--muted-2);
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  background: rgba(255,255,255,.015);
+}
+.tool-item.is-hidden { display: none !important; }
+@media (max-width: 980px) {
+  .tool-search { display: none; }
+  .tool-nav-empty { display: none !important; }
+}
 .tool-item {
   all: unset;
   display: flex;
@@ -1590,6 +1637,11 @@ input[type="url"]:focus, input[type="number"]:focus, .select:focus {
       <div class="workspace">
         <aside class="tool-nav" id="toolNav" aria-label="Choose a tool">
           <div class="tool-nav-title">Tools</div>
+          <label class="tool-search" id="toolSearchWrap">
+            <svg class="tool-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input type="search" id="toolSearch" autocomplete="off" placeholder="Search tools" aria-label="Search converter tools">
+          </label>
+          <div class="tool-nav-empty" id="toolNavEmpty" hidden>No tools match that search.</div>
           <div class="tool-nav-list">
             <button class="tool-item is-active" type="button" data-tool="all" data-href="/converter">
               <span class="tool-glyph" aria-hidden="true">
@@ -2774,6 +2826,38 @@ function downloadGridAsPng(pixels, w, h) {
       }
     });
   });
+
+  const toolSearchInput = document.getElementById('toolSearch');
+  const toolNavEmpty = document.getElementById('toolNavEmpty');
+  if (toolSearchInput) {
+    const haystacks = Array.from(navItems).map(item => {
+      const name = item.querySelector('.tool-item-name');
+      const desc = item.querySelector('.tool-item-desc');
+      const tool = item.dataset.tool || '';
+      return (tool + ' ' + (name ? name.textContent : '') + ' ' + (desc ? desc.textContent : '')).toLowerCase();
+    });
+    const runFilter = () => {
+      const q = toolSearchInput.value.trim().toLowerCase();
+      let visible = 0;
+      navItems.forEach((item, i) => {
+        const match = !q || haystacks[i].includes(q);
+        item.classList.toggle('is-hidden', !match);
+        if (match) visible += 1;
+      });
+      if (toolNavEmpty) toolNavEmpty.hidden = visible !== 0;
+    };
+    toolSearchInput.addEventListener('input', runFilter);
+    toolSearchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        toolSearchInput.value = '';
+        runFilter();
+        toolSearchInput.blur();
+      } else if (e.key === 'Enter') {
+        const first = Array.from(navItems).find(item => !item.classList.contains('is-hidden'));
+        if (first) first.click();
+      }
+    });
+  }
 
   const initialTool = PATH_TO_TOOL[window.location.pathname] || 'all';
   applyTool(initialTool);
