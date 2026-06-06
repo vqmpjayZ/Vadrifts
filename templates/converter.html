@@ -1349,6 +1349,31 @@ input[type="url"]:focus, input[type="number"]:focus, .select:focus {
   display: block;
   opacity: .92;
 }
+.step-block.tool-only-block { display: none; }
+.step-block.tool-only-block.is-primary,
+.step-block.tool-only-block.is-secondary.is-revealed { display: block; }
+.crop-divider {
+  width: 1px;
+  align-self: stretch;
+  background: var(--border);
+  margin: 0 4px;
+  opacity: .7;
+}
+.rotate-angle {
+  width: 70px;
+  height: 32px;
+  padding: 0 8px;
+  font-family: var(--mono);
+  font-size: 12px;
+  text-align: center;
+  background: var(--bg-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  outline: none;
+}
+.rotate-angle:focus { border-color: var(--blue-2); }
+.rotate-angle::-webkit-inner-spin-button { opacity: .55; }
 .converter-card:not([data-tool="all"]) .step-block.is-secondary.is-revealed .step-badge-optional {
   display: inline-flex;
   align-items: center;
@@ -1685,7 +1710,25 @@ input[type="url"]:focus, input[type="number"]:focus, .select:focus {
               </span>
               <span class="tool-text">
                 <span class="tool-item-name"><span class="t-long">Pixelate</span><span class="t-short">Pixelate</span></span>
-                <span class="tool-item-desc">Sprite / pixel-art mode</span>
+                <span class="tool-item-desc">Pixel-art &middot; keeps full size</span>
+              </span>
+            </button>
+            <button class="tool-item" type="button" data-tool="invert" data-href="/invert">
+              <span class="tool-glyph" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none"/></svg>
+              </span>
+              <span class="tool-text">
+                <span class="tool-item-name"><span class="t-long">Invert colors</span><span class="t-short">Invert</span></span>
+                <span class="tool-item-desc">Negative &middot; keeps alpha</span>
+              </span>
+            </button>
+            <button class="tool-item" type="button" data-tool="mirror" data-href="/mirror">
+              <span class="tool-glyph" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M3 7l6 5-6 5z"/><path d="M21 7l-6 5 6 5z"/></svg>
+              </span>
+              <span class="tool-text">
+                <span class="tool-item-name"><span class="t-long">Mirror image</span><span class="t-short">Mirror</span></span>
+                <span class="tool-item-desc">Flip horizontal / vertical</span>
               </span>
             </button>
             <button class="tool-item" type="button" data-tool="grid" data-href="/pixel-grid">
@@ -1762,6 +1805,11 @@ input[type="url"]:focus, input[type="number"]:focus, .select:focus {
               <div class="crop-toolbar">
                 <button class="icon-btn" id="resetCrop" type="button">RESET</button>
                 <button class="icon-btn" id="fullCrop" type="button">FULL</button>
+                <span class="crop-divider" aria-hidden="true"></span>
+                <button class="icon-btn" id="rotateLeftBtn" type="button" title="Rotate 90\u00b0 counter-clockwise">&#8634; 90&deg;</button>
+                <button class="icon-btn" id="rotateRightBtn" type="button" title="Rotate 90\u00b0 clockwise">90&deg; &#8635;</button>
+                <input id="rotateAngleInput" type="number" class="rotate-angle" min="-360" max="360" step="1" value="0" aria-label="Rotation angle" title="Free rotation angle" />
+                <button class="icon-btn" id="rotateResetBtn" type="button" title="Reset rotation">UNDO</button>
                 <div class="crop-spacer"></div>
                 <span class="crop-meta" id="cropMeta">&mdash;</span>
               </div>
@@ -1775,6 +1823,79 @@ input[type="url"]:focus, input[type="number"]:focus, .select:focus {
               <div class="also-bar" id="alsoBar" hidden>
                 <span class="also-label">Also adjust:</span>
                 <div class="also-chips" id="alsoChips"></div>
+              </div>
+
+              <div class="step-block tool-only-block" id="pixelateBlock" data-step-block="3" data-step-name="pixelate">
+                <header class="step-header">
+                  <div class="step-tag">Pixelate <span class="step-badge step-badge-primary">Primary</span></div>
+                  <h3 class="step-title">Pixel-art settings</h3>
+                  <p class="step-sub">Pick a block size and a smoothing mode. Output keeps the source dimensions &mdash; no shrinking.</p>
+                </header>
+                <div class="option-group">
+                  <div class="option-label">Block size</div>
+                  <div class="dim-row">
+                    <input id="pixelBlockInput" type="number" min="2" max="128" value="10" />
+                    <span class="dim-suffix">px / block</span>
+                  </div>
+                  <div class="preset-label">Quick presets</div>
+                  <div class="preset-row">
+                    <button class="preset" data-pixel-preset="4" type="button">4</button>
+                    <button class="preset" data-pixel-preset="8" type="button">8</button>
+                    <button class="preset" data-pixel-preset="12" type="button">12</button>
+                    <button class="preset" data-pixel-preset="16" type="button">16</button>
+                    <button class="preset" data-pixel-preset="24" type="button">24</button>
+                    <button class="preset" data-pixel-preset="32" type="button">32</button>
+                  </div>
+                  <div class="option-label" style="margin-top:18px">Pixel mode</div>
+                  <div class="behaviour-grid">
+                    <label class="behaviour-card">
+                      <input type="radio" name="pixelMode" value="simple" checked />
+                      <span class="behaviour-name">Simple</span>
+                      <span class="behaviour-desc">Crisp blocks. Nearest neighbour. Best for sprites.</span>
+                    </label>
+                    <label class="behaviour-card">
+                      <input type="radio" name="pixelMode" value="og" />
+                      <span class="behaviour-name">OG</span>
+                      <span class="behaviour-desc">Averaged blocks. Softer, photo-style mosaic.</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="step-block tool-only-block" id="invertBlock" data-step-block="3" data-step-name="invert">
+                <header class="step-header">
+                  <div class="step-tag">Invert <span class="step-badge step-badge-primary">Primary</span></div>
+                  <h3 class="step-title">Invert colors</h3>
+                  <p class="step-sub">Flips every RGB channel into its negative. Alpha channel passes through unchanged.</p>
+                </header>
+                <div class="option-group">
+                  <p class="advanced-help">No options needed &mdash; just pick a format below and hit convert.</p>
+                </div>
+              </div>
+
+              <div class="step-block tool-only-block" id="mirrorBlock" data-step-block="3" data-step-name="mirror">
+                <header class="step-header">
+                  <div class="step-tag">Mirror <span class="step-badge step-badge-primary">Primary</span></div>
+                  <h3 class="step-title">Mirror / flip image</h3>
+                  <p class="step-sub">Flip horizontally, vertically, or both at once.</p>
+                </header>
+                <div class="behaviour-grid">
+                  <label class="behaviour-card">
+                    <input type="radio" name="mirrorAxis" value="h" checked />
+                    <span class="behaviour-name">Horizontal</span>
+                    <span class="behaviour-desc">Left &harr; right.</span>
+                  </label>
+                  <label class="behaviour-card">
+                    <input type="radio" name="mirrorAxis" value="v" />
+                    <span class="behaviour-name">Vertical</span>
+                    <span class="behaviour-desc">Top &harr; bottom.</span>
+                  </label>
+                  <label class="behaviour-card">
+                    <input type="radio" name="mirrorAxis" value="both" />
+                    <span class="behaviour-name">Both</span>
+                    <span class="behaviour-desc">Flips on both axes &mdash; like a 180&deg; rotate.</span>
+                  </label>
+                </div>
               </div>
 
               <div class="step-block" data-step-block="3" data-step-name="size">
@@ -1978,6 +2099,66 @@ input[type="url"]:focus, input[type="number"]:focus, .select:focus {
   <span class="c-key">"processing_time"</span>: 0.04
 }</code></pre>
       </div>
+
+      <div class="code-card">
+        <div class="code-head">
+          <span class="code-tag">GET / POST</span>
+          <span class="code-path">/api/image/pixelate</span>
+        </div>
+<pre><code><span class="c-key">url</span>=&lt;image url&gt;          <span class="c-mut">required when no file uploaded</span>
+<span class="c-key">file</span>=&lt;multipart upload&gt;   <span class="c-mut">POST alternative to url</span>
+<span class="c-key">block</span>=2..128             <span class="c-mut">block size in source pixels, default 10</span>
+<span class="c-key">mode</span>=simple|og          <span class="c-mut">simple = nearest neighbour (crisp), og = averaged (smooth)</span>
+<span class="c-key">format</span>=png|jpeg|webp|bmp|gif   <span class="c-mut">default png</span></code></pre>
+        <div class="code-head">
+          <span class="code-tag tag-res">200</span>
+          <span class="code-path">image/&lt;format&gt; \u00b7 output keeps source dimensions</span>
+        </div>
+      </div>
+
+      <div class="code-card">
+        <div class="code-head">
+          <span class="code-tag">GET / POST</span>
+          <span class="code-path">/api/image/invert</span>
+        </div>
+<pre><code><span class="c-key">url</span>=&lt;image url&gt;          <span class="c-mut">required when no file uploaded</span>
+<span class="c-key">file</span>=&lt;multipart upload&gt;   <span class="c-mut">POST alternative to url</span>
+<span class="c-key">format</span>=png|jpeg|webp|bmp|gif   <span class="c-mut">default png \u00b7 alpha preserved</span></code></pre>
+      </div>
+
+      <div class="code-card">
+        <div class="code-head">
+          <span class="code-tag">GET / POST</span>
+          <span class="code-path">/api/image/mirror</span>
+        </div>
+<pre><code><span class="c-key">url</span>=&lt;image url&gt;          <span class="c-mut">required when no file uploaded</span>
+<span class="c-key">file</span>=&lt;multipart upload&gt;   <span class="c-mut">POST alternative to url</span>
+<span class="c-key">axis</span>=h|v|both           <span class="c-mut">default h \u00b7 horizontal / vertical / both</span>
+<span class="c-key">format</span>=png|jpeg|webp|bmp|gif   <span class="c-mut">default png</span></code></pre>
+      </div>
+
+      <div class="code-card">
+        <div class="code-head">
+          <span class="code-tag">GET / POST</span>
+          <span class="code-path">/api/image/rotate</span>
+        </div>
+<pre><code><span class="c-key">url</span>=&lt;image url&gt;          <span class="c-mut">required when no file uploaded</span>
+<span class="c-key">file</span>=&lt;multipart upload&gt;   <span class="c-mut">POST alternative to url</span>
+<span class="c-key">angle</span>=-360..360         <span class="c-mut">degrees, positive = clockwise, default 0</span>
+<span class="c-key">expand</span>=true|false        <span class="c-mut">expand canvas to fit rotated image, default true</span>
+<span class="c-key">format</span>=png|jpeg|webp|bmp|gif   <span class="c-mut">default png</span></code></pre>
+      </div>
+
+      <div class="code-card">
+        <div class="code-head">
+          <span class="code-tag">GET / POST</span>
+          <span class="code-path">/api/image/format</span>
+        </div>
+<pre><code><span class="c-key">url</span>=&lt;image url&gt;          <span class="c-mut">required when no file uploaded</span>
+<span class="c-key">file</span>=&lt;multipart upload&gt;   <span class="c-mut">POST alternative to url</span>
+<span class="c-key">format</span>=png|jpeg|webp|bmp|gif   <span class="c-mut">target format, default png</span>
+<span class="c-key">quality</span>=1..100          <span class="c-mut">jpeg / webp quality, default 92</span></code></pre>
+      </div>
     </section>
   </main>
 
@@ -2011,12 +2192,20 @@ const els = {
   cropImage: byId('cropImage'),
   resetCrop: byId('resetCrop'),
   fullCrop: byId('fullCrop'),
+  rotateLeft: byId('rotateLeftBtn'),
+  rotateRight: byId('rotateRightBtn'),
+  rotateAngle: byId('rotateAngleInput'),
+  rotateReset: byId('rotateResetBtn'),
   cropMeta: byId('cropMeta'),
   outputBlock: byId('outputBlock'),
   width: byId('widthInput'),
   height: byId('heightInput'),
   lockBtn: byId('lockBtn'),
-  presets: document.querySelectorAll('.preset'),
+  presets: document.querySelectorAll('.preset[data-preset]'),
+  pixelBlock: byId('pixelBlockInput'),
+  pixelPresets: document.querySelectorAll('.preset[data-pixel-preset]'),
+  pixelModeRadios: document.querySelectorAll('input[name="pixelMode"]'),
+  mirrorAxisRadios: document.querySelectorAll('input[name="mirrorAxis"]'),
   format: byId('formatSelect'),
   simple: byId('simpleMode'),
   convert: byId('convertBtn'),
@@ -2032,6 +2221,8 @@ const els = {
   metaTime: byId('metaTime'),
   examplesGrid: byId('examplesGrid'),
 };
+
+let currentTool = 'all';
 
 const state = {
   source: 'url',
@@ -2072,7 +2263,10 @@ function updateConvertLabel() {
   const pretty = f === 'json' ? 'Pixel Grid' :
                  f === 'jpeg' ? 'JPEG' :
                  f.toUpperCase();
-  els.convertLabel.textContent = `Convert to ${pretty}`;
+  if (currentTool === 'pixelate')      els.convertLabel.textContent = 'Pixelate image';
+  else if (currentTool === 'invert')   els.convertLabel.textContent = 'Invert colors';
+  else if (currentTool === 'mirror')   els.convertLabel.textContent = 'Mirror image';
+  else                                  els.convertLabel.textContent = `Convert to ${pretty}`;
 }
 
 function animateReveal(el) {
@@ -2143,6 +2337,41 @@ function bindCropControls() {
     const data = state.cropper.getImageData();
     state.cropper.setData({ x: 0, y: 0, width: data.naturalWidth, height: data.naturalHeight });
   });
+  if (els.rotateLeft) els.rotateLeft.addEventListener('click', () => applyRotation(-90, true));
+  if (els.rotateRight) els.rotateRight.addEventListener('click', () => applyRotation(90, true));
+  if (els.rotateReset) els.rotateReset.addEventListener('click', () => setRotation(0));
+  if (els.rotateAngle) {
+    els.rotateAngle.addEventListener('change', () => {
+      const v = parseInt(els.rotateAngle.value, 10);
+      if (Number.isFinite(v)) setRotation(v);
+    });
+    els.rotateAngle.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        const v = parseInt(els.rotateAngle.value, 10);
+        if (Number.isFinite(v)) setRotation(v);
+      }
+    });
+  }
+}
+
+function applyRotation(delta, additive) {
+  if (!state.cropper) return;
+  const cur = state.cropper.getData(true).rotate || 0;
+  const next = additive ? cur + delta : delta;
+  state.cropper.rotateTo(next);
+  if (els.rotateAngle) els.rotateAngle.value = ((next % 360) + 360) % 360;
+}
+
+function setRotation(angle) {
+  if (!state.cropper) return;
+  state.cropper.rotateTo(angle);
+  if (els.rotateAngle) els.rotateAngle.value = ((angle % 360) + 360) % 360;
+}
+
+function currentRotation() {
+  if (!state.cropper) return 0;
+  const d = state.cropper.getData(true);
+  return d && d.rotate ? d.rotate : 0;
 }
 
 function bindOutputControls() {
@@ -2164,6 +2393,22 @@ function bindOutputControls() {
       updateCropperAspect();
     });
   });
+
+  if (els.pixelBlock) {
+    els.pixelBlock.addEventListener('input', () => {
+      els.pixelPresets.forEach(p => p.classList.toggle('active', parseInt(p.dataset.pixelPreset, 10) === parseInt(els.pixelBlock.value, 10)));
+      updateEndpointPill();
+    });
+  }
+  els.pixelPresets.forEach(p => {
+    p.addEventListener('click', () => {
+      els.pixelBlock.value = p.dataset.pixelPreset;
+      els.pixelPresets.forEach(x => x.classList.toggle('active', x === p));
+      updateEndpointPill();
+    });
+  });
+  els.pixelModeRadios.forEach(r => r.addEventListener('change', updateEndpointPill));
+  els.mirrorAxisRadios.forEach(r => r.addEventListener('change', updateEndpointPill));
 }
 
 function onDimChange(which) {
@@ -2326,7 +2571,7 @@ function loadImageInto(src) {
         movable: true,
         zoomable: true,
         scalable: false,
-        rotatable: false,
+        rotatable: true,
         responsive: true,
         checkOrientation: false,
         crop: updateCropMeta,
@@ -2361,54 +2606,143 @@ function revealOutput(showCrop = true) {
   animateReveal(els.outputBlock);
 }
 
+function endpointForTool(tool) {
+  if (tool === 'pixelate') return '/api/image/pixelate';
+  if (tool === 'invert')   return '/api/image/invert';
+  if (tool === 'mirror')   return '/api/image/mirror';
+  return '/convert-image';
+}
+
+function getPixelMode() {
+  const r = document.querySelector('input[name="pixelMode"]:checked');
+  return r ? r.value : 'simple';
+}
+
+function getMirrorAxis() {
+  const r = document.querySelector('input[name="mirrorAxis"]:checked');
+  return r ? r.value : 'h';
+}
+
 function updateEndpointPill() {
-  const w = parseInt(els.width.value, 10) || 32;
-  const h = parseInt(els.height.value, 10) || 32;
+  const ep = endpointForTool(currentTool);
   const f = els.format.value;
-  const params = `width=${w}&height=${h}&format=${f}`;
-  els.endpointPill.textContent = `GET ${ENDPOINT}?${params}`;
+  const params = new URLSearchParams();
+  if (currentTool === 'pixelate') {
+    params.set('block', parseInt(els.pixelBlock && els.pixelBlock.value, 10) || 10);
+    params.set('mode', getPixelMode());
+    params.set('format', f === 'json' ? 'png' : f);
+  } else if (currentTool === 'invert') {
+    params.set('format', f === 'json' ? 'png' : f);
+  } else if (currentTool === 'mirror') {
+    params.set('axis', getMirrorAxis());
+    params.set('format', f === 'json' ? 'png' : f);
+  } else {
+    const w = parseInt(els.width.value, 10) || 32;
+    const h = parseInt(els.height.value, 10) || 32;
+    params.set('width', w);
+    params.set('height', h);
+    params.set('format', f);
+  }
+  els.endpointPill.textContent = `GET ${ep}?${params.toString()}`;
+}
+
+function hasCropTransform() {
+  if (!state.cropper || !state.loadedNaturalSize) return false;
+  const d = state.cropper.getData(true);
+  if (!d) return false;
+  const rot = d.rotate || 0;
+  if (rot % 360 !== 0) return true;
+  const fullW = state.loadedNaturalSize.w;
+  const fullH = state.loadedNaturalSize.h;
+  if (Math.abs(d.x) > 0.5 || Math.abs(d.y) > 0.5) return true;
+  if (Math.abs(d.width - fullW) > 0.5 || Math.abs(d.height - fullH) > 0.5) return true;
+  return false;
+}
+
+async function getTransformedBlob() {
+  if (!state.cropper) return null;
+  const canvas = state.cropper.getCroppedCanvas({ imageSmoothingQuality: 'high' });
+  if (!canvas) return null;
+  return await new Promise(resolve => canvas.toBlob(b => resolve(b), 'image/png'));
 }
 
 async function convert() {
   if (!state.loadedSource) { setStatus('Load an image first.', 'error'); return; }
 
-  const width = clampInt(els.width.value, 1, 4096, 32);
-  const height = clampInt(els.height.value, 1, 4096, 32);
+  const tool = currentTool;
+  const endpoint = endpointForTool(tool);
   const format = els.format.value;
-  const mode = document.querySelector('input[name="resizeMode"]:checked').value;
-  const simple = els.simple.checked;
 
   els.convert.disabled = true;
   setStatus('Processing…', 'loading');
   els.result.classList.add('hidden');
 
   const params = new URLSearchParams();
-  params.set('width', width);
-  params.set('height', height);
-  params.set('format', format);
-  params.set('mode', mode);
-  if (simple) params.set('simple', 'true');
+  let methodLabel = '';
 
-  if (state.cropper) {
+  if (tool === 'pixelate') {
+    const block = clampInt(els.pixelBlock && els.pixelBlock.value, 2, 128, 10);
+    const pmode = getPixelMode();
+    params.set('block', block);
+    params.set('mode', pmode);
+    params.set('format', format === 'json' ? 'png' : format);
+    methodLabel = `pixelate · ${pmode} · ${block}px`;
+  } else if (tool === 'invert') {
+    params.set('format', format === 'json' ? 'png' : format);
+    methodLabel = 'invert';
+  } else if (tool === 'mirror') {
+    const axis = getMirrorAxis();
+    params.set('axis', axis);
+    params.set('format', format === 'json' ? 'png' : format);
+    methodLabel = `mirror · ${axis}`;
+  } else {
+    const width = clampInt(els.width.value, 1, 4096, 32);
+    const height = clampInt(els.height.value, 1, 4096, 32);
+    const mode = document.querySelector('input[name="resizeMode"]:checked').value;
+    const simple = els.simple && els.simple.checked;
+    params.set('width', width);
+    params.set('height', height);
+    params.set('format', format);
+    params.set('mode', mode);
+    if (simple) params.set('simple', 'true');
+    methodLabel = mode;
+  }
+
+  let usedTransformBlob = false;
+  let transformedBlob = null;
+  if (hasCropTransform()) {
+    try {
+      transformedBlob = await getTransformedBlob();
+      if (transformedBlob) usedTransformBlob = true;
+    } catch (e) {
+      transformedBlob = null;
+    }
+  }
+
+  if (!usedTransformBlob && state.cropper && tool !== 'pixelate' && tool !== 'invert' && tool !== 'mirror') {
     const d = state.cropper.getData(true);
-    if (d.width > 0 && d.height > 0) {
-      params.set('crop_x', d.x);
-      params.set('crop_y', d.y);
-      params.set('crop_w', d.width);
-      params.set('crop_h', d.height);
+    if (d && d.width > 0 && d.height > 0 && (d.rotate || 0) % 360 === 0) {
+      params.set('crop_x', Math.max(0, Math.round(d.x)));
+      params.set('crop_y', Math.max(0, Math.round(d.y)));
+      params.set('crop_w', Math.max(1, Math.round(d.width)));
+      params.set('crop_h', Math.max(1, Math.round(d.height)));
     }
   }
 
   const t0 = performance.now();
   try {
     let res;
-    if (state.loadedSource.kind === 'file' && state.loadedFile) {
+    if (usedTransformBlob && transformedBlob) {
+      const form = new FormData();
+      form.append('file', transformedBlob, 'transformed.png');
+      res = await fetch(`${endpoint}?${params.toString()}`, { method: 'POST', body: form });
+    } else if (state.loadedSource.kind === 'file' && state.loadedFile) {
       const form = new FormData();
       form.append('file', state.loadedFile);
-      res = await fetch(`${ENDPOINT}?${params.toString()}`, { method: 'POST', body: form });
+      res = await fetch(`${endpoint}?${params.toString()}`, { method: 'POST', body: form });
     } else {
       params.set('url', state.loadedSource.url);
-      res = await fetch(`${ENDPOINT}?${params.toString()}`);
+      res = await fetch(`${endpoint}?${params.toString()}`);
     }
 
     if (!res.ok) {
@@ -2418,20 +2752,26 @@ async function convert() {
     }
 
     const elapsed = Math.round(performance.now() - t0);
-    if (format === 'json') {
+    const apiOnlyTool = tool === 'pixelate' || tool === 'invert' || tool === 'mirror';
+    const outFormat = apiOnlyTool ? (format === 'json' ? 'png' : format) : format;
+
+    if (outFormat === 'json' && !apiOnlyTool) {
       const data = await res.json();
       renderJsonResult(data, elapsed);
     } else {
       const blob = await res.blob();
+      const headerFinal = parseHeaderSize(res.headers.get('X-Final-Size'));
+      const fallbackFinal = headerFinal
+        || (state.loadedNaturalSize ? [state.loadedNaturalSize.w, state.loadedNaturalSize.h] : [0, 0]);
       const meta = {
         original_size: parseHeaderSize(res.headers.get('X-Original-Size')),
-        final_size: parseHeaderSize(res.headers.get('X-Final-Size')) || [width, height],
-        resize_method: res.headers.get('X-Resize-Method') || mode,
+        final_size: fallbackFinal,
+        resize_method: res.headers.get('X-Resize-Method') || methodLabel,
         processing_time: parseFloat(res.headers.get('X-Processing-Time')) || elapsed / 1000,
       };
-      renderImageResult(blob, format, meta, elapsed);
+      renderImageResult(blob, outFormat, meta, elapsed);
     }
-    setStatus(`Converted in ${elapsed}ms.`, 'ok');
+    setStatus(`Done in ${elapsed}ms.`, 'ok');
     setTimeout(() => {
       if (els.result) els.result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }, 60);
@@ -2691,14 +3031,14 @@ function downloadGridAsPng(pixels, w, h) {
       defaultPixel: null
     },
     pixelate: {
-      title: 'Pixelate any image into clean sprite art',
+      title: 'Pixelate any image into clean pixel art',
       eyebrow: 'Pixel-art mode',
-      sub: 'Nearest-neighbour scaling, low-res presets, crisp edges. Perfect for game sprites, avatars, and 8-bit aesthetics.',
+      sub: 'Block-based pixelation that keeps the source size. Pick simple (nearest neighbour) or og (averaged). No shrinking.',
       cardTitle: 'Pixelate',
-      primary: 'size',
-      secondary: ['crop', 'format', 'behaviour'],
+      primary: 'pixelate',
+      secondary: ['crop', 'format'],
       defaultFormat: 'png',
-      defaultPixel: true
+      defaultPixel: null
     },
     grid: {
       title: 'Export an image as an RGB pixel grid',
@@ -2708,6 +3048,26 @@ function downloadGridAsPng(pixels, w, h) {
       primary: 'size',
       secondary: ['crop', 'format', 'behaviour'],
       defaultFormat: 'json',
+      defaultPixel: null
+    },
+    invert: {
+      title: 'Invert the colors of any image',
+      eyebrow: 'Color inverter',
+      sub: 'Negate every RGB channel in one click. Transparency stays intact. Free and instant.',
+      cardTitle: 'Invert colors',
+      primary: 'invert',
+      secondary: ['crop', 'format'],
+      defaultFormat: 'png',
+      defaultPixel: null
+    },
+    mirror: {
+      title: 'Mirror or flip your image',
+      eyebrow: 'Mirror tool',
+      sub: 'Flip horizontally, vertically, or both. Same quality as the source, just reflected.',
+      cardTitle: 'Mirror image',
+      primary: 'mirror',
+      secondary: ['crop', 'format'],
+      defaultFormat: 'png',
       defaultPixel: null
     }
   };
@@ -2720,7 +3080,11 @@ function downloadGridAsPng(pixels, w, h) {
     '/crop': 'crop',
     '/pixelate': 'pixelate',
     '/pixel-art': 'pixelate',
-    '/pixel-grid': 'grid'
+    '/pixel-grid': 'grid',
+    '/invert': 'invert',
+    '/invert-colors': 'invert',
+    '/mirror': 'mirror',
+    '/flip': 'mirror'
   };
 
   const card = document.getElementById('converterCard');
@@ -2740,15 +3104,18 @@ function downloadGridAsPng(pixels, w, h) {
     crop: 'Crop',
     size: 'Resize',
     format: 'Change format',
-    behaviour: 'Fit / stretch'
+    behaviour: 'Fit / stretch',
+    pixelate: 'Pixelate',
+    invert: 'Invert',
+    mirror: 'Mirror'
   };
 
-  let currentTool = 'all';
   const revealed = new Set();
 
   function applyTool(toolName, opts) {
     opts = opts || {};
     const conf = TOOLS[toolName] || TOOLS.all;
+    if (typeof window !== 'undefined') window.currentTool = toolName;
     currentTool = toolName;
     revealed.clear();
 
@@ -2799,6 +3166,8 @@ function downloadGridAsPng(pixels, w, h) {
       formatSelect.value = conf.defaultFormat;
       formatSelect.dispatchEvent(new Event('change', { bubbles: true }));
     }
+    if (typeof updateEndpointPill === 'function') updateEndpointPill();
+    if (typeof updateConvertLabel === 'function') updateConvertLabel();
   }
 
   function toggleAlso(name, chip) {
