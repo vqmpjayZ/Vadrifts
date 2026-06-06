@@ -56,7 +56,7 @@ verification_tokens = {}
 checkpoint_tokens = {}
 active_checkpoints = {}
 
-API_SECRET = "vadriftsisalwaysinseason"
+API_SECRET = os.environ.get("API_SECRET")
 TURNSTILE_SITE_KEY = os.environ.get("TURNSTILE_SITE_KEY")
 TURNSTILE_SECRET_KEY = os.environ.get("TURNSTILE_SECRET_KEY")
 
@@ -1320,6 +1320,80 @@ def validate_guild_key_route():
     valid, message = validate_guild_key(key, hwid, secret)
     logger.info(f"Guild key validation ({request.method}): key='{key[:8]}...' valid={valid} message='{message}'")
     return jsonify({"valid": valid, "message": message})
+
+SUGGESTION_WEBHOOK_URL = os.environ.get("SUGGESTION_WEBHOOK_URL")
+SUGGESTION_MIN_LENGTH = 8
+SUGGESTION_MAX_LENGTH = 800
+SUGGESTION_IP_COOLDOWN_SECONDS = 25
+SUGGESTION_IP_HOURLY_CAP = 6
+SUGGESTION_TYPE_META = {
+    "idea":     {"label": "IDEA",     "color": 0xC77DFF},
+    "bug":      {"label": "BUG",      "color": 0xEF476F},
+    "feedback": {"label": "FEEDBACK", "color": 0x4CC9F0},
+}
+_suggestion_history = defaultdict(list)
+
+
+def _suggestion_client_ip():
+    fwd = request.headers.get("X-Forwarded-For", "")
+    if fwd:
+        return fwd.split(",")[0].strip()
+    return request.remote_addr or "unknown"
+
+
+@app.route('/api/suggestion', methods=['POST'])
+def submit_suggestion_route():
+    if not SUGGESTION_WEBHOOK_URL:
+        return jsonify({"ok": False, "error": "Suggestions are not configured on the server."}), 503
+
+    data = request.get_json(silent=True) or {}
+    text = (data.get("text") or "").strip()
+    stype = (data.get("type") or "idea").lower()
+
+    if stype not in SUGGESTION_TYPE_META:
+        stype = "idea"
+    if len(text) < SUGGESTION_MIN_LENGTH:
+        return jsonify({"ok": False, "error": "Add a few more words \u2014 keep it meaningful."}), 400
+    if len(text) > SUGGESTION_MAX_LENGTH:
+        return jsonify({"ok": False, "error": "Too long. Keep it under 800 characters."}), 400
+
+    ip = _suggestion_client_ip()
+    now = time.time()
+    history = [t for t in _suggestion_history[ip] if now - t < 3600]
+    _suggestion_history[ip] = history
+
+    if history and now - history[-1] < SUGGESTION_IP_COOLDOWN_SECONDS:
+        wait = int(SUGGESTION_IP_COOLDOWN_SECONDS - (now - history[-1]))
+        return jsonify({"ok": False, "error": f"Slow down \u2014 try again in {wait}s."}), 429
+    if len(history) >= SUGGESTION_IP_HOURLY_CAP:
+        return jsonify({"ok": False, "error": "Hourly limit hit. Try again later."}), 429
+
+    meta = SUGGESTION_TYPE_META[stype]
+    ua = request.headers.get("User-Agent", "unknown")[:120]
+    embed = {
+        "title": f"New {meta['label']} Suggestion",
+        "description": text,
+        "color": meta["color"],
+        "timestamp": datetime.utcnow().isoformat(),
+        "footer": {"text": f"IP {ip} \u00b7 {ua}"},
+    }
+
+    try:
+        r = requests.post(
+            SUGGESTION_WEBHOOK_URL,
+            json={"username": "vadrifts", "embeds": [embed]},
+            timeout=8,
+        )
+        if r.status_code >= 300:
+            logger.warning(f"Suggestion webhook returned {r.status_code}: {r.text[:200]}")
+            return jsonify({"ok": False, "error": "Discord didn't accept that. Try again."}), 502
+    except requests.RequestException as exc:
+        logger.exception(f"Suggestion webhook failed: {exc}")
+        return jsonify({"ok": False, "error": "Could not reach Discord. Try again."}), 502
+
+    _suggestion_history[ip].append(now)
+    return jsonify({"ok": True})
+
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
