@@ -104,6 +104,20 @@ PIXEL_GRID_META_TAGS = make_meta(
     override_title=True,
     keywords="pixel grid json, rgb array, sprite json, image to json, pixel data exporter, sprite engine"
 )
+INVERT_META_TAGS = make_meta(
+    "Invert Image Colors Online \u2014 Free Color Inverter | Vadrifts",
+    "Invert the colors of any image online. Transparency stays intact. Free, fast, no signup.",
+    "/invert",
+    override_title=True,
+    keywords="invert image, invert colors, negative image, color invert, photo negative, free invert tool"
+)
+MIRROR_META_TAGS = make_meta(
+    "Mirror & Flip Image Online \u2014 Horizontal, Vertical, Both | Vadrifts",
+    "Flip any image horizontally, vertically, or both. Free, fast, browser-based image mirror tool.",
+    "/mirror",
+    override_title=True,
+    keywords="mirror image, flip image, flip horizontal, flip vertical, image mirror, reverse image"
+)
 
 CONVERTER_TOOL_META = {
     "/converter": CONVERTER_META_TAGS,
@@ -113,4 +127,8 @@ CONVERTER_TOOL_META = {
     "/pixelate": PIXELATE_META_TAGS,
     "/pixel-art": PIXELATE_META_TAGS,
     "/pixel-grid": PIXEL_GRID_META_TAGS,
+    "/invert": INVERT_META_TAGS,
+    "/invert-colors": INVERT_META_TAGS,
+    "/mirror": MIRROR_META_TAGS,
+    "/flip": MIRROR_META_TAGS,
 }
