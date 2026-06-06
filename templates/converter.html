@@ -36,6 +36,46 @@
 
   --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   --sans: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+
+  --body-grad-top: #07090f;
+  --body-grad-bot: #050810;
+  --body-glow: rgba(59,130,246,.10);
+  --nav-grad-top: rgba(7,9,15,.85);
+  --nav-grad-bot: rgba(7,9,15,.55);
+  --nav-border: rgba(31,42,68,.6);
+  --stage-bg: #0d1424;
+  --stage-shadow: inset 0 1px 0 rgba(96,165,250,.08), inset 0 -40px 80px rgba(0,0,0,.35);
+}
+
+html[data-theme="light"] {
+  --bg: #f5f7fb;
+  --bg-2: #eef2f9;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+  --elev: #eef2f9;
+  --border: #d8dfe9;
+  --border-strong: #b9c4d4;
+  --text: #0b1220;
+  --muted: #4a5876;
+  --muted-2: #6b7891;
+
+  --blue: #2563eb;
+  --blue-2: #2563eb;
+  --blue-3: #1d4ed8;
+  --blue-dim: #1d4ed8;
+  --blue-glow: rgba(37,99,235,.28);
+
+  --shadow-1: 0 1px 0 rgba(255,255,255,.6) inset, 0 6px 22px rgba(15,23,42,.08);
+  --shadow-blue: 0 10px 30px -12px rgba(37,99,235,.45);
+
+  --body-grad-top: #f5f7fb;
+  --body-grad-bot: #eaeef6;
+  --body-glow: rgba(37,99,235,.08);
+  --nav-grad-top: rgba(255,255,255,.92);
+  --nav-grad-bot: rgba(255,255,255,.7);
+  --nav-border: rgba(216,223,233,.85);
+  --stage-bg: #f3f5fa;
+  --stage-shadow: inset 0 0 0 1px rgba(15,23,42,.04);
 }
 
 * { box-sizing: border-box; }
@@ -50,14 +90,25 @@ html, body {
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   scroll-behavior: smooth;
+  overflow-x: clip;
+  width: 100%;
+  max-width: 100%;
 }
 
 body {
   background:
-    radial-gradient(1000px 600px at 50% -200px, rgba(59,130,246,.10), transparent 70%),
-    linear-gradient(180deg, #07090f 0%, #050810 100%);
+    radial-gradient(1000px 600px at 50% -200px, var(--body-glow), transparent 70%),
+    linear-gradient(180deg, var(--body-grad-top) 0%, var(--body-grad-bot) 100%);
   min-height: 100vh;
+  max-width: 100vw;
+  overflow-x: clip;
 }
+
+main { max-width: 100vw; overflow-x: clip; }
+.workspace, .workspace-main, .converter-card, .card, .step-block { min-width: 0; }
+.workspace > * { min-width: 0; }
+.tool-nav { min-width: 0; max-width: 100%; }
+.endpoint-pill { max-width: 100%; word-break: break-all; }
 
 a { color: var(--blue-2); text-decoration: none; }
 a:hover { color: var(--blue-3); }
@@ -75,9 +126,53 @@ h1, h2, h3 { letter-spacing: -.02em; margin: 0; }
   justify-content: space-between;
   padding: 16px clamp(20px, 5vw, 64px);
   backdrop-filter: blur(14px);
-  background: linear-gradient(180deg, rgba(7,9,15,.85), rgba(7,9,15,.55));
-  border-bottom: 1px solid rgba(31, 42, 68, .6);
+  background: linear-gradient(180deg, var(--nav-grad-top), var(--nav-grad-bot));
+  border-bottom: 1px solid var(--nav-border);
+  transition: background .25s ease, border-color .25s ease;
 }
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.theme-toggle {
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0;
+  transition: color .2s ease, transform .2s ease, filter .2s ease, text-shadow .2s ease;
+}
+.theme-toggle svg {
+  width: 22px;
+  height: 22px;
+  transition: filter .25s ease, transform .35s ease;
+}
+.theme-toggle:hover {
+  color: #fbbf24;
+  transform: rotate(15deg) scale(1.08);
+}
+.theme-toggle:hover svg {
+  filter: drop-shadow(0 0 6px rgba(251,191,36,.85)) drop-shadow(0 0 14px rgba(251,191,36,.55));
+}
+.theme-toggle:active { transform: scale(.95); }
+.theme-toggle .icon-moon { display: none; }
+.theme-toggle .icon-sun { display: block; }
+html[data-theme="light"] .theme-toggle { color: #475569; }
+html[data-theme="light"] .theme-toggle:hover { color: #6366f1; transform: rotate(-15deg) scale(1.08); }
+html[data-theme="light"] .theme-toggle:hover svg {
+  filter: drop-shadow(0 0 6px rgba(99,102,241,.85)) drop-shadow(0 0 14px rgba(99,102,241,.5));
+}
+html[data-theme="light"] .theme-toggle .icon-sun { display: none; }
+html[data-theme="light"] .theme-toggle .icon-moon { display: block; }
 
 .brand {
   display: inline-flex;
@@ -534,22 +629,97 @@ input[type="url"]:focus, input[type="number"]:focus, .select:focus {
 
 .crop-stage {
   position: relative;
-  background:
-    linear-gradient(45deg, #0a0f1c 25%, transparent 25%) 0 0/16px 16px,
-    linear-gradient(-45deg, #0a0f1c 25%, transparent 25%) 0 0/16px 16px,
-    linear-gradient(45deg, transparent 75%, #0a0f1c 75%) 8px 8px/16px 16px,
-    linear-gradient(-45deg, transparent 75%, #0a0f1c 75%) 8px 8px/16px 16px,
-    #0d1424;
+  background: var(--stage-bg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  max-height: 460px;
-  min-height: 240px;
+  padding: 18px;
+  width: 100%;
+  max-width: 100%;
+  min-height: 280px;
+  max-height: min(70vh, 620px);
   overflow: hidden;
   display: flex;
+  align-items: center;
   justify-content: center;
-  box-shadow: inset 0 1px 0 rgba(96,165,250,.08), inset 0 -40px 80px rgba(0,0,0,.35);
+  box-shadow: var(--stage-shadow);
 }
-.crop-stage img { display: block; max-width: 100%; }
+.crop-stage img {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+@media (max-width: 640px) {
+  .crop-stage { padding: 10px; min-height: 220px; max-height: 60vh; }
+}
+
+img, video, canvas, svg { max-width: 100%; }
+
+@media (max-width: 720px) {
+  .converter-section { padding: 14px 8px 60px; }
+  .converter-card { padding: 16px 10px; border-radius: 14px; }
+  .card { padding: 16px 10px; border-radius: 14px; }
+  .hero { padding-left: 16px; padding-right: 16px; }
+  .nav { padding: 12px 14px; }
+  .card-head { flex-wrap: wrap; gap: 8px; }
+  .card-head h2 { font-size: 18px; }
+  .step-title { font-size: 18px; }
+  .step-sub { font-size: 13px; }
+  .step-block { padding-top: 18px; margin-top: 18px; }
+  .crop-toolbar { flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .crop-toolbar .icon-btn { font-size: 11px; padding: 0 9px; min-height: 34px; }
+  .crop-spacer { display: none; }
+  .crop-meta { width: 100%; text-align: center; order: 99; margin-top: 4px; }
+  .rotate-angle { width: 70px !important; }
+  .input-row { flex-wrap: wrap; gap: 8px; }
+  .input-row input { min-width: 0; flex: 1 1 100%; }
+  .input-row .btn, .input-row .icon-btn { flex: 1 1 auto; }
+  .dim-row { flex-wrap: wrap; }
+  .dim-row input[type="number"] { flex: 1 1 40%; min-width: 0; font-size: 15px; padding: 10px 8px; }
+  .preset-row { flex-wrap: wrap; gap: 6px; }
+  .preset { flex: 1 1 auto; min-width: 0; font-size: 12px; padding: 7px 10px; }
+  pre, code { font-size: 12px; }
+  .code-card pre { padding: 12px; overflow-x: auto; }
+  .format-grid { grid-template-columns: 1fr 1fr !important; gap: 8px; }
+  .behaviour-grid { grid-template-columns: 1fr !important; gap: 8px; }
+  .format-card, .behaviour-card { padding: 12px 14px; }
+  .endpoint-pill { font-size: 11px; padding: 4px 10px; }
+  .crop-stage { padding: 10px; min-height: 220px; max-height: 60vh; }
+  .also-bar { flex-wrap: wrap; gap: 6px; }
+  .also-chips { gap: 6px; }
+  .also-chip { font-size: 11px; padding: 6px 10px; }
+  .btn-full { padding: 12px 16px; font-size: 15px; }
+  .tool-nav-list { gap: 6px; }
+  .footer-inner { flex-direction: column; gap: 14px; text-align: center; padding: 18px; }
+  .badge { font-size: 11px; padding: 4px 10px; }
+  .lede { font-size: 14px; }
+  h1 { font-size: clamp(28px, 8vw, 38px) !important; }
+}
+
+@media (max-width: 420px) {
+  .converter-section { padding: 12px 6px 50px; }
+  .converter-card { padding: 14px 8px; }
+  .card-head h2 { font-size: 17px; }
+  .format-grid { grid-template-columns: 1fr !important; }
+}
+
+html[data-theme="light"] .cropper-modal { background-color: rgba(15,23,42,.35); }
+html[data-theme="light"] .cropper-view-box, html[data-theme="light"] .cropper-face { outline-color: var(--blue-2); }
+html[data-theme="light"] .grad { background: linear-gradient(120deg, var(--blue-3) 0%, var(--blue-2) 45%, #0b1220 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+html[data-theme="light"] .hero-grid { background-image: linear-gradient(rgba(37,99,235,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(37,99,235,.06) 1px, transparent 1px); }
+html[data-theme="light"] .hero-inner::before { background: radial-gradient(closest-side at 50% 60%, rgba(37,99,235,.18), transparent 72%), radial-gradient(closest-side at 50% 30%, rgba(37,99,235,.10), transparent 70%); }
+html[data-theme="light"] .badge { background: rgba(255,255,255,.7); }
+html[data-theme="light"] .btn-primary { color: #fff; }
+html[data-theme="light"] .btn-ghost { background: var(--surface); }
+html[data-theme="light"] .drop-zone { background: var(--surface); }
+html[data-theme="light"] .code-card pre { background: var(--surface); }
+html[data-theme="light"] .code-head { background: var(--surface-2); }
+html[data-theme="light"] .converter-card { background: var(--surface); }
+html[data-theme="light"] .c-key { color: #1d4ed8; }
+html[data-theme="light"] .c-str { color: #047857; }
+html[data-theme="light"] .c-mut { color: var(--muted); }
 .cropper-view-box, .cropper-face { outline: 1px solid var(--blue-2); }
 .cropper-line, .cropper-point { background-color: var(--blue-2); }
 .cropper-modal { background-color: #050810; }
@@ -563,10 +733,10 @@ input[type="url"]:focus, input[type="number"]:focus, .select:focus {
 @media (max-width: 720px) { .grid-2 { grid-template-columns: 1fr; } }
 
 .option-group {
-  background: var(--bg-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
 }
 .option-label {
   font-size: 11px;
@@ -1437,9 +1607,9 @@ input[type="url"]:focus, input[type="number"]:focus, .select:focus {
 }
 
 .converter-card:not([data-tool="all"]) .step-block.is-primary {
-  border-color: rgba(96,165,250,.55);
-  box-shadow: 0 0 0 1px rgba(96,165,250,.18) inset, var(--shadow-blue);
-  border-top-color: rgba(96,165,250,.55);
+  border-color: transparent;
+  box-shadow: none;
+  border-top-color: rgba(96,165,250,.4);
 }
 .converter-card:not([data-tool="all"]) .step-block.is-primary .step-badge-primary {
   display: inline-flex;
@@ -1725,12 +1895,16 @@ input[type="url"]:focus, input[type="number"]:focus, .select:focus {
       <svg class="brand-icon spin-hover" viewBox="0 0 16 16" aria-hidden="true"><use href="#pixl-arrow"/></svg>
       <span class="brand-word">PIXL<span class="brand-dot">.</span></span>
     </a>
-    <nav class="nav-links">
-      <a href="#converter">Converter</a>
-      <a href="#examples">Examples</a>
-      <a href="#how">How it works</a>
-      <a href="#api">API</a>
-    </nav>
+    <div class="nav-right">
+      <nav class="nav-links">
+        <a href="#converter">Converter</a>
+        <a href="#api">API</a>
+      </nav>
+      <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle color theme" title="Toggle light / dark">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m4.93 19.07 1.41-1.41"/><path d="m17.66 6.34 1.41-1.41"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
   </header>
 
   <main>
@@ -2119,43 +2293,6 @@ input[type="url"]:focus, input[type="number"]:focus, .select:focus {
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="examples reveal" id="examples">
-      <div class="section-head">
-        <h2>Try an example</h2>
-        <p>Click any image to load it into the converter.</p>
-      </div>
-      <div class="examples-grid" id="examplesGrid"></div>
-    </section>
-
-    <section class="how reveal" id="how">
-      <div class="section-head">
-        <h2>How it works</h2>
-        <p>Four steps from raw image to ready-to-ship asset.</p>
-      </div>
-      <div class="steps">
-        <div class="step">
-          <div class="step-num">01</div>
-          <h3>Pick a source</h3>
-          <p>Drop a URL or upload from disk. Anything Pillow can open works — PNG, JPG, WebP, GIF, BMP.</p>
-        </div>
-        <div class="step">
-          <div class="step-num">02</div>
-          <h3>Crop it</h3>
-          <p>Drag the crop box, lock the aspect to your output ratio, or hit Full to use the whole image.</p>
-        </div>
-        <div class="step">
-          <div class="step-num">03</div>
-          <h3>Set dimensions</h3>
-          <p>Any size up to 4096. Lock the aspect to scale proportionally. Presets for common sprite sizes.</p>
-        </div>
-        <div class="step">
-          <div class="step-num">04</div>
-          <h3>Ship the format</h3>
-          <p>Download as PNG, JPEG, WebP, BMP, or GIF — or grab the raw pixel grid as JSON / Lua / hex.</p>
         </div>
       </div>
     </section>
@@ -2604,6 +2741,7 @@ function setStatus(msg, kind) {
 }
 
 function renderExamples() {
+  if (!els.examplesGrid) return;
   els.examplesGrid.innerHTML = '';
   EXAMPLES.forEach(ex => {
     const btn = document.createElement('button');
@@ -3388,6 +3526,28 @@ function downloadGridAsPng(pixels, w, h) {
 })();
 
 init();
+
+(function initThemeToggle() {
+  const root = document.documentElement;
+  const KEY = 'pixl-theme';
+  const btn = document.getElementById('themeToggle');
+  const saved = (() => { try { return localStorage.getItem(KEY); } catch (_) { return null; } })();
+  const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+  const initial = saved || (prefersLight ? 'light' : 'dark');
+  if (initial === 'light') root.setAttribute('data-theme', 'light');
+  if (btn) {
+    btn.addEventListener('click', () => {
+      const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      if (next === 'light') root.setAttribute('data-theme', 'light');
+      else root.removeAttribute('data-theme');
+      try { localStorage.setItem(KEY, next); } catch (_) {}
+      btn.animate(
+        [{ transform: 'rotate(0) scale(1)' }, { transform: 'rotate(360deg) scale(1.15)' }, { transform: 'rotate(360deg) scale(1)' }],
+        { duration: 420, easing: 'cubic-bezier(.2,.7,.2,1)' }
+      );
+    });
+  }
+})();
 
 </script>
 </body>
