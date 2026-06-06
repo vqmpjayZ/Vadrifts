@@ -237,7 +237,7 @@ h1, h2, h3 { letter-spacing: -.02em; margin: 0; }
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-1);
-  padding: clamp(20px, 3vw, 32px);
+  padding: clamp(20px, 3vw, 32px) clamp(24px, 4.5vw, 44px);
 }
 
 .converter-section {
@@ -250,25 +250,12 @@ h1, h2, h3 { letter-spacing: -.02em; margin: 0; }
   overflow: hidden;
   isolation: isolate;
   background:
-    radial-gradient(circle at 1px 1px, rgba(96,165,250,.055) 1px, transparent 1.4px),
-    radial-gradient(1100px 600px at 0% 0%, rgba(59,130,246,.07), transparent 60%),
-    radial-gradient(900px 500px at 100% 100%, rgba(96,165,250,.05), transparent 65%),
+    radial-gradient(circle at 1px 1px, rgba(96,165,250,.045) 1px, transparent 1.4px),
+    radial-gradient(1100px 600px at 0% 0%, rgba(59,130,246,.06), transparent 60%),
+    radial-gradient(900px 500px at 100% 100%, rgba(96,165,250,.045), transparent 65%),
     linear-gradient(180deg, var(--surface), var(--bg-2));
   background-size: 22px 22px, auto, auto, auto;
   background-repeat: repeat, no-repeat, no-repeat, no-repeat;
-}
-.converter-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: -1;
-  background-image: url("data:image/svg+xml;utf8,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%22720%22%20height=%22720%22%20viewBox=%220%200%20720%20720%22%3E%3Cdefs%3E%3Cfilter%20id=%22t%22%20x=%220%22%20y=%220%22%20width=%22100%25%22%20height=%22100%25%22%3E%3CfeTurbulence%20type=%22fractalNoise%22%20baseFrequency=%220.011%22%20numOctaves=%222%22%20seed=%229%22/%3E%3CfeColorMatrix%20type=%22matrix%22%20values=%220%200%200%200%200.376%200%200%200%200%200.647%200%200%200%200%200.980%200%200%200%20240%20-119%22/%3E%3C/filter%3E%3C/defs%3E%3Crect%20width=%22100%25%22%20height=%22100%25%22%20filter=%22url(%23t)%22/%3E%3C/svg%3E");
-  background-size: 720px 720px;
-  background-repeat: repeat;
-  opacity: .14;
-  -webkit-mask-image: radial-gradient(ellipse 75% 65% at 50% 50%, transparent 30%, #000 95%);
-          mask-image: radial-gradient(ellipse 75% 65% at 50% 50%, transparent 30%, #000 95%);
 }
 .converter-card.has-loaded-image #cropBlock { display: block; }
 .converter-card::before {
@@ -383,59 +370,49 @@ h1, h2, h3 { letter-spacing: -.02em; margin: 0; }
   background: var(--border);
 }
 
-.source-loaded { display: none; }
-.converter-card.has-loaded-image .source-inputs { display: none; }
-.converter-card.has-loaded-image .source-loaded {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 12px 14px;
-  background: linear-gradient(180deg, rgba(59,130,246,.06), rgba(59,130,246,.02));
-  border: 1px solid rgba(96,165,250,.25);
-  border-radius: var(--radius);
-}
-.source-loaded-info { display: flex; align-items: center; gap: 14px; min-width: 0; }
-.source-thumb {
-  width: 48px;
-  height: 48px;
-  object-fit: cover;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: #0a0f1c;
-  image-rendering: pixelated;
-  flex-shrink: 0;
+.converter-card.has-loaded-image .source-inputs,
+.converter-card.has-loaded-image .step-block[data-step-name="source"] .step-header {
   display: none;
 }
-.source-thumb[src] { display: block; }
-.source-loaded-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.source-loaded-label {
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: var(--blue-3);
-  display: inline-flex;
+.converter-card.has-loaded-image .step-block[data-step-name="source"] {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0;
+  display: none;
+}
+
+.change-overlay {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 20;
+  display: none;
   align-items: center;
   gap: 8px;
-}
-.source-loaded-label::before {
-  content: '';
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--blue-2);
-  box-shadow: 0 0 8px rgba(96,165,250,.7);
-}
-.source-loaded-meta {
+  padding: 8px 12px;
+  background: rgba(7,9,15,.78);
+  -webkit-backdrop-filter: blur(10px);
+          backdrop-filter: blur(10px);
+  border: 1px solid rgba(96,165,250,.35);
+  border-radius: 10px;
+  color: var(--blue-3);
   font-family: var(--mono);
-  font-size: 12px;
-  color: var(--muted);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 100%;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color .15s, color .15s, transform .12s, background .15s;
 }
+.change-overlay svg { width: 14px; height: 14px; }
+.change-overlay:hover {
+  border-color: var(--blue-2);
+  color: #fff;
+  background: rgba(15,23,42,.92);
+  transform: translateY(-1px);
+}
+.change-overlay:active { transform: translateY(0); }
+.converter-card.has-loaded-image .change-overlay { display: inline-flex; }
 
 .field-label {
   display: block;
@@ -1889,16 +1866,7 @@ input[type="url"]:focus, input[type="number"]:focus, .select:focus {
                 </div>
               </div>
 
-              <div class="source-loaded" id="sourceLoaded">
-                <div class="source-loaded-info">
-                  <img id="sourceThumb" class="source-thumb" alt="" />
-                  <div class="source-loaded-text">
-                    <span class="source-loaded-label">Image loaded</span>
-                    <span class="source-loaded-meta" id="sourceLoadedMeta"></span>
-                  </div>
-                </div>
-                <button id="changeImageBtn" class="icon-btn" type="button">CHANGE IMAGE</button>
-              </div>
+              <div class="source-loaded" id="sourceLoaded" hidden></div>
             </div>
 
             <div class="step-block hidden" id="cropBlock" data-step-block="2" data-step-name="crop">
@@ -1919,6 +1887,10 @@ input[type="url"]:focus, input[type="number"]:focus, .select:focus {
                 <span class="crop-meta" id="cropMeta">&mdash;</span>
               </div>
               <div class="crop-stage">
+                <button class="change-overlay" id="changeImageBtn" type="button" title="Choose a different image">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 5l-7 7 7 7"/></svg>
+                  Change image
+                </button>
                 <img id="cropImage" alt="" />
               </div>
             </div>
@@ -2496,14 +2468,11 @@ function bindUploader() {
       if (state.cropper) { state.cropper.destroy(); state.cropper = null; }
       els.url.value = '';
       if (els.fileInput) els.fileInput.value = '';
-      const thumb = document.getElementById('sourceThumb');
-      if (thumb) thumb.removeAttribute('src');
-      const meta = document.getElementById('sourceLoadedMeta');
-      if (meta) meta.textContent = '';
       els.cropBlock.classList.add('hidden');
       if (els.outputBlock) els.outputBlock.classList.add('hidden');
       setStatus('');
       els.url.focus();
+      els.url.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
   }
 }
@@ -2736,19 +2705,6 @@ function loadImageInto(src) {
       state.loadedNaturalSize = { w: img.naturalWidth, h: img.naturalHeight };
       const card = document.getElementById('converterCard');
       if (card) card.classList.add('has-loaded-image');
-      const thumb = document.getElementById('sourceThumb');
-      if (thumb) thumb.src = img.src;
-      const meta = document.getElementById('sourceLoadedMeta');
-      if (meta) {
-        if (state.loadedFile) {
-          meta.textContent = `${state.loadedFile.name} \u00b7 ${img.naturalWidth}\u00d7${img.naturalHeight}`;
-        } else if (state.loadedSource && state.loadedSource.url) {
-          const u = state.loadedSource.url.replace(/^https?:\/\//, '');
-          meta.textContent = `${u.length > 48 ? u.slice(0, 45) + '\u2026' : u} \u00b7 ${img.naturalWidth}\u00d7${img.naturalHeight}`;
-        } else {
-          meta.textContent = `${img.naturalWidth}\u00d7${img.naturalHeight}`;
-        }
-      }
       animateReveal(els.cropBlock);
       animateReveal(els.outputBlock);
       state.cropper = new Cropper(img, {
