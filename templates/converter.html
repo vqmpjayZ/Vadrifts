@@ -328,6 +328,26 @@ h1, h2, h3 { letter-spacing: -.02em; margin: 0; }
   box-shadow: 0 0 0 1px rgba(96,165,250,.35) inset;
 }
 
+.source-inputs { display: flex; flex-direction: column; gap: 14px; }
+.source-row { width: 100%; }
+.source-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--muted-2);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  margin: 2px 0;
+}
+.source-divider::before, .source-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
 .field-label {
   display: block;
   font-size: 13px;
@@ -1768,30 +1788,29 @@ input[type="url"]:focus, input[type="number"]:focus, .select:focus {
                 <h3 class="step-title">Choose your image</h3>
                 <p class="step-sub">Paste a URL or drop a file from your computer. PNG, JPG, WebP, GIF, and BMP all work.</p>
               </header>
-              <div class="tabs" role="tablist">
-                <button class="tab active" data-tab="url" type="button" role="tab" aria-selected="true">URL</button>
-                <button class="tab" data-tab="upload" type="button" role="tab" aria-selected="false">Upload</button>
-              </div>
-
-              <div class="tab-panel" data-panel="url">
-                <label class="field-label" for="imageUrl">Image URL</label>
-                <div class="input-row">
-                  <input id="imageUrl" type="url" autocomplete="off" spellcheck="false"
-                         placeholder="https://example.com/image.png" />
-                  <button id="pasteBtn" class="icon-btn" title="Paste from clipboard" type="button">PASTE</button>
-                  <button id="loadUrlBtn" class="btn btn-ghost btn-compact" type="button">Load</button>
-                </div>
-              </div>
-
-              <div class="tab-panel hidden" data-panel="upload">
-                <label class="field-label">Drop a file or click to browse</label>
-                <div class="drop-zone" id="dropZone" tabindex="0" role="button" aria-label="Upload image">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="drop-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                  <div class="drop-text">
-                    <strong>Drop image here</strong>
-                    <span>or click to choose &middot; PNG &middot; JPG &middot; WebP &middot; GIF &middot; BMP</span>
+              <div class="source-inputs">
+                <div class="source-row" data-panel="url">
+                  <label class="field-label" for="imageUrl">Image URL</label>
+                  <div class="input-row">
+                    <input id="imageUrl" type="url" autocomplete="off" spellcheck="false"
+                           placeholder="https://example.com/image.png" />
+                    <button id="pasteBtn" class="icon-btn" title="Paste URL or image from clipboard" type="button">PASTE</button>
+                    <button id="loadUrlBtn" class="btn btn-ghost btn-compact" type="button">Load</button>
                   </div>
-                  <input id="fileInput" type="file" accept="image/*" hidden />
+                </div>
+
+                <div class="source-divider" aria-hidden="true"><span>or</span></div>
+
+                <div class="source-row" data-panel="upload">
+                  <label class="field-label">Upload an image</label>
+                  <div class="drop-zone" id="dropZone" tabindex="0" role="button" aria-label="Upload image">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="drop-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <div class="drop-text">
+                      <strong>Drop, click, or paste image</strong>
+                      <span>PNG &middot; JPG &middot; WebP &middot; GIF &middot; BMP &middot; Ctrl/Cmd+V works anywhere</span>
+                    </div>
+                    <input id="fileInput" type="file" accept="image/*" hidden />
+                  </div>
                 </div>
               </div>
             </div>
@@ -2249,6 +2268,7 @@ function init() {
   bindTabs();
   bindUrlInput();
   bindUploader();
+  bindGlobalPaste();
   bindCropControls();
   bindOutputControls();
   els.convert.addEventListener('click', convert);
@@ -2301,12 +2321,62 @@ function bindUrlInput() {
   els.loadUrl.addEventListener('click', loadFromUrl);
   els.url.addEventListener('keydown', e => { if (e.key === 'Enter') loadFromUrl(); });
   els.paste.addEventListener('click', async () => {
+    if (await tryPasteImageFromClipboard()) return;
     try {
       const t = await navigator.clipboard.readText();
-      els.url.value = t.trim();
-      els.url.focus();
+      if (t && t.trim()) {
+        els.url.value = t.trim();
+        els.url.focus();
+      } else {
+        setStatus('Clipboard is empty.', 'error');
+      }
     } catch {
       setStatus('Clipboard access blocked — paste manually with Ctrl/Cmd+V.', 'error');
+    }
+  });
+}
+
+async function tryPasteImageFromClipboard() {
+  if (!navigator.clipboard || !navigator.clipboard.read) return false;
+  try {
+    const items = await navigator.clipboard.read();
+    for (const item of items) {
+      for (const type of item.types) {
+        if (type.startsWith('image/')) {
+          const blob = await item.getType(type);
+          const ext = (type.split('/')[1] || 'png').split('+')[0];
+          const file = new File([blob], `pasted-${Date.now()}.${ext}`, { type });
+          await loadFromFile(file);
+          return true;
+        }
+      }
+    }
+  } catch {}
+  return false;
+}
+
+function bindGlobalPaste() {
+  document.addEventListener('paste', e => {
+    const dt = e.clipboardData;
+    if (!dt) return;
+    const items = dt.items ? Array.from(dt.items) : [];
+    for (const it of items) {
+      if (it.kind === 'file' && it.type && it.type.startsWith('image/')) {
+        const f = it.getAsFile();
+        if (f) {
+          e.preventDefault();
+          loadFromFile(f);
+          return;
+        }
+      }
+    }
+    const files = dt.files ? Array.from(dt.files) : [];
+    for (const f of files) {
+      if (f.type && f.type.startsWith('image/')) {
+        e.preventDefault();
+        loadFromFile(f);
+        return;
+      }
     }
   });
 }
@@ -2464,12 +2534,6 @@ function renderExamples() {
 }
 
 function switchTo(tab) {
-  els.tabs.forEach(t => {
-    const active = t.dataset.tab === tab;
-    t.classList.toggle('active', active);
-    t.setAttribute('aria-selected', active);
-  });
-  els.panels.forEach(p => p.classList.toggle('hidden', p.dataset.panel !== tab));
   state.source = tab;
 }
 
