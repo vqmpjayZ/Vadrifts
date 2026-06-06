@@ -3604,14 +3604,15 @@ class AutoShowcasersManager {
 		    requestAnimationFrame(tick);
 		  }
 
-		  function submitSuggestion(e) {
+		  async function submitSuggestion(e) {
 		    e.preventDefault();
 		    var ta = document.getElementById('suggestText');
 		    var btn = document.getElementById('suggestSubmit');
+		    var label = btn ? btn.querySelector('.ss-submit-label') : null;
 		    var text = (ta.textContent || '').trim();
 		    if (!text) return false;
 		    if (text.length < SUGGEST_MIN_LENGTH) {
-		      showToast('Add a few more words — keep it meaningful.', 'warn');
+		      showToast('Add a few more words \u2014 keep it meaningful.', 'warn');
 		      return false;
 		    }
 		    var rec = _getRecord();
@@ -3620,14 +3621,14 @@ class AutoShowcasersManager {
 		    var since = now - (rec.last || 0);
 		    if (since < SUGGEST_COOLDOWN_MS) {
 		      var wait = SUGGEST_COOLDOWN_MS - since;
-		      showToast('Slow down — try again in ' + _formatSeconds(wait) + '.', 'warn');
+		      showToast('Slow down \u2014 try again in ' + _formatSeconds(wait) + '.', 'warn');
 		      _setCooldown(btn, wait);
 		      return false;
 		    }
 		    if (rec.hourly.length >= SUGGEST_HOURLY_CAP) {
 		      var oldest = rec.hourly[0];
 		      var resetIn = SUGGEST_HOURLY_WINDOW - (now - oldest);
-		      showToast('Hourly limit hit — try again in ' + _formatSeconds(resetIn) + '.', 'error');
+		      showToast('Hourly limit hit \u2014 try again in ' + _formatSeconds(resetIn) + '.', 'error');
 		      return false;
 		    }
 		    if (rec.lastText && rec.lastText === text) {
@@ -3637,40 +3638,52 @@ class AutoShowcasersManager {
 
 		    var activeChip = document.querySelector('.stype-chip.is-active');
 		    var stype = activeChip ? activeChip.getAttribute('data-stype') : 'idea';
-		    var prefix = stype === 'bug' ? '[BUG] ' : (stype === 'feedback' ? '[FEEDBACK] ' : '[IDEA] ');
-		    var payload = prefix + '**NEW SUGGESTION:** ' + text;
 
-		    var copied = false;
+		    var originalLabel = label ? label.textContent : '';
+		    if (btn) btn.disabled = true;
+		    if (label) label.textContent = 'Sending...';
+
 		    try {
-		      if (navigator.clipboard && navigator.clipboard.writeText) {
-		        navigator.clipboard.writeText(payload);
-		        copied = true;
+		      var res = await fetch('/api/suggestion', {
+		        method: 'POST',
+		        headers: { 'Content-Type': 'application/json' },
+		        body: JSON.stringify({ text: text, type: stype })
+		      });
+		      var body = {};
+		      try { body = await res.json(); } catch (_) {}
+
+		      if (!res.ok || !body.ok) {
+		        var msg = (body && body.error) || 'Could not send. Try again in a sec.';
+		        showToast(msg, res.status === 429 ? 'warn' : 'error');
+		        if (btn) btn.disabled = false;
+		        if (label) label.textContent = originalLabel || 'Send to Discord';
+		        return false;
 		      }
-		    } catch (e2) {}
 
-		    showToast(copied
-		      ? 'Copied! Opening Discord — paste it in #suggestions.'
-		      : 'Opening Discord — paste your idea in #suggestions.');
-		    rec.last = now;
-		    rec.hourly.push(now);
-		    rec.lastText = text;
-		    _saveRecord(rec);
+		      showToast('Sent to #suggestions \u2014 thanks!', 'success');
+		      rec.last = now;
+		      rec.hourly.push(now);
+		      rec.lastText = text;
+		      _saveRecord(rec);
 
-		    ta.textContent = '';
-		    ta.style.height = '';
-		    var counter = document.getElementById('suggestCount');
-		    if (counter) counter.textContent = '0';
-		    var progress = document.getElementById('suggestProgress');
-		    if (progress) {
-		      var fill = progress.querySelector('span');
-		      if (fill) fill.style.width = '0%';
-		      progress.classList.remove('is-warn', 'is-full');
+		      ta.textContent = '';
+		      ta.style.height = '';
+		      var counter = document.getElementById('suggestCount');
+		      if (counter) counter.textContent = '0';
+		      var progress = document.getElementById('suggestProgress');
+		      if (progress) {
+		        var fill = progress.querySelector('span');
+		        if (fill) fill.style.width = '0%';
+		        progress.classList.remove('is-warn', 'is-full');
+		      }
+		      if (btn) btn.disabled = false;
+		      if (label) label.textContent = originalLabel || 'Send to Discord';
+		      _setCooldown(btn, SUGGEST_COOLDOWN_MS);
+		    } catch (err) {
+		      showToast('Network error \u2014 try again.', 'error');
+		      if (btn) btn.disabled = false;
+		      if (label) label.textContent = originalLabel || 'Send to Discord';
 		    }
-		    _setCooldown(btn, SUGGEST_COOLDOWN_MS);
-
-		    setTimeout(function () {
-		      window.open('https://discord.com/invite/WDbJ5wE2cR', '_blank', 'noopener');
-		    }, 400);
 		    return false;
 		  }
 		</script>
