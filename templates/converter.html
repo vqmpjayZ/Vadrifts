@@ -1688,16 +1688,7 @@ input[type="url"]:focus, input[type="number"]:focus, .select:focus {
           </label>
           <div class="tool-nav-empty" id="toolNavEmpty" hidden>No tools match that search.</div>
           <div class="tool-nav-list">
-            <button class="tool-item is-active" type="button" data-tool="all" data-href="/converter">
-              <span class="tool-glyph" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
-              </span>
-              <span class="tool-text">
-                <span class="tool-item-name"><span class="t-long">All-in-one</span><span class="t-short">All</span></span>
-                <span class="tool-item-desc">Every step, one flow</span>
-              </span>
-            </button>
-            <button class="tool-item" type="button" data-tool="convert" data-href="/convert">
+            <button class="tool-item is-active" type="button" data-tool="convert" data-href="/convert">
               <span class="tool-glyph" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h11"/><path d="M12 5l3 3-3 3"/><path d="M20 16H9"/><path d="M12 13l-3 3 3 3"/></svg>
               </span>
@@ -1765,7 +1756,7 @@ input[type="url"]:focus, input[type="number"]:focus, .select:focus {
         </aside>
 
         <div class="workspace-main">
-          <div class="card converter-card" id="converterCard" data-tool="all">
+          <div class="card converter-card" id="converterCard" data-tool="convert">
             <div class="card-head">
               <h2>
                 <svg class="head-icon" viewBox="0 0 16 16"><use href="#pixl-arrow"/></svg>
@@ -3137,7 +3128,7 @@ function downloadGridAsPng(pixels, w, h) {
   };
 
   const PATH_TO_TOOL = {
-    '/converter': 'all',
+    '/converter': 'convert',
     '/convert': 'convert',
     '/convert-format': 'convert',
     '/resize': 'resize',
@@ -3292,7 +3283,7 @@ function downloadGridAsPng(pixels, w, h) {
     });
   }
 
-  const initialTool = PATH_TO_TOOL[window.location.pathname] || 'all';
+  const initialTool = PATH_TO_TOOL[window.location.pathname] || 'convert';
   applyTool(initialTool);
 })();
 
