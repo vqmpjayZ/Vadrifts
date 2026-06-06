@@ -242,7 +242,7 @@ h1, h2, h3 { letter-spacing: -.02em; margin: 0; }
 
 .converter-section {
   padding: 20px clamp(20px, 5vw, 64px) 80px;
-  max-width: 920px;
+  max-width: 1240px;
   margin: 0 auto;
 }
 .converter-card {
@@ -256,6 +256,19 @@ h1, h2, h3 { letter-spacing: -.02em; margin: 0; }
     linear-gradient(180deg, var(--surface), var(--bg-2));
   background-size: 22px 22px, auto, auto, auto;
   background-repeat: repeat, no-repeat, no-repeat, no-repeat;
+}
+.converter-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background-image: url("data:image/svg+xml;utf8,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%22900%22%20height=%22900%22%20viewBox=%220%200%20900%20900%22%3E%3Cdefs%3E%3Cfilter%20id=%22t%22%20x=%220%22%20y=%220%22%20width=%22100%25%22%20height=%22100%25%22%3E%3CfeTurbulence%20type=%22fractalNoise%22%20baseFrequency=%220.018%22%20numOctaves=%221%22%20seed=%2211%22/%3E%3CfeColorMatrix%20type=%22matrix%22%20values=%220%200%200%200%200.376%200%200%200%200%200.647%200%200%200%200%200.980%200%200%200%20420%20-209%22/%3E%3C/filter%3E%3C/defs%3E%3Crect%20width=%22100%25%22%20height=%22100%25%22%20filter=%22url(%23t)%22/%3E%3C/svg%3E");
+  background-size: 900px 900px;
+  background-repeat: repeat;
+  opacity: .07;
+  -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 50%, transparent 55%, #000 100%);
+          mask-image: radial-gradient(ellipse 90% 80% at 50% 50%, transparent 55%, #000 100%);
 }
 .converter-card.has-loaded-image #cropBlock { display: block; }
 .converter-card::before {
@@ -384,7 +397,7 @@ h1, h2, h3 { letter-spacing: -.02em; margin: 0; }
 .change-overlay {
   position: absolute;
   top: 12px;
-  left: 12px;
+  right: 12px;
   z-index: 20;
   display: none;
   align-items: center;
@@ -1889,7 +1902,7 @@ input[type="url"]:focus, input[type="number"]:focus, .select:focus {
               </div>
               <div class="crop-stage">
                 <button class="change-overlay" id="changeImageBtn" type="button" title="Choose a different image">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 5l-7 7 7 7"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>
                   Change image
                 </button>
                 <img id="cropImage" alt="" />
@@ -2047,7 +2060,7 @@ input[type="url"]:focus, input[type="number"]:focus, .select:focus {
                 </select>
               </div>
 
-              <div class="step-block" data-step-block="5" data-step-name="behaviour">
+              <div class="step-block tool-only-block" data-step-block="5" data-step-name="behaviour">
                 <header class="step-header">
                   <div class="step-tag">Behaviour <span class="step-badge step-badge-primary">Primary</span><span class="step-badge step-badge-optional">Optional</span></div>
                   <h3 class="step-title">How should we resize?</h3>
@@ -2734,9 +2747,7 @@ function loadImageInto(src) {
 
 function updateCropperAspect() {
   if (!state.cropper) return;
-  const w = parseFloat(els.width.value) || 1;
-  const h = parseFloat(els.height.value) || 1;
-  state.cropper.setAspectRatio(state.aspectLocked ? w / h : NaN);
+  state.cropper.setAspectRatio(NaN);
 }
 
 function updateCropMeta() {
@@ -3150,7 +3161,7 @@ function downloadGridAsPng(pixels, w, h) {
       sub: 'Drop in any image and ship it as PNG, JPEG, WebP, BMP, GIF, or a raw pixel-grid JSON. Free, fast, browser-based.',
       cardTitle: 'Convert format',
       primary: 'format',
-      secondary: ['crop', 'size', 'behaviour'],
+      secondary: ['crop', 'size'],
       defaultFormat: null,
       defaultPixel: null
     },
@@ -3160,7 +3171,7 @@ function downloadGridAsPng(pixels, w, h) {
       sub: 'Any width, any height, up to 4096px. Lock the aspect ratio, or pick a sprite preset in one click.',
       cardTitle: 'Resize image',
       primary: 'size',
-      secondary: ['crop', 'format', 'behaviour'],
+      secondary: ['crop', 'format'],
       defaultFormat: null,
       defaultPixel: null
     },
@@ -3170,7 +3181,7 @@ function downloadGridAsPng(pixels, w, h) {
       sub: 'Drag the crop box, lock to your output aspect, or fill the frame in a click. Then ship it in any format you want.',
       cardTitle: 'Crop image',
       primary: 'crop',
-      secondary: ['size', 'format', 'behaviour'],
+      secondary: ['size', 'format'],
       defaultFormat: null,
       defaultPixel: null
     },
