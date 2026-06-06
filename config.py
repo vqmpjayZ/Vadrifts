@@ -10,20 +10,107 @@ if not os.path.exists(DATA_DIR):
 
 PLUGINS_FILE = os.path.join(DATA_DIR, 'plugins_data.json')
 
-def make_meta(title, description, path=""):
-    url = f"https://vadrifts.onrender.com{path}"
-    return f'''
-    <meta property="og:title" content="{title}">
-    <meta property="og:description" content="{description}">
-    <meta property="og:url" content="{url}">
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="Vadrifts">
-    <meta property="og:image" content="https://i.imgur.com/ePueN25.png">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:image" content="https://i.imgur.com/ePueN25.png">
-    <meta name="theme-color" content="#2B2D313">'''
+SITE_URL = "https://vadrifts.onrender.com"
+DEFAULT_OG_IMAGE = "https://i.imgur.com/ePueN25.png"
 
-HOME_META_TAGS = make_meta("Vadrifts - Roblox Scripts & Tools", "Vadrift's all-in-one website!")
-SCRIPTS_META_TAGS = make_meta("Vadrifts Scripts - Collection", "Check out our collection of all Vadrifts Scripts!", "/scripts")
-PLUGINS_META_TAGS = make_meta("Vadrifts Plugins - Community", "Create and share custom bypass plugins!", "/plugins")
-PROJECTS_META_TAGS = make_meta("Vadrifts Projects", "Everything Vadrifts has built — Roblox scripts, web apps, userscripts, and more.", "/projects")
+def make_meta(title, description, path="", override_title=False, image=None, keywords=None):
+    url = f"{SITE_URL}{path}"
+    og_image = image or DEFAULT_OG_IMAGE
+    parts = []
+    if override_title:
+        parts.append(f'<title>{title}</title>')
+    parts.append(f'<meta name="description" content="{description}">')
+    if keywords:
+        parts.append(f'<meta name="keywords" content="{keywords}">')
+    parts.append('<meta name="robots" content="index, follow, max-image-preview:large">')
+    parts.append(f'<link rel="canonical" href="{url}">')
+    parts.append(f'<meta property="og:title" content="{title}">')
+    parts.append(f'<meta property="og:description" content="{description}">')
+    parts.append(f'<meta property="og:url" content="{url}">')
+    parts.append('<meta property="og:type" content="website">')
+    parts.append('<meta property="og:site_name" content="Vadrifts">')
+    parts.append(f'<meta property="og:image" content="{og_image}">')
+    parts.append('<meta name="twitter:card" content="summary_large_image">')
+    parts.append(f'<meta name="twitter:title" content="{title}">')
+    parts.append(f'<meta name="twitter:description" content="{description}">')
+    parts.append(f'<meta name="twitter:image" content="{og_image}">')
+    parts.append('<meta name="theme-color" content="#7209b7">')
+    return "\n    " + "\n    ".join(parts)
+
+HOME_META_TAGS = make_meta(
+    "Vadrifts - Roblox Scripts & Tools",
+    "Vadrift's all-in-one website! Roblox scripts, an image converter, community plugins and more.",
+    "/",
+    keywords="vadrifts, roblox scripts, roblox executor, image converter, pixel art, sprite generator"
+)
+SCRIPTS_META_TAGS = make_meta(
+    "Vadrifts Scripts - Collection",
+    "Check out our collection of all Vadrifts Scripts!",
+    "/scripts",
+    keywords="vadrifts scripts, roblox scripts, free roblox scripts, lua executor scripts"
+)
+PLUGINS_META_TAGS = make_meta(
+    "Vadrifts Plugins - Community",
+    "Create and share custom bypass plugins!",
+    "/plugins",
+    keywords="vadrifts plugins, roblox bypass plugins, community plugins, custom bypasses"
+)
+PROJECTS_META_TAGS = make_meta(
+    "Vadrifts Projects",
+    "Everything Vadrifts has built \u2014 Roblox scripts, web apps, userscripts, and more.",
+    "/projects",
+    keywords="vadrifts projects, web apps, userscripts, roblox tools, vadrifts portfolio"
+)
+
+CONVERTER_META_TAGS = make_meta(
+    "Image Converter \u2014 Resize, Crop, Pixelate & Convert | Vadrifts",
+    "Free online image converter. Resize, crop, pixelate, change format (PNG, JPG, WebP, GIF, BMP) or export pixel grid JSON. No upload limits, no signup.",
+    "/converter",
+    override_title=True,
+    keywords="image converter, resize image, crop image, pixelate, png to jpg, webp converter, pixel grid json, sprite, free image tools"
+)
+CONVERT_META_TAGS = make_meta(
+    "Convert Image Format \u2014 PNG, JPG, WebP, GIF, BMP | Vadrifts",
+    "Convert any image between PNG, JPG, JPEG, WebP, GIF, BMP, and JSON. Free, fast, no signup.",
+    "/convert",
+    override_title=True,
+    keywords="convert png to jpg, convert jpg to png, webp converter, gif converter, bmp converter, image format converter"
+)
+RESIZE_META_TAGS = make_meta(
+    "Resize Image Online \u2014 Free Image Resizer up to 4096px | Vadrifts",
+    "Resize images online up to 4096px on any side. Keep aspect ratio, fit, or stretch. Free and instant.",
+    "/resize",
+    override_title=True,
+    keywords="resize image, image resizer, resize png, resize jpg, scale image, image dimensions"
+)
+CROP_META_TAGS = make_meta(
+    "Crop Image Online \u2014 Free Image Cropper with Aspect Ratios | Vadrifts",
+    "Crop images online for free. Free-form or aspect-locked crops with pixel-perfect control.",
+    "/crop",
+    override_title=True,
+    keywords="crop image, image cropper, crop png, crop jpg, aspect ratio crop, free crop tool"
+)
+PIXELATE_META_TAGS = make_meta(
+    "Pixelate Image \u2014 Pixel Art & Sprite Generator | Vadrifts",
+    "Pixelate any image. Perfect for sprite art, pixel-art mockups, and retro-style assets.",
+    "/pixelate",
+    override_title=True,
+    keywords="pixelate image, pixel art generator, sprite generator, image to pixel art, retro pixel converter"
+)
+PIXEL_GRID_META_TAGS = make_meta(
+    "Pixel Grid JSON Exporter \u2014 RGB Array from Image | Vadrifts",
+    "Export any image as a pixel grid JSON of RGB arrays. Built for sprite engines and API consumers.",
+    "/pixel-grid",
+    override_title=True,
+    keywords="pixel grid json, rgb array, sprite json, image to json, pixel data exporter, sprite engine"
+)
+
+CONVERTER_TOOL_META = {
+    "/converter": CONVERTER_META_TAGS,
+    "/convert": CONVERT_META_TAGS,
+    "/resize": RESIZE_META_TAGS,
+    "/crop": CROP_META_TAGS,
+    "/pixelate": PIXELATE_META_TAGS,
+    "/pixel-art": PIXELATE_META_TAGS,
+    "/pixel-grid": PIXEL_GRID_META_TAGS,
+}

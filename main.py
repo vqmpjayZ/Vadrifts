@@ -500,11 +500,132 @@ def script_detail(script_id):
 @app.route('/pixel-art')
 @app.route('/pixel-grid')
 def converter():
+    meta = CONVERTER_TOOL_META.get(request.path, CONVERTER_META_TAGS)
     try:
-        return send_file('templates/converter.html')
-    except FileNotFoundError:
-        logger.error("converter.html template not found")
+        html_content = render_template('converter.html')
+        return inject_meta_tags(html_content, meta)
+    except Exception as e:
+        logger.error(f"converter.html render failed: {e}")
         return jsonify({"error": "Converter page not found"}), 404
+
+
+@app.route('/robots.txt')
+def robots_txt():
+    body = (
+        "User-agent: *\n"
+        "Allow: /\n"
+        "Disallow: /api/\n"
+        "Disallow: /ks/\n"
+        "Disallow: /unlock/\n"
+        "Disallow: /start-unlock/\n"
+        "Disallow: /complete-unlock/\n"
+        "Disallow: /check-credits/\n"
+        "Disallow: /use-credit/\n"
+        "Disallow: /debug-keys\n"
+        "Disallow: /debug-guild-keys\n"
+        "Disallow: /verify\n"
+        "Disallow: /validate\n"
+        "Disallow: /create\n"
+        "Disallow: /getkey/\n"
+        "Disallow: /checkpoint/\n"
+        "Disallow: /start-verification\n"
+        "Disallow: /check-usage\n"
+        "Disallow: /update-usage\n"
+        "Disallow: /check-copy-usage\n"
+        "Disallow: /update-copy-usage\n"
+        "Disallow: /log-execution\n"
+        "Disallow: /analytics-data\n"
+        "Disallow: /analytics-sync\n"
+        "Disallow: /status-check\n"
+        "Disallow: /health\n"
+        "Disallow: /convert-image\n"
+        "\n"
+        f"Sitemap: {SITE_URL}/sitemap.xml\n"
+    )
+    response = make_response(body)
+    response.headers['Content-Type'] = 'text/plain; charset=utf-8'
+    response.headers['Cache-Control'] = 'public, max-age=3600'
+    return response
+
+
+@app.route('/sitemap.xml')
+def sitemap_xml():
+    today = datetime.now().strftime('%Y-%m-%d')
+    static_pages = [
+        ('/', '1.0', 'weekly'),
+        ('/projects', '0.9', 'weekly'),
+        ('/scripts', '0.9', 'weekly'),
+        ('/plugins', '0.9', 'weekly'),
+        ('/converter', '0.9', 'monthly'),
+        ('/convert', '0.8', 'monthly'),
+        ('/resize', '0.8', 'monthly'),
+        ('/crop', '0.8', 'monthly'),
+        ('/pixelate', '0.8', 'monthly'),
+        ('/pixel-art', '0.7', 'monthly'),
+        ('/pixel-grid', '0.7', 'monthly'),
+    ]
+    urls = []
+    for path, priority, freq in static_pages:
+        urls.append(
+            '  <url>\n'
+            f'    <loc>{SITE_URL}{path}</loc>\n'
+            f'    <lastmod>{today}</lastmod>\n'
+            f'    <changefreq>{freq}</changefreq>\n'
+            f'    <priority>{priority}</priority>\n'
+            '  </url>'
+        )
+    try:
+        for script in scripts_data:
+            sid = script.get('id') if isinstance(script, dict) else None
+            if sid is None:
+                continue
+            urls.append(
+                '  <url>\n'
+                f'    <loc>{SITE_URL}/script/{sid}</loc>\n'
+                f'    <lastmod>{today}</lastmod>\n'
+                '    <changefreq>monthly</changefreq>\n'
+                '    <priority>0.7</priority>\n'
+                '  </url>'
+            )
+    except Exception as e:
+        logger.error(f"sitemap scripts loop failed: {e}")
+    try:
+        raw_plugins = plugins_manager.get_all_plugins()
+        plugin_list = None
+        if hasattr(raw_plugins, 'get_json'):
+            payload = raw_plugins.get_json(silent=True)
+            if isinstance(payload, list):
+                plugin_list = payload
+            elif isinstance(payload, dict):
+                plugin_list = payload.get('plugins') or payload.get('data')
+        elif isinstance(raw_plugins, list):
+            plugin_list = raw_plugins
+        elif isinstance(raw_plugins, dict):
+            plugin_list = raw_plugins.get('plugins') or raw_plugins.get('data')
+        for plugin in plugin_list or []:
+            pid = plugin.get('id') if isinstance(plugin, dict) else None
+            if not pid:
+                continue
+            urls.append(
+                '  <url>\n'
+                f'    <loc>{SITE_URL}/plugin/{pid}</loc>\n'
+                f'    <lastmod>{today}</lastmod>\n'
+                '    <changefreq>monthly</changefreq>\n'
+                '    <priority>0.6</priority>\n'
+                '  </url>'
+            )
+    except Exception as e:
+        logger.error(f"sitemap plugins loop failed: {e}")
+    body = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap-0.9">\n'
+        + '\n'.join(urls)
+        + '\n</urlset>\n'
+    )
+    response = make_response(body)
+    response.headers['Content-Type'] = 'application/xml; charset=utf-8'
+    response.headers['Cache-Control'] = 'public, max-age=3600'
+    return response
 
 
 @app.route('/check-usage', methods=['GET'])
