@@ -20,7 +20,7 @@ script_profiles_collection = None
 
 if MONGODB_URI:
     try:
-        _client = MongoClient(MONGODB_URI)
+        _client = MongoClient(MONGODB_URI, serverSelectionTimeoutMS=5000, connectTimeoutMS=5000)
         _db = _client["vadrifts"]
         guild_configs_collection = _db["guild_key_configs"]
         guild_sessions_collection = _db["guild_key_sessions"]
