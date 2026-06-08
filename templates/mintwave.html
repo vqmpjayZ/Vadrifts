@@ -249,6 +249,18 @@ main { max-width: 1180px; margin: 0 auto 80px; padding: 0 clamp(20px, 4vw, 48px)
 .btn-play.is-playing .icon-play { display: none; }
 .btn-play.is-playing .icon-pause { display: block; }
 .btn-play .icon-pause { display: none; }
+.btn-loop {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: transparent; border: 1px solid var(--border);
+  color: var(--muted); cursor: pointer;
+  display: grid; place-items: center; flex-shrink: 0;
+  transition: color .15s, border-color .15s, background .15s, transform .1s;
+}
+.btn-loop svg { width: 18px; height: 18px; }
+.btn-loop:hover { color: var(--text); border-color: var(--border-strong); background: var(--surface-2); }
+.btn-loop:active { transform: scale(.94); }
+.btn-loop.is-on { color: var(--mint-deep); border-color: var(--mint-3); background: rgba(16,185,129,.10); }
+.btn-loop.is-on:hover { background: rgba(16,185,129,.15); }
 .time { font-family: var(--mono); font-size: 14px; color: var(--text); }
 .time .sep { color: var(--muted-2); margin: 0 4px; }
 .time .total { color: var(--muted); }
@@ -510,6 +522,9 @@ footer a { color: var(--muted); }
       <button class="btn-play" id="btnPlay" aria-label="Play/pause">
         <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
         <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zm8 0h4v16h-4z"/></svg>
+      </button>
+      <button class="btn-loop is-on" id="btnLoop" aria-label="Loop region" title="Loop the selected region">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
       </button>
       <div class="time">
         <span id="tCur">0:00</span><span class="sep">/</span><span class="total" id="tDur">0:00</span>
@@ -835,6 +850,8 @@ const state = {
   fileBytes: null,
   pitchLock: true,
   region: { start: 0, end: 0 },
+  loop: true,
+  livePreview: { fadeIn: 0, fadeOut: 0, speed: 1, pitchLock: true },
   cover: { data: null, mime: null },
   ws: null,
   wsRegions: null,
@@ -1011,11 +1028,41 @@ async function mountWavesurfer(buf) {
     updateTrimDisplay();
   });
 
-  state.ws.on('audioprocess', () => $('#tCur').textContent = fmtTime(state.ws.getCurrentTime(), 2));
+  state.ws.on('audioprocess', (t) => {
+    const ct = typeof t === 'number' ? t : state.ws.getCurrentTime();
+    $('#tCur').textContent = fmtTime(ct, 2);
+    applyLivePreview(ct);
+    if (ct >= state.region.end - 0.005) {
+      if (state.loop && state.region.end - state.region.start > 0.05) {
+        state.ws.setTime(state.region.start);
+      } else {
+        state.ws.pause();
+        state.ws.setTime(state.region.start);
+      }
+    }
+  });
   state.ws.on('seeking', () => $('#tCur').textContent = fmtTime(state.ws.getCurrentTime(), 2));
-  state.ws.on('finish', () => $('#btnPlay').classList.remove('is-playing'));
-  state.ws.on('play', () => $('#btnPlay').classList.add('is-playing'));
-  state.ws.on('pause', () => $('#btnPlay').classList.remove('is-playing'));
+  state.ws.on('finish', () => {
+    if (state.loop) { state.ws.setTime(state.region.start); state.ws.play(); }
+    else $('#btnPlay').classList.remove('is-playing');
+  });
+  state.ws.on('play', () => {
+    $('#btnPlay').classList.add('is-playing');
+    state.ws.setPlaybackRate(state.livePreview.speed, state.livePreview.pitchLock);
+  });
+  state.ws.on('pause', () => { $('#btnPlay').classList.remove('is-playing'); state.ws.setVolume(1); });
+}
+
+function applyLivePreview(currentTime) {
+  if (!state.ws) return;
+  const fi = state.livePreview.fadeIn;
+  const fo = state.livePreview.fadeOut;
+  if (fi <= 0 && fo <= 0) { state.ws.setVolume(1); return; }
+  const dur = state.audioBuffer ? state.audioBuffer.duration : 0;
+  let g = 1;
+  if (fi > 0 && currentTime < fi) g *= Math.max(0, currentTime / fi);
+  if (fo > 0 && currentTime > dur - fo) g *= Math.max(0, (dur - currentTime) / fo);
+  state.ws.setVolume(Math.max(0, Math.min(1, g)));
 }
 
 function getCss(varName) {
@@ -1024,7 +1071,23 @@ function getCss(varName) {
 
 $('#btnPlay').addEventListener('click', () => {
   if (!state.ws) return;
+  if (state.audioCtx && state.audioCtx.state === 'suspended') state.audioCtx.resume();
+  const ct = state.ws.getCurrentTime();
+  if (ct < state.region.start - 0.01 || ct >= state.region.end - 0.01) {
+    state.ws.setTime(state.region.start);
+  }
   state.ws.playPause();
+});
+
+$('#btnLoop').addEventListener('click', () => {
+  state.loop = !state.loop;
+  $('#btnLoop').classList.toggle('is-on', state.loop);
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && state.audioCtx && state.audioCtx.state === 'suspended') {
+    state.audioCtx.resume();
+  }
 });
 
 function bindSwitch(el, key) {
@@ -1033,6 +1096,8 @@ function bindSwitch(el, key) {
     const on = el.classList.contains('on');
     if (key === 'main') {
       state.pitchLock = on;
+      state.livePreview.pitchLock = on;
+      if (state.ws) state.ws.setPlaybackRate(state.livePreview.speed, on);
       $('#pitchLockLabel').textContent = on ? 'on' : 'off';
       $('#pitchLockLabel').style.color = on ? 'var(--mint-deep)' : 'var(--muted)';
     }
@@ -1143,10 +1208,14 @@ const liveVal = (id, fmt) => {
 };
 liveVal('fadeInRange', v => v.toFixed(2) + ' s');
 liveVal('fadeOutRange', v => v.toFixed(2) + ' s');
+$('#fadeInRange').addEventListener('input', () => { state.livePreview.fadeIn = parseFloat($('#fadeInRange').value) || 0; });
+$('#fadeOutRange').addEventListener('input', () => { state.livePreview.fadeOut = parseFloat($('#fadeOutRange').value) || 0; });
 $('#btnResetFade').addEventListener('click', () => {
   $('#fadeInRange').value = 0; $('#fadeOutRange').value = 0;
   $('#sliceStart').value = 0; $('#sliceEnd').value = 0;
   $('#fadeInVal').textContent = '0.00 s'; $('#fadeOutVal').textContent = '0.00 s';
+  state.livePreview.fadeIn = 0; state.livePreview.fadeOut = 0;
+  if (state.ws) state.ws.setVolume(1);
 });
 $('#btnApplyFade').addEventListener('click', async () => {
   if (!state.audioBuffer) return;
@@ -1164,6 +1233,9 @@ $('#btnApplyFade').addEventListener('click', async () => {
   }
   buf = applyFade(buf, fi, fo, fadeCurve);
   state.audioBuffer = buf;
+  state.livePreview.fadeIn = 0; state.livePreview.fadeOut = 0;
+  $('#fadeInRange').value = 0; $('#fadeOutRange').value = 0;
+  $('#fadeInVal').textContent = '0.00 s'; $('#fadeOutVal').textContent = '0.00 s';
   await refreshWaveform();
   busy.hide();
   toast('faded', 'ok');
@@ -1200,6 +1272,8 @@ liveVal('speedRange', v => v.toFixed(2) + '×');
 $('#speedRange').addEventListener('input', () => {
   const f = parseFloat($('#speedRange').value);
   $('#speedVal').textContent = f.toFixed(2) + '×';
+  state.livePreview.speed = f;
+  if (state.ws) state.ws.setPlaybackRate(f, state.livePreview.pitchLock);
   if (state.audioBuffer) $('#speedNewDur').textContent = fmtTime(state.audioBuffer.duration / f, 2);
 
   const semis = 12 * Math.log2(f);
@@ -1222,6 +1296,10 @@ $('#btnApplySpeed').addEventListener('click', async () => {
   state.audioBuffer = state.pitchLock
     ? timeStretch(state.audioBuffer, f, 0)
     : resampleSpeed(state.audioBuffer, f);
+  $('#speedRange').value = 1;
+  $('#speedVal').textContent = '1.00×';
+  state.livePreview.speed = 1;
+  if (state.ws) state.ws.setPlaybackRate(1, state.livePreview.pitchLock);
   await refreshWaveform();
   busy.hide();
   toast('speed applied', 'ok');
