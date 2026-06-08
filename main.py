@@ -17,7 +17,6 @@ from image_tools import (
     pixelate_endpoint, invert_endpoint, mirror_endpoint,
     rotate_endpoint, format_endpoint, remove_bg_endpoint,
 )
-from plugins_manager import PluginsManager
 from scripts_data import scripts_data, process_script_data
 import sys as _sys, os as _os
 _sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), 'templates'))
@@ -49,7 +48,6 @@ app = Flask(__name__)
 GUILD_ID = os.environ.get("DISCORD_GUILD_ID", "1241797935100989594")
 
 youtube_finder = YouTubeChannelFinder()
-plugins_manager = PluginsManager()
 key_system = KeySystemManager()
 verification_timer = VerificationTimer(min_verification_time=25)
 verification_tokens = {}
@@ -393,78 +391,6 @@ def start_verification():
     verification_timer.start_timer(client_ip)
     logger.info(f"Verification timer started for IP: {client_ip}")
     return jsonify({"success": True, "message": "Timer started"})
-
-
-@app.route('/plugins')
-def plugins_page():
-    try:
-        html_content = render_template('plugins.html')
-        return inject_meta_tags(html_content, PLUGINS_META_TAGS)
-    except Exception as e:
-        logger.error(f"plugins.html render failed: {e}")
-        return jsonify({"error": "Plugins page not found"}), 404
-
-
-@app.route('/plugin-details')
-def plugin_details():
-    try:
-        return send_file('templates/plugin-details.html')
-    except FileNotFoundError:
-        logger.error("plugin-details.html template not found")
-        return jsonify({"error": "Plugin details page not found"}), 404
-
-
-@app.route('/api/plugins/<plugin_id>/raw')
-def get_plugin_raw(plugin_id):
-    try:
-        plugin = plugins_manager.get_plugin_data(plugin_id)
-        if not plugin:
-            response = make_response("-- Plugin not found")
-            response.headers['Content-Type'] = 'text/plain; charset=utf-8'
-            return response, 404
-
-        def escape_lua_string(s):
-            if s is None:
-                return ""
-            return str(s).replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n').replace('\r', '\\r')
-
-        sections = []
-        for section_name, bypasses in plugin.get('sections', {}).items():
-            escaped_bypasses = [f'                "{escape_lua_string(bypass)}"' for bypass in bypasses]
-            bypasses_str = ',\n'.join(escaped_bypasses)
-            sections.append(f'''        {{
-            Name = "{escape_lua_string(section_name)}",
-            Bypasses = {{
-{bypasses_str}
-            }}
-        }}''')
-
-        sections_code = ',\n'.join(sections)
-        lua_code = f'''-- {escape_lua_string(plugin['name'])} by {escape_lua_string(plugin.get('author', 'Anonymous'))}
--- {escape_lua_string(plugin.get('description', 'No description'))}
-
-local Plugin = {{
-    Name = "{escape_lua_string(plugin['name'])}",
-    Author = "{escape_lua_string(plugin.get('author', 'Anonymous'))}",
-    Description = "{escape_lua_string(plugin.get('description', 'No description'))}",
-    Icon = "{escape_lua_string(plugin.get('icon', 'package'))}",
-    Sections = {{
-{sections_code}
-    }}
-}}
-
-return Plugin'''
-
-        response = make_response(lua_code)
-        response.headers['Content-Type'] = 'text/plain; charset=utf-8'
-        response.headers['Access-Control-Allow-Origin'] = '*'
-        logger.info(f"Served raw plugin: {plugin_id}")
-        return response
-    except Exception as e:
-        logger.error(f"Error serving raw plugin {plugin_id}: {str(e)}", exc_info=True)
-        response = make_response(f"-- Error generating plugin: {str(e)}")
-        response.headers['Content-Type'] = 'text/plain; charset=utf-8'
-        return response, 500
 
 
 @app.route('/script/<int:script_id>')
@@ -888,72 +814,6 @@ def validate_discord_key():
     return jsonify({"valid": True, "message": "Authenticated"})
 
 
-@app.route('/plugin/<plugin_id>')
-def plugin_detail(plugin_id):
-    plugin = plugins_manager.get_plugin_data(plugin_id)
-    if not plugin:
-        return jsonify({"error": "Plugin not found"}), 404
-
-    html = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>{plugin['name']} - Vadrifts Plugin</title>
-        <style>
-            body {{ background: #000; color: #fff; font-family: 'Inter', sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; }}
-            h1 {{ color: #9c88ff; }}
-            .section {{ background: rgba(40, 40, 40, 0.8); padding: 20px; border-radius: 10px; margin: 20px 0; }}
-            .bypass {{ background: rgba(114, 9, 183, 0.2); padding: 8px 12px; border-radius: 6px; margin: 5px; display: inline-block; }}
-            .back-btn {{ background: #9c88ff; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; display: inline-block; margin-bottom: 20px; }}
-            .export-btn {{ background: #22c55e; color: white; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; margin-top: 20px; }}
-        </style>
-    </head>
-    <body>
-        <a href="/plugins" class="back-btn">← Back to Plugins</a>
-        <h1>{plugin['name']}</h1>
-        <p>By {plugin.get('author', 'Anonymous')}</p>
-        <p>{plugin.get('description', 'No description')}</p>
-        <p>Used {plugin.get('uses', 0)} times</p>
-        <div id="sections">
-    """
-
-    for section_name, bypasses in plugin.get('sections', {}).items():
-        html += f'<div class="section"><h3>{section_name}</h3><div>'
-        for bypass in bypasses:
-            html += f'<span class="bypass">{bypass}</span>'
-        html += '</div></div>'
-
-    html += f"""
-        <button class="export-btn" onclick="exportPlugin()">Export for Roblox</button>
-        <script>
-            function exportPlugin() {{
-                const pluginData = {json.dumps(plugin)};
-                const scriptCode = generateRobloxScript(pluginData);
-                navigator.clipboard.writeText(scriptCode);
-                alert('Plugin code copied to clipboard!');
-            }}
-            function generateRobloxScript(plugin) {{
-                let script = '{{\\n';
-                script += '  id = "' + plugin.id + '",\\n';
-                script += '  name = "' + plugin.name + '",\\n';
-                script += '  author = "' + (plugin.author || 'Anonymous') + '",\\n';
-                if (plugin.icon) {{ script += '  icon = "' + plugin.icon + '",\\n'; }}
-                script += '  sections = {{\\n';
-                for (const [section, bypasses] of Object.entries(plugin.sections || {{}})) {{
-                    script += '    ["' + section + '"] = {{\\n';
-                    bypasses.forEach(bypass => {{ script += '      "' + bypass + '",\\n'; }});
-                    script += '    }},\\n';
-                }}
-                script += '  }}\\n';
-                script += '}}';
-                return script;
-            }}
-        </script>
-    </body></html>
-    """
-    return html
-
-
 @app.route('/templates/<path:filename>')
 def serve_templates(filename):
     return send_from_directory('templates', filename)
@@ -1013,31 +873,6 @@ def get_script_detail(script_id):
     if script:
         return jsonify(sanitize_script(script))
     return jsonify({"error": "Script not found"}), 404
-
-
-@app.route('/api/plugins', methods=['GET'])
-def get_plugins():
-    return plugins_manager.get_all_plugins()
-
-
-@app.route('/api/plugins', methods=['POST'])
-def create_plugin():
-    return plugins_manager.create_plugin(request)
-
-
-@app.route('/api/plugins/<plugin_id>', methods=['GET'])
-def get_plugin(plugin_id):
-    return plugins_manager.get_plugin(plugin_id)
-
-
-@app.route('/api/plugins/<plugin_id>', methods=['PUT'])
-def update_plugin(plugin_id):
-    return plugins_manager.update_plugin(plugin_id, request)
-
-
-@app.route('/api/plugins/<plugin_id>', methods=['DELETE'])
-def delete_plugin(plugin_id):
-    return plugins_manager.delete_plugin(plugin_id)
 
 
 @app.route('/convert-image', methods=['GET', 'POST'])
@@ -1369,13 +1204,11 @@ def submit_suggestion_route():
         return jsonify({"ok": False, "error": "Hourly limit hit. Try again later."}), 429
 
     meta = SUGGESTION_TYPE_META[stype]
-    ua = request.headers.get("User-Agent", "unknown")[:120]
     embed = {
         "title": f"New {meta['label']} Suggestion",
         "description": text,
         "color": meta["color"],
         "timestamp": datetime.utcnow().isoformat(),
-        "footer": {"text": f"IP {ip} \u00b7 {ua}"},
     }
 
     try:
