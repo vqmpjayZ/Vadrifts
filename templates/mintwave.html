@@ -227,13 +227,12 @@ main { max-width: 1180px; margin: 0 auto 80px; padding: 0 clamp(20px, 4vw, 48px)
   display: flex; align-items: center; justify-content: center;
   color: var(--muted); font-family: var(--mono); font-size: 12px; letter-spacing: .08em;
 }
-.fade-overlay { position: absolute; left: 22px; right: 22px; top: 18px; bottom: 18px; pointer-events: none; }
-.fade-overlay .seg { position: absolute; top: 0; bottom: 0; display: flex; align-items: flex-start; justify-content: center; padding-top: 4px; font-family: var(--mono); font-size: 10px; letter-spacing: .06em; color: rgba(7,36,26,.78); text-shadow: 0 1px 0 rgba(255,255,255,.55); border-left: 1px dashed rgba(7,36,26,.3); border-right: 1px dashed rgba(7,36,26,.3); border-radius: 4px; }
-.fade-overlay .seg-fadeIn  { background: linear-gradient(90deg, rgba(7,36,26,.45), rgba(7,36,26,0)); }
-.fade-overlay .seg-fadeOut { background: linear-gradient(90deg, rgba(7,36,26,0), rgba(7,36,26,.45)); }
-.fade-overlay .seg-boostIn { background: linear-gradient(90deg, rgba(16,185,129,.45), rgba(16,185,129,0)); }
-.fade-overlay .seg-boostOut{ background: linear-gradient(90deg, rgba(16,185,129,0), rgba(16,185,129,.45)); }
-html[data-theme="dark"] .fade-overlay .seg { color: rgba(220,242,229,.92); text-shadow: 0 1px 0 rgba(0,0,0,.65); border-color: rgba(220,242,229,.3); }
+.fade-overlay { position: absolute; left: 22px; right: 22px; top: 18px; bottom: 18px; pointer-events: none; width: calc(100% - 44px); height: calc(100% - 36px); display: block; }
+.fade-overlay polygon.wedge-fade  { fill: rgba(7,36,26,.55); }
+.fade-overlay polygon.wedge-boost { fill: rgba(7,36,26,.55); }
+.fade-overlay text { font-family: var(--mono); font-size: 5.2px; letter-spacing: .06em; fill: #ffffff; paint-order: stroke; stroke: rgba(0,0,0,.45); stroke-width: 0.4px; }
+html[data-theme="dark"] .fade-overlay polygon.wedge-fade  { fill: rgba(7,36,26,.68); }
+html[data-theme="dark"] .fade-overlay polygon.wedge-boost { fill: rgba(7,36,26,.68); }
 .playhead-grab { cursor: grab; }
 .playhead-grab.dragging { cursor: grabbing; }
 .dirty-modal-backdrop { position: fixed; inset: 0; background: rgba(7,36,26,.55); display: none; align-items: center; justify-content: center; z-index: 250; backdrop-filter: blur(4px); }
@@ -530,7 +529,7 @@ footer a { color: var(--muted); }
 
     <div class="wave-stage playhead-grab" id="waveStage">
       <div id="waveform"></div>
-      <div class="fade-overlay" id="fadeOverlay"></div>
+      <svg class="fade-overlay" id="fadeOverlay" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
       <div class="wave-overlay hidden" id="waveOverlay">drag to select a region · click anywhere to seek</div>
     </div>
 
@@ -623,19 +622,14 @@ footer a { color: var(--muted); }
             <div class="value" id="fadeOutVal">0.00 s</div>
           </div>
           <div class="row">
-            <div class="label">Boost in<small>anti-fade · ramps the start up to boost gain</small></div>
+            <div class="label">Boost in<small>anti-fade · starts loud, settles to normal</small></div>
             <input type="range" id="boostInRange" min="0" max="10" step="0.05" value="0"/>
             <div class="value" id="boostInVal">0.00 s</div>
           </div>
           <div class="row">
-            <div class="label">Boost out<small>anti-fade · ramps the end up to boost gain</small></div>
+            <div class="label">Boost out<small>anti-fade · normal to loud at the end</small></div>
             <input type="range" id="boostOutRange" min="0" max="10" step="0.05" value="0"/>
             <div class="value" id="boostOutVal">0.00 s</div>
-          </div>
-          <div class="row">
-            <div class="label">Boost gain<small>peak multiplier for boost regions</small></div>
-            <input type="range" id="boostGainRange" min="1" max="3" step="0.05" value="1.5"/>
-            <div class="value" id="boostGainVal">1.50×</div>
           </div>
           <div class="row">
             <div class="label">Fade curve<small>shape of the ramp</small></div>
@@ -879,7 +873,7 @@ const state = {
   pitchLock: false,
   region: { start: 0, end: 0 },
   loop: true,
-  livePreview: { fadeIn: 0, fadeOut: 0, boostIn: 0, boostOut: 0, boostGain: 1.5, pitchPreview: 0, speed: 1, pitchLock: false },
+  livePreview: { fadeIn: 0, fadeOut: 0, boostIn: 0, boostOut: 0, pitchPreview: 0, speed: 1, pitchLock: false },
   pendingTabSwitch: null,
   panelBaselines: {},
   cover: { data: null, mime: null },
@@ -2104,7 +2098,6 @@ function readPanelSnapshot(tab) {
       return JSON.stringify({
         fi: $('#fadeInRange').value, fo: $('#fadeOutRange').value,
         bi: $('#boostInRange').value, bo: $('#boostOutRange').value,
-        bg: $('#boostGainRange').value,
         sS: $('#sliceStart').value, sE: $('#sliceEnd').value,
         c: fadeCurve,
       });
@@ -2134,14 +2127,11 @@ const TAB_RESET = {
   trim: () => { if (state.audioBuffer) { state.region = { start: 0, end: state.audioBuffer.duration }; updateTrimDisplay(); if (state.wsRegions) { const rs = state.wsRegions.getRegions?.() || []; rs[0]?.setOptions?.({ start: 0, end: state.audioBuffer.duration }); } } },
   fade: () => {
     ['fadeInRange','fadeOutRange','boostInRange','boostOutRange'].forEach(id => { $('#'+id).value = 0; });
-    $('#boostGainRange').value = 1.5;
     $('#fadeInVal').textContent = '0.00 s'; $('#fadeOutVal').textContent = '0.00 s';
     $('#boostInVal').textContent = '0.00 s'; $('#boostOutVal').textContent = '0.00 s';
-    $('#boostGainVal').textContent = '1.50\u00d7';
     $('#sliceStart').value = 0; $('#sliceEnd').value = 0;
     state.livePreview.fadeIn = 0; state.livePreview.fadeOut = 0;
     state.livePreview.boostIn = 0; state.livePreview.boostOut = 0;
-    state.livePreview.boostGain = 1.5;
     drawFadeOverlay();
   },
   speed: () => { $('#speedRange').value = 1; $('#speedRange').dispatchEvent(new Event('input')); },
@@ -2190,7 +2180,8 @@ $('#dirtyApplyBtn').addEventListener('click', async () => {
 
 function drawFadeOverlay() {
   const overlay = $('#fadeOverlay');
-  if (!overlay || !state.audioBuffer || !state.ws) { if (overlay) overlay.innerHTML = ''; return; }
+  if (!overlay) return;
+  if (!state.audioBuffer || !state.ws) { overlay.innerHTML = ''; return; }
   const dur = state.audioBuffer.duration;
   if (dur <= 0) { overlay.innerHTML = ''; return; }
   const activeTab = document.querySelector('.tab.active')?.dataset?.tab;
@@ -2199,24 +2190,37 @@ function drawFadeOverlay() {
   const fo = parseFloat($('#fadeOutRange').value) || 0;
   const bi = parseFloat($('#boostInRange').value) || 0;
   const bo = parseFloat($('#boostOutRange').value) || 0;
-  const segs = [];
   const pct = (sec) => Math.max(0, Math.min(100, (sec / dur) * 100));
-  if (fi > 0) segs.push({ cls: 'seg-fadeIn',  left: 0,                 width: pct(fi), label: 'FADE IN '  + fi.toFixed(2) + 's' });
-  if (fo > 0) segs.push({ cls: 'seg-fadeOut', left: 100 - pct(fo),     width: pct(fo), label: 'FADE OUT ' + fo.toFixed(2) + 's' });
-  if (bi > 0) segs.push({ cls: 'seg-boostIn', left: 0,                 width: pct(bi), label: 'BOOST IN ' + bi.toFixed(2) + 's' });
-  if (bo > 0) segs.push({ cls: 'seg-boostOut',left: 100 - pct(bo),     width: pct(bo), label: 'BOOST OUT '+ bo.toFixed(2) + 's' });
-  overlay.innerHTML = segs.map(s =>
-    '<div class="seg ' + s.cls + '" style="left:' + s.left.toFixed(3) + '%;width:' + s.width.toFixed(3) + '%;">' + s.label + '</div>'
-  ).join('');
+  const parts = [];
+  if (fi > 0) {
+    const X = pct(fi);
+    parts.push('<polygon class="wedge-fade" points="0,0 ' + X.toFixed(3) + ',0 0,100"/>');
+    parts.push('<text x="' + Math.max(1, X*0.18).toFixed(3) + '" y="7">FADE IN ' + fi.toFixed(2) + 's</text>');
+  }
+  if (fo > 0) {
+    const X = pct(fo);
+    parts.push('<polygon class="wedge-fade" points="100,0 ' + (100-X).toFixed(3) + ',0 100,100"/>');
+    parts.push('<text x="' + (100 - X*0.55).toFixed(3) + '" y="7">FADE OUT ' + fo.toFixed(2) + 's</text>');
+  }
+  if (bi > 0) {
+    const X = pct(bi);
+    parts.push('<polygon class="wedge-boost" points="0,100 ' + X.toFixed(3) + ',100 0,0"/>');
+    parts.push('<text x="' + Math.max(1, X*0.18).toFixed(3) + '" y="97">BOOST IN ' + bi.toFixed(2) + 's</text>');
+  }
+  if (bo > 0) {
+    const X = pct(bo);
+    parts.push('<polygon class="wedge-boost" points="100,100 ' + (100-X).toFixed(3) + ',100 100,0"/>');
+    parts.push('<text x="' + (100 - X*0.55).toFixed(3) + '" y="97">BOOST OUT ' + bo.toFixed(2) + 's</text>');
+  }
+  overlay.innerHTML = parts.join('');
 }
 
-['fadeInRange','fadeOutRange','boostInRange','boostOutRange','boostGainRange'].forEach(id => {
+['fadeInRange','fadeOutRange','boostInRange','boostOutRange'].forEach(id => {
   const el = $('#' + id);
   if (!el) return;
   el.addEventListener('input', () => {
     if (id === 'boostInRange')  { state.livePreview.boostIn  = parseFloat(el.value) || 0; $('#boostInVal').textContent  = (parseFloat(el.value)||0).toFixed(2) + ' s'; }
     if (id === 'boostOutRange') { state.livePreview.boostOut = parseFloat(el.value) || 0; $('#boostOutVal').textContent = (parseFloat(el.value)||0).toFixed(2) + ' s'; }
-    if (id === 'boostGainRange'){ state.livePreview.boostGain= parseFloat(el.value) || 1; $('#boostGainVal').textContent= (parseFloat(el.value)||1).toFixed(2) + '\u00d7'; }
     drawFadeOverlay();
   });
 });
@@ -2291,7 +2295,6 @@ $('#pitchRange').addEventListener('input', () => {
     const out = _origApplyFade(buf, fadeIn, fadeOut, curve);
     const bi = parseFloat($('#boostInRange').value) || 0;
     const bo = parseFloat($('#boostOutRange').value) || 0;
-    const bg = parseFloat($('#boostGainRange').value) || 1;
     if (bi <= 0 && bo <= 0) return out;
     const sr = out.sampleRate;
     const N = out.length;
@@ -2309,8 +2312,8 @@ $('#pitchRange').addEventListener('input', () => {
       const d = out.getChannelData(c);
       for (let i = 0; i < N; i++) {
         let g = 1;
-        if (nIn > 0 && i < nIn) g *= 1 + (bg - 1) * r(i / nIn);
-        if (nOut > 0 && i > N - nOut) g *= 1 + (bg - 1) * r((N - i) / nOut);
+        if (nIn > 0 && i < nIn)        g *= 2 - r(i / nIn);
+        if (nOut > 0 && i > N - nOut)  g *= 1 + r(1 - (N - i) / nOut);
         d[i] *= g;
       }
     }
@@ -2334,13 +2337,12 @@ PreviewEngine.startTick = function() {
     const fo = state.livePreview.fadeOut;
     const bi = state.livePreview.boostIn;
     const bo = state.livePreview.boostOut;
-    const bg = state.livePreview.boostGain || 1;
     const rs = state.region.start, re = state.region.end;
     let g = 1;
     if (fi > 0 && ct - rs < fi) g *= Math.max(0, (ct - rs) / fi);
     if (fo > 0 && re - ct < fo) g *= Math.max(0, (re - ct) / fo);
-    if (bi > 0 && ct - rs < bi) g *= 1 + (bg - 1) * Math.max(0, Math.min(1, (ct - rs) / bi));
-    if (bo > 0 && re - ct < bo) g *= 1 + (bg - 1) * Math.max(0, Math.min(1, (re - ct) / bo));
+    if (bi > 0 && ct - rs < bi) g *= 2 - Math.max(0, Math.min(1, (ct - rs) / bi));
+    if (bo > 0 && re - ct < bo) g *= 1 + (1 - Math.max(0, Math.min(1, (re - ct) / bo)));
     if (!self.gain) self.ensureCtx();
     self.gain.gain.setTargetAtTime(Math.max(0, Math.min(4, g)), self.ctx.currentTime, 0.008);
     const dur = state.audioBuffer ? state.audioBuffer.duration : 0;
