@@ -227,6 +227,21 @@ main { max-width: 1180px; margin: 0 auto 80px; padding: 0 clamp(20px, 4vw, 48px)
   display: flex; align-items: center; justify-content: center;
   color: var(--muted); font-family: var(--mono); font-size: 12px; letter-spacing: .08em;
 }
+.fade-overlay { position: absolute; left: 22px; right: 22px; top: 18px; bottom: 18px; pointer-events: none; }
+.fade-overlay .seg { position: absolute; top: 0; bottom: 0; display: flex; align-items: flex-start; justify-content: center; padding-top: 4px; font-family: var(--mono); font-size: 10px; letter-spacing: .06em; color: rgba(7,36,26,.78); text-shadow: 0 1px 0 rgba(255,255,255,.55); border-left: 1px dashed rgba(7,36,26,.3); border-right: 1px dashed rgba(7,36,26,.3); border-radius: 4px; }
+.fade-overlay .seg-fadeIn  { background: linear-gradient(90deg, rgba(7,36,26,.45), rgba(7,36,26,0)); }
+.fade-overlay .seg-fadeOut { background: linear-gradient(90deg, rgba(7,36,26,0), rgba(7,36,26,.45)); }
+.fade-overlay .seg-boostIn { background: linear-gradient(90deg, rgba(16,185,129,.45), rgba(16,185,129,0)); }
+.fade-overlay .seg-boostOut{ background: linear-gradient(90deg, rgba(16,185,129,0), rgba(16,185,129,.45)); }
+html[data-theme="dark"] .fade-overlay .seg { color: rgba(220,242,229,.92); text-shadow: 0 1px 0 rgba(0,0,0,.65); border-color: rgba(220,242,229,.3); }
+.playhead-grab { cursor: grab; }
+.playhead-grab.dragging { cursor: grabbing; }
+.dirty-modal-backdrop { position: fixed; inset: 0; background: rgba(7,36,26,.55); display: none; align-items: center; justify-content: center; z-index: 250; backdrop-filter: blur(4px); }
+.dirty-modal-backdrop.show { display: flex; }
+.dirty-modal { background: var(--surface); border-radius: 18px; padding: 22px 26px; border: 1px solid var(--border); min-width: 320px; max-width: 420px; box-shadow: 0 30px 80px rgba(0,0,0,.3); }
+.dirty-modal h3 { margin: 0 0 6px; font-size: 17px; color: var(--text); }
+.dirty-modal p { margin: 0 0 16px; color: var(--muted); font-size: 14px; line-height: 1.45; }
+.dirty-modal .actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
 
 .transport {
   display: flex; align-items: center; gap: 16px;
@@ -513,8 +528,9 @@ footer a { color: var(--muted); }
       <button class="btn btn-ghost" id="changeFile">change</button>
     </div>
 
-    <div class="wave-stage">
+    <div class="wave-stage playhead-grab" id="waveStage">
       <div id="waveform"></div>
+      <div class="fade-overlay" id="fadeOverlay"></div>
       <div class="wave-overlay hidden" id="waveOverlay">drag to select a region · click anywhere to seek</div>
     </div>
 
@@ -532,8 +548,8 @@ footer a { color: var(--muted); }
       <div class="spacer"></div>
       <div class="pitch-lock">
         <span>PITCH LOCK</span>
-        <div class="switch on" id="pitchLockSwitch" role="switch" aria-checked="true"></div>
-        <span class="mono" id="pitchLockLabel" style="color: var(--mint-deep);">on</span>
+        <div class="switch" id="pitchLockSwitch" role="switch" aria-checked="false"></div>
+        <span class="mono" id="pitchLockLabel" style="color: var(--muted);">off</span>
       </div>
     </div>
 
@@ -605,6 +621,21 @@ footer a { color: var(--muted); }
             <div class="label">Fade out<small>full → silent at the end</small></div>
             <input type="range" id="fadeOutRange" min="0" max="10" step="0.05" value="0"/>
             <div class="value" id="fadeOutVal">0.00 s</div>
+          </div>
+          <div class="row">
+            <div class="label">Boost in<small>anti-fade · ramps the start up to boost gain</small></div>
+            <input type="range" id="boostInRange" min="0" max="10" step="0.05" value="0"/>
+            <div class="value" id="boostInVal">0.00 s</div>
+          </div>
+          <div class="row">
+            <div class="label">Boost out<small>anti-fade · ramps the end up to boost gain</small></div>
+            <input type="range" id="boostOutRange" min="0" max="10" step="0.05" value="0"/>
+            <div class="value" id="boostOutVal">0.00 s</div>
+          </div>
+          <div class="row">
+            <div class="label">Boost gain<small>peak multiplier for boost regions</small></div>
+            <input type="range" id="boostGainRange" min="1" max="3" step="0.05" value="1.5"/>
+            <div class="value" id="boostGainVal">1.50×</div>
           </div>
           <div class="row">
             <div class="label">Fade curve<small>shape of the ramp</small></div>
@@ -691,10 +722,6 @@ footer a { color: var(--muted); }
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
             Apply curve
           </button>
-          <span class="pitch-lock">
-            <span>PITCH LOCK</span>
-            <div class="switch on" id="curvePitchSwitch" role="switch" aria-checked="true"></div>
-          </span>
         </div>
       </div>
 
@@ -779,6 +806,7 @@ footer a { color: var(--muted); }
 </footer>
 
 <div class="toast" id="toast"></div>
+<div class="dirty-modal-backdrop" id="dirtyBackdrop"><div class="dirty-modal"><h3 id="dirtyTitle">Unsaved changes</h3><p id="dirtyText">You have unsaved changes in this tab. Apply them before switching, or discard.</p><div class="actions"><button class="btn btn-ghost" id="dirtyCancelBtn">Cancel</button><button class="btn btn-danger" id="dirtyDiscardBtn">Discard</button><button class="btn btn-primary" id="dirtyApplyBtn">Apply &amp; switch</button></div></div></div>
 <div class="busy" id="busy">
   <div class="busy-card">
     <div class="spinner"></div>
@@ -848,10 +876,12 @@ const state = {
   fileName: '',
   fileMime: '',
   fileBytes: null,
-  pitchLock: true,
+  pitchLock: false,
   region: { start: 0, end: 0 },
   loop: true,
-  livePreview: { fadeIn: 0, fadeOut: 0, speed: 1, pitchLock: true },
+  livePreview: { fadeIn: 0, fadeOut: 0, boostIn: 0, boostOut: 0, boostGain: 1.5, pitchPreview: 0, speed: 1, pitchLock: false },
+  pendingTabSwitch: null,
+  panelBaselines: {},
   cover: { data: null, mime: null },
   ws: null,
   wsRegions: null,
@@ -1134,7 +1164,7 @@ const PreviewEngine = {
         const tNorm = Math.max(0, Math.min(1, (ct - rs) / Math.max(0.001, re - rs)));
         const speed = evalCurveAt(curvePoints.slice().sort((a,b)=>a.t-b.t), tNorm);
         const clamped = Math.max(0.25, Math.min(4, speed));
-        state.ws.setPlaybackRate(clamped, $('#curvePitchSwitch').classList.contains('on'));
+        state.ws.setPlaybackRate(clamped, state.livePreview.pitchLock);
         drawCurve(tNorm);
       }
 
@@ -1188,14 +1218,27 @@ function bindSwitch(el, key) {
   });
 }
 bindSwitch($('#pitchLockSwitch'), 'main');
-bindSwitch($('#curvePitchSwitch'), 'curve');
 
+function activateTab(tab) {
+  $$('.tab').forEach(x => x.classList.toggle('active', x.dataset.tab === tab));
+  $$('.panel').forEach(p => p.classList.toggle('active', p.dataset.panel === tab));
+  if (tab === 'curve') requestAnimationFrame(drawCurve);
+  $('#waveOverlay').classList.toggle('hidden', tab !== 'trim');
+  if (tab === 'pitch') applyPitchPreview(); else clearPitchPreview();
+  drawFadeOverlay();
+  capturePanelBaseline(tab);
+  state.pendingTabSwitch = null;
+}
 $$('.tab').forEach(t => t.addEventListener('click', () => {
-  $$('.tab').forEach(x => x.classList.remove('active'));
-  t.classList.add('active');
-  $$('.panel').forEach(p => p.classList.toggle('active', p.dataset.panel === t.dataset.tab));
-  if (t.dataset.tab === 'curve') requestAnimationFrame(drawCurve);
-  $('#waveOverlay').classList.toggle('hidden', t.dataset.tab !== 'trim');
+  const current = document.querySelector('.tab.active')?.dataset?.tab;
+  const target = t.dataset.tab;
+  if (!target || current === target) return;
+  if (current && isPanelDirty(current)) {
+    state.pendingTabSwitch = target;
+    showDirtyPrompt(current, target);
+    return;
+  }
+  activateTab(target);
 }));
 
 function updateTrimDisplay() {
@@ -1709,7 +1752,7 @@ $('#btnApplyCurve').addEventListener('click', async () => {
   const pts = curvePoints.slice().sort((a, b) => a.t - b.t);
   const flat = pts.every(p => Math.abs(p.v - 1) < 0.005);
   if (flat) { toast('curve is flat at 1× — nothing to do', 'err'); return; }
-  const preserve = $('#curvePitchSwitch').classList.contains('on');
+  const preserve = state.livePreview.pitchLock;
   busy.show('applying curve…');
   await new Promise(r => setTimeout(r, 20));
   state.audioBuffer = await applyCurveSpeed(state.audioBuffer, pts, preserve);
@@ -2046,6 +2089,300 @@ window.addEventListener('keydown', (e) => {
   if (e.target.matches('input, textarea')) return;
   if (e.code === 'Space') { e.preventDefault(); $('#btnPlay').click(); }
 });
+
+
+function readPanelSnapshot(tab) {
+  switch (tab) {
+    case 'trim': {
+      return JSON.stringify({
+        s: $('#trimStartInp')?.value || '',
+        e: $('#trimEndInp')?.value || '',
+        rs: state.region.start, re: state.region.end,
+      });
+    }
+    case 'fade': {
+      return JSON.stringify({
+        fi: $('#fadeInRange').value, fo: $('#fadeOutRange').value,
+        bi: $('#boostInRange').value, bo: $('#boostOutRange').value,
+        bg: $('#boostGainRange').value,
+        sS: $('#sliceStart').value, sE: $('#sliceEnd').value,
+        c: fadeCurve,
+      });
+    }
+    case 'speed': return JSON.stringify({ v: $('#speedRange').value });
+    case 'pitch': return JSON.stringify({ v: $('#pitchRange').value });
+    case 'curve': return JSON.stringify(curvePoints.map(p => [p.t.toFixed(4), p.v.toFixed(4)]));
+    case 'cover': return JSON.stringify({ d: state.cover.data ? state.cover.data.byteLength : 0, m: state.cover.mime || '' });
+    default: return '';
+  }
+}
+function capturePanelBaseline(tab) {
+  state.panelBaselines[tab] = readPanelSnapshot(tab);
+}
+function isPanelDirty(tab) {
+  if (!(tab in state.panelBaselines)) return false;
+  return readPanelSnapshot(tab) !== state.panelBaselines[tab];
+}
+function captureAllBaselines() {
+  ['trim','fade','speed','curve','pitch','cover'].forEach(capturePanelBaseline);
+}
+
+const dirtyBackdrop = $('#dirtyBackdrop');
+const TAB_LABEL = { trim:'Trim', fade:'Fade', speed:'Speed', curve:'Curve Speed', pitch:'Pitch', cover:'Cover' };
+const TAB_APPLY_BTN = { trim:'btnApplyTrim', fade:'btnApplyFade', speed:'btnApplySpeed', curve:'btnApplyCurve', pitch:'btnApplyPitch', cover:null };
+const TAB_RESET = {
+  trim: () => { if (state.audioBuffer) { state.region = { start: 0, end: state.audioBuffer.duration }; updateTrimDisplay(); if (state.wsRegions) { const rs = state.wsRegions.getRegions?.() || []; rs[0]?.setOptions?.({ start: 0, end: state.audioBuffer.duration }); } } },
+  fade: () => {
+    ['fadeInRange','fadeOutRange','boostInRange','boostOutRange'].forEach(id => { $('#'+id).value = 0; });
+    $('#boostGainRange').value = 1.5;
+    $('#fadeInVal').textContent = '0.00 s'; $('#fadeOutVal').textContent = '0.00 s';
+    $('#boostInVal').textContent = '0.00 s'; $('#boostOutVal').textContent = '0.00 s';
+    $('#boostGainVal').textContent = '1.50\u00d7';
+    $('#sliceStart').value = 0; $('#sliceEnd').value = 0;
+    state.livePreview.fadeIn = 0; state.livePreview.fadeOut = 0;
+    state.livePreview.boostIn = 0; state.livePreview.boostOut = 0;
+    state.livePreview.boostGain = 1.5;
+    drawFadeOverlay();
+  },
+  speed: () => { $('#speedRange').value = 1; $('#speedRange').dispatchEvent(new Event('input')); },
+  pitch: () => { $('#pitchRange').value = 0; $('#pitchRange').dispatchEvent(new Event('input')); },
+  curve: () => { resetCurveDefault(); },
+  cover: () => {},
+};
+function showDirtyPrompt(currentTab, targetTab) {
+  const applyBtnId = TAB_APPLY_BTN[currentTab];
+  $('#dirtyTitle').textContent = 'Unsaved ' + (TAB_LABEL[currentTab] || currentTab) + ' changes';
+  $('#dirtyText').textContent = 'You changed something in ' + (TAB_LABEL[currentTab] || currentTab) + ' but haven\u2019t applied it. Apply now, discard the change, or stay on this tab.';
+  $('#dirtyApplyBtn').disabled = !applyBtnId;
+  $('#dirtyApplyBtn').style.opacity = applyBtnId ? '1' : '.5';
+  dirtyBackdrop.classList.add('show');
+}
+function hideDirtyPrompt() { dirtyBackdrop.classList.remove('show'); }
+$('#dirtyCancelBtn').addEventListener('click', () => { state.pendingTabSwitch = null; hideDirtyPrompt(); });
+$('#dirtyDiscardBtn').addEventListener('click', () => {
+  const current = document.querySelector('.tab.active')?.dataset?.tab;
+  if (current && TAB_RESET[current]) TAB_RESET[current]();
+  const tgt = state.pendingTabSwitch;
+  hideDirtyPrompt();
+  if (tgt) activateTab(tgt);
+});
+$('#dirtyApplyBtn').addEventListener('click', async () => {
+  const current = document.querySelector('.tab.active')?.dataset?.tab;
+  const applyBtnId = TAB_APPLY_BTN[current];
+  const tgt = state.pendingTabSwitch;
+  hideDirtyPrompt();
+  if (applyBtnId) {
+    const btn = document.getElementById(applyBtnId);
+    if (btn) {
+      await new Promise(r => {
+        const obs = new MutationObserver(() => {
+          if (!$('#busy').classList.contains('show')) { obs.disconnect(); r(); }
+        });
+        obs.observe($('#busy'), { attributes: true, attributeFilter: ['class'] });
+        btn.click();
+        setTimeout(() => { obs.disconnect(); r(); }, 8000);
+      });
+    }
+  }
+  capturePanelBaseline(current);
+  if (tgt) activateTab(tgt);
+});
+
+function drawFadeOverlay() {
+  const overlay = $('#fadeOverlay');
+  if (!overlay || !state.audioBuffer || !state.ws) { if (overlay) overlay.innerHTML = ''; return; }
+  const dur = state.audioBuffer.duration;
+  if (dur <= 0) { overlay.innerHTML = ''; return; }
+  const activeTab = document.querySelector('.tab.active')?.dataset?.tab;
+  if (activeTab !== 'fade') { overlay.innerHTML = ''; return; }
+  const fi = parseFloat($('#fadeInRange').value) || 0;
+  const fo = parseFloat($('#fadeOutRange').value) || 0;
+  const bi = parseFloat($('#boostInRange').value) || 0;
+  const bo = parseFloat($('#boostOutRange').value) || 0;
+  const segs = [];
+  const pct = (sec) => Math.max(0, Math.min(100, (sec / dur) * 100));
+  if (fi > 0) segs.push({ cls: 'seg-fadeIn',  left: 0,                 width: pct(fi), label: 'FADE IN '  + fi.toFixed(2) + 's' });
+  if (fo > 0) segs.push({ cls: 'seg-fadeOut', left: 100 - pct(fo),     width: pct(fo), label: 'FADE OUT ' + fo.toFixed(2) + 's' });
+  if (bi > 0) segs.push({ cls: 'seg-boostIn', left: 0,                 width: pct(bi), label: 'BOOST IN ' + bi.toFixed(2) + 's' });
+  if (bo > 0) segs.push({ cls: 'seg-boostOut',left: 100 - pct(bo),     width: pct(bo), label: 'BOOST OUT '+ bo.toFixed(2) + 's' });
+  overlay.innerHTML = segs.map(s =>
+    '<div class="seg ' + s.cls + '" style="left:' + s.left.toFixed(3) + '%;width:' + s.width.toFixed(3) + '%;">' + s.label + '</div>'
+  ).join('');
+}
+
+['fadeInRange','fadeOutRange','boostInRange','boostOutRange','boostGainRange'].forEach(id => {
+  const el = $('#' + id);
+  if (!el) return;
+  el.addEventListener('input', () => {
+    if (id === 'boostInRange')  { state.livePreview.boostIn  = parseFloat(el.value) || 0; $('#boostInVal').textContent  = (parseFloat(el.value)||0).toFixed(2) + ' s'; }
+    if (id === 'boostOutRange') { state.livePreview.boostOut = parseFloat(el.value) || 0; $('#boostOutVal').textContent = (parseFloat(el.value)||0).toFixed(2) + ' s'; }
+    if (id === 'boostGainRange'){ state.livePreview.boostGain= parseFloat(el.value) || 1; $('#boostGainVal').textContent= (parseFloat(el.value)||1).toFixed(2) + '\u00d7'; }
+    drawFadeOverlay();
+  });
+});
+
+function applyPitchPreview() {
+  if (!state.ws) return;
+  const el = PreviewEngine.attachedTo;
+  if (!el) return;
+  const s = parseFloat($('#pitchRange').value) || 0;
+  const rate = Math.pow(2, s / 12);
+  el.preservesPitch = false;
+  el.mozPreservesPitch = false;
+  el.webkitPreservesPitch = false;
+  state.ws.setPlaybackRate(rate, false);
+}
+function clearPitchPreview() {
+  if (!state.ws) return;
+  const el = PreviewEngine.attachedTo;
+  if (!el) return;
+  el.preservesPitch = state.livePreview.pitchLock;
+  el.mozPreservesPitch = state.livePreview.pitchLock;
+  el.webkitPreservesPitch = state.livePreview.pitchLock;
+  state.ws.setPlaybackRate(state.livePreview.speed || 1, state.livePreview.pitchLock);
+}
+$('#pitchRange').addEventListener('input', () => {
+  const activeTab = document.querySelector('.tab.active')?.dataset?.tab;
+  if (activeTab === 'pitch') applyPitchPreview();
+});
+
+(function setupDraggablePlayhead() {
+  const stage = $('#waveStage');
+  if (!stage) return;
+  let dragging = false;
+  const xToTime = (clientX) => {
+    if (!state.ws || !state.audioBuffer) return 0;
+    const rect = $('#waveform').getBoundingClientRect();
+    const x = Math.max(0, Math.min(rect.width, clientX - rect.left));
+    return (x / rect.width) * state.audioBuffer.duration;
+  };
+  const seekTo = (t) => {
+    if (!state.ws || !state.audioBuffer) return;
+    const dur = state.audioBuffer.duration;
+    const norm = Math.max(0, Math.min(1, t / Math.max(0.0001, dur)));
+    if (typeof state.ws.seekTo === 'function') state.ws.seekTo(norm);
+    else if (typeof state.ws.setTime === 'function') state.ws.setTime(norm * dur);
+    $('#tCur').textContent = fmtTime(norm * dur, 2);
+  };
+  stage.addEventListener('mousedown', (e) => {
+    if (!state.ws) return;
+    if (e.target.closest('.wavesurfer-region, .wavesurfer-handle')) return;
+    if (e.button !== 0) return;
+    dragging = true;
+    stage.classList.add('dragging');
+    seekTo(xToTime(e.clientX));
+    e.preventDefault();
+  });
+  window.addEventListener('mousemove', (e) => { if (dragging) seekTo(xToTime(e.clientX)); });
+  window.addEventListener('mouseup',   () => { if (dragging) { dragging = false; stage.classList.remove('dragging'); } });
+  stage.addEventListener('touchstart', (e) => {
+    if (!state.ws || !e.touches[0]) return;
+    if (e.target.closest('.wavesurfer-region, .wavesurfer-handle')) return;
+    dragging = true; stage.classList.add('dragging');
+    seekTo(xToTime(e.touches[0].clientX));
+  }, { passive: true });
+  stage.addEventListener('touchmove', (e) => { if (dragging && e.touches[0]) seekTo(xToTime(e.touches[0].clientX)); }, { passive: true });
+  stage.addEventListener('touchend',  () => { if (dragging) { dragging = false; stage.classList.remove('dragging'); } });
+})();
+
+(function patchFadeForBoost() {
+  const _origApplyFade = applyFade;
+  applyFade = function(buf, fadeIn, fadeOut, curve) {
+    const out = _origApplyFade(buf, fadeIn, fadeOut, curve);
+    const bi = parseFloat($('#boostInRange').value) || 0;
+    const bo = parseFloat($('#boostOutRange').value) || 0;
+    const bg = parseFloat($('#boostGainRange').value) || 1;
+    if (bi <= 0 && bo <= 0) return out;
+    const sr = out.sampleRate;
+    const N = out.length;
+    const nIn  = Math.floor(bi * sr);
+    const nOut = Math.floor(bo * sr);
+    const r = (t) => {
+      switch (curve) {
+        case 'exp': return t * t;
+        case 'log': return Math.sqrt(t);
+        case 'cos': return 0.5 - 0.5 * Math.cos(Math.PI * t);
+        default: return t;
+      }
+    };
+    for (let c = 0; c < out.numberOfChannels; c++) {
+      const d = out.getChannelData(c);
+      for (let i = 0; i < N; i++) {
+        let g = 1;
+        if (nIn > 0 && i < nIn) g *= 1 + (bg - 1) * r(i / nIn);
+        if (nOut > 0 && i > N - nOut) g *= 1 + (bg - 1) * r((N - i) / nOut);
+        d[i] *= g;
+      }
+    }
+    return out;
+  };
+})();
+
+const _origStartTick = PreviewEngine.startTick.bind(PreviewEngine);
+PreviewEngine.startTick = function() {
+  if (this.raf) return;
+  const self = this;
+  const loop = () => {
+    if (!state.ws) { self.raf = null; return; }
+    const ct = state.ws.getCurrentTime();
+    $('#tCur').textContent = fmtTime(ct, 2);
+    if (ct >= state.region.end - 0.005) {
+      if (state.loop && state.region.end - state.region.start > 0.05) state.ws.setTime(state.region.start);
+      else { state.ws.pause(); state.ws.setTime(state.region.start); }
+    }
+    const fi = state.livePreview.fadeIn;
+    const fo = state.livePreview.fadeOut;
+    const bi = state.livePreview.boostIn;
+    const bo = state.livePreview.boostOut;
+    const bg = state.livePreview.boostGain || 1;
+    const rs = state.region.start, re = state.region.end;
+    let g = 1;
+    if (fi > 0 && ct - rs < fi) g *= Math.max(0, (ct - rs) / fi);
+    if (fo > 0 && re - ct < fo) g *= Math.max(0, (re - ct) / fo);
+    if (bi > 0 && ct - rs < bi) g *= 1 + (bg - 1) * Math.max(0, Math.min(1, (ct - rs) / bi));
+    if (bo > 0 && re - ct < bo) g *= 1 + (bg - 1) * Math.max(0, Math.min(1, (re - ct) / bo));
+    if (!self.gain) self.ensureCtx();
+    self.gain.gain.setTargetAtTime(Math.max(0, Math.min(4, g)), self.ctx.currentTime, 0.008);
+    const dur = state.audioBuffer ? state.audioBuffer.duration : 0;
+    const activeTab = document.querySelector('.tab.active')?.dataset?.tab;
+    if (activeTab === 'curve' && dur > 0) {
+      const tNorm = Math.max(0, Math.min(1, (ct - rs) / Math.max(0.001, re - rs)));
+      const speed = evalCurveAt(curvePoints.slice().sort((a,b)=>a.t-b.t), tNorm);
+      const clamped = Math.max(0.25, Math.min(4, speed));
+      state.ws.setPlaybackRate(clamped, state.livePreview.pitchLock);
+      drawCurve(tNorm);
+    }
+    self.raf = requestAnimationFrame(loop);
+  };
+  self.raf = requestAnimationFrame(loop);
+};
+
+PreviewEngine.setGain = function(v, immediate) {
+  if (!this.gain) return;
+  const clamped = Math.max(0, Math.min(4, v));
+  if (immediate) this.gain.gain.value = clamped;
+  else this.gain.gain.setTargetAtTime(clamped, this.ctx.currentTime, 0.008);
+};
+
+const _origBtnApplyFade = $('#btnApplyFade');
+_origBtnApplyFade.addEventListener('click', () => {
+  setTimeout(() => {
+    $('#boostInRange').value = 0;  $('#boostInVal').textContent  = '0.00 s';
+    $('#boostOutRange').value = 0; $('#boostOutVal').textContent = '0.00 s';
+    state.livePreview.boostIn = 0; state.livePreview.boostOut = 0;
+    drawFadeOverlay();
+    capturePanelBaseline('fade');
+  }, 50);
+});
+
+const _origMountWavesurfer = mountWavesurfer;
+mountWavesurfer = async function(buf) {
+  const r = await _origMountWavesurfer(buf);
+  setTimeout(() => { captureAllBaselines(); drawFadeOverlay(); }, 50);
+  return r;
+};
+
+if (state.audioBuffer) { captureAllBaselines(); drawFadeOverlay(); }
 
 requestAnimationFrame(() => { sizeCurveCanvas(); drawCurve(); updateCurveStats(); });
 </script>
