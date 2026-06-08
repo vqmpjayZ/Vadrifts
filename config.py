@@ -8,8 +8,6 @@ DATA_DIR = 'data'
 if not os.path.exists(DATA_DIR):
     os.makedirs(DATA_DIR)
 
-PLUGINS_FILE = os.path.join(DATA_DIR, 'plugins_data.json')
-
 SITE_URL = "https://vadrifts.onrender.com"
 DEFAULT_OG_IMAGE = "https://i.imgur.com/ePueN25.png"
 
@@ -39,7 +37,7 @@ def make_meta(title, description, path="", override_title=False, image=None, key
 
 HOME_META_TAGS = make_meta(
     "Vadrifts - Roblox Scripts & Tools",
-    "Vadrift's all-in-one website! Roblox scripts, an image converter, community plugins and more.",
+    "Vadrift's all-in-one website! Roblox scripts, an image converter, and more.",
     "/",
     keywords="vadrifts, roblox scripts, roblox executor, image converter, pixel art, sprite generator"
 )
@@ -48,12 +46,6 @@ SCRIPTS_META_TAGS = make_meta(
     "Check out our collection of all Vadrifts Scripts!",
     "/scripts",
     keywords="vadrifts scripts, roblox scripts, free roblox scripts, lua executor scripts"
-)
-PLUGINS_META_TAGS = make_meta(
-    "Vadrifts Plugins - Community",
-    "Create and share custom bypass plugins!",
-    "/plugins",
-    keywords="vadrifts plugins, roblox bypass plugins, community plugins, custom bypasses"
 )
 PROJECTS_META_TAGS = make_meta(
     "Vadrifts Projects",
