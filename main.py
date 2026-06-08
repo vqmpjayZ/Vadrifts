@@ -417,7 +417,17 @@ def script_detail(script_id):
         logger.error("script-detail.html template not found")
         return jsonify({"error": "Script detail page not found"}), 404
 
-
+@app.route('/mintwave')
+@app.route('/audio')
+@app.route('/audio-editor')
+def mintwave():
+    try:
+        html_content = render_template('mintwave.html')
+        return inject_meta_tags(html_content, MINTWAVE_META_TAGS)
+    except Exception as e:
+        logger.error(f"mintwave.html render failed: {e}")
+        return jsonify({"error": "Mintwave page not found"}), 404
+        
 @app.route('/converter')
 @app.route('/convert')
 @app.route('/resize')
