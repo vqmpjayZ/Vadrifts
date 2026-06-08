@@ -2329,7 +2329,7 @@ PreviewEngine.startTick = function() {
     if (!state.ws) { self.raf = null; return; }
     const ct = state.ws.getCurrentTime();
     $('#tCur').textContent = fmtTime(ct, 2);
-    if (ct >= state.region.end - 0.005) {
+    if (ct >= state.region.end - 0.0005) {
       if (state.loop && state.region.end - state.region.start > 0.05) state.ws.setTime(state.region.start);
       else { state.ws.pause(); state.ws.setTime(state.region.start); }
     }
@@ -2344,7 +2344,8 @@ PreviewEngine.startTick = function() {
     if (bi > 0 && ct - rs < bi) g *= 2 - Math.max(0, Math.min(1, (ct - rs) / bi));
     if (bo > 0 && re - ct < bo) g *= 1 + (1 - Math.max(0, Math.min(1, (re - ct) / bo)));
     if (!self.gain) self.ensureCtx();
-    self.gain.gain.setTargetAtTime(Math.max(0, Math.min(4, g)), self.ctx.currentTime, 0.008);
+    self.gain.gain.cancelScheduledValues(self.ctx.currentTime);
+    self.gain.gain.setValueAtTime(Math.max(0, Math.min(4, g)), self.ctx.currentTime);
     const dur = state.audioBuffer ? state.audioBuffer.duration : 0;
     const activeTab = document.querySelector('.tab.active')?.dataset?.tab;
     if (activeTab === 'curve' && dur > 0) {
@@ -2362,8 +2363,8 @@ PreviewEngine.startTick = function() {
 PreviewEngine.setGain = function(v, immediate) {
   if (!this.gain) return;
   const clamped = Math.max(0, Math.min(4, v));
-  if (immediate) this.gain.gain.value = clamped;
-  else this.gain.gain.setTargetAtTime(clamped, this.ctx.currentTime, 0.008);
+  this.gain.gain.cancelScheduledValues(this.ctx.currentTime);
+  this.gain.gain.setValueAtTime(clamped, this.ctx.currentTime);
 };
 
 const _origBtnApplyFade = $('#btnApplyFade');
