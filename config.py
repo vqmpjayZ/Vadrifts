@@ -54,6 +54,15 @@ PROJECTS_META_TAGS = make_meta(
     keywords="vadrifts projects, web apps, userscripts, roblox tools, vadrifts portfolio"
 )
 
+MINTWAVE_META_TAGS = make_meta(
+    "Mintwave — Free Online Audio Editor | Trim, Fade, Speed Curves, Pitch Shift",
+    "Free in-browser audio editor. Trim with waveform, fade in/out, change speed with pitch lock, draw speed curves, shift pitch, extract or embed cover art. No signup, no upload limits.",
+    "/mintwave",
+    override_title=True,
+    image="https://i.imgur.com/R8usK6m.png",
+    keywords="audio editor, online audio editor, trim audio, fade audio, change audio speed, pitch shifter, speed curve, audio waveform, extract audio from video, cover art editor, mp3 editor, free audio tool"
+)
+
 CONVERTER_META_TAGS = make_meta(
     "Image Converter \u2014 Resize, Crop, Pixelate & Convert | Vadrifts",
     "Free online image converter. Resize, crop, pixelate, change format (PNG, JPG, WebP, GIF, BMP) or export pixel grid JSON. No upload limits, no signup.",
