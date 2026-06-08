@@ -1026,44 +1026,128 @@ async function mountWavesurfer(buf) {
       state.region = { start: 0, end: buf.duration };
     }
     updateTrimDisplay();
+    PreviewEngine.attach(state.ws);
   });
 
-  state.ws.on('audioprocess', (t) => {
-    const ct = typeof t === 'number' ? t : state.ws.getCurrentTime();
-    $('#tCur').textContent = fmtTime(ct, 2);
-    applyLivePreview(ct);
-    if (ct >= state.region.end - 0.005) {
-      if (state.loop && state.region.end - state.region.start > 0.05) {
-        state.ws.setTime(state.region.start);
-      } else {
-        state.ws.pause();
-        state.ws.setTime(state.region.start);
-      }
-    }
-  });
   state.ws.on('seeking', () => $('#tCur').textContent = fmtTime(state.ws.getCurrentTime(), 2));
   state.ws.on('finish', () => {
-    if (state.loop) { state.ws.setTime(state.region.start); state.ws.play(); }
-    else $('#btnPlay').classList.remove('is-playing');
+    if (state.loop && state.region.end - state.region.start > 0.05) {
+      state.ws.setTime(state.region.start); state.ws.play();
+    } else {
+      $('#btnPlay').classList.remove('is-playing');
+      PreviewEngine.stopTick();
+    }
   });
   state.ws.on('play', () => {
     $('#btnPlay').classList.add('is-playing');
-    state.ws.setPlaybackRate(state.livePreview.speed, state.livePreview.pitchLock);
+    PreviewEngine.applyImmediate();
+    PreviewEngine.startTick();
   });
-  state.ws.on('pause', () => { $('#btnPlay').classList.remove('is-playing'); state.ws.setVolume(1); });
+  state.ws.on('pause', () => {
+    $('#btnPlay').classList.remove('is-playing');
+    PreviewEngine.stopTick();
+    PreviewEngine.setGain(1, true);
+  });
 }
 
-function applyLivePreview(currentTime) {
-  if (!state.ws) return;
-  const fi = state.livePreview.fadeIn;
-  const fo = state.livePreview.fadeOut;
-  if (fi <= 0 && fo <= 0) { state.ws.setVolume(1); return; }
-  const dur = state.audioBuffer ? state.audioBuffer.duration : 0;
-  let g = 1;
-  if (fi > 0 && currentTime < fi) g *= Math.max(0, currentTime / fi);
-  if (fo > 0 && currentTime > dur - fo) g *= Math.max(0, (dur - currentTime) / fo);
-  state.ws.setVolume(Math.max(0, Math.min(1, g)));
-}
+const PreviewEngine = {
+  ctx: null,
+  source: null,
+  gain: null,
+  attachedTo: null,
+  raf: null,
+
+  ensureCtx() {
+    if (!this.ctx) {
+      this.ctx = getCtx();
+      this.gain = this.ctx.createGain();
+      this.gain.gain.value = 1;
+      this.gain.connect(this.ctx.destination);
+    }
+  },
+
+  attach(ws) {
+    this.ensureCtx();
+    const el = ws.getMediaElement ? ws.getMediaElement() : (ws.media || null);
+    if (!el || el === this.attachedTo) return;
+    try {
+      if (this.source) { this.source.disconnect(); }
+      this.source = this.ctx.createMediaElementSource(el);
+      this.source.connect(this.gain);
+      this.attachedTo = el;
+      el.preservesPitch = state.livePreview.pitchLock;
+      el.mozPreservesPitch = state.livePreview.pitchLock;
+      el.webkitPreservesPitch = state.livePreview.pitchLock;
+    } catch (e) {
+      console.warn('PreviewEngine.attach failed (already wired?):', e.message);
+    }
+  },
+
+  applyImmediate() {
+    if (!state.ws) return;
+    const el = this.attachedTo;
+    if (el) {
+      el.preservesPitch = state.livePreview.pitchLock;
+      el.mozPreservesPitch = state.livePreview.pitchLock;
+      el.webkitPreservesPitch = state.livePreview.pitchLock;
+    }
+    const activeTab = document.querySelector('.tab.active')?.dataset?.tab;
+    if (activeTab !== 'curve') {
+      state.ws.setPlaybackRate(state.livePreview.speed, state.livePreview.pitchLock);
+    }
+  },
+
+  setGain(v, immediate) {
+    if (!this.gain) return;
+    const clamped = Math.max(0, Math.min(1, v));
+    if (immediate) this.gain.gain.value = clamped;
+    else this.gain.gain.setTargetAtTime(clamped, this.ctx.currentTime, 0.008);
+  },
+
+  startTick() {
+    if (this.raf) return;
+    const loop = () => {
+      if (!state.ws) { this.raf = null; return; }
+      const ct = state.ws.getCurrentTime();
+      $('#tCur').textContent = fmtTime(ct, 2);
+
+      if (ct >= state.region.end - 0.005) {
+        if (state.loop && state.region.end - state.region.start > 0.05) {
+          state.ws.setTime(state.region.start);
+        } else {
+          state.ws.pause();
+          state.ws.setTime(state.region.start);
+        }
+      }
+
+      const fi = state.livePreview.fadeIn;
+      const fo = state.livePreview.fadeOut;
+      const dur = state.audioBuffer ? state.audioBuffer.duration : 0;
+      let g = 1;
+      const rs = state.region.start, re = state.region.end;
+      if (fi > 0 && ct - rs < fi) g *= Math.max(0, (ct - rs) / fi);
+      if (fo > 0 && re - ct < fo) g *= Math.max(0, (re - ct) / fo);
+      this.setGain(g, false);
+
+      const activeTab = document.querySelector('.tab.active')?.dataset?.tab;
+      if (activeTab === 'curve' && dur > 0) {
+        const tNorm = Math.max(0, Math.min(1, (ct - rs) / Math.max(0.001, re - rs)));
+        const speed = evalCurveAt(curvePoints.slice().sort((a,b)=>a.t-b.t), tNorm);
+        const clamped = Math.max(0.25, Math.min(4, speed));
+        state.ws.setPlaybackRate(clamped, $('#curvePitchSwitch').classList.contains('on'));
+        drawCurve(tNorm);
+      }
+
+      this.raf = requestAnimationFrame(loop);
+    };
+    this.raf = requestAnimationFrame(loop);
+  },
+
+  stopTick() {
+    if (this.raf) cancelAnimationFrame(this.raf);
+    this.raf = null;
+  },
+};
 
 function getCss(varName) {
   return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
@@ -1455,7 +1539,7 @@ function xToTime(x) {
   return Math.max(0, Math.min(1, (x - pad) / (w - pad * 2)));
 }
 
-function drawCurve() {
+function drawCurve(playheadProgress) {
   const r = curveCanvas.getBoundingClientRect();
   const w = r.width, h = r.height;
   curveCtx.clearRect(0, 0, w, h);
@@ -1504,6 +1588,32 @@ function drawCurve() {
     curveCtx.font = '600 11px JetBrains Mono, monospace';
     curveCtx.fillText(p.v.toFixed(2) + '×', x + 10, y - 8);
   });
+
+  if (typeof playheadProgress === 'number' && playheadProgress >= 0 && playheadProgress <= 1) {
+    const px = timeToX(playheadProgress);
+    const speedAt = evalCurveAt(pts, playheadProgress);
+    const py = speedToY(speedAt);
+    curveCtx.strokeStyle = mintDeep;
+    curveCtx.lineWidth = 1.5;
+    curveCtx.setLineDash([5, 4]);
+    curveCtx.beginPath();
+    curveCtx.moveTo(px, 6);
+    curveCtx.lineTo(px, h - 6);
+    curveCtx.stroke();
+    curveCtx.setLineDash([]);
+    curveCtx.beginPath();
+    curveCtx.arc(px, py, 5, 0, Math.PI * 2);
+    curveCtx.fillStyle = '#fff';
+    curveCtx.fill();
+    curveCtx.lineWidth = 2;
+    curveCtx.strokeStyle = mintDeep;
+    curveCtx.stroke();
+    curveCtx.fillStyle = mintDeep;
+    curveCtx.font = '700 11px JetBrains Mono, monospace';
+    const lbl = speedAt.toFixed(2) + '×';
+    const tx = px + 8 > w - 50 ? px - 50 : px + 8;
+    curveCtx.fillText(lbl, tx, 18);
+  }
 }
 
 function evalCurveAt(pts, t) {
