@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>StemWave — Audio Editor</title>
+  <title>TeenyTuning — Audio Editor</title>
   <meta name="description" content="In-browser audio editor. Trim, fade, slice, change speed with pitch lock, draw speed curves, shift pitch, swap cover art. No upload limits, no signup, runs entirely on your device." />
 
   <link rel="icon" type="image/png" href="https://i.imgur.com/J3TQ64u.png" />
@@ -423,8 +423,8 @@ footer a { color: var(--muted); }
 
 <nav class="nav">
   <a class="brand" href="/">
-    <img src="https://i.imgur.com/J3TQ64u.png" alt="StemWave"/>
-    <span>StemWave</span>
+    <img src="https://i.imgur.com/J3TQ64u.png" alt="TeenyTuning"/>
+    <span>TeenyTuning</span>
     <span class="b-sub">BETA</span>
   </a>
   <div class="nav-right">
@@ -439,9 +439,9 @@ footer a { color: var(--muted); }
 </nav>
 
 <section class="hero">
-  <img class="hero-logo" src="https://i.imgur.com/J3TQ64u.png" alt="StemWave logo"/>
+  <img class="hero-logo" src="https://i.imgur.com/J3TQ64u.png" alt="TeenyTuning logo"/>
   <div class="hero-text">
-    <h1>StemWave — <span class="accent">audio that listens back.</span></h1>
+    <h1>TeenyTuning — <span class="accent">audio that listens back.</span></h1>
     <p>Drag a file. Pull audio out of a video. Trim, fade, draw speed curves, swap cover art. Everything runs in your browser — no uploads, no signup, no limits.</p>
     <div class="hero-tags">
       <span class="hero-tag">trim · fade · slice</span>
@@ -767,7 +767,7 @@ footer a { color: var(--muted); }
 </main>
 
 <footer>
-  StemWave · part of <a href="/projects">Vadrifts</a> · built client-side with WebAudio + Wavesurfer · v0.2
+  TeenyTuning · part of <a href="/projects">Vadrifts</a> · built client-side with WebAudio + Wavesurfer · v0.2
 </footer>
 
 <div class="toast" id="toast"></div>
@@ -791,13 +791,13 @@ const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 
 (function () {
-  const saved = localStorage.getItem('stemwave-theme') || 'dark';
+  const saved = localStorage.getItem('teenytuning-theme') || 'dark';
   document.documentElement.dataset.theme = saved;
   $('#themeToggle').addEventListener('click', () => {
     const cur = document.documentElement.dataset.theme || 'dark';
     const next = cur === 'light' ? 'dark' : 'light';
     document.documentElement.dataset.theme = next;
-    localStorage.setItem('stemwave-theme', next);
+    localStorage.setItem('teenytuning-theme', next);
   });
 })();
 
@@ -1964,7 +1964,7 @@ function floatTo16(arr) {
 }
 
 function prependID3v2WithCover(mp3, cover) {
-  const title = (state.fileName || 'stemwave').replace(/\.[^.]+$/, '');
+  const title = (state.fileName || 'teenytuning').replace(/\.[^.]+$/, '');
   const titleFrame = makeTextFrame('TIT2', title);
   const apicFrame = makeAPICFrame(cover.data, cover.mime || 'image/jpeg');
   const body = concatU8([titleFrame, apicFrame]);
@@ -2024,12 +2024,12 @@ function download(bytes, name, mime) {
  $$('.export-tile').forEach(t => t.addEventListener('click', async () => {
   if (!state.audioBuffer) return;
   const fmt = t.dataset.fmt;
-  const base = (state.fileName || 'stemwave').replace(/\.[^.]+$/, '');
+  const base = (state.fileName || 'teenytuning').replace(/\.[^.]+$/, '');
   if (fmt === 'wav') {
     busy.show('encoding wav…');
     await new Promise(r => setTimeout(r, 20));
     const bytes = audioBufferToWavBytes(state.audioBuffer);
-    download(bytes, base + '_stemwave.wav', 'audio/wav');
+    download(bytes, base + '_teenytuning.wav', 'audio/wav');
     busy.hide();
     toast('exported wav', 'ok');
   } else if (fmt === 'mp3') {
@@ -2037,7 +2037,7 @@ function download(bytes, name, mime) {
     await new Promise(r => setTimeout(r, 20));
     try {
       const bytes = audioBufferToMp3Bytes(state.audioBuffer, 320, state.cover);
-      download(bytes, base + '_stemwave.mp3', 'audio/mpeg');
+      download(bytes, base + '_teenytuning.mp3', 'audio/mpeg');
       busy.hide();
       toast('exported mp3', 'ok');
     } catch (err) {
