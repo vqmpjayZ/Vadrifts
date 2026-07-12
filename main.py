@@ -417,16 +417,17 @@ def script_detail(script_id):
         logger.error("script-detail.html template not found")
         return jsonify({"error": "Script detail page not found"}), 404
 
-@app.route('/stemwave')
+@app.route('/teenytuning')
 @app.route('/audio')
 @app.route('/audio-editor')
-def stemwave():
+@app.route('/mintwave') 
+def teenytuning():
     try:
-        html_content = render_template('stemwave.html')
-        return inject_meta_tags(html_content, stemwave_META_TAGS)
+        html_content = render_template('teenytuning.html')
+        return inject_meta_tags(html_content, MINTWAVE_META_TAGS)
     except Exception as e:
-        logger.error(f"stemwave.html render failed: {e}")
-        return jsonify({"error": "stemwave page not found"}), 404
+        logger.error(f"teenytuning.html render failed: {e}")
+        return jsonify({"error": "TeenyTuning page not found"}), 404
         
 @app.route('/converter')
 @app.route('/convert')
