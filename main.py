@@ -424,7 +424,7 @@ def script_detail(script_id):
 def teenytuning():
     try:
         html_content = render_template('teenytuning.html')
-        return inject_meta_tags(html_content, MINTWAVE_META_TAGS)
+        return inject_meta_tags(html_content, TEENYTUNING_META_TAGS)
     except Exception as e:
         logger.error(f"teenytuning.html render failed: {e}")
         return jsonify({"error": "TeenyTuning page not found"}), 404
