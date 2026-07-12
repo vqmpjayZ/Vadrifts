@@ -68,9 +68,9 @@ html[data-theme="light"] {
   --muted-2: #6f8a7d;
 
   --mint: #10b981;
-  --mint-2: #34d399;
-  --mint-3: #6ee7b7;
-  --mint-deep: #047857;
+  --mint-2: #059669;
+  --mint-3: #047857;
+  --mint-deep: #065f46;
   --mint-glow: rgba(16,185,129,.30);
 
   --shadow-1: 0 1px 0 rgba(255,255,255,.65) inset, 0 6px 22px rgba(7,36,26,.07);
@@ -122,24 +122,23 @@ h1,h2,h3,h4 { letter-spacing: -.02em; margin: 0; font-weight: 700; }
   border-bottom: 1px solid var(--nav-border);
 }
 .brand { 
-  position: relative; overflow: hidden; 
   display: inline-flex; align-items: center; gap: 12px; 
   color: var(--text); font-weight: 800; font-size: 20px; letter-spacing: -.02em; 
   padding: 4px 8px; border-radius: 8px;
 }
-.brand img { width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 4px 12px var(--mint-glow)); position: relative; z-index: 2; }
-.brand .txt { position: relative; z-index: 2; }
-.brand .b-sub { font-family: var(--mono); font-weight: 600; font-size: 11px; color: var(--mint-3); padding: 3px 8px; border-radius: 6px; background: rgba(76,175,80,.15); letter-spacing: .08em; position: relative; z-index: 2; }
-.brand::after { 
-  content: ''; position: absolute; bottom: -100%; left: 0; width: 100%; height: 100%; 
-  background: linear-gradient(to top, var(--mint-glow), transparent); 
-  transition: bottom 0.3s ease; z-index: 1; 
+.brand img { width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 4px 12px var(--mint-glow)); }
+.brand .txt { transition: color .2s, background .2s; padding: 2px 4px; border-radius: 4px; }
+.brand:hover .txt {
+  background: linear-gradient(90deg, var(--mint-deep), var(--mint), var(--mint-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
-.brand:hover::after { bottom: 0; }
+.brand .b-sub { font-family: var(--mono); font-weight: 600; font-size: 11px; color: var(--mint-3); padding: 3px 8px; border-radius: 6px; background: rgba(76,175,80,.15); letter-spacing: .08em; }
 
 .nav-right { display: flex; align-items: center; gap: 14px; }
 .nav-link { color: var(--muted); font-weight: 600; font-size: 14px; padding: 8px 12px; border-radius: 10px; transition: color .15s, text-shadow .15s; }
-.nav-link:hover { color: var(--mint-3); text-shadow: 0 0 12px var(--mint-glow); background: transparent; }
+.nav-link:hover { color: var(--text); text-shadow: 0 0 10px var(--text); background: transparent; }
 .theme-toggle {
   background: transparent; border: 1px solid var(--border); border-radius: 50%;
   width: 38px; height: 38px; display: inline-flex; align-items: center; justify-content: center;
@@ -249,6 +248,8 @@ main { max-width: 1180px; margin: 0 auto 40px; padding: 0 clamp(20px, 4vw, 48px)
 .fade-overlay { position: absolute; left: 22px; right: 22px; top: 18px; bottom: 18px; pointer-events: none; width: calc(100% - 44px); height: calc(100% - 36px); display: block; }
 .fade-overlay polygon.wedge-fade  { fill: rgba(0, 0, 0, 0.65); }
 html[data-theme="light"] .fade-overlay polygon.wedge-fade { fill: rgba(7,36,26,.45); }
+.fade-overlay polygon.wedge-boost { fill: rgba(255, 255, 255, 0.2); }
+html[data-theme="light"] .fade-overlay polygon.wedge-boost { fill: rgba(7,36,26,.15); }
 .playhead-grab { cursor: grab; }
 .playhead-grab.dragging { cursor: grabbing; }
 
@@ -347,6 +348,7 @@ input[type=range]::-moz-range-thumb {
   box-shadow: 0 4px 12px -2px var(--mint-glow);
   cursor: pointer; border-style: solid;
 }
+input[type=range]:disabled { opacity: 0.4; cursor: not-allowed; }
 
 input[type=number], input[type=text] {
   background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
@@ -450,14 +452,29 @@ input[type=number]:focus, input[type=text]:focus { border-color: var(--mint); bo
 .busy-card .progress .bar { height: 100%; background: linear-gradient(90deg, var(--mint), var(--mint-2)); width: 0; transition: width .2s; }
 
 footer { 
-  margin-top: 40px; padding: 30px 24px; 
+  margin-top: 40px; padding: 24px clamp(20px, 5vw, 64px); 
   border-top: 1px solid var(--border);
-  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  background: rgba(0,0,0,0.1);
 }
-footer .ft-links { display: flex; gap: 20px; }
-footer .ft-links a { color: var(--muted); font-size: 13px; transition: color .15s; }
-footer .ft-links a:hover { color: var(--mint-3); }
-footer p { color: var(--muted-2); font-size: 12px; margin: 0; }
+html[data-theme="light"] footer { background: rgba(255,255,255,0.4); }
+.ft-brand { display: flex; align-items: center; gap: 14px; font-weight: 800; font-size: 18px; }
+.ft-icon-wrap { position: relative; display: flex; align-items: center; gap: 4px; }
+.ft-icon-wrap img { width: 32px; height: 32px; animation: herb-bounce 2s infinite ease-in-out; }
+@keyframes herb-bounce {
+  0%, 100% { transform: translateX(-2px) rotate(-8deg); }
+  50% { transform: translateX(2px) rotate(8deg); }
+}
+.ft-waves { display: flex; gap: 2px; align-items: center; height: 24px; }
+.ft-waves span { width: 3px; background: var(--mint-2); border-radius: 2px; animation: wave 1s infinite ease-in-out; }
+.ft-waves span:nth-child(1) { height: 8px; animation-delay: 0s; }
+.ft-waves span:nth-child(2) { height: 16px; animation-delay: 0.2s; }
+.ft-waves span:nth-child(3) { height: 10px; animation-delay: 0.4s; }
+@keyframes wave { 0%, 100% { transform: scaleY(0.4); opacity: 0.5; } 50% { transform: scaleY(1.2); opacity: 1; } }
+.ft-links { display: flex; gap: 24px; }
+.ft-links a { color: var(--muted); font-size: 13px; transition: color .15s; }
+.ft-links a:hover { color: var(--mint-3); }
+.ft-copy { color: var(--muted-2); font-size: 12px; margin: 0; }
 
 @media (max-width: 740px) {
   .hero { flex-direction: column; align-items: flex-start; gap: 18px; }
@@ -466,6 +483,7 @@ footer p { color: var(--muted-2); font-size: 12px; margin: 0; }
   .row .value { text-align: left; }
   .row-stack > .row { grid-template-columns: 1fr; }
   .vol-control { min-width: 100%; margin-top: 8px; }
+  footer { flex-direction: column; text-align: center; }
 }
   </style>
 </head>
@@ -566,7 +584,7 @@ footer p { color: var(--muted-2); font-size: 12px; margin: 0; }
         <span id="tCur">0:00</span><span class="sep">/</span><span class="total" id="tDur">0:00</span>
       </div>
       <div class="spacer"></div>
-      <div class="vol-control">
+      <div class="vol-control" title="Preview volume (not included in download)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
         <input type="range" id="volSlider" min="0" max="1" step="0.01" value="1" aria-label="Volume">
       </div>
@@ -747,7 +765,7 @@ footer p { color: var(--muted-2); font-size: 12px; margin: 0; }
       <div class="panel" data-panel="pitch">
         <div class="row-stack">
           <div class="row">
-            <div class="label">Pitch shift<small>±24 semitones · tempo preserved on save</small></div>
+            <div class="label">Pitch shift<small>±24 semitones · tempo preserved</small></div>
             <input type="range" id="pitchRange" min="-24" max="24" step="0.1" value="0"/>
             <div class="value" id="pitchVal">+0.0 st</div>
           </div>
@@ -765,12 +783,8 @@ footer p { color: var(--muted-2); font-size: 12px; margin: 0; }
             <div></div>
           </div>
         </div>
-        <p class="muted" style="font-size:12px;margin-top:12px;">Note: Preview alters playback speed. Click apply to render the shift while keeping the original tempo.</p>
+        <p class="muted" style="font-size:12px;margin-top:12px;">Release the slider to apply the shift. The audio will resample to preserve exact tempo.</p>
         <div class="btn-row">
-          <button class="btn btn-primary" id="btnApplyPitch">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            Save pitch on preview
-          </button>
           <button class="btn btn-ghost" id="btnResetPitch">Reset to 0</button>
         </div>
       </div>
@@ -800,7 +814,7 @@ footer p { color: var(--muted-2); font-size: 12px; margin: 0; }
 
     <div class="card-head" style="border-top:1px solid var(--border);border-bottom:none;">
       <h2>Export</h2>
-      <span class="curve-hint">downloads the current preview state</span>
+      <span class="curve-hint">downloads the current preview state (includes unsaved edits)</span>
     </div>
     <div class="card-body">
       <div class="export-grid">
@@ -822,12 +836,19 @@ footer p { color: var(--muted-2); font-size: 12px; margin: 0; }
 </main>
 
 <footer>
+  <div class="ft-brand">
+    <div class="ft-icon-wrap">
+      <img src="https://i.imgur.com/J3TQ64u.png" alt="TeenyTuning"/>
+      <div class="ft-waves"><span></span><span></span><span></span></div>
+    </div>
+    <span>TeenyTuning</span>
+  </div>
   <div class="ft-links">
     <a href="/projects">Projects</a>
     <a href="/converter">PIXL</a>
     <a href="https://discord.com/invite/WDbJ5wE2cR" target="_blank" rel="noopener">Discord</a>
   </div>
-  <p>TeenyTuning · part of <a href="/" style="color:var(--muted);">Vadrifts</a> · built client-side with WebAudio + Wavesurfer</p>
+  <p class="ft-copy">built client-side · part of Vadrifts</p>
 </footer>
 
 <div class="toast" id="toast"></div>
@@ -1354,22 +1375,52 @@ const liveVal = (id, fmt) => {
 };
 liveVal('fadeInRange', v => v.toFixed(2) + ' s');
 liveVal('fadeOutRange', v => v.toFixed(2) + ' s');
- $('#fadeInRange').addEventListener('input', () => { state.livePreview.fadeIn = parseFloat($('#fadeInRange').value) || 0; });
- $('#fadeOutRange').addEventListener('input', () => { state.livePreview.fadeOut = parseFloat($('#fadeOutRange').value) || 0; });
- $('#btnResetFade').addEventListener('click', () => {
-  $('#fadeInRange').value = 0; $('#fadeOutRange').value = 0;
-  $('#sliceStart').value = 0; $('#sliceEnd').value = 0;
-  $('#fadeInVal').textContent = '0.00 s'; $('#fadeOutVal').textContent = '0.00 s';
-  state.livePreview.fadeIn = 0; state.livePreview.fadeOut = 0;
-  if (state.ws) state.ws.setVolume(state.volume);
+liveVal('boostInRange', v => v.toFixed(2) + ' s');
+liveVal('boostOutRange', v => v.toFixed(2) + ' s');
+
+function disableOverlappingFades(changedId) {
+  if (changedId === 'fadeInRange' && parseFloat($('#fadeInRange').value) > 0) {
+    $('#boostInRange').value = 0; $('#boostInVal').textContent = '0.00 s'; state.livePreview.boostIn = 0;
+  } else if (changedId === 'boostInRange' && parseFloat($('#boostInRange').value) > 0) {
+    $('#fadeInRange').value = 0; $('#fadeInVal').textContent = '0.00 s'; state.livePreview.fadeIn = 0;
+  }
+  if (changedId === 'fadeOutRange' && parseFloat($('#fadeOutRange').value) > 0) {
+    $('#boostOutRange').value = 0; $('#boostOutVal').textContent = '0.00 s'; state.livePreview.boostOut = 0;
+  } else if (changedId === 'boostOutRange' && parseFloat($('#boostOutRange').value) > 0) {
+    $('#fadeOutRange').value = 0; $('#fadeOutVal').textContent = '0.00 s'; state.livePreview.fadeOut = 0;
+  }
+}
+
+['fadeInRange','fadeOutRange','boostInRange','boostOutRange'].forEach(id => {
+  const el = $('#' + id);
+  if (!el) return;
+  el.addEventListener('input', () => {
+    disableOverlappingFades(id);
+    if (id === 'fadeInRange')  { state.livePreview.fadeIn  = parseFloat(el.value) || 0; }
+    if (id === 'fadeOutRange') { state.livePreview.fadeOut = parseFloat(el.value) || 0; }
+    if (id === 'boostInRange')  { state.livePreview.boostIn  = parseFloat(el.value) || 0; }
+    if (id === 'boostOutRange') { state.livePreview.boostOut = parseFloat(el.value) || 0; }
+    drawFadeOverlay();
+  });
 });
+
+ $('#btnResetFade').addEventListener('click', () => {
+  ['fadeInRange','fadeOutRange','boostInRange','boostOutRange'].forEach(id => { $('#'+id).value = 0; $('#'+id.replace('Range','Val')).textContent = '0.00 s'; });
+  $('#sliceStart').value = 0; $('#sliceEnd').value = 0;
+  state.livePreview.fadeIn = 0; state.livePreview.fadeOut = 0;
+  state.livePreview.boostIn = 0; state.livePreview.boostOut = 0;
+  drawFadeOverlay();
+});
+
  $('#btnApplyFade').addEventListener('click', async () => {
   if (!state.audioBuffer) return;
   const fi = parseFloat($('#fadeInRange').value) || 0;
   const fo = parseFloat($('#fadeOutRange').value) || 0;
+  const bi = parseFloat($('#boostInRange').value) || 0;
+  const bo = parseFloat($('#boostOutRange').value) || 0;
   const sS = Math.max(0, parseFloat($('#sliceStart').value) || 0);
   const sE = Math.max(0, parseFloat($('#sliceEnd').value) || 0);
-  if (fi === 0 && fo === 0 && sS === 0 && sE === 0) { toast('nothing to apply', 'err'); return; }
+  if (fi === 0 && fo === 0 && bi === 0 && bo === 0 && sS === 0 && sE === 0) { toast('nothing to apply', 'err'); return; }
   busy.show('applying fade…');
   await new Promise(r => setTimeout(r, 20));
   let buf = state.audioBuffer;
@@ -1377,21 +1428,22 @@ liveVal('fadeOutRange', v => v.toFixed(2) + ' s');
     const start = sS, end = Math.max(start + 0.01, buf.duration - sE);
     buf = sliceBuffer(buf, start, end);
   }
-  buf = applyFade(buf, fi, fo, fadeCurve);
+  buf = applyFadeAndBoost(buf, fi, fo, bi, bo, fadeCurve);
   state.audioBuffer = buf;
-  state.livePreview.fadeIn = 0; state.livePreview.fadeOut = 0;
-  $('#fadeInRange').value = 0; $('#fadeOutRange').value = 0;
-  $('#fadeInVal').textContent = '0.00 s'; $('#fadeOutVal').textContent = '0.00 s';
+  state.livePreview.fadeIn = 0; state.livePreview.fadeOut = 0; state.livePreview.boostIn = 0; state.livePreview.boostOut = 0;
+  ['fadeInRange','fadeOutRange','boostInRange','boostOutRange'].forEach(id => { $('#'+id).value = 0; $('#'+id.replace('Range','Val')).textContent = '0.00 s'; });
   await refreshWaveform();
   busy.hide();
   toast('faded', 'ok');
 });
 
-function applyFade(buf, fadeIn, fadeOut, curve) {
+function applyFadeAndBoost(buf, fadeIn, fadeOut, boostIn, boostOut, curve) {
   const sr = buf.sampleRate;
   const out = getCtx().createBuffer(buf.numberOfChannels, buf.length, sr);
   const fIn = Math.floor(fadeIn * sr);
   const fOut = Math.floor(fadeOut * sr);
+  const bIn = Math.floor(boostIn * sr);
+  const bOut = Math.floor(boostOut * sr);
   const N = buf.length;
   const ramp = (t) => {
     switch (curve) {
@@ -1408,6 +1460,8 @@ function applyFade(buf, fadeIn, fadeOut, curve) {
       let g = 1;
       if (fIn > 0 && i < fIn) g *= ramp(i / fIn);
       if (fOut > 0 && i > N - fOut) g *= ramp((N - i) / fOut);
+      if (bIn > 0 && i < bIn) g *= 2 - ramp(i / bIn);
+      if (bOut > 0 && i > N - bOut) g *= 1 + ramp(1 - (N - i) / bOut);
       dst[i] = src[i] * g;
     }
   }
@@ -1460,23 +1514,25 @@ liveVal('pitchRange', v => (v >= 0 ? '+' : '') + v.toFixed(1) + ' st');
  $('#btnResetPitch').addEventListener('click', () => {
   $('#pitchRange').value = 0; $('#pitchRange').dispatchEvent(new Event('input'));
 });
- $('#btnApplyPitch').addEventListener('click', async () => {
+
+ $('#pitchRange').addEventListener('change', async () => {
   if (!state.audioBuffer) return;
   const s = parseFloat($('#pitchRange').value);
-  if (Math.abs(s) < 0.05) { toast('pitch unchanged', 'err'); return; }
-  busy.show('shifting pitch…');
+  if (Math.abs(s) < 0.05) return;
+  busy.show('rendering pitch shift...');
   await new Promise(r => setTimeout(r, 20));
   state.audioBuffer = timeStretch(state.audioBuffer, 1, s);
   await refreshWaveform();
   busy.hide();
   toast('pitch applied', 'ok');
+  $('#pitchRange').value = 0;
+  $('#pitchVal').textContent = '+0.0 st';
 });
 
 function timeStretch(buf, tempoFactor, semitones) {
   const ST = window.soundtouch || window.SoundTouchJS || {};
   const SoundTouch = ST.SoundTouch || window.SoundTouch;
   const SimpleFilter = ST.SimpleFilter || window.SimpleFilter;
-  const WebAudioBufferSource = ST.WebAudioBufferSource;
   if (!SoundTouch || !SimpleFilter) {
     console.warn('SoundTouch missing, falling back to resample');
     return resampleSpeed(buf, tempoFactor);
@@ -2081,29 +2137,75 @@ function download(bytes, name, mime) {
   setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
 }
 
+async function processExport() {
+  let exportBuffer = state.audioBuffer;
+  const activeTab = document.querySelector('.tab.active')?.dataset?.tab;
+
+  if (activeTab === 'trim') {
+    const { start, end } = state.region;
+    if (end - start > 0.01 && !(start <= 0.001 && end >= exportBuffer.duration - 0.001)) {
+      exportBuffer = sliceBuffer(exportBuffer, start, end);
+    }
+  }
+  if (activeTab === 'speed') {
+    const f = parseFloat($('#speedRange').value);
+    if (Math.abs(f - 1) > 0.001) {
+      exportBuffer = state.pitchLock ? timeStretch(exportBuffer, f, 0) : resampleSpeed(exportBuffer, f);
+    }
+  }
+  if (activeTab === 'fade') {
+    const fi = parseFloat($('#fadeInRange').value) || 0;
+    const fo = parseFloat($('#fadeOutRange').value) || 0;
+    const bi = parseFloat($('#boostInRange').value) || 0;
+    const bo = parseFloat($('#boostOutRange').value) || 0;
+    const sS = Math.max(0, parseFloat($('#sliceStart').value) || 0);
+    const sE = Math.max(0, parseFloat($('#sliceEnd').value) || 0);
+    if (fi > 0 || fo > 0 || bi > 0 || bo > 0 || sS > 0 || sE > 0) {
+      if (sS > 0 || sE > 0) {
+        const start = sS, end = Math.max(start + 0.01, exportBuffer.duration - sE);
+        exportBuffer = sliceBuffer(exportBuffer, start, end);
+      }
+      exportBuffer = applyFadeAndBoost(exportBuffer, fi, fo, bi, bo, fadeCurve);
+    }
+  }
+  if (activeTab === 'curve') {
+    const pts = curvePoints.slice().sort((a, b) => a.t - b.t);
+    const flat = pts.every(p => Math.abs(p.v - 1) < 0.005);
+    if (!flat) {
+      const preserve = state.livePreview.pitchLock;
+      exportBuffer = await applyCurveSpeed(exportBuffer, pts, preserve);
+    }
+  }
+  return exportBuffer;
+}
+
  $$('.export-tile').forEach(t => t.addEventListener('click', async () => {
   if (!state.audioBuffer) return;
   const fmt = t.dataset.fmt;
   const base = (state.fileName || 'teenytuning').replace(/\.[^.]+$/, '');
-  if (fmt === 'wav') {
-    busy.show('encoding wav…');
-    await new Promise(r => setTimeout(r, 20));
-    const bytes = audioBufferToWavBytes(state.audioBuffer);
-    download(bytes, base + '_teenytuning.wav', 'audio/wav');
-    busy.hide();
-    toast('exported wav', 'ok');
-  } else if (fmt === 'mp3') {
-    busy.show('encoding mp3…');
-    await new Promise(r => setTimeout(r, 20));
-    try {
-      const bytes = audioBufferToMp3Bytes(state.audioBuffer, 320, state.cover);
+  busy.show('preparing export...');
+  await new Promise(r => setTimeout(r, 20));
+  
+  try {
+    const exportBuf = await processExport();
+    if (fmt === 'wav') {
+      busy.show('encoding wav…');
+      await new Promise(r => setTimeout(r, 20));
+      const bytes = audioBufferToWavBytes(exportBuf);
+      download(bytes, base + '_teenytuning.wav', 'audio/wav');
+      busy.hide();
+      toast('exported wav', 'ok');
+    } else if (fmt === 'mp3') {
+      busy.show('encoding mp3…');
+      await new Promise(r => setTimeout(r, 20));
+      const bytes = audioBufferToMp3Bytes(exportBuf, 320, state.cover);
       download(bytes, base + '_teenytuning.mp3', 'audio/mpeg');
       busy.hide();
       toast('exported mp3', 'ok');
-    } catch (err) {
-      busy.hide();
-      toast('mp3 encode failed: ' + err.message, 'err');
     }
+  } catch (err) {
+    busy.hide();
+    toast('export failed: ' + err.message, 'err');
   }
 }));
 
@@ -2120,30 +2222,33 @@ function drawFadeOverlay() {
   if (dur <= 0) { overlay.innerHTML = ''; return; }
   const activeTab = document.querySelector('.tab.active')?.dataset?.tab;
   if (activeTab !== 'fade') { overlay.innerHTML = ''; return; }
+  
   const fi = parseFloat($('#fadeInRange').value) || 0;
   const fo = parseFloat($('#fadeOutRange').value) || 0;
+  const bi = parseFloat($('#boostInRange').value) || 0;
+  const bo = parseFloat($('#boostOutRange').value) || 0;
+  
   const pct = (sec) => Math.max(0, Math.min(100, (sec / dur) * 100));
   const parts = [];
+  
   if (fi > 0) {
     const X = pct(fi);
-    parts.push('<polygon class="wedge-fade" points="0,0 ' + X.toFixed(3) + ',0 0,100"/>');
+    parts.push(`<polygon class="wedge-fade" points="0,100 ${X.toFixed(3)},100 0,0"/>`);
+  } else if (bi > 0) {
+    const X = pct(bi);
+    parts.push(`<polygon class="wedge-boost" points="0,0 ${X.toFixed(3)},0 0,100"/>`);
   }
+  
   if (fo > 0) {
     const X = pct(fo);
-    parts.push('<polygon class="wedge-fade" points="100,0 ' + (100-X).toFixed(3) + ',0 100,100"/>');
+    parts.push(`<polygon class="wedge-fade" points="100,100 100,0 ${(100-X).toFixed(3)},100"/>`);
+  } else if (bo > 0) {
+    const X = pct(bo);
+    parts.push(`<polygon class="wedge-boost" points="100,0 100,100 ${(100-X).toFixed(3)},0"/>`);
   }
+  
   overlay.innerHTML = parts.join('');
 }
-
-['fadeInRange','fadeOutRange','boostInRange','boostOutRange'].forEach(id => {
-  const el = $('#' + id);
-  if (!el) return;
-  el.addEventListener('input', () => {
-    if (id === 'boostInRange')  { state.livePreview.boostIn  = parseFloat(el.value) || 0; $('#boostInVal').textContent  = (parseFloat(el.value)||0).toFixed(2) + ' s'; }
-    if (id === 'boostOutRange') { state.livePreview.boostOut = parseFloat(el.value) || 0; $('#boostOutVal').textContent = (parseFloat(el.value)||0).toFixed(2) + ' s'; }
-    drawFadeOverlay();
-  });
-});
 
 function applyPitchPreview() {
   if (!state.ws) return;
@@ -2209,38 +2314,6 @@ function clearPitchPreview() {
   stage.addEventListener('touchend',  () => { if (dragging) { dragging = false; stage.classList.remove('dragging'); } });
 })();
 
-(function patchFadeForBoost() {
-  const _origApplyFade = applyFade;
-  applyFade = function(buf, fadeIn, fadeOut, curve) {
-    const out = _origApplyFade(buf, fadeIn, fadeOut, curve);
-    const bi = parseFloat($('#boostInRange').value) || 0;
-    const bo = parseFloat($('#boostOutRange').value) || 0;
-    if (bi <= 0 && bo <= 0) return out;
-    const sr = out.sampleRate;
-    const N = out.length;
-    const nIn  = Math.floor(bi * sr);
-    const nOut = Math.floor(bo * sr);
-    const r = (t) => {
-      switch (curve) {
-        case 'exp': return t * t;
-        case 'log': return Math.sqrt(t);
-        case 'cos': return 0.5 - 0.5 * Math.cos(Math.PI * t);
-        default: return t;
-      }
-    };
-    for (let c = 0; c < out.numberOfChannels; c++) {
-      const d = out.getChannelData(c);
-      for (let i = 0; i < N; i++) {
-        let g = 1;
-        if (nIn > 0 && i < nIn)        g *= 2 - r(i / nIn);
-        if (nOut > 0 && i > N - nOut)  g *= 1 + r(1 - (N - i) / nOut);
-        d[i] *= g;
-      }
-    }
-    return out;
-  };
-})();
-
 const _origStartTick = PreviewEngine.startTick.bind(PreviewEngine);
 PreviewEngine.startTick = function() {
   if (this.raf) return;
@@ -2286,16 +2359,6 @@ PreviewEngine.setGain = function(v, immediate) {
   this.gain.gain.cancelScheduledValues(this.ctx.currentTime);
   this.gain.gain.setValueAtTime(clamped, this.ctx.currentTime);
 };
-
-const _origBtnApplyFade = $('#btnApplyFade');
-_origBtnApplyFade.addEventListener('click', () => {
-  setTimeout(() => {
-    $('#boostInRange').value = 0;  $('#boostInVal').textContent  = '0.00 s';
-    $('#boostOutRange').value = 0; $('#boostOutVal').textContent = '0.00 s';
-    state.livePreview.boostIn = 0; state.livePreview.boostOut = 0;
-    drawFadeOverlay();
-  }, 50);
-});
 
 const _origMountWavesurfer = mountWavesurfer;
 mountWavesurfer = async function(buf) {
