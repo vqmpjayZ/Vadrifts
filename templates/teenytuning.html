@@ -248,13 +248,13 @@ main { max-width: 1180px; margin: 0 auto 40px; padding: 0 clamp(20px, 4vw, 48px)
   padding: 18px 22px;
   position: relative;
 }
-#waveform { width: 100%; min-height: 132px; }
+#waveform { width: 100%; min-height: 132px; position: relative; z-index: 1; }
 #waveform .wavesurfer-region { background: rgba(76,175,80,.18) !important; }
-.fade-overlay { position: absolute; left: 22px; right: 22px; top: 18px; bottom: 18px; pointer-events: none; width: calc(100% - 44px); height: calc(100% - 36px); display: block; }
-.fade-overlay polygon.wedge-fade  { fill: rgba(0, 0, 0, 0.75); }
-html[data-theme="light"] .fade-overlay polygon.wedge-fade { fill: rgba(7,36,26,.45); }
-.fade-overlay polygon.wedge-boost { fill: rgba(255, 255, 255, 0.2); }
-html[data-theme="light"] .fade-overlay polygon.wedge-boost { fill: rgba(7,36,26,.15); }
+.fade-overlay { position: absolute; left: 22px; right: 22px; top: 18px; bottom: 18px; pointer-events: none; width: calc(100% - 44px); height: calc(100% - 36px); display: block; z-index: 10; }
+.fade-overlay polygon.wedge-fade  { fill: rgba(239, 68, 68, 0.28); }
+html[data-theme="light"] .fade-overlay polygon.wedge-fade { fill: rgba(239, 68, 68, 0.22); }
+.fade-overlay polygon.wedge-boost { fill: rgba(76, 175, 80, 0.22); }
+html[data-theme="light"] .fade-overlay polygon.wedge-boost { fill: rgba(16, 185, 129, 0.18); }
 .playhead-grab { cursor: grab; }
 .playhead-grab.dragging { cursor: grabbing; }
 
@@ -499,7 +499,7 @@ html[data-theme="light"] footer { background: rgba(255,255,255,0.4); }
 <body>
 
 <nav class="nav">
-  <a class="brand" href="/">
+  <a class="brand" href="/teenytuning">
     <img src="https://i.imgur.com/VWBy5Sk.png" alt="TeenyTuning"/>
     <span class="txt">TeenyTuning</span>
     <span class="b-sub">BETA</span>
@@ -795,7 +795,7 @@ html[data-theme="light"] footer { background: rgba(255,255,255,0.4); }
             <div></div>
           </div>
         </div>
-        <p class="muted" style="font-size:12px;margin-top:12px;">Release the slider to apply the shift. The audio will resample to preserve exact tempo.</p>
+        <p class="muted" style="font-size:12px;margin-top:12px;">Release the slider to apply the shift. Tempo is preserved — only pitch changes.</p>
         <div class="btn-row">
           <button class="btn btn-ghost" id="btnResetPitch">Reset to 0</button>
         </div>
@@ -826,7 +826,7 @@ html[data-theme="light"] footer { background: rgba(255,255,255,0.4); }
 
     <div class="card-head" style="border-top:1px solid var(--border);border-bottom:none;">
       <h2>Export</h2>
-      <span class="curve-hint">downloads the current preview state (includes unsaved edits)</span>
+      <span class="curve-hint">downloads with all unsaved adjustments applied</span>
     </div>
     <div class="card-body">
       <div class="export-grid">
@@ -848,7 +848,7 @@ html[data-theme="light"] footer { background: rgba(255,255,255,0.4); }
 </main>
 
 <footer>
-  <a class="ft-brand" href="/">
+  <a class="ft-brand" href="/teenytuning">
     <div class="ft-icon-wrap">
       <img src="https://i.imgur.com/VWBy5Sk.png" alt="TeenyTuning"/>
       <span class="ft-note">🎵</span>
@@ -1263,8 +1263,23 @@ function getCss(varName) {
 });
 
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && state.audioCtx && state.audioCtx.state === 'suspended') {
-    state.audioCtx.resume();
+  if (document.visibilityState === 'visible') {
+    if (state.audioCtx && state.audioCtx.state === 'suspended') {
+      state.audioCtx.resume();
+    }
+    if (state.ws && state.audioBuffer) {
+      const activeTab = document.querySelector('.tab.active')?.dataset?.tab;
+      if (activeTab === 'curve') {
+        const ct = state.ws.getCurrentTime();
+        const rs = state.region.start, re = state.region.end;
+        const tNorm = Math.max(0, Math.min(1, (ct - rs) / Math.max(0.001, re - rs)));
+        const speed = evalCurveAt(curvePoints.slice().sort((a,b)=>a.t-b.t), tNorm);
+        const clamped = Math.max(0.25, Math.min(4, speed));
+        state.ws.setPlaybackRate(clamped, state.livePreview.pitchLock);
+      } else {
+        state.ws.setPlaybackRate(state.livePreview.speed || 1, state.livePreview.pitchLock);
+      }
+    }
   }
 });
 
@@ -1546,67 +1561,72 @@ liveVal('pitchRange', v => (v >= 0 ? '+' : '') + v.toFixed(1) + ' st');
 });
 
 function timeStretch(buf, tempoFactor, semitones) {
-  const ST = window.soundtouch || window.SoundTouchJS || {};
-  const SoundTouch = ST.SoundTouch || window.SoundTouch;
-  const SimpleFilter = ST.SimpleFilter || window.SimpleFilter;
-  if (!SoundTouch || !SimpleFilter) {
-    console.warn('SoundTouch missing, falling back to resample');
-    return resampleSpeed(buf, tempoFactor);
-  }
+  try {
+    const ST = window.soundtouch || window.SoundTouchJS || (typeof window.SoundTouch === 'object' && window.SoundTouch ? window.SoundTouch : {}) || {};
+    const SoundTouch = ST.SoundTouch || (typeof window.SoundTouch === 'function' ? window.SoundTouch : null);
+    const SimpleFilter = ST.SimpleFilter || (typeof window.SimpleFilter === 'function' ? window.SimpleFilter : null);
+    if (!SoundTouch || !SimpleFilter) {
+      console.warn('SoundTouch missing, falling back to resample');
+      return resampleSpeed(buf, tempoFactor);
+    }
 
-  const inLen = buf.length;
-  const ch = buf.numberOfChannels;
-  const sr = buf.sampleRate;
-  const interleaved = new Float32Array(inLen * 2);
-  const L = buf.getChannelData(0);
-  const R = ch > 1 ? buf.getChannelData(1) : L;
-  for (let i = 0; i < inLen; i++) {
-    interleaved[i * 2] = L[i];
-    interleaved[i * 2 + 1] = R[i];
-  }
-  let position = 0;
-  const source = {
-    extract: function (target, numFrames, _position) {
-      const start = position * 2;
-      const wanted = numFrames * 2;
-      const available = Math.max(0, interleaved.length - start);
-      const n = Math.min(wanted, available);
-      for (let i = 0; i < n; i++) target[i] = interleaved[start + i];
-      for (let i = n; i < wanted; i++) target[i] = 0;
-      const framesProduced = Math.floor(n / 2);
-      position += framesProduced;
-      return framesProduced;
+    const inLen = buf.length;
+    const ch = buf.numberOfChannels;
+    const sr = buf.sampleRate;
+    const interleaved = new Float32Array(inLen * 2);
+    const L = buf.getChannelData(0);
+    const R = ch > 1 ? buf.getChannelData(1) : L;
+    for (let i = 0; i < inLen; i++) {
+      interleaved[i * 2] = L[i];
+      interleaved[i * 2 + 1] = R[i];
     }
-  };
-  const st = new SoundTouch();
-  st.tempo = tempoFactor;
-  st.pitchSemitones = semitones || 0;
-  const filter = new SimpleFilter(source, st);
-  const block = 4096;
-  const chunks = [];
-  const tmp = new Float32Array(block * 2);
-  while (true) {
-    const got = filter.extract(tmp, block);
-    if (got === 0) break;
-    chunks.push(tmp.slice(0, got * 2));
-  }
-  const newLen = chunks.reduce((s, c) => s + c.length, 0) / 2;
-  const out = getCtx().createBuffer(ch, Math.max(1, newLen), sr);
-  let outIdx = 0;
-  if (ch === 1) {
-    const c = out.getChannelData(0);
-    for (const chunk of chunks) {
-      for (let i = 0; i < chunk.length; i += 2) c[outIdx++] = (chunk[i] + chunk[i + 1]) * 0.5;
+    let position = 0;
+    const source = {
+      extract: function (target, numFrames, _position) {
+        const start = position * 2;
+        const wanted = numFrames * 2;
+        const available = Math.max(0, interleaved.length - start);
+        const n = Math.min(wanted, available);
+        for (let i = 0; i < n; i++) target[i] = interleaved[start + i];
+        for (let i = n; i < wanted; i++) target[i] = 0;
+        const framesProduced = Math.floor(n / 2);
+        position += framesProduced;
+        return framesProduced;
+      }
+    };
+    const st = new SoundTouch();
+    st.tempo = tempoFactor;
+    st.pitchSemitones = semitones || 0;
+    const filter = new SimpleFilter(source, st);
+    const block = 4096;
+    const chunks = [];
+    const tmp = new Float32Array(block * 2);
+    while (true) {
+      const got = filter.extract(tmp, block);
+      if (got === 0) break;
+      chunks.push(tmp.slice(0, got * 2));
     }
-  } else {
-    const cL = out.getChannelData(0), cR = out.getChannelData(1);
-    for (const chunk of chunks) {
-      for (let i = 0; i < chunk.length; i += 2) {
-        cL[outIdx] = chunk[i]; cR[outIdx] = chunk[i + 1]; outIdx++;
+    const newLen = chunks.reduce((s, c) => s + c.length, 0) / 2;
+    const out = getCtx().createBuffer(ch, Math.max(1, newLen), sr);
+    let outIdx = 0;
+    if (ch === 1) {
+      const c = out.getChannelData(0);
+      for (const chunk of chunks) {
+        for (let i = 0; i < chunk.length; i += 2) c[outIdx++] = (chunk[i] + chunk[i + 1]) * 0.5;
+      }
+    } else {
+      const cL = out.getChannelData(0), cR = out.getChannelData(1);
+      for (const chunk of chunks) {
+        for (let i = 0; i < chunk.length; i += 2) {
+          cL[outIdx] = chunk[i]; cR[outIdx] = chunk[i + 1]; outIdx++;
+        }
       }
     }
+    return out;
+  } catch (e) {
+    console.warn('timeStretch error, falling back:', e.message);
+    return resampleSpeed(buf, tempoFactor);
   }
-  return out;
 }
 
 function resampleSpeed(buf, factor) {
@@ -2112,7 +2132,7 @@ function prependID3v2WithCover(mp3, cover) {
 }
 function makeTextFrame(id, text) {
   const enc = new TextEncoder();
-  const payload = concatU8([new Uint8Array([3]), enc.encode(text)]);
+  const payload = concatU8([new Uint8Array([0]), enc.encode(text)]);
   return makeFrame(id, payload);
 }
 function makeAPICFrame(dataBytes, mime) {
@@ -2155,49 +2175,43 @@ function download(bytes, name, mime) {
 
 async function processExport() {
   let exportBuffer = state.audioBuffer;
-  const activeTab = document.querySelector('.tab.active')?.dataset?.tab;
 
-  if (activeTab === 'trim') {
-    const { start, end } = state.region;
-    if (end - start > 0.01 && !(start <= 0.001 && end >= exportBuffer.duration - 0.001)) {
-      exportBuffer = sliceBuffer(exportBuffer, start, end);
-    }
+  const { start, end } = state.region;
+  if (end - start > 0.01 && !(start <= 0.001 && end >= exportBuffer.duration - 0.001)) {
+    exportBuffer = sliceBuffer(exportBuffer, start, end);
   }
-  if (activeTab === 'speed') {
-    const f = parseFloat($('#speedRange').value);
-    if (Math.abs(f - 1) > 0.001) {
-      exportBuffer = state.pitchLock ? timeStretch(exportBuffer, f, 0) : resampleSpeed(exportBuffer, f);
+
+  const sS = Math.max(0, parseFloat($('#sliceStart').value) || 0);
+  const sE = Math.max(0, parseFloat($('#sliceEnd').value) || 0);
+  const fi = parseFloat($('#fadeInRange').value) || 0;
+  const fo = parseFloat($('#fadeOutRange').value) || 0;
+  const bi = parseFloat($('#boostInRange').value) || 0;
+  const bo = parseFloat($('#boostOutRange').value) || 0;
+  if (fi > 0 || fo > 0 || bi > 0 || bo > 0 || sS > 0 || sE > 0) {
+    if (sS > 0 || sE > 0) {
+      const sStart = sS, sEnd = Math.max(sStart + 0.01, exportBuffer.duration - sE);
+      exportBuffer = sliceBuffer(exportBuffer, sStart, sEnd);
     }
+    exportBuffer = applyFadeAndBoost(exportBuffer, fi, fo, bi, bo, fadeCurve);
   }
-  if (activeTab === 'pitch') {
-    const s = parseFloat($('#pitchRange').value);
-    if (Math.abs(s) > 0.05) {
-      exportBuffer = timeStretch(exportBuffer, 1, s);
-    }
+
+  const speedVal = parseFloat($('#speedRange').value);
+  if (Math.abs(speedVal - 1) > 0.001) {
+    exportBuffer = state.pitchLock ? timeStretch(exportBuffer, speedVal, 0) : resampleSpeed(exportBuffer, speedVal);
   }
-  if (activeTab === 'fade') {
-    const fi = parseFloat($('#fadeInRange').value) || 0;
-    const fo = parseFloat($('#fadeOutRange').value) || 0;
-    const bi = parseFloat($('#boostInRange').value) || 0;
-    const bo = parseFloat($('#boostOutRange').value) || 0;
-    const sS = Math.max(0, parseFloat($('#sliceStart').value) || 0);
-    const sE = Math.max(0, parseFloat($('#sliceEnd').value) || 0);
-    if (fi > 0 || fo > 0 || bi > 0 || bo > 0 || sS > 0 || sE > 0) {
-      if (sS > 0 || sE > 0) {
-        const start = sS, end = Math.max(start + 0.01, exportBuffer.duration - sE);
-        exportBuffer = sliceBuffer(exportBuffer, start, end);
-      }
-      exportBuffer = applyFadeAndBoost(exportBuffer, fi, fo, bi, bo, fadeCurve);
-    }
+
+  const pitchVal = parseFloat($('#pitchRange').value);
+  if (Math.abs(pitchVal) > 0.05) {
+    exportBuffer = timeStretch(exportBuffer, 1, pitchVal);
   }
-  if (activeTab === 'curve') {
-    const pts = curvePoints.slice().sort((a, b) => a.t - b.t);
-    const flat = pts.every(p => Math.abs(p.v - 1) < 0.005);
-    if (!flat) {
-      const preserve = state.livePreview.pitchLock;
-      exportBuffer = await applyCurveSpeed(exportBuffer, pts, preserve);
-    }
+
+  const pts = curvePoints.slice().sort((a, b) => a.t - b.t);
+  const flat = pts.every(p => Math.abs(p.v - 1) < 0.005);
+  if (!flat) {
+    const preserve = state.livePreview.pitchLock;
+    exportBuffer = await applyCurveSpeed(exportBuffer, pts, preserve);
   }
+
   return exportBuffer;
 }
 
@@ -2276,12 +2290,10 @@ function applyPitchPreview() {
   if (!state.ws) return;
   const el = PreviewEngine.attachedTo;
   if (!el) return;
-  const s = parseFloat($('#pitchRange').value) || 0;
-  const rate = Math.pow(2, s / 12);
-  el.preservesPitch = false;
-  el.mozPreservesPitch = false;
-  el.webkitPreservesPitch = false;
-  state.ws.setPlaybackRate(rate, false);
+  el.preservesPitch = state.livePreview.pitchLock;
+  el.mozPreservesPitch = state.livePreview.pitchLock;
+  el.webkitPreservesPitch = state.livePreview.pitchLock;
+  state.ws.setPlaybackRate(state.livePreview.speed || 1, state.livePreview.pitchLock);
 }
 function clearPitchPreview() {
   if (!state.ws) return;
