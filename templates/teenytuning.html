@@ -127,13 +127,13 @@ footer { animation: fade-up 0.8s cubic-bezier(.2,.7,.2,1) both; animation-delay:
   background: linear-gradient(180deg, var(--nav-grad-top), var(--nav-grad-bot));
   border-bottom: 1px solid var(--nav-border);
 }
-.brand { 
-  display: inline-flex; align-items: center; gap: 12px; 
-  font-weight: 800; font-size: 20px; letter-spacing: -.02em; 
+.brand {
+  display: inline-flex; align-items: center; gap: 12px;
+  font-weight: 800; font-size: 20px; letter-spacing: -.02em;
   padding: 4px 8px; border-radius: 8px;
 }
 .brand img { width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 4px 12px var(--mint-glow)); }
-.brand .txt { 
+.brand .txt {
   background-image: linear-gradient(180deg, var(--text) 40%, var(--mint-2) 90%, var(--mint-deep) 100%);
   background-size: 100% 200%;
   background-position: 0% 0%;
@@ -253,8 +253,8 @@ main { max-width: 1180px; margin: 0 auto 40px; padding: 0 clamp(20px, 4vw, 48px)
 .fade-overlay { position: absolute; left: 22px; right: 22px; top: 18px; bottom: 18px; pointer-events: none; width: calc(100% - 44px); height: calc(100% - 36px); display: block; z-index: 10; }
 .fade-overlay polygon.wedge-fade  { fill: rgba(239, 68, 68, 0.28); }
 html[data-theme="light"] .fade-overlay polygon.wedge-fade { fill: rgba(239, 68, 68, 0.22); }
-.fade-overlay polygon.wedge-boost { fill: rgba(76, 175, 80, 0.22); }
-html[data-theme="light"] .fade-overlay polygon.wedge-boost { fill: rgba(16, 185, 129, 0.18); }
+.fade-overlay polygon.wedge-boost { fill: rgba(245, 158, 11, 0.45); }
+html[data-theme="light"] .fade-overlay polygon.wedge-boost { fill: rgba(217, 119, 6, 0.40); }
 .playhead-grab { cursor: grab; }
 .playhead-grab.dragging { cursor: grabbing; }
 
@@ -458,8 +458,8 @@ input[type=number]:focus, input[type=text]:focus { border-color: var(--mint); bo
 .busy-card .progress { width: 100%; height: 6px; background: var(--bg); border-radius: 999px; overflow: hidden; }
 .busy-card .progress .bar { height: 100%; background: linear-gradient(90deg, var(--mint), var(--mint-2)); width: 0; transition: width .2s; }
 
-footer { 
-  margin-top: 40px; padding: 24px clamp(20px, 5vw, 64px); 
+footer {
+  margin-top: 40px; padding: 24px clamp(20px, 5vw, 64px);
   border-top: 1px solid var(--border);
   display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
   background: rgba(0,0,0,0.1);
@@ -795,7 +795,7 @@ html[data-theme="light"] footer { background: rgba(255,255,255,0.4); }
             <div></div>
           </div>
         </div>
-        <p class="muted" style="font-size:12px;margin-top:12px;">Release the slider to apply the shift. Tempo is preserved — only pitch changes.</p>
+        <p class="muted" style="font-size:12px;margin-top:12px;">Pitch shift is applied in real-time during preview and baked on export. Tempo is preserved.</p>
         <div class="btn-row">
           <button class="btn btn-ghost" id="btnResetPitch">Reset to 0</button>
         </div>
@@ -873,55 +873,59 @@ html[data-theme="light"] footer { background: rgba(255,255,255,0.4); }
 <script src="https://unpkg.com/lamejs@1.2.1/lame.min.js"></script>
 
 <script>
-const $ = (s, r = document) => r.querySelector(s);
-const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+var $ = function(s, r) { return (r || document).querySelector(s); };
+var $$ = function(s, r) { return Array.from((r || document).querySelectorAll(s)); };
 
-(function () {
-  const saved = localStorage.getItem('teenytuning-theme') || 'dark';
+(function() {
+  var saved = localStorage.getItem('teenytuning-theme') || 'dark';
   document.documentElement.dataset.theme = saved;
-  $('#themeToggle').addEventListener('click', () => {
-    const cur = document.documentElement.dataset.theme || 'dark';
-    const next = cur === 'light' ? 'dark' : 'light';
+  $('#themeToggle').addEventListener('click', function() {
+    var cur = document.documentElement.dataset.theme || 'dark';
+    var next = cur === 'light' ? 'dark' : 'light';
     document.documentElement.dataset.theme = next;
     localStorage.setItem('teenytuning-theme', next);
   });
 })();
 
-const toast = (msg, kind = '') => {
-  const t = $('#toast');
-  t.textContent = msg;
-  t.className = 'toast show ' + (kind ? 'is-' + kind : '');
-  clearTimeout(toast._t);
-  toast._t = setTimeout(() => t.classList.remove('show'), 2400);
-};
-const busy = {
-  show(msg = 'working…') { $('#busy').classList.add('show'); $('#busyMsg').textContent = msg; $('#busyBar').style.width = '0%'; },
-  prog(p, msg) { $('#busyBar').style.width = (p * 100).toFixed(1) + '%'; if (msg) $('#busyMsg').textContent = msg; },
-  hide() { $('#busy').classList.remove('show'); }
-};
+var toastEl = $('#toast');
+var toastTimer = 0;
+function toast(msg, kind) {
+  toastEl.textContent = msg;
+  toastEl.className = 'toast show ' + (kind ? 'is-' + kind : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() { toastEl.classList.remove('show'); }, 2400);
+}
 
-const fmtTime = (s, prec = 2) => {
+function busyShow(msg) { $('#busy').classList.add('show'); $('#busyMsg').textContent = msg || 'working…'; $('#busyBar').style.width = '0%'; }
+function busyProg(p, msg) { $('#busyBar').style.width = (p * 100).toFixed(1) + '%'; if (msg) $('#busyMsg').textContent = msg; }
+function busyHide() { $('#busy').classList.remove('show'); }
+
+function fmtTime(s, prec) {
+  if (prec === undefined) prec = 2;
   if (!isFinite(s) || s < 0) s = 0;
-  const m = Math.floor(s / 60);
-  const sec = (s - m * 60).toFixed(prec).padStart(prec ? 3 + prec : 2, '0');
-  return `${m}:${sec}`;
-};
-const parseTime = (str) => {
+  var m = Math.floor(s / 60);
+  var sec = (s - m * 60).toFixed(prec);
+  while (sec.length < prec + (prec > 0 ? 3 : 2)) sec = '0' + sec;
+  return m + ':' + sec;
+}
+
+function parseTime(str) {
   if (typeof str !== 'string') return NaN;
-  const t = str.trim();
+  var t = str.trim();
   if (!t) return NaN;
   if (/^\d+(\.\d+)?$/.test(t)) return parseFloat(t);
-  const m = t.match(/^(\d+):(\d+(?:\.\d+)?)$/);
+  var m = t.match(/^(\d+):(\d+(?:\.\d+)?)$/);
   if (m) return parseInt(m[1]) * 60 + parseFloat(m[2]);
   return NaN;
-};
-const fmtBytes = (b) => {
-  if (b < 1024) return b + ' B';
-  if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB';
-  return (b / 1024 / 1024).toFixed(2) + ' MB';
-};
+}
 
-const state = {
+function fmtBytes(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
+  return (b / 1048576).toFixed(2) + ' MB';
+}
+
+var S = {
   audioBuffer: null,
   originalBuffer: null,
   fileName: '',
@@ -931,1480 +935,604 @@ const state = {
   region: { start: 0, end: 0 },
   loop: true,
   volume: 1,
-  livePreview: { fadeIn: 0, fadeOut: 0, boostIn: 0, boostOut: 0, pitchPreview: 0, speed: 1, pitchLock: false },
+  activeTab: 'trim',
+  livePreview: { fadeIn: 0, fadeOut: 0, boostIn: 0, boostOut: 0, pitch: 0, speed: 1, fadeCurve: 'lin', sliceStart: 0, sliceEnd: 0 },
+  curvePoints: [],
   cover: { data: null, mime: null },
   ws: null,
   wsRegions: null,
   audioCtx: null,
+  isPlaying: false,
+  playStartTime: 0,
+  playStartPos: 0,
+  wasPlayingBeforeHidden: false,
+  hiddenAt: 0,
+  hiddenPos: 0,
+  rafId: null,
+  stInstances: [],
+  stFilters: [],
+  processor: null,
+  gainNode: null,
+  readPos: 0,
+  fadeCurveShape: 'lin'
 };
 
 function getCtx() {
-  if (!state.audioCtx) state.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  return state.audioCtx;
+  if (!S.audioCtx) S.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (S.audioCtx.state === 'suspended') S.audioCtx.resume();
+  return S.audioCtx;
 }
 
-const drop = $('#drop');
-const fileInput = $('#fileInput');
-['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, (e) => {
-  e.preventDefault(); e.stopPropagation(); drop.classList.add('is-drag');
-}));
-['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, (e) => {
-  e.preventDefault(); e.stopPropagation(); drop.classList.remove('is-drag');
-}));
-drop.addEventListener('drop', (e) => {
-  const f = e.dataTransfer.files?.[0];
-  if (f) handleFile(f);
-});
-fileInput.addEventListener('change', (e) => {
-  const f = e.target.files?.[0];
-  if (f) handleFile(f);
-});
-window.addEventListener('paste', (e) => {
-  if (!e.clipboardData) return;
-  const items = Array.from(e.clipboardData.items || []);
-  const fileItem = items.find(it => it.kind === 'file');
-  if (fileItem) {
-    const f = fileItem.getAsFile();
-    if (f) handleFile(f);
-  }
-});
- $('#changeFile').addEventListener('click', () => fileInput.click());
-
-async function handleFile(file) {
-  const isAudio = file.type.startsWith('audio/');
-  const isVideo = file.type.startsWith('video/');
-  if (!isAudio && !isVideo && !/\.(mp3|wav|m4a|ogg|opus|flac|mp4|mov|webm|mkv|aac)$/i.test(file.name)) {
-    toast('not an audio/video file', 'err'); return;
-  }
-  busy.show('reading file…');
-  try {
-    const bytes = new Uint8Array(await file.arrayBuffer());
-    state.fileBytes = bytes;
-    state.fileName = file.name;
-    state.fileMime = file.type || guessMimeFromName(file.name);
-
-    busy.prog(0.3, isVideo ? 'extracting audio from video…' : 'decoding audio…');
-
-    const ctx = getCtx();
-    let buf;
-    try {
-      buf = await ctx.decodeAudioData(bytes.slice().buffer);
-    } catch (err) {
-      buf = await decodeViaMediaElement(file);
-    }
-    busy.prog(0.8, 'rendering waveform…');
-    state.audioBuffer = buf;
-    state.originalBuffer = cloneBuffer(buf);
-    state.cover = { data: null, mime: null };
-    await tryAutoExtractCover();
-    renderLoadedFile(file, buf);
-    await mountWavesurfer(buf);
-    busy.hide();
-    toast('loaded · ' + fmtTime(buf.duration, 2), 'ok');
-  } catch (err) {
-    console.error(err);
-    busy.hide();
-    toast('couldn\'t decode: ' + (err.message || err), 'err');
-  }
-}
-
-function guessMimeFromName(n) {
-  const ext = (n.split('.').pop() || '').toLowerCase();
-  return ({mp3:'audio/mpeg', wav:'audio/wav', flac:'audio/flac', m4a:'audio/mp4',
-    ogg:'audio/ogg', opus:'audio/ogg', mp4:'video/mp4', mov:'video/quicktime',
-    webm:'video/webm', mkv:'video/x-matroska', aac:'audio/aac'}[ext]) || 'application/octet-stream';
-}
-
-async function decodeViaMediaElement(file) {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file);
-    const el = document.createElement(file.type.startsWith('video/') ? 'video' : 'audio');
-    el.src = url; el.crossOrigin = 'anonymous'; el.preload = 'auto';
-    el.addEventListener('loadedmetadata', async () => {
-      try {
-        const dur = el.duration;
-        if (!isFinite(dur)) throw new Error('unknown duration');
-        const sr = 44100, ch = 2;
-        const off = new OfflineAudioContext(ch, Math.ceil(dur * sr), sr);
-        const src = off.createMediaElementSource(el);
-        src.connect(off.destination);
-        await el.play().catch(() => {});
-        const buf = await off.startRendering();
-        URL.revokeObjectURL(url);
-        resolve(buf);
-      } catch (e) { URL.revokeObjectURL(url); reject(e); }
-    });
-    el.addEventListener('error', () => { URL.revokeObjectURL(url); reject(new Error('media element decode failed')); });
-  });
-}
-
-function cloneBuffer(b) {
-  const out = getCtx().createBuffer(b.numberOfChannels, b.length, b.sampleRate);
-  for (let c = 0; c < b.numberOfChannels; c++) out.getChannelData(c).set(b.getChannelData(c));
-  return out;
-}
-
-function renderLoadedFile(file, buf) {
-  $('#dropCard').classList.add('hidden');
-  $('#editorCard').classList.remove('hidden');
-  $('#fileName').textContent = file.name;
-  $('#fileType').textContent = file.type.startsWith('video/') ? 'video → audio' : 'audio';
-  $('#fileSize').textContent = fmtBytes(file.size);
-  $('#fileDur').textContent = fmtTime(buf.duration, 2);
-  $('#fileChans').textContent = buf.numberOfChannels === 1 ? 'mono' : (buf.numberOfChannels === 2 ? 'stereo' : buf.numberOfChannels + 'ch');
-  $('#fileRate').textContent = (buf.sampleRate / 1000).toFixed(1) + ' kHz';
-  $('#tDur').textContent = fmtTime(buf.duration, 2);
-  $('#speedOrigDur').textContent = fmtTime(buf.duration, 2);
-  $('#speedNewDur').textContent = fmtTime(buf.duration, 2);
-  $('#curveOutDur').textContent = fmtTime(buf.duration, 1);
-  state.region = { start: 0, end: buf.duration };
-  updateTrimDisplay();
-  resetCurveDefault(buf.duration);
-}
-
-async function mountWavesurfer(buf) {
-  const prevTime = state.ws ? state.ws.getCurrentTime() : 0;
-  const wasPlaying = state.ws ? state.ws.isPlaying() : false;
-  
-  if (state.ws) { state.ws.destroy(); state.ws = null; state.wsRegions = null; }
-
-  const WS = window.WaveSurfer || window.wavesurfer;
-  const RegionsPlugin = window.WaveSurfer?.Regions || window.WaveSurfer?.regions || window.WaveSurfer?.RegionsPlugin
-    || (window.WaveSurferRegions || null);
-
-  const regionsPlugin = (window.WaveSurfer && window.WaveSurfer.Regions) ? window.WaveSurfer.Regions.create() : null;
-
-  state.ws = WS.create({
-    container: '#waveform',
-    waveColor: getCss('--mint-3'),
-    progressColor: getCss('--mint-deep'),
-    cursorColor: getCss('--mint-3'),
-    cursorWidth: 2,
-    height: 132,
-    barWidth: 2,
-    barRadius: 2,
-    barGap: 2,
-    normalize: true,
-    plugins: regionsPlugin ? [regionsPlugin] : [],
-  });
-  state.wsRegions = regionsPlugin;
-
-  state.ws.loadBlob(audioBufferToWavBlob(buf));
-
-  state.ws.on('ready', () => {
-    if (state.wsRegions) {
-      state.wsRegions.clearRegions();
-      const r = state.wsRegions.addRegion({
-        start: 0, end: buf.duration,
-        color: 'rgba(76,175,80,0.18)',
-        drag: true, resize: true,
-      });
-      r.on('update-end', () => {
-        state.region.start = r.start;
-        state.region.end = r.end;
-        updateTrimDisplay();
-      });
-      state.region = { start: 0, end: buf.duration };
-    }
-    updateTrimDisplay();
-    PreviewEngine.attach(state.ws);
-    state.ws.setVolume(state.volume);
-    
-    if (prevTime > 0 && prevTime < buf.duration) {
-      state.ws.setTime(prevTime);
-    }
-    if (wasPlaying) {
-      state.ws.play();
-    }
-  });
-
-  state.ws.on('seeking', () => $('#tCur').textContent = fmtTime(state.ws.getCurrentTime(), 2));
-  state.ws.on('finish', () => {
-    if (state.loop && state.region.end - state.region.start > 0.05) {
-      state.ws.setTime(state.region.start); state.ws.play();
-    } else {
-      $('#btnPlay').classList.remove('is-playing');
-      PreviewEngine.stopTick();
-    }
-  });
-  state.ws.on('play', () => {
-    $('#btnPlay').classList.add('is-playing');
-    PreviewEngine.applyImmediate();
-    PreviewEngine.startTick();
-  });
-  state.ws.on('pause', () => {
-    $('#btnPlay').classList.remove('is-playing');
-    PreviewEngine.stopTick();
-    PreviewEngine.setGain(1, true);
-  });
-}
-
-const PreviewEngine = {
-  ctx: null,
-  source: null,
-  gain: null,
-  attachedTo: null,
-  raf: null,
-
-  ensureCtx() {
-    if (!this.ctx) {
-      this.ctx = getCtx();
-      this.gain = this.ctx.createGain();
-      this.gain.gain.value = 1;
-      this.gain.connect(this.ctx.destination);
-    }
-  },
-
-  attach(ws) {
-    this.ensureCtx();
-    const el = ws.getMediaElement ? ws.getMediaElement() : (ws.media || null);
-    if (!el || el === this.attachedTo) return;
-    try {
-      if (this.source) { this.source.disconnect(); }
-      this.source = this.ctx.createMediaElementSource(el);
-      this.source.connect(this.gain);
-      this.attachedTo = el;
-      el.preservesPitch = state.livePreview.pitchLock;
-      el.mozPreservesPitch = state.livePreview.pitchLock;
-      el.webkitPreservesPitch = state.livePreview.pitchLock;
-    } catch (e) {
-      console.warn('PreviewEngine.attach failed (already wired?):', e.message);
-    }
-  },
-
-  applyImmediate() {
-    if (!state.ws) return;
-    const el = this.attachedTo;
-    if (el) {
-      el.preservesPitch = state.livePreview.pitchLock;
-      el.mozPreservesPitch = state.livePreview.pitchLock;
-      el.webkitPreservesPitch = state.livePreview.pitchLock;
-    }
-    const activeTab = document.querySelector('.tab.active')?.dataset?.tab;
-    if (activeTab !== 'curve') {
-      state.ws.setPlaybackRate(state.livePreview.speed, state.livePreview.pitchLock);
-    }
-  },
-
-  setGain(v, immediate) {
-    if (!this.gain) return;
-    const clamped = Math.max(0, Math.min(1, v));
-    if (immediate) this.gain.gain.value = clamped;
-    else this.gain.gain.setTargetAtTime(clamped, this.ctx.currentTime, 0.008);
-  },
-
-  startTick() {
-    if (this.raf) return;
-    const loop = () => {
-      if (!state.ws) { this.raf = null; return; }
-      const ct = state.ws.getCurrentTime();
-      $('#tCur').textContent = fmtTime(ct, 2);
-
-      if (ct >= state.region.end - 0.005) {
-        if (state.loop && state.region.end - state.region.start > 0.05) {
-          state.ws.setTime(state.region.start);
-        } else {
-          state.ws.pause();
-          state.ws.setTime(state.region.start);
-        }
-      }
-
-      const fi = state.livePreview.fadeIn;
-      const fo = state.livePreview.fadeOut;
-      const dur = state.audioBuffer ? state.audioBuffer.duration : 0;
-      let g = 1;
-      const rs = state.region.start, re = state.region.end;
-      if (fi > 0 && ct - rs < fi) g *= Math.max(0, (ct - rs) / fi);
-      if (fo > 0 && re - ct < fo) g *= Math.max(0, (re - ct) / fo);
-      this.setGain(g, false);
-
-      const activeTab = document.querySelector('.tab.active')?.dataset?.tab;
-      if (activeTab === 'curve' && dur > 0) {
-        const tNorm = Math.max(0, Math.min(1, (ct - rs) / Math.max(0.001, re - rs)));
-        const speed = evalCurveAt(curvePoints.slice().sort((a,b)=>a.t-b.t), tNorm);
-        const clamped = Math.max(0.25, Math.min(4, speed));
-        state.ws.setPlaybackRate(clamped, state.livePreview.pitchLock);
-        drawCurve(tNorm);
-      }
-
-      this.raf = requestAnimationFrame(loop);
-    };
-    this.raf = requestAnimationFrame(loop);
-  },
-
-  stopTick() {
-    if (this.raf) cancelAnimationFrame(this.raf);
-    this.raf = null;
-  },
-};
-
-function getCss(varName) {
-  return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
-}
-
- $('#btnPlay').addEventListener('click', () => {
-  if (!state.ws) return;
-  if (state.audioCtx && state.audioCtx.state === 'suspended') state.audioCtx.resume();
-  const ct = state.ws.getCurrentTime();
-  if (ct < state.region.start - 0.01 || ct >= state.region.end - 0.01) {
-    state.ws.setTime(state.region.start);
-  }
-  state.ws.playPause();
-});
-
- $('#btnLoop').addEventListener('click', () => {
-  state.loop = !state.loop;
-  $('#btnLoop').classList.toggle('is-on', state.loop);
-});
-
- $('#volSlider').addEventListener('input', (e) => {
-  state.volume = parseFloat(e.target.value);
-  if (state.ws) state.ws.setVolume(state.volume);
-});
-
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible') {
-    if (state.audioCtx && state.audioCtx.state === 'suspended') {
-      state.audioCtx.resume();
-    }
-    if (state.ws && state.audioBuffer) {
-      const activeTab = document.querySelector('.tab.active')?.dataset?.tab;
-      if (activeTab === 'curve') {
-        const ct = state.ws.getCurrentTime();
-        const rs = state.region.start, re = state.region.end;
-        const tNorm = Math.max(0, Math.min(1, (ct - rs) / Math.max(0.001, re - rs)));
-        const speed = evalCurveAt(curvePoints.slice().sort((a,b)=>a.t-b.t), tNorm);
-        const clamped = Math.max(0.25, Math.min(4, speed));
-        state.ws.setPlaybackRate(clamped, state.livePreview.pitchLock);
-      } else {
-        state.ws.setPlaybackRate(state.livePreview.speed || 1, state.livePreview.pitchLock);
-      }
-    }
-  }
-});
-
-function bindSwitch(el, key) {
-  el.addEventListener('click', () => {
-    el.classList.toggle('on');
-    const on = el.classList.contains('on');
-    if (key === 'main') {
-      state.pitchLock = on;
-      state.livePreview.pitchLock = on;
-      if (state.ws) state.ws.setPlaybackRate(state.livePreview.speed, on);
-      $('#pitchLockLabel').textContent = on ? 'on' : 'off';
-      $('#pitchLockLabel').style.color = on ? 'var(--mint-3)' : 'var(--muted)';
-    }
-  });
-}
-bindSwitch($('#pitchLockSwitch'), 'main');
-
-function activateTab(tab) {
-  $$('.tab').forEach(x => x.classList.toggle('active', x.dataset.tab === tab));
-  $$('.panel').forEach(p => p.classList.toggle('active', p.dataset.panel === tab));
-  if (tab === 'curve') requestAnimationFrame(drawCurve);
-  if (tab === 'pitch') applyPitchPreview(); else clearPitchPreview();
-  drawFadeOverlay();
-}
- $$('.tab').forEach(t => t.addEventListener('click', () => {
-  const current = document.querySelector('.tab.active')?.dataset?.tab;
-  const target = t.dataset.tab;
-  if (!target || current === target) return;
-  activateTab(target);
-}));
-
-function updateTrimDisplay() {
-  const { start, end } = state.region;
-  const dur = state.audioBuffer ? state.audioBuffer.duration : 0;
-  $('#trimStart').textContent = fmtTime(start, 2);
-  $('#trimEnd').textContent = fmtTime(end, 2);
-  $('#trimLen').textContent = fmtTime(Math.max(0, end - start), 2);
-  $('#trimRemoved').textContent = fmtTime(Math.max(0, dur - (end - start)), 2);
-  $('#trimStartInp').value = fmtTime(start, 2);
-  $('#trimEndInp').value = fmtTime(end, 2);
-}
- $('#trimStartInp').addEventListener('change', (e) => {
-  const v = parseTime(e.target.value);
-  if (isFinite(v) && state.audioBuffer) {
-    state.region.start = Math.max(0, Math.min(v, state.region.end - 0.05));
-    syncRegion(); updateTrimDisplay();
-  }
-});
- $('#trimEndInp').addEventListener('change', (e) => {
-  const v = parseTime(e.target.value);
-  if (isFinite(v) && state.audioBuffer) {
-    state.region.end = Math.max(state.region.start + 0.05, Math.min(v, state.audioBuffer.duration));
-    syncRegion(); updateTrimDisplay();
-  }
-});
-function syncRegion() {
-  if (!state.wsRegions) return;
-  const regs = state.wsRegions.getRegions();
-  const r = regs[0];
-  if (r) { r.setOptions({ start: state.region.start, end: state.region.end }); }
-}
- $('#btnSelectAll').addEventListener('click', () => {
-  if (!state.audioBuffer) return;
-  state.region = { start: 0, end: state.audioBuffer.duration };
-  syncRegion(); updateTrimDisplay();
-});
- $('#btnResetRegion').addEventListener('click', () => {
-  if (!state.audioBuffer) return;
-  state.region = { start: 0, end: state.audioBuffer.duration };
-  syncRegion(); updateTrimDisplay();
-});
- $('#btnApplyTrim').addEventListener('click', async () => {
-  if (!state.audioBuffer) return;
-  const { start, end } = state.region;
-  if (end - start < 0.01) { toast('region too short', 'err'); return; }
-  if (start <= 0.001 && end >= state.audioBuffer.duration - 0.001) {
-    toast('nothing to trim', 'err'); return;
-  }
-  busy.show('trimming…');
-  await new Promise(r => setTimeout(r, 20));
-  state.audioBuffer = sliceBuffer(state.audioBuffer, start, end);
-  await refreshWaveform();
-  busy.hide();
-  toast('trimmed', 'ok');
-});
-
-function sliceBuffer(buf, t0, t1) {
-  const sr = buf.sampleRate;
-  const i0 = Math.max(0, Math.floor(t0 * sr));
-  const i1 = Math.min(buf.length, Math.floor(t1 * sr));
-  const len = Math.max(1, i1 - i0);
-  const out = getCtx().createBuffer(buf.numberOfChannels, len, sr);
-  for (let c = 0; c < buf.numberOfChannels; c++) {
-    out.getChannelData(c).set(buf.getChannelData(c).subarray(i0, i1));
-  }
-  return out;
-}
-
-async function refreshWaveform() {
-  if (!state.audioBuffer) return;
-  const buf = state.audioBuffer;
-  $('#fileDur').textContent = fmtTime(buf.duration, 2);
-  $('#tDur').textContent = fmtTime(buf.duration, 2);
-  $('#speedOrigDur').textContent = fmtTime(buf.duration, 2);
-  $('#speedNewDur').textContent = fmtTime(buf.duration / parseFloat($('#speedRange').value), 2);
-  state.region = { start: 0, end: buf.duration };
-  resetCurveDefault(buf.duration);
-  await mountWavesurfer(buf);
-}
-
-const fadeCurveSeg = $('#fadeCurveSeg');
-let fadeCurve = 'lin';
-fadeCurveSeg.addEventListener('click', (e) => {
-  const b = e.target.closest('button[data-curve]');
-  if (!b) return;
-  $$('button', fadeCurveSeg).forEach(x => x.classList.remove('active'));
-  b.classList.add('active');
-  fadeCurve = b.dataset.curve;
-});
-const liveVal = (id, fmt) => {
-  const el = $('#' + id), vl = $('#' + id.replace('Range', 'Val'));
-  el.addEventListener('input', () => vl.textContent = fmt(parseFloat(el.value)));
-};
-liveVal('fadeInRange', v => v.toFixed(2) + ' s');
-liveVal('fadeOutRange', v => v.toFixed(2) + ' s');
-liveVal('boostInRange', v => v.toFixed(2) + ' s');
-liveVal('boostOutRange', v => v.toFixed(2) + ' s');
-
-function disableOverlappingFades(changedId) {
-  if (changedId === 'fadeInRange' && parseFloat($('#fadeInRange').value) > 0) {
-    $('#boostInRange').value = 0; $('#boostInVal').textContent = '0.00 s'; state.livePreview.boostIn = 0;
-  } else if (changedId === 'boostInRange' && parseFloat($('#boostInRange').value) > 0) {
-    $('#fadeInRange').value = 0; $('#fadeInVal').textContent = '0.00 s'; state.livePreview.fadeIn = 0;
-  }
-  if (changedId === 'fadeOutRange' && parseFloat($('#fadeOutRange').value) > 0) {
-    $('#boostOutRange').value = 0; $('#boostOutVal').textContent = '0.00 s'; state.livePreview.boostOut = 0;
-  } else if (changedId === 'boostOutRange' && parseFloat($('#boostOutRange').value) > 0) {
-    $('#fadeOutRange').value = 0; $('#fadeOutVal').textContent = '0.00 s'; state.livePreview.fadeOut = 0;
-  }
-}
-
-['fadeInRange','fadeOutRange','boostInRange','boostOutRange'].forEach(id => {
-  const el = $('#' + id);
-  if (!el) return;
-  el.addEventListener('input', () => {
-    disableOverlappingFades(id);
-    if (id === 'fadeInRange')  { state.livePreview.fadeIn  = parseFloat(el.value) || 0; }
-    if (id === 'fadeOutRange') { state.livePreview.fadeOut = parseFloat(el.value) || 0; }
-    if (id === 'boostInRange')  { state.livePreview.boostIn  = parseFloat(el.value) || 0; }
-    if (id === 'boostOutRange') { state.livePreview.boostOut = parseFloat(el.value) || 0; }
-    drawFadeOverlay();
-  });
-});
-
- $('#btnResetFade').addEventListener('click', () => {
-  ['fadeInRange','fadeOutRange','boostInRange','boostOutRange'].forEach(id => { $('#'+id).value = 0; $('#'+id.replace('Range','Val')).textContent = '0.00 s'; });
-  $('#sliceStart').value = 0; $('#sliceEnd').value = 0;
-  state.livePreview.fadeIn = 0; state.livePreview.fadeOut = 0;
-  state.livePreview.boostIn = 0; state.livePreview.boostOut = 0;
-  drawFadeOverlay();
-});
-
- $('#btnApplyFade').addEventListener('click', async () => {
-  if (!state.audioBuffer) return;
-  const fi = parseFloat($('#fadeInRange').value) || 0;
-  const fo = parseFloat($('#fadeOutRange').value) || 0;
-  const bi = parseFloat($('#boostInRange').value) || 0;
-  const bo = parseFloat($('#boostOutRange').value) || 0;
-  const sS = Math.max(0, parseFloat($('#sliceStart').value) || 0);
-  const sE = Math.max(0, parseFloat($('#sliceEnd').value) || 0);
-  if (fi === 0 && fo === 0 && bi === 0 && bo === 0 && sS === 0 && sE === 0) { toast('nothing to apply', 'err'); return; }
-  busy.show('applying fade…');
-  await new Promise(r => setTimeout(r, 20));
-  let buf = state.audioBuffer;
-  if (sS > 0 || sE > 0) {
-    const start = sS, end = Math.max(start + 0.01, buf.duration - sE);
-    buf = sliceBuffer(buf, start, end);
-  }
-  buf = applyFadeAndBoost(buf, fi, fo, bi, bo, fadeCurve);
-  state.audioBuffer = buf;
-  state.livePreview.fadeIn = 0; state.livePreview.fadeOut = 0; state.livePreview.boostIn = 0; state.livePreview.boostOut = 0;
-  ['fadeInRange','fadeOutRange','boostInRange','boostOutRange'].forEach(id => { $('#'+id).value = 0; $('#'+id.replace('Range','Val')).textContent = '0.00 s'; });
-  await refreshWaveform();
-  busy.hide();
-  toast('faded', 'ok');
-});
-
-function applyFadeAndBoost(buf, fadeIn, fadeOut, boostIn, boostOut, curve) {
-  const sr = buf.sampleRate;
-  const out = getCtx().createBuffer(buf.numberOfChannels, buf.length, sr);
-  const fIn = Math.floor(fadeIn * sr);
-  const fOut = Math.floor(fadeOut * sr);
-  const bIn = Math.floor(boostIn * sr);
-  const bOut = Math.floor(boostOut * sr);
-  const N = buf.length;
-  const ramp = (t) => {
-    switch (curve) {
-      case 'exp': return t * t;
-      case 'log': return Math.sqrt(t);
-      case 'cos': return 0.5 - 0.5 * Math.cos(Math.PI * t);
-      default: return t;
-    }
-  };
-  for (let c = 0; c < buf.numberOfChannels; c++) {
-    const src = buf.getChannelData(c);
-    const dst = out.getChannelData(c);
-    for (let i = 0; i < N; i++) {
-      let g = 1;
-      if (fIn > 0 && i < fIn) g *= ramp(i / fIn);
-      if (fOut > 0 && i > N - fOut) g *= ramp((N - i) / fOut);
-      if (bIn > 0 && i < bIn) g *= 2 - ramp(i / bIn);
-      if (bOut > 0 && i > N - bOut) g *= 1 + ramp(1 - (N - i) / bOut);
-      dst[i] = src[i] * g;
-    }
-  }
-  return out;
-}
-
-liveVal('speedRange', v => v.toFixed(2) + '×');
- $('#speedRange').addEventListener('input', () => {
-  const f = parseFloat($('#speedRange').value);
-  $('#speedVal').textContent = f.toFixed(2) + '×';
-  state.livePreview.speed = f;
-  if (state.ws) state.ws.setPlaybackRate(f, state.livePreview.pitchLock);
-  if (state.audioBuffer) $('#speedNewDur').textContent = fmtTime(state.audioBuffer.duration / f, 2);
-
-  const semis = 12 * Math.log2(f);
-  $('#speedPitchShift').textContent = state.pitchLock ? '0.0 st' : (semis >= 0 ? '+' : '') + semis.toFixed(1) + ' st';
-});
- $$('[data-speed]').forEach(b => b.addEventListener('click', () => {
-  const v = parseFloat(b.dataset.speed);
-  $('#speedRange').value = v;
-  $('#speedRange').dispatchEvent(new Event('input'));
-}));
- $('#btnResetSpeed').addEventListener('click', () => {
-  $('#speedRange').value = 1; $('#speedRange').dispatchEvent(new Event('input'));
-});
- $('#btnApplySpeed').addEventListener('click', async () => {
-  if (!state.audioBuffer) return;
-  const f = parseFloat($('#speedRange').value);
-  if (Math.abs(f - 1) < 0.001) { toast('speed unchanged', 'err'); return; }
-  busy.show(state.pitchLock ? 'stretching (pitch-locked)…' : 'resampling…');
-  await new Promise(r => setTimeout(r, 20));
-  state.audioBuffer = state.pitchLock
-    ? timeStretch(state.audioBuffer, f, 0)
-    : resampleSpeed(state.audioBuffer, f);
-  $('#speedRange').value = 1;
-  $('#speedVal').textContent = '1.00×';
-  state.livePreview.speed = 1;
-  if (state.ws) state.ws.setPlaybackRate(1, state.livePreview.pitchLock);
-  await refreshWaveform();
-  busy.hide();
-  toast('speed applied', 'ok');
-});
-
-liveVal('pitchRange', v => (v >= 0 ? '+' : '') + v.toFixed(1) + ' st');
- $$('[data-pitch]').forEach(b => b.addEventListener('click', () => {
-  const v = parseFloat(b.dataset.pitch);
-  $('#pitchRange').value = v;
-  $('#pitchRange').dispatchEvent(new Event('input'));
-}));
- $('#btnResetPitch').addEventListener('click', () => {
-  $('#pitchRange').value = 0; $('#pitchRange').dispatchEvent(new Event('input'));
-});
-
- $('#pitchRange').addEventListener('change', async () => {
-  if (!state.audioBuffer) return;
-  const s = parseFloat($('#pitchRange').value);
-  if (Math.abs(s) < 0.05) return;
-  busy.show('rendering pitch shift...');
-  await new Promise(r => setTimeout(r, 20));
-  state.audioBuffer = timeStretch(state.audioBuffer, 1, s);
-  await refreshWaveform();
-  busy.hide();
-  toast('pitch applied', 'ok');
-  $('#pitchRange').value = 0;
-  $('#pitchVal').textContent = '+0.0 st';
-});
-
-function timeStretch(buf, tempoFactor, semitones) {
-  try {
-    const ST = window.soundtouch || window.SoundTouchJS || (typeof window.SoundTouch === 'object' && window.SoundTouch ? window.SoundTouch : {}) || {};
-    const SoundTouch = ST.SoundTouch || (typeof window.SoundTouch === 'function' ? window.SoundTouch : null);
-    const SimpleFilter = ST.SimpleFilter || (typeof window.SimpleFilter === 'function' ? window.SimpleFilter : null);
-    if (!SoundTouch || !SimpleFilter) {
-      console.warn('SoundTouch missing, falling back to resample');
-      return resampleSpeed(buf, tempoFactor);
-    }
-
-    const inLen = buf.length;
-    const ch = buf.numberOfChannels;
-    const sr = buf.sampleRate;
-    const interleaved = new Float32Array(inLen * 2);
-    const L = buf.getChannelData(0);
-    const R = ch > 1 ? buf.getChannelData(1) : L;
-    for (let i = 0; i < inLen; i++) {
-      interleaved[i * 2] = L[i];
-      interleaved[i * 2 + 1] = R[i];
-    }
-    let position = 0;
-    const source = {
-      extract: function (target, numFrames, _position) {
-        const start = position * 2;
-        const wanted = numFrames * 2;
-        const available = Math.max(0, interleaved.length - start);
-        const n = Math.min(wanted, available);
-        for (let i = 0; i < n; i++) target[i] = interleaved[start + i];
-        for (let i = n; i < wanted; i++) target[i] = 0;
-        const framesProduced = Math.floor(n / 2);
-        position += framesProduced;
-        return framesProduced;
-      }
-    };
-    const st = new SoundTouch();
-    st.tempo = tempoFactor;
-    st.pitchSemitones = semitones || 0;
-    const filter = new SimpleFilter(source, st);
-    const block = 4096;
-    const chunks = [];
-    const tmp = new Float32Array(block * 2);
-    while (true) {
-      const got = filter.extract(tmp, block);
-      if (got === 0) break;
-      chunks.push(tmp.slice(0, got * 2));
-    }
-    const newLen = chunks.reduce((s, c) => s + c.length, 0) / 2;
-    const out = getCtx().createBuffer(ch, Math.max(1, newLen), sr);
-    let outIdx = 0;
-    if (ch === 1) {
-      const c = out.getChannelData(0);
-      for (const chunk of chunks) {
-        for (let i = 0; i < chunk.length; i += 2) c[outIdx++] = (chunk[i] + chunk[i + 1]) * 0.5;
-      }
-    } else {
-      const cL = out.getChannelData(0), cR = out.getChannelData(1);
-      for (const chunk of chunks) {
-        for (let i = 0; i < chunk.length; i += 2) {
-          cL[outIdx] = chunk[i]; cR[outIdx] = chunk[i + 1]; outIdx++;
-        }
-      }
-    }
-    return out;
-  } catch (e) {
-    console.warn('timeStretch error, falling back:', e.message);
-    return resampleSpeed(buf, tempoFactor);
-  }
-}
-
-function resampleSpeed(buf, factor) {
-  const ch = buf.numberOfChannels, sr = buf.sampleRate;
-  const newLen = Math.floor(buf.length / factor);
-  const out = getCtx().createBuffer(ch, newLen, sr);
-  for (let c = 0; c < ch; c++) {
-    const src = buf.getChannelData(c);
-    const dst = out.getChannelData(c);
-    for (let i = 0; i < newLen; i++) {
-      const t = i * factor;
-      const i0 = Math.floor(t), i1 = Math.min(buf.length - 1, i0 + 1);
-      const a = t - i0;
-      dst[i] = src[i0] * (1 - a) + src[i1] * a;
-    }
-  }
-  return out;
-}
-
-const curveCanvas = $('#curveCanvas');
-const curveCtx = curveCanvas.getContext('2d');
-let curvePoints = [{ t: 0, v: 1 }, { t: 1, v: 1 }];
-let curveDragIdx = -1;
-const SPEED_MIN = 0.25, SPEED_MAX = 2.0;
-
-function resetCurveDefault() {
-  curvePoints = [{ t: 0, v: 1 }, { t: 1, v: 1 }];
-  drawCurve();
-  updateCurveStats();
-}
-
-function sizeCurveCanvas() {
-  const dpr = window.devicePixelRatio || 1;
-  const r = curveCanvas.getBoundingClientRect();
-  curveCanvas.width = r.width * dpr;
-  curveCanvas.height = r.height * dpr;
-  curveCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-}
-new ResizeObserver(() => { sizeCurveCanvas(); drawCurve(); }).observe(curveCanvas);
-window.addEventListener('load', () => { sizeCurveCanvas(); drawCurve(); });
-
-function speedToY(v) {
-  const r = curveCanvas.getBoundingClientRect();
-  const h = r.height, pad = 16;
-  const norm = (Math.log2(v) - Math.log2(SPEED_MIN)) / (Math.log2(SPEED_MAX) - Math.log2(SPEED_MIN));
-  return pad + (1 - norm) * (h - pad * 2);
-}
-function yToSpeed(y) {
-  const r = curveCanvas.getBoundingClientRect();
-  const h = r.height, pad = 16;
-  const norm = 1 - (y - pad) / (h - pad * 2);
-  const v = Math.pow(2, norm * (Math.log2(SPEED_MAX) - Math.log2(SPEED_MIN)) + Math.log2(SPEED_MIN));
-  return Math.max(SPEED_MIN, Math.min(SPEED_MAX, v));
-}
-function timeToX(t) {
-  const r = curveCanvas.getBoundingClientRect();
-  const w = r.width, pad = 22;
-  return pad + t * (w - pad * 2);
-}
-function xToTime(x) {
-  const r = curveCanvas.getBoundingClientRect();
-  const w = r.width, pad = 22;
-  return Math.max(0, Math.min(1, (x - pad) / (w - pad * 2)));
-}
-
-function drawCurve(playheadProgress) {
-  const r = curveCanvas.getBoundingClientRect();
-  const w = r.width, h = r.height;
-  curveCtx.clearRect(0, 0, w, h);
-  const mintDeep = getCss('--mint-deep') || '#2e7d32';
-  const mint = getCss('--mint') || '#4caf50';
-  const muted = getCss('--muted-2') || '#6f8a7d';
-  const elev = getCss('--elev') || '#1e2823';
-
-  curveCtx.strokeStyle = elev; curveCtx.lineWidth = 1;
-  const guides = [0.25, 0.5, 1, 1.5, 2];
-  curveCtx.font = '11px JetBrains Mono, monospace';
-  curveCtx.fillStyle = muted;
-  for (const g of guides) {
-    const y = speedToY(g);
-    curveCtx.beginPath(); curveCtx.moveTo(22, y); curveCtx.lineTo(w - 22, y); curveCtx.stroke();
-    curveCtx.fillText(g + '×', 4, y + 4);
-  }
-
-  const pts = curvePoints.slice().sort((a, b) => a.t - b.t);
-  curveCtx.strokeStyle = mint; curveCtx.lineWidth = 2.5;
-  curveCtx.beginPath();
-  for (let i = 0; i < 200; i++) {
-    const tt = i / 199;
-    const v = evalCurveAt(pts, tt);
-    const x = timeToX(tt), y = speedToY(v);
-    if (i === 0) curveCtx.moveTo(x, y); else curveCtx.lineTo(x, y);
-  }
-  curveCtx.stroke();
-
-  curveCtx.lineTo(timeToX(1), h);
-  curveCtx.lineTo(timeToX(0), h);
-  curveCtx.closePath();
-  curveCtx.fillStyle = mint + '22';
-  curveCtx.fill();
-
-  pts.forEach((p, i) => {
-    const x = timeToX(p.t), y = speedToY(p.v);
-    curveCtx.beginPath();
-    curveCtx.arc(x, y, 7, 0, Math.PI * 2);
-    curveCtx.fillStyle = mintDeep;
-    curveCtx.fill();
-    curveCtx.lineWidth = 2; curveCtx.strokeStyle = '#fff';
-    curveCtx.stroke();
-
-    curveCtx.fillStyle = mintDeep;
-    curveCtx.font = '600 11px JetBrains Mono, monospace';
-    curveCtx.fillText(p.v.toFixed(2) + '×', x + 10, y - 8);
-  });
-
-  if (typeof playheadProgress === 'number' && playheadProgress >= 0 && playheadProgress <= 1) {
-    const px = timeToX(playheadProgress);
-    const speedAt = evalCurveAt(pts, playheadProgress);
-    const py = speedToY(speedAt);
-    curveCtx.strokeStyle = mintDeep;
-    curveCtx.lineWidth = 1.5;
-    curveCtx.setLineDash([5, 4]);
-    curveCtx.beginPath();
-    curveCtx.moveTo(px, 6);
-    curveCtx.lineTo(px, h - 6);
-    curveCtx.stroke();
-    curveCtx.setLineDash([]);
-    curveCtx.beginPath();
-    curveCtx.arc(px, py, 5, 0, Math.PI * 2);
-    curveCtx.fillStyle = '#fff';
-    curveCtx.fill();
-    curveCtx.lineWidth = 2;
-    curveCtx.strokeStyle = mintDeep;
-    curveCtx.stroke();
-    curveCtx.fillStyle = mintDeep;
-    curveCtx.font = '700 11px JetBrains Mono, monospace';
-    const lbl = speedAt.toFixed(2) + '×';
-    const tx = px + 8 > w - 50 ? px - 50 : px + 8;
-    curveCtx.fillText(lbl, tx, 18);
-  }
-}
-
-function evalCurveAt(pts, t) {
-  if (t <= pts[0].t) return pts[0].v;
-  if (t >= pts[pts.length - 1].t) return pts[pts.length - 1].v;
-  for (let i = 0; i < pts.length - 1; i++) {
-    const a = pts[i], b = pts[i + 1];
-    if (t >= a.t && t <= b.t) {
-      const u = (t - a.t) / (b.t - a.t);
-      const s = u * u * (3 - 2 * u);
-      return a.v + (b.v - a.v) * s;
+function getSpeedAtPos(pos, pts, dur) {
+  if (!pts || pts.length === 0) return 1;
+  pts.sort(function(a, b) { return a.x - b.x; });
+  if (pts.length === 1) return pts[0].y;
+  if (pos <= pts[0].x) return pts[0].y;
+  if (pos >= pts[pts.length - 1].x) return pts[pts.length - 1].y;
+  for (var i = 0; i < pts.length - 1; i++) {
+    if (pos >= pts[i].x && pos <= pts[i + 1].x) {
+      var t = (pos - pts[i].x) / (pts[i + 1].x - pts[i].x);
+      return pts[i].y + t * (pts[i + 1].y - pts[i].y);
     }
   }
   return 1;
 }
 
-function updateCurveStats() {
-  const pts = curvePoints.slice().sort((a, b) => a.t - b.t);
-  let mn = Infinity, mx = -Infinity, sum = 0;
-  const N = 200;
-
-  let durMul = 0;
-  for (let i = 0; i < N; i++) {
-    const tt = (i + 0.5) / N;
-    const v = evalCurveAt(pts, tt);
-    mn = Math.min(mn, v); mx = Math.max(mx, v); sum += v;
-    durMul += 1 / v;
+function integrateCurvePos(startPos, elapsed, pts, dur) {
+  var pos = startPos;
+  var rem = elapsed;
+  var dt = 0.005;
+  while (rem > 0.0001 && pos < dur) {
+    var step = Math.min(dt, rem);
+    var spd = getSpeedAtPos(pos, pts, dur);
+    pos += spd * step;
+    rem -= step;
   }
-  durMul /= N;
-  $('#curveMin').textContent = mn.toFixed(2) + '×';
-  $('#curveMax').textContent = mx.toFixed(2) + '×';
-  $('#curveAvg').textContent = (sum / N).toFixed(2) + '×';
-  const baseDur = state.audioBuffer ? state.audioBuffer.duration : 0;
-  $('#curveOutDur').textContent = fmtTime(baseDur * durMul, 1);
+  return Math.min(pos, dur);
 }
 
-function curveHitPoint(x, y) {
-  const pts = curvePoints;
-  for (let i = 0; i < pts.length; i++) {
-    const px = timeToX(pts[i].t), py = speedToY(pts[i].v);
-    if ((px - x) ** 2 + (py - y) ** 2 <= 12 * 12) return i;
-  }
-  return -1;
+function fadeCurveFunc(t, type) {
+  if (type === 'exp') return t * t;
+  if (type === 'log') return Math.sqrt(t);
+  if (type === 'cos') return (1 - Math.cos(t * Math.PI)) / 2;
+  return t;
 }
 
-curveCanvas.addEventListener('pointerdown', (e) => {
-  const r = curveCanvas.getBoundingClientRect();
-  const x = e.clientX - r.left, y = e.clientY - r.top;
-  if (e.button === 2) return;
-  const hit = curveHitPoint(x, y);
-  if (hit >= 0) {
-    curveDragIdx = hit;
-    curveCanvas.setPointerCapture(e.pointerId);
-  } else {
-    const t = xToTime(x), v = yToSpeed(y);
-    curvePoints.push({ t, v });
-    curvePoints.sort((a, b) => a.t - b.t);
-    curveDragIdx = curvePoints.findIndex(p => p.t === t && p.v === v);
-    curveCanvas.setPointerCapture(e.pointerId);
-    drawCurve(); updateCurveStats();
+function getEffectiveSpeed() {
+  if (S.activeTab === 'curve' && S.curvePoints.length > 0) {
+    return getSpeedAtPos(S.readPos, S.curvePoints, S.audioBuffer ? S.audioBuffer.duration : 0);
   }
+  return S.livePreview.speed;
+}
+
+function needsSoundTouch() {
+  if (S.livePreview.pitch !== 0) return true;
+  if (S.activeTab === 'speed' && S.livePreview.speed !== 1 && S.pitchLock) return true;
+  if (S.activeTab === 'curve' && S.curvePoints.length > 0 && S.pitchLock) return true;
+  return false;
+}
+
+function needsFadeGain() {
+  var lp = S.livePreview;
+  if (S.activeTab === 'fade') {
+    return lp.fadeIn > 0 || lp.fadeOut > 0 || lp.boostIn > 0 || lp.boostOut > 0 || lp.sliceStart > 0 || lp.sliceEnd > 0;
+  }
+  return false;
+}
+
+var drop = $('#drop');
+var fileInput = $('#fileInput');
+['dragenter', 'dragover'].forEach(function(ev) {
+  drop.addEventListener(ev, function(e) { e.preventDefault(); e.stopPropagation(); drop.classList.add('is-drag'); });
 });
-curveCanvas.addEventListener('pointermove', (e) => {
-  if (curveDragIdx < 0) return;
-  const r = curveCanvas.getBoundingClientRect();
-  const x = e.clientX - r.left, y = e.clientY - r.top;
-  const p = curvePoints[curveDragIdx];
-
-  const isEdge = curveDragIdx === 0 || curveDragIdx === curvePoints.length - 1;
-  if (!isEdge) p.t = xToTime(x);
-  else if (curveDragIdx === 0) p.t = 0;
-  else p.t = 1;
-  p.v = yToSpeed(y);
-  curvePoints.sort((a, b) => a.t - b.t);
-  curveDragIdx = curvePoints.indexOf(p);
-  drawCurve(); updateCurveStats();
+['dragleave', 'drop'].forEach(function(ev) {
+  drop.addEventListener(ev, function(e) { e.preventDefault(); e.stopPropagation(); drop.classList.remove('is-drag'); });
 });
-curveCanvas.addEventListener('pointerup', () => { curveDragIdx = -1; });
-curveCanvas.addEventListener('contextmenu', (e) => {
-  e.preventDefault();
-  const r = curveCanvas.getBoundingClientRect();
-  const hit = curveHitPoint(e.clientX - r.left, e.clientY - r.top);
-  if (hit > 0 && hit < curvePoints.length - 1) {
-    curvePoints.splice(hit, 1);
-    drawCurve(); updateCurveStats();
-  }
+drop.addEventListener('drop', function(e) {
+  var f = e.dataTransfer.files && e.dataTransfer.files[0];
+  if (f) handleFile(f);
 });
- $('#btnCurveReset').addEventListener('click', () => resetCurveDefault());
-
- $('#btnApplyCurve').addEventListener('click', async () => {
-  if (!state.audioBuffer) return;
-  const pts = curvePoints.slice().sort((a, b) => a.t - b.t);
-  const flat = pts.every(p => Math.abs(p.v - 1) < 0.005);
-  if (flat) { toast('curve is flat at 1× — nothing to do', 'err'); return; }
-  const preserve = state.livePreview.pitchLock;
-  busy.show('applying curve…');
-  await new Promise(r => setTimeout(r, 20));
-  state.audioBuffer = await applyCurveSpeed(state.audioBuffer, pts, preserve);
-  await refreshWaveform();
-  busy.hide();
-  toast('curve applied', 'ok');
+fileInput.addEventListener('change', function(e) {
+  var f = e.target.files && e.target.files[0];
+  if (f) handleFile(f);
 });
-
-async function applyCurveSpeed(buf, pts, preservePitch) {
-  const SEG = 0.05;
-  const dur = buf.duration;
-  const nSeg = Math.max(2, Math.ceil(dur / SEG));
-  const chunks = [];
-  for (let i = 0; i < nSeg; i++) {
-    const t0 = (i / nSeg) * dur;
-    const t1 = ((i + 1) / nSeg) * dur;
-    const midNorm = ((i + 0.5) / nSeg);
-    const v = evalCurveAt(pts, midNorm);
-    const slice = sliceBuffer(buf, t0, t1);
-    const stretched = preservePitch ? timeStretch(slice, v, 0) : resampleSpeed(slice, v);
-    chunks.push(stretched);
-    if (i % 20 === 0) busy.prog(i / nSeg, 'stretching segment ' + (i + 1) + '/' + nSeg);
-  }
-  return concatBuffers(chunks);
-}
-
-function concatBuffers(chunks) {
-  const ch = chunks[0].numberOfChannels;
-  const sr = chunks[0].sampleRate;
-  const total = chunks.reduce((s, b) => s + b.length, 0);
-  const out = getCtx().createBuffer(ch, total, sr);
-  let pos = 0;
-  for (const b of chunks) {
-    for (let c = 0; c < ch; c++) {
-      const d = b.getChannelData(Math.min(c, b.numberOfChannels - 1));
-      out.getChannelData(c).set(d, pos);
-    }
-    pos += b.length;
-  }
-  return out;
-}
-
-const coverPreview = $('#coverPreview');
-const coverPh = $('#coverPh');
-const coverInput = $('#coverInput');
-const loadedThumb = $('#loadedThumb');
-
-function showCover(blob) {
-  $$('img', coverPreview).forEach(el => el.remove());
-  if (coverPh) coverPh.style.display = 'none';
-  const img = document.createElement('img');
-  img.src = URL.createObjectURL(blob);
-  coverPreview.appendChild(img);
-
-  $$('img', loadedThumb).forEach(el => el.remove());
-  const thumbImg = document.createElement('img');
-  thumbImg.src = URL.createObjectURL(blob);
-  loadedThumb.appendChild(thumbImg);
-  loadedThumb.querySelector('svg')?.style.setProperty('display', 'none');
-}
-function clearCoverUI() {
-  $$('img', coverPreview).forEach(el => el.remove());
-  if (coverPh) coverPh.style.display = '';
-  $$('img', loadedThumb).forEach(el => el.remove());
-  loadedThumb.querySelector('svg')?.style.setProperty('display', '');
-}
-
- $('#btnUploadCover').addEventListener('click', () => coverInput.click());
-coverInput.addEventListener('change', async (e) => {
-  const f = e.target.files?.[0]; if (!f) return;
-  const bytes = new Uint8Array(await f.arrayBuffer());
-  state.cover = { data: bytes, mime: f.type || 'image/jpeg' };
-  showCover(new Blob([bytes], { type: state.cover.mime }));
-  toast('cover loaded', 'ok');
+window.addEventListener('paste', function(e) {
+  if (!e.clipboardData) return;
+  var items = Array.from(e.clipboardData.items || []);
+  var fi = items.find(function(it) { return it.kind === 'file'; });
+  if (fi) { var f = fi.getAsFile(); if (f) handleFile(f); }
 });
- $('#btnClearCover').addEventListener('click', () => {
-  state.cover = { data: null, mime: null };
-  clearCoverUI();
-  toast('cover removed');
-});
- $('#btnExtractCover').addEventListener('click', () => tryAutoExtractCover(true));
+ $('#changeFile').addEventListener('click', function() { fileInput.click(); });
 
-async function tryAutoExtractCover(notify = false) {
-  if (!state.fileBytes) return;
-  const cov = extractCover(state.fileBytes, state.fileMime || guessMimeFromName(state.fileName));
-  if (cov) {
-    state.cover = cov;
-    showCover(new Blob([cov.data], { type: cov.mime }));
-    if (notify) toast('cover extracted', 'ok');
-  } else {
-    clearCoverUI();
-    if (notify) toast('no embedded cover found', 'err');
+function handleFile(file) {
+  var isAudio = file.type.startsWith('audio/');
+  var isVideo = file.type.startsWith('video/');
+  if (!isAudio && !isVideo && !/\.(mp3|wav|m4a|ogg|opus|flac|mp4|mov|webm|mkv|aac)$/i.test(file.name)) {
+    toast('not an audio/video file', 'err');
+    return;
   }
-}
-
-function extractCover(bytes, mime) {
-  const m = (mime || '').toLowerCase();
-  if (m.includes('mpeg') || m.includes('mp3')) return extractCoverID3(bytes);
-  if (m.includes('flac')) return extractCoverFLAC(bytes);
-  return extractCoverID3(bytes) || extractCoverFLAC(bytes);
-}
-
-function extractCoverID3(bytes) {
-  if (bytes.length < 10) return null;
-  if (bytes[0] !== 0x49 || bytes[1] !== 0x44 || bytes[2] !== 0x33) return null;
-  const ver = bytes[3];
-  const flags = bytes[5];
-  const tagSize = ((bytes[6] & 0x7f) << 21) | ((bytes[7] & 0x7f) << 14) | ((bytes[8] & 0x7f) << 7) | (bytes[9] & 0x7f);
-  let p = 10;
-
-  if (flags & 0x40) {
-    const extSize = readSyncSafe(bytes, p);
-    p += 4 + extSize;
-  }
-  const end = Math.min(10 + tagSize, bytes.length);
-  while (p + 10 < end) {
-    const fid = String.fromCharCode(bytes[p], bytes[p + 1], bytes[p + 2], bytes[p + 3]);
-    if (!/^[A-Z0-9]{4}$/.test(fid)) break;
-    const size = ver === 4
-      ? readSyncSafe(bytes, p + 4)
-      : ((bytes[p + 4] << 24) | (bytes[p + 5] << 16) | (bytes[p + 6] << 8) | bytes[p + 7]);
-    if (size <= 0 || p + 10 + size > end) break;
-    if (fid === 'APIC') {
-      let q = p + 10;
-      const enc = bytes[q]; q++;
-
-      let mimeEnd = q;
-      while (mimeEnd < p + 10 + size && bytes[mimeEnd] !== 0) mimeEnd++;
-      const mimeStr = new TextDecoder().decode(bytes.subarray(q, mimeEnd));
-      q = mimeEnd + 1;
-      q++;
-
-      if (enc === 1 || enc === 2) {
-        while (q + 1 < p + 10 + size && !(bytes[q] === 0 && bytes[q + 1] === 0)) q += 2;
-        q += 2;
-      } else {
-        while (q < p + 10 + size && bytes[q] !== 0) q++;
-        q++;
-      }
-      const data = bytes.subarray(q, p + 10 + size);
-      return { data: new Uint8Array(data), mime: mimeStr || 'image/jpeg' };
-    }
-    p += 10 + size;
-  }
-  return null;
-}
-function readSyncSafe(b, p) {
-  return ((b[p] & 0x7f) << 21) | ((b[p + 1] & 0x7f) << 14) | ((b[p + 2] & 0x7f) << 7) | (b[p + 3] & 0x7f);
-}
-
-function extractCoverFLAC(bytes) {
-  if (bytes.length < 4) return null;
-  if (bytes[0] !== 0x66 || bytes[1] !== 0x4C || bytes[2] !== 0x61 || bytes[3] !== 0x43) return null;
-  let p = 4;
-  const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-  while (p + 4 <= bytes.length) {
-    const head = bytes[p];
-    const last = (head & 0x80) !== 0;
-    const type = head & 0x7f;
-    const size = (bytes[p + 1] << 16) | (bytes[p + 2] << 8) | bytes[p + 3];
-    p += 4;
-    if (type === 6 && p + size <= bytes.length) {
-      let q = p;
-      q += 4;
-      const mimeLen = dv.getUint32(q); q += 4;
-      const mimeStr = new TextDecoder().decode(bytes.subarray(q, q + mimeLen)); q += mimeLen;
-      const descLen = dv.getUint32(q); q += 4;
-      q += descLen;
-      q += 16;
-      const dataLen = dv.getUint32(q); q += 4;
-      const data = bytes.subarray(q, q + dataLen);
-      return { data: new Uint8Array(data), mime: mimeStr || 'image/jpeg' };
-    }
-    p += size;
-    if (last) break;
-  }
-  return null;
-}
-
-function audioBufferToWavBlob(buf) {
-  return new Blob([audioBufferToWavBytes(buf)], { type: 'audio/wav' });
-}
-
-function audioBufferToWavBytes(buf) {
-  const ch = buf.numberOfChannels, sr = buf.sampleRate;
-  const N = buf.length;
-  const blockAlign = ch * 2;
-  const byteRate = sr * blockAlign;
-  const dataSize = N * blockAlign;
-  const total = 44 + dataSize;
-  const ab = new ArrayBuffer(total);
-  const dv = new DataView(ab);
-  const writeStr = (off, s) => { for (let i = 0; i < s.length; i++) dv.setUint8(off + i, s.charCodeAt(i)); };
-  writeStr(0, 'RIFF'); dv.setUint32(4, total - 8, true);
-  writeStr(8, 'WAVE'); writeStr(12, 'fmt '); dv.setUint32(16, 16, true);
-  dv.setUint16(20, 1, true); dv.setUint16(22, ch, true);
-  dv.setUint32(24, sr, true); dv.setUint32(28, byteRate, true);
-  dv.setUint16(32, blockAlign, true); dv.setUint16(34, 16, true);
-  writeStr(36, 'data'); dv.setUint32(40, dataSize, true);
-  let off = 44;
-
-  const channels = [];
-  for (let c = 0; c < ch; c++) channels.push(buf.getChannelData(c));
-  for (let i = 0; i < N; i++) {
-    for (let c = 0; c < ch; c++) {
-      let s = Math.max(-1, Math.min(1, channels[c][i]));
-      s = s < 0 ? s * 0x8000 : s * 0x7fff;
-      dv.setInt16(off, s | 0, true);
-      off += 2;
-    }
-  }
-  return new Uint8Array(ab);
-}
-
-function audioBufferToMp3Bytes(buf, kbps = 320, cover = null) {
-  if (!window.lamejs) throw new Error('lamejs not loaded');
-  const ch = Math.min(2, buf.numberOfChannels);
-  const sr = buf.sampleRate;
-  const enc = new lamejs.Mp3Encoder(ch, sr, kbps);
-  const N = buf.length;
-  const block = 1152;
-  const left = floatTo16(buf.getChannelData(0));
-  const right = ch > 1 ? floatTo16(buf.getChannelData(1)) : null;
-  const parts = [];
-  for (let i = 0; i < N; i += block) {
-    const l = left.subarray(i, i + block);
-    let frame;
-    if (ch === 1) frame = enc.encodeBuffer(l);
-    else frame = enc.encodeBuffer(l, right.subarray(i, i + block));
-    if (frame && frame.length) parts.push(frame);
-    if (i % (block * 200) === 0) busy.prog(0.5 + 0.4 * (i / N), 'encoding mp3 ' + Math.round(100 * i / N) + '%');
-  }
-  const tail = enc.flush();
-  if (tail && tail.length) parts.push(tail);
-  let totalLen = parts.reduce((s, p) => s + p.length, 0);
-  const mp3 = new Uint8Array(totalLen);
-  let off = 0;
-  for (const p of parts) { mp3.set(p, off); off += p.length; }
-
-  if (cover && cover.data && cover.data.length) {
-    return prependID3v2WithCover(mp3, cover);
-  }
-  return mp3;
-}
-function floatTo16(arr) {
-  const out = new Int16Array(arr.length);
-  for (let i = 0; i < arr.length; i++) {
-    let s = Math.max(-1, Math.min(1, arr[i]));
-    out[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
-  }
-  return out;
-}
-
-function prependID3v2WithCover(mp3, cover) {
-  const title = (state.fileName || 'teenytuning').replace(/\.[^.]+$/, '');
-  const titleFrame = makeTextFrame('TIT2', title);
-  const apicFrame = makeAPICFrame(cover.data, cover.mime || 'image/jpeg');
-  const body = concatU8([titleFrame, apicFrame]);
-  const size = body.length;
-
-  const ss = [(size >> 21) & 0x7f, (size >> 14) & 0x7f, (size >> 7) & 0x7f, size & 0x7f];
-  const header = new Uint8Array(10);
-  header[0] = 0x49; header[1] = 0x44; header[2] = 0x33;
-  header[3] = 0x03; header[4] = 0x00;
-  header[5] = 0x00;
-  header[6] = ss[0]; header[7] = ss[1]; header[8] = ss[2]; header[9] = ss[3];
-  return concatU8([header, body, mp3]);
-}
-function makeTextFrame(id, text) {
-  const enc = new TextEncoder();
-  const payload = concatU8([new Uint8Array([0]), enc.encode(text)]);
-  return makeFrame(id, payload);
-}
-function makeAPICFrame(dataBytes, mime) {
-  const enc = new TextEncoder();
-  const parts = [
-    new Uint8Array([0x00]),
-    enc.encode(mime), new Uint8Array([0x00]),
-    new Uint8Array([0x03]),
-    new Uint8Array([0x00]),
-    dataBytes
-  ];
-  return makeFrame('APIC', concatU8(parts));
-}
-function makeFrame(id, payload) {
-  const head = new Uint8Array(10);
-  for (let i = 0; i < 4; i++) head[i] = id.charCodeAt(i);
-  const s = payload.length;
-  head[4] = (s >>> 24) & 0xff; head[5] = (s >>> 16) & 0xff;
-  head[6] = (s >>> 8) & 0xff; head[7] = s & 0xff;
-  head[8] = 0; head[9] = 0;
-  return concatU8([head, payload]);
-}
-function concatU8(arrs) {
-  const total = arrs.reduce((s, a) => s + a.length, 0);
-  const out = new Uint8Array(total);
-  let o = 0;
-  for (const a of arrs) { out.set(a, o); o += a.length; }
-  return out;
-}
-
-function download(bytes, name, mime) {
-  const blob = new Blob([bytes], { type: mime });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = name;
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
-}
-
-async function processExport() {
-  let exportBuffer = state.audioBuffer;
-
-  const { start, end } = state.region;
-  if (end - start > 0.01 && !(start <= 0.001 && end >= exportBuffer.duration - 0.001)) {
-    exportBuffer = sliceBuffer(exportBuffer, start, end);
-  }
-
-  const sS = Math.max(0, parseFloat($('#sliceStart').value) || 0);
-  const sE = Math.max(0, parseFloat($('#sliceEnd').value) || 0);
-  const fi = parseFloat($('#fadeInRange').value) || 0;
-  const fo = parseFloat($('#fadeOutRange').value) || 0;
-  const bi = parseFloat($('#boostInRange').value) || 0;
-  const bo = parseFloat($('#boostOutRange').value) || 0;
-  if (fi > 0 || fo > 0 || bi > 0 || bo > 0 || sS > 0 || sE > 0) {
-    if (sS > 0 || sE > 0) {
-      const sStart = sS, sEnd = Math.max(sStart + 0.01, exportBuffer.duration - sE);
-      exportBuffer = sliceBuffer(exportBuffer, sStart, sEnd);
-    }
-    exportBuffer = applyFadeAndBoost(exportBuffer, fi, fo, bi, bo, fadeCurve);
-  }
-
-  const speedVal = parseFloat($('#speedRange').value);
-  if (Math.abs(speedVal - 1) > 0.001) {
-    exportBuffer = state.pitchLock ? timeStretch(exportBuffer, speedVal, 0) : resampleSpeed(exportBuffer, speedVal);
-  }
-
-  const pitchVal = parseFloat($('#pitchRange').value);
-  if (Math.abs(pitchVal) > 0.05) {
-    exportBuffer = timeStretch(exportBuffer, 1, pitchVal);
-  }
-
-  const pts = curvePoints.slice().sort((a, b) => a.t - b.t);
-  const flat = pts.every(p => Math.abs(p.v - 1) < 0.005);
-  if (!flat) {
-    const preserve = state.livePreview.pitchLock;
-    exportBuffer = await applyCurveSpeed(exportBuffer, pts, preserve);
-  }
-
-  return exportBuffer;
-}
-
- $$('.export-tile').forEach(t => t.addEventListener('click', async () => {
-  if (!state.audioBuffer) return;
-  const fmt = t.dataset.fmt;
-  const base = (state.fileName || 'teenytuning').replace(/\.[^.]+$/, '');
-  busy.show('preparing export...');
-  await new Promise(r => setTimeout(r, 20));
-  
-  try {
-    const exportBuf = await processExport();
-    if (fmt === 'wav') {
-      busy.show('encoding wav…');
-      await new Promise(r => setTimeout(r, 20));
-      const bytes = audioBufferToWavBytes(exportBuf);
-      download(bytes, base + '_teenytuning.wav', 'audio/wav');
-      busy.hide();
-      toast('exported wav', 'ok');
-    } else if (fmt === 'mp3') {
-      busy.show('encoding mp3…');
-      await new Promise(r => setTimeout(r, 20));
-      const bytes = audioBufferToMp3Bytes(exportBuf, 320, state.cover);
-      download(bytes, base + '_teenytuning.mp3', 'audio/mpeg');
-      busy.hide();
-      toast('exported mp3', 'ok');
-    }
-  } catch (err) {
-    busy.hide();
-    toast('export failed: ' + err.message, 'err');
-  }
-}));
-
-window.addEventListener('keydown', (e) => {
-  if (e.target.matches('input, textarea')) return;
-  if (e.code === 'Space') { e.preventDefault(); $('#btnPlay').click(); }
-});
-
-function drawFadeOverlay() {
-  const overlay = $('#fadeOverlay');
-  if (!overlay) return;
-  if (!state.audioBuffer || !state.ws) { overlay.innerHTML = ''; return; }
-  const dur = state.audioBuffer.duration;
-  if (dur <= 0) { overlay.innerHTML = ''; return; }
-  const activeTab = document.querySelector('.tab.active')?.dataset?.tab;
-  if (activeTab !== 'fade') { overlay.innerHTML = ''; return; }
-  
-  const fi = parseFloat($('#fadeInRange').value) || 0;
-  const fo = parseFloat($('#fadeOutRange').value) || 0;
-  const bi = parseFloat($('#boostInRange').value) || 0;
-  const bo = parseFloat($('#boostOutRange').value) || 0;
-  
-  const pct = (sec) => Math.max(0, Math.min(100, (sec / dur) * 100));
-  const parts = [];
-  
-  if (fi > 0) {
-    const X = pct(fi);
-    parts.push(`<polygon class="wedge-fade" points="0,0 ${X.toFixed(3)},0 0,100"/>`);
-  } else if (bi > 0) {
-    const X = pct(bi);
-    parts.push(`<polygon class="wedge-boost" points="0,100 ${X.toFixed(3)},100 0,0"/>`);
-  }
-  
-  if (fo > 0) {
-    const X = pct(fo);
-    parts.push(`<polygon class="wedge-fade" points="100,0 100,100 ${(100-X).toFixed(3)},0"/>`);
-  } else if (bo > 0) {
-    const X = pct(bo);
-    parts.push(`<polygon class="wedge-boost" points="100,100 100,0 ${(100-X).toFixed(3)},100"/>`);
-  }
-  
-  overlay.innerHTML = parts.join('');
-}
-
-function applyPitchPreview() {
-  if (!state.ws) return;
-  const el = PreviewEngine.attachedTo;
-  if (!el) return;
-  el.preservesPitch = state.livePreview.pitchLock;
-  el.mozPreservesPitch = state.livePreview.pitchLock;
-  el.webkitPreservesPitch = state.livePreview.pitchLock;
-  state.ws.setPlaybackRate(state.livePreview.speed || 1, state.livePreview.pitchLock);
-}
-function clearPitchPreview() {
-  if (!state.ws) return;
-  const el = PreviewEngine.attachedTo;
-  if (!el) return;
-  el.preservesPitch = state.livePreview.pitchLock;
-  el.mozPreservesPitch = state.livePreview.pitchLock;
-  el.webkitPreservesPitch = state.livePreview.pitchLock;
-  state.ws.setPlaybackRate(state.livePreview.speed || 1, state.livePreview.pitchLock);
-}
- $('#pitchRange').addEventListener('input', () => {
-  const activeTab = document.querySelector('.tab.active')?.dataset?.tab;
-  if (activeTab === 'pitch') applyPitchPreview();
-});
-
-(function setupDraggablePlayhead() {
-  const stage = $('#waveStage');
-  if (!stage) return;
-  let dragging = false;
-  const xToTime = (clientX) => {
-    if (!state.ws || !state.audioBuffer) return 0;
-    const rect = $('#waveform').getBoundingClientRect();
-    const x = Math.max(0, Math.min(rect.width, clientX - rect.left));
-    return (x / rect.width) * state.audioBuffer.duration;
+  busyShow('reading file…');
+  stopPlayback();
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    S.fileBytes = new Uint8Array(e.target.result);
+    S.fileName = file.name;
+    S.fileMime = file.type || 'audio/mpeg';
+    S.cover = { data: null, mime: null };
+    $('#coverPh').style.display = '';
+    var existingImg = $('#coverPreview img');
+    if (existingImg) existingImg.remove();
+    decodeAudio(S.fileBytes, S.fileMime);
   };
-  const seekTo = (t) => {
-    if (!state.ws || !state.audioBuffer) return;
-    const dur = state.audioBuffer.duration;
-    const norm = Math.max(0, Math.min(1, t / Math.max(0.0001, dur)));
-    if (typeof state.ws.seekTo === 'function') state.ws.seekTo(norm);
-    else if (typeof state.ws.setTime === 'function') state.ws.setTime(norm * dur);
-    $('#tCur').textContent = fmtTime(norm * dur, 2);
-  };
-  stage.addEventListener('mousedown', (e) => {
-    if (!state.ws) return;
-    if (e.target.closest('.wavesurfer-region, .wavesurfer-handle')) return;
-    if (e.button !== 0) return;
-    dragging = true;
-    stage.classList.add('dragging');
-    seekTo(xToTime(e.clientX));
-    e.preventDefault();
+  reader.readAsArrayBuffer(file);
+}
+
+function decodeAudio(bytes, mime) {
+  busyShow('decoding audio…');
+  getCtx();
+  var ctx = S.audioCtx;
+  ctx.decodeAudioData(bytes.slice(0).buffer).then(function(buf) {
+    S.originalBuffer = buf;
+    S.audioBuffer = buf;
+    S.region.start = 0;
+    S.region.end = buf.duration;
+    S.livePreview = { fadeIn: 0, fadeOut: 0, boostIn: 0, boostOut: 0, pitch: 0, speed: 1, fadeCurve: 'lin', sliceStart: 0, sliceEnd: 0 };
+    S.curvePoints = [];
+    S.pitchLock = false;
+    $('#pitchLockSwitch').classList.remove('on');
+    $('#pitchLockLabel').textContent = 'off';
+    resetSliders();
+    initWaveSurfer(buf);
+    updateFileInfo();
+    $('#dropCard').classList.add('hidden');
+    $('#editorCard').classList.remove('hidden');
+    busyHide();
+    toast('loaded ' + S.fileName, 'ok');
+  }).catch(function(err) {
+    busyHide();
+    toast('failed to decode: ' + err.message, 'err');
   });
-  window.addEventListener('mousemove', (e) => { if (dragging) seekTo(xToTime(e.clientX)); });
-  window.addEventListener('mouseup',   () => { if (dragging) { dragging = false; stage.classList.remove('dragging'); } });
-  stage.addEventListener('touchstart', (e) => {
-    if (!state.ws || !e.touches[0]) return;
-    if (e.target.closest('.wavesurfer-region, .wavesurfer-handle')) return;
-    dragging = true; stage.classList.add('dragging');
-    seekTo(xToTime(e.touches[0].clientX));
-  }, { passive: true });
-  stage.addEventListener('touchmove', (e) => { if (dragging && e.touches[0]) seekTo(xToTime(e.touches[0].clientX)); }, { passive: true });
-  stage.addEventListener('touchend',  () => { if (dragging) { dragging = false; stage.classList.remove('dragging'); } });
-})();
+}
 
-const _origStartTick = PreviewEngine.startTick.bind(PreviewEngine);
-PreviewEngine.startTick = function() {
-  if (this.raf) return;
-  const self = this;
-  const loop = () => {
-    if (!state.ws) { self.raf = null; return; }
-    const ct = state.ws.getCurrentTime();
-    $('#tCur').textContent = fmtTime(ct, 2);
-    if (ct >= state.region.end - 0.0005) {
-      if (state.loop && state.region.end - state.region.start > 0.05) state.ws.setTime(state.region.start);
-      else { state.ws.pause(); state.ws.setTime(state.region.start); }
+function resetSliders() {
+  $('#fadeInRange').value = 0; $('#fadeInVal').textContent = '0.00 s';
+  $('#fadeOutRange').value = 0; $('#fadeOutVal').textContent = '0.00 s';
+  $('#boostInRange').value = 0; $('#boostInVal').textContent = '0.00 s';
+  $('#boostOutRange').value = 0; $('#boostOutVal').textContent = '0.00 s';
+  $('#speedRange').value = 1; $('#speedVal').textContent = '1.00×';
+  $('#pitchRange').value = 0; $('#pitchVal').textContent = '+0.0 st';
+  $('#sliceStart').value = 0; $('#sliceEnd').value = 0;
+  $$('#fadeCurveSeg button').forEach(function(b) { b.classList.toggle('active', b.dataset.curve === 'lin'); });
+  S.fadeCurveShape = 'lin';
+  updateFadeOverlay();
+  updateSpeedInfo();
+  updateCurveInfo();
+}
+
+function updateFileInfo() {
+  var buf = S.audioBuffer;
+  $('#fileName').textContent = S.fileName;
+  $('#fileSize').textContent = fmtBytes(S.fileBytes ? S.fileBytes.length : 0);
+  $('#fileDur').textContent = fmtTime(buf.duration, 2);
+  $('#fileChans').textContent = buf.numberOfChannels === 1 ? 'mono' : 'stereo';
+  $('#fileRate').textContent = (buf.sampleRate / 1000).toFixed(1) + ' kHz';
+  $('#fileType').textContent = S.fileMime.startsWith('video') ? 'video' : 'audio';
+  $('#tDur').textContent = fmtTime(buf.duration, 2);
+  $('#tCur').textContent = fmtTime(0, 2);
+  updateTrimInfo();
+  updateSpeedInfo();
+  updateCurveInfo();
+}
+
+function initWaveSurfer(buf) {
+  if (S.ws) { S.ws.destroy(); S.ws = null; }
+  var blob = new Blob([S.fileBytes], { type: S.fileMime });
+  var url = URL.createObjectURL(blob);
+  var regions = WaveSurfer.Regions.create();
+  S.wsRegions = regions;
+  S.ws = WaveSurfer.create({
+    container: '#waveform',
+    waveColor: 'rgba(76,175,80,0.35)',
+    progressColor: 'rgba(76,175,80,0.8)',
+    cursorColor: '#fff',
+    cursorWidth: 2,
+    height: 132,
+    barWidth: 2,
+    barGap: 1,
+    barRadius: 2,
+    url: url,
+    plugins: [regions],
+    backend: 'WebAudio',
+    mediaControls: false
+  });
+  S.ws.on('ready', function() {
+    var r = S.wsRegions.addRegion({
+      start: S.region.start,
+      end: S.region.end,
+      color: 'rgba(76,175,80,0.18)',
+      drag: true,
+      resize: true
+    });
+    S.ws.setVolume(0);
+    updateTrimInfo();
+  });
+  S.ws.on('interaction', function(newTime) {
+    var pos = Math.max(0, Math.min(newTime, S.audioBuffer.duration));
+    if (S.isPlaying) {
+      seekTo(pos);
+    } else {
+      S.readPos = pos;
+      S.ws.setTime(pos);
+      $('#tCur').textContent = fmtTime(pos, 2);
     }
-    const fi = state.livePreview.fadeIn;
-    const fo = state.livePreview.fadeOut;
-    const bi = state.livePreview.boostIn;
-    const bo = state.livePreview.boostOut;
-    const rs = state.region.start, re = state.region.end;
-    let g = 1;
-    if (fi > 0 && ct - rs < fi) g *= Math.max(0, (ct - rs) / fi);
-    if (fo > 0 && re - ct < fo) g *= Math.max(0, (re - ct) / fo);
-    if (bi > 0 && ct - rs < bi) g *= 2 - Math.max(0, Math.min(1, (ct - rs) / bi));
-    if (bo > 0 && re - ct < bo) g *= 1 + (1 - Math.max(0, Math.min(1, (re - ct) / bo)));
-    if (!self.gain) self.ensureCtx();
-    self.gain.gain.cancelScheduledValues(self.ctx.currentTime);
-    self.gain.gain.setValueAtTime(Math.max(0, Math.min(4, g)), self.ctx.currentTime);
-    const dur = state.audioBuffer ? state.audioBuffer.duration : 0;
-    const activeTab = document.querySelector('.tab.active')?.dataset?.tab;
-    if (activeTab === 'curve' && dur > 0) {
-      const tNorm = Math.max(0, Math.min(1, (ct - rs) / Math.max(0.001, re - rs)));
-      const speed = evalCurveAt(curvePoints.slice().sort((a,b)=>a.t-b.t), tNorm);
-      const clamped = Math.max(0.25, Math.min(4, speed));
-      state.ws.setPlaybackRate(clamped, state.livePreview.pitchLock);
-      drawCurve(tNorm);
+  });
+  S.wsRegions.on('region-updated', function(r) {
+    S.region.start = r.start;
+    S.region.end = r.end;
+    updateTrimInfo();
+  });
+}
+
+function updateTrimInfo() {
+  $('#trimStart').textContent = fmtTime(S.region.start, 2);
+  $('#trimEnd').textContent = fmtTime(S.region.end, 2);
+  var len = Math.max(0, S.region.end - S.region.start);
+  var dur = S.audioBuffer ? S.audioBuffer.duration : 0;
+  $('#trimLen').textContent = fmtTime(len, 2);
+  $('#trimRemoved').textContent = fmtTime(Math.max(0, dur - len), 2);
+  $('#trimStartInp').value = fmtTime(S.region.start, 2);
+  $('#trimEndInp').value = fmtTime(S.region.end, 2);
+}
+
+ $('#trimStartInp').addEventListener('change', function() {
+  var v = parseTime(this.value);
+  if (isFinite(v) && S.wsRegions) {
+    v = Math.max(0, Math.min(v, S.region.end - 0.01));
+    var regs = S.wsRegions.getRegions();
+    if (regs.length) { regs[0].setOptions({ start: v }); S.region.start = v; }
+    updateTrimInfo();
+  }
+});
+ $('#trimEndInp').addEventListener('change', function() {
+  var v = parseTime(this.value);
+  if (isFinite(v) && S.wsRegions) {
+    v = Math.max(S.region.start + 0.01, Math.min(v, S.audioBuffer.duration));
+    var regs = S.wsRegions.getRegions();
+    if (regs.length) { regs[0].setOptions({ end: v }); S.region.end = v; }
+    updateTrimInfo();
+  }
+});
+
+ $('#btnSelectAll').addEventListener('click', function() {
+  if (!S.wsRegions || !S.audioBuffer) return;
+  var regs = S.wsRegions.getRegions();
+  if (regs.length) { regs[0].setOptions({ start: 0, end: S.audioBuffer.duration }); }
+  S.region.start = 0; S.region.end = S.audioBuffer.duration;
+  updateTrimInfo();
+});
+ $('#btnResetRegion').addEventListener('click', function() {
+  if (!S.wsRegions || !S.audioBuffer) return;
+  var regs = S.wsRegions.getRegions();
+  if (regs.length) { regs[0].setOptions({ start: 0, end: S.audioBuffer.duration }); }
+  S.region.start = 0; S.region.end = S.audioBuffer.duration;
+  updateTrimInfo();
+});
+
+ $('#btnApplyTrim').addEventListener('click', function() {
+  if (!S.audioBuffer) return;
+  stopPlayback();
+  var sr = S.audioBuffer.sampleRate;
+  var ch = S.audioBuffer.numberOfChannels;
+  var s0 = Math.round(S.region.start * sr);
+  var s1 = Math.round(S.region.end * sr);
+  s0 = Math.max(0, Math.min(s0, S.audioBuffer.length));
+  s1 = Math.max(s0, Math.min(s1, S.audioBuffer.length));
+  var len = s1 - s0;
+  var newBuf = S.audioCtx.createBuffer(ch, len, sr);
+  for (var c = 0; c < ch; c++) {
+    var src = S.audioBuffer.getChannelData(c);
+    var dst = newBuf.getChannelData(c);
+    for (var i = 0; i < len; i++) dst[i] = src[s0 + i];
+  }
+  S.audioBuffer = newBuf;
+  S.region.start = 0;
+  S.region.end = newBuf.duration;
+  reloadWaveSurfer();
+  updateFileInfo();
+  toast('trim applied', 'ok');
+});
+
+function reloadWaveSurfer() {
+  var blob = bufferToWavBlob(S.audioBuffer);
+  var url = URL.createObjectURL(blob);
+  if (S.ws) { S.ws.destroy(); S.ws = null; }
+  var regions = WaveSurfer.Regions.create();
+  S.wsRegions = regions;
+  S.ws = WaveSurfer.create({
+    container: '#waveform',
+    waveColor: 'rgba(76,175,80,0.35)',
+    progressColor: 'rgba(76,175,80,0.8)',
+    cursorColor: '#fff',
+    cursorWidth: 2,
+    height: 132,
+    barWidth: 2,
+    barGap: 1,
+    barRadius: 2,
+    url: url,
+    plugins: [regions],
+    backend: 'WebAudio',
+    mediaControls: false
+  });
+  S.ws.on('ready', function() {
+    S.wsRegions.addRegion({
+      start: S.region.start,
+      end: S.region.end,
+      color: 'rgba(76,175,80,0.18)',
+      drag: true,
+      resize: true
+    });
+    updateTrimInfo();
+  });
+  S.ws.on('interaction', function(newTime) {
+    var pos = Math.max(0, Math.min(newTime, S.audioBuffer.duration));
+    if (S.isPlaying) {
+      seekTo(pos);
+    } else {
+      S.readPos = pos;
+      S.ws.setTime(pos);
+      $('#tCur').textContent = fmtTime(pos, 2);
     }
-    self.raf = requestAnimationFrame(loop);
+  });
+  S.wsRegions.on('region-updated', function(r) {
+    S.region.start = r.start;
+    S.region.end = r.end;
+    updateTrimInfo();
+  });
+}
+
+function stopPlayback() {
+  S.isPlaying = false;
+  if (S.rafId) { cancelAnimationFrame(S.rafId); S.rafId = null; }
+  if (S.processor) { try { S.processor.disconnect(); } catch(e){} S.processor = null; }
+  if (S.gainNode) { try { S.gainNode.disconnect(); } catch(e){} S.gainNode = null; }
+  S.stInstances = [];
+  S.stFilters = [];
+  $('#btnPlay').classList.remove('is-playing');
+}
+
+function seekTo(pos) {
+  var wasPlaying = S.isPlaying;
+  stopPlayback();
+  S.readPos = pos;
+  if (S.ws) S.ws.setTime(pos);
+  $('#tCur').textContent = fmtTime(pos, 2);
+  if (wasPlaying) startPlayback(pos);
+}
+
+function startPlayback(fromPos) {
+  if (!S.audioBuffer) return;
+  getCtx();
+  stopPlayback();
+
+  var pos = fromPos !== undefined ? fromPos : S.readPos;
+  if (pos >= S.audioBuffer.duration) pos = 0;
+  S.readPos = pos;
+  S.playStartPos = pos;
+  S.playStartTime = performance.now();
+  S.isPlaying = true;
+  $('#btnPlay').classList.add('is-playing');
+
+  var ctx = S.audioCtx;
+  var buf = S.audioBuffer;
+  var numCh = buf.numberOfChannels;
+  var sr = buf.sampleRate;
+  var useST = needsSoundTouch();
+  var useFade = needsFadeGain();
+  var chunkSize = 4096;
+
+  if (useST) {
+    S.stInstances = [];
+    S.stFilters = [];
+    for (var c = 0; c < numCh; c++) {
+      var st = new SoundTouch(sr);
+      st.tempo = 1;
+      st.pitchSemiTones = S.livePreview.pitch;
+      S.stInstances.push(st);
+      S.stFilters.push(new soundtouch.SimpleFilter(st));
+    }
+  }
+
+  S.processor = ctx.createScriptProcessor(chunkSize, 0, numCh);
+  S.gainNode = ctx.createGain();
+  S.gainNode.gain.value = S.volume;
+  S.processor.connect(S.gainNode);
+  S.gainNode.connect(ctx.destination);
+
+  var self = this;
+  S.processor.onaudioprocess = function(e) {
+    if (!S.isPlaying) return;
+    var dur = buf.duration;
+    var effSpeed = getEffectiveSpeed();
+
+    if (useST) {
+      var temp = effSpeed;
+      if (S.pitchLock || S.livePreview.pitch !== 0) {
+        for (var ci = 0; ci < numCh; ci++) {
+          S.stInstances[ci].tempo = temp;
+          S.stInstances[ci].pitchSemiTones = S.livePreview.pitch;
+        }
+      }
+    }
+
+    var inputSamples = useST ? chunkSize : Math.round(chunkSize * effSpeed);
+    if (inputSamples < 1) inputSamples = 1;
+
+    for (var ch = 0; ch < numCh; ch++) {
+      var channelData = buf.getChannelData(ch);
+      var outBuf = e.outputBuffer.getChannelData(ch);
+      var input = new Float32Array(inputSamples);
+
+      for (var i = 0; i < inputSamples; i++) {
+        var sIdx = Math.floor(S.readPos * sr) + i;
+        if (sIdx < channelData.length) {
+          input[i] = channelData[sIdx];
+        } else {
+          input[i] = 0;
+        }
+      }
+
+      var output;
+      if (useST) {
+        S.stFilters[ch].push(input);
+        output = S.stFilters[ch].pull();
+      } else {
+        output = input;
+      }
+
+      if (useFade) {
+        var fadeSr = sr;
+        for (var j = 0; j < output.length; j++) {
+          var sampleTime = S.readPos + (j / fadeSr);
+          var fadeDur = buf.duration;
+          var lp = S.livePreview;
+          var sliceS = lp.sliceStart || 0;
+          var sliceE = lp.sliceEnd || 0;
+          var effectiveStart = sliceS;
+          var effectiveEnd = fadeDur - sliceE;
+          var relPos = sampleTime - effectiveStart;
+          var effectiveLen = effectiveEnd - effectiveStart;
+          var gain = 1;
+
+          if (relPos < 0 || relPos > effectiveLen) {
+            gain = 0;
+          } else {
+            var fadeIn = lp.fadeIn || 0;
+            var fadeOut = lp.fadeOut || 0;
+            var boostIn = lp.boostIn || 0;
+            var boostOut = lp.boostOut || 0;
+
+            if (relPos < fadeIn) {
+              gain *= fadeCurveFunc(relPos / fadeIn, S.fadeCurveShape);
+            }
+            if (relPos > effectiveLen - fadeOut && fadeOut > 0) {
+              var t = (effectiveLen - relPos) / fadeOut;
+              gain *= fadeCurveFunc(t, S.fadeCurveShape);
+            }
+            if (relPos < boostIn && boostIn > 0) {
+              var bt = relPos / boostIn;
+              gain *= 1 + 2 * (1 - bt);
+            }
+            if (relPos > effectiveLen - boostOut && boostOut > 0) {
+              var bt2 = (effectiveLen - relPos) / boostOut;
+              gain *= 1 + 2 * (1 - bt2);
+            }
+          }
+
+          output[j] *= gain;
+        }
+      }
+
+      var copyLen = Math.min(output.length, outBuf.length);
+      for (var k = 0; k < copyLen; k++) {
+        outBuf[k] = output[k];
+      }
+      for (var k2 = copyLen; k2 < outBuf.length; k2++) {
+        outBuf[k2] = 0;
+      }
+    }
+
+    S.readPos += inputSamples / sr;
+
+    if (S.readPos >= dur) {
+      if (S.loop && S.region.start < S.region.end) {
+        S.readPos = S.region.start;
+        S.playStartPos = S.region.start;
+        S.playStartTime = performance.now();
+        if (useST) {
+          for (var ci2 = 0; ci2 < numCh; ci2++) {
+            S.stInstances[ci2].clear();
+          }
+        }
+      } else {
+        S.isPlaying = false;
+        S.readPos = 0;
+        S.playStartPos = 0;
+        $('#btnPlay').classList.remove('is-playing');
+        if (S.processor) { try { S.processor.disconnect(); } catch(ex){} S.processor = null; }
+        if (S.gainNode) { try { S.gainNode.disconnect(); } catch(ex){} S.gainNode = null; }
+        S.stInstances = [];
+        S.stFilters = [];
+        if (S.ws) S.ws.setTime(0);
+        $('#tCur').textContent = fmtTime(0, 2);
+        return;
+      }
+    }
   };
-  self.raf = requestAnimationFrame(loop);
-};
 
-PreviewEngine.setGain = function(v, immediate) {
-  if (!this.gain) return;
-  const clamped = Math.max(0, Math.min(4, v));
-  this.gain.gain.cancelScheduledValues(this.ctx.currentTime);
-  this.gain.gain.setValueAtTime(clamped, this.ctx.currentTime);
-};
+  S.rafId = requestAnimationFrame(syncLoop);
+}
 
-const _origMountWavesurfer = mountWavesurfer;
-mountWavesurfer = async function(buf) {
-  const r = await _origMountWavesurfer(buf);
-  setTimeout(() => { drawFadeOverlay(); }, 50);
-  return r;
-};
+function syncLoop() {
+  if (!S.isPlaying) return;
+  if (S.ws) {
+    S.ws.setTime(S.readPos);
+  }
+  $('#tCur').textContent = fmtTime(S.readPos, 2);
+  S.rafId = requestAnimationFrame(syncLoop);
+}
 
-if (state.audioBuffer) { drawFadeOverlay(); }
+ $('#btnPlay').addEventListener('click', function() {
+  if (!S.audioBuffer) return;
+  getCtx();
+  if (S.isPlaying) {
+    stopPlayback();
+  } else {
+    startPlayback(S.readPos);
+  }
+});
 
-requestAnimationFrame(() => { sizeCurveCanvas(); drawCurve(); updateCurveStats(); });
-</script>
+ $('#btnLoop').addEventListener('click', function() {
+  S.loop = !S.loop;
+  this.classList.toggle('is-on', S.loop);
+});
 
-</body>
-</html>
+ $('#volSlider').addEventListener('input', function() {
+  S.volume = parseFloat(this.value);
+  if (S.gainNode) S.gainNode.gain.value = S.volume;
+});
+
+ $('#pitchLockSwitch').addEventListener('click', function() {
+  S.pitchLock = !S.pitchLock;
+  this.classList.toggle('on', S.pitchLock);
+  $('#pitchLockLabel').textContent = S.pitchLock ? 'on' : 'off';
+  if (S.isPlaying && !needsSoundTouch() && (S.activeTab === 'speed' && S.livePreview.speed !== 1 && S.pitchLock)) {
+    startPlayback(S.readPos);
+  }
+  updateSpeedInfo();
+});
+
+ $$('.tab').forEach(function(tab) {
+  tab.addEventListener('click', function() {
+    $$('.tab').forEach(function(t) { t.classList.remove('active'); });
+    $$('.panel').forEach(function(p) { p.classList.remove('active'); });
+    this.classList.add('active');
+    var panelName = this.dataset.tab;
+    S.activeTab = panelName;
+    var panel = $('[data-panel="' + panelName + '"]');
+    if (panel) panel.classList.add('active');
+    if (S.isPlaying && (panelName === 'curve' && S.curvePoints.length > 0 || panelName === 'speed' || panelName === 'pitch')) {
+      startPlayback(S.readPos);
+    } else if (S.isPlaying && !needsSoundTouch() && !needsFadeGain()) {
+      startPlayback(S.readPos);
+    }
+  });
+});
+
+ $('#fadeInRange').addEventListener('input', function() {
+  S.livePreview.fadeIn = parseFloat(this.value);
+  $('#fadeInVal').textContent = S.livePreview.fadeIn.toFixed(2) + ' s';
+  updateFadeOverlay();
+});
+ $('#fadeOutRange').addEventListener('input', function() {
+  S.livePreview.fadeOut = parseFloat(this.value);
+  $('#fadeOutVal').textContent = S.livePreview.fadeOut.toFixed
