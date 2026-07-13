@@ -6,7 +6,7 @@
   <title>TeenyTuning — Audio Editor</title>
   <meta name="description" content="In-browser audio editor. Trim, fade, slice, change speed with pitch lock, draw speed curves, shift pitch, swap cover art. No upload limits, no signup, runs entirely on your device." />
 
-  <link rel="icon" type="image/png" href="https://i.imgur.com/VWBy5Sk.png" />
+  <link rel="icon" type="image/png" href="https://i.imgur.com/J3TQ64u.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -113,6 +113,12 @@ h1,h2,h3,h4 { letter-spacing: -.02em; margin: 0; font-weight: 700; }
 .mono { font-family: var(--mono); }
 .muted { color: var(--muted); }
 
+@keyframes fade-up { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
+.nav { animation: fade-up 0.6s ease-out both; }
+.hero { animation: fade-up 0.8s cubic-bezier(.2,.7,.2,1) both; animation-delay: .05s; }
+.card { animation: fade-up 0.8s cubic-bezier(.2,.7,.2,1) both; animation-delay: .2s; }
+footer { animation: fade-up 0.8s cubic-bezier(.2,.7,.2,1) both; animation-delay: .35s; }
+
 .nav {
   position: sticky; top: 0; z-index: 50;
   display: flex; align-items: center; justify-content: space-between;
@@ -123,17 +129,21 @@ h1,h2,h3,h4 { letter-spacing: -.02em; margin: 0; font-weight: 700; }
 }
 .brand { 
   display: inline-flex; align-items: center; gap: 12px; 
-  color: var(--text); font-weight: 800; font-size: 20px; letter-spacing: -.02em; 
+  font-weight: 800; font-size: 20px; letter-spacing: -.02em; 
   padding: 4px 8px; border-radius: 8px;
 }
 .brand img { width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 4px 12px var(--mint-glow)); }
-.brand .txt { transition: color .2s, background .2s; padding: 2px 4px; border-radius: 4px; }
-.brand:hover .txt {
-  background: linear-gradient(90deg, var(--mint-deep), var(--mint), var(--mint-2));
+.brand .txt { 
+  background-image: linear-gradient(180deg, var(--text) 40%, var(--mint-2) 90%, var(--mint-deep) 100%);
+  background-size: 100% 200%;
+  background-position: 0% 0%;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+  transition: background-position 0.8s cubic-bezier(.2,.8,.2,1);
+  padding: 2px 4px; border-radius: 4px;
 }
+.brand:hover .txt { background-position: 0% 100%; }
 .brand .b-sub { font-family: var(--mono); font-weight: 600; font-size: 11px; color: var(--mint-3); padding: 3px 8px; border-radius: 6px; background: rgba(76,175,80,.15); letter-spacing: .08em; }
 
 .nav-right { display: flex; align-items: center; gap: 14px; }
@@ -231,6 +241,7 @@ main { max-width: 1180px; margin: 0 auto 40px; padding: 0 clamp(20px, 4vw, 48px)
 .loaded-info .meta { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: .05em; margin-top: 4px; }
 .loaded-info .meta b { color: var(--mint-3); }
 
+.wave-hint { font-family: var(--mono); font-size: 11px; color: var(--muted-2); padding: 12px 22px 0; text-align: center; }
 .wave-stage {
   background: var(--stage-bg);
   box-shadow: var(--stage-shadow);
@@ -239,14 +250,8 @@ main { max-width: 1180px; margin: 0 auto 40px; padding: 0 clamp(20px, 4vw, 48px)
 }
 #waveform { width: 100%; min-height: 132px; }
 #waveform .wavesurfer-region { background: rgba(76,175,80,.18) !important; }
-.wave-overlay {
-  position: absolute; left: 22px; right: 22px; top: 18px; bottom: 18px;
-  pointer-events: none;
-  display: flex; align-items: center; justify-content: center;
-  color: var(--muted); font-family: var(--mono); font-size: 12px; letter-spacing: .08em;
-}
 .fade-overlay { position: absolute; left: 22px; right: 22px; top: 18px; bottom: 18px; pointer-events: none; width: calc(100% - 44px); height: calc(100% - 36px); display: block; }
-.fade-overlay polygon.wedge-fade  { fill: rgba(0, 0, 0, 0.65); }
+.fade-overlay polygon.wedge-fade  { fill: rgba(0, 0, 0, 0.75); }
 html[data-theme="light"] .fade-overlay polygon.wedge-fade { fill: rgba(7,36,26,.45); }
 .fade-overlay polygon.wedge-boost { fill: rgba(255, 255, 255, 0.2); }
 html[data-theme="light"] .fade-overlay polygon.wedge-boost { fill: rgba(7,36,26,.15); }
@@ -290,9 +295,11 @@ html[data-theme="light"] .fade-overlay polygon.wedge-boost { fill: rgba(7,36,26,
 .time .sep { color: var(--muted-2); margin: 0 4px; }
 .time .total { color: var(--muted); }
 
-.vol-control { display: flex; align-items: center; gap: 8px; min-width: 120px; }
-.vol-control svg { width: 18px; height: 18px; color: var(--muted); }
-.vol-control input[type=range] { width: 100%; }
+.vol-control { display: flex; flex-direction: column; gap: 2px; min-width: 120px; }
+.vol-row { display: flex; align-items: center; gap: 8px; }
+.vol-row svg { width: 18px; height: 18px; color: var(--muted); }
+.vol-row input[type=range] { width: 100%; }
+.vol-hint { font-size: 9px; color: var(--muted-2); text-align: center; font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.1em; }
 
 .spacer { flex: 1; }
 
@@ -458,23 +465,25 @@ footer {
   background: rgba(0,0,0,0.1);
 }
 html[data-theme="light"] footer { background: rgba(255,255,255,0.4); }
-.ft-brand { display: flex; align-items: center; gap: 14px; font-weight: 800; font-size: 18px; }
-.ft-icon-wrap { position: relative; display: flex; align-items: center; gap: 4px; }
-.ft-icon-wrap img { width: 32px; height: 32px; animation: herb-bounce 2s infinite ease-in-out; }
-@keyframes herb-bounce {
-  0%, 100% { transform: translateX(-2px) rotate(-8deg); }
-  50% { transform: translateX(2px) rotate(8deg); }
+.ft-brand { display: flex; align-items: center; gap: 14px; font-weight: 800; font-size: 18px; color: var(--text); transition: text-shadow 0.2s; }
+.ft-brand:hover { text-shadow: 0 0 12px var(--mint-glow); }
+.ft-icon-wrap { position: relative; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; }
+.ft-icon-wrap img { width: 32px; height: 32px; animation: tt-bounce 2s infinite ease-in-out; }
+@keyframes tt-bounce {
+  0%, 100% { transform: translateY(0) rotate(-5deg) scale(1, 1); }
+  25% { transform: translateY(-4px) rotate(5deg) scale(0.95, 1.05); }
+  50% { transform: translateY(0) rotate(-5deg) scale(1.05, 0.95); }
+  75% { transform: translateY(-4px) rotate(5deg) scale(1, 1); }
 }
-.ft-waves { display: flex; gap: 2px; align-items: center; height: 24px; }
-.ft-waves span { width: 3px; background: var(--mint-2); border-radius: 2px; animation: wave 1s infinite ease-in-out; }
-.ft-waves span:nth-child(1) { height: 8px; animation-delay: 0s; }
-.ft-waves span:nth-child(2) { height: 16px; animation-delay: 0.2s; }
-.ft-waves span:nth-child(3) { height: 10px; animation-delay: 0.4s; }
-@keyframes wave { 0%, 100% { transform: scaleY(0.4); opacity: 0.5; } 50% { transform: scaleY(1.2); opacity: 1; } }
-.ft-links { display: flex; gap: 24px; }
-.ft-links a { color: var(--muted); font-size: 13px; transition: color .15s; }
-.ft-links a:hover { color: var(--mint-3); }
+.ft-note { position: absolute; font-size: 12px; opacity: 0; animation: note-float 2s infinite ease-in-out; pointer-events: none; }
+@keyframes note-float {
+  0% { transform: translate(10px, 5px) scale(0.5); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translate(20px, -20px) scale(1); opacity: 0; }
+}
 .ft-copy { color: var(--muted-2); font-size: 12px; margin: 0; }
+.ft-copy a { color: var(--muted); text-decoration: none; border-bottom: 1px dotted var(--muted-2); }
+.ft-copy a:hover { color: var(--mint-3); border-bottom-color: var(--mint-3); }
 
 @media (max-width: 740px) {
   .hero { flex-direction: column; align-items: flex-start; gap: 18px; }
@@ -491,7 +500,7 @@ html[data-theme="light"] footer { background: rgba(255,255,255,0.4); }
 
 <nav class="nav">
   <a class="brand" href="/">
-    <img src="https://i.imgur.com/VWBy5Sk.png" alt="TeenyTuning"/>
+    <img src="https://i.imgur.com/J3TQ64u.png" alt="TeenyTuning"/>
     <span class="txt">TeenyTuning</span>
     <span class="b-sub">BETA</span>
   </a>
@@ -507,7 +516,7 @@ html[data-theme="light"] footer { background: rgba(255,255,255,0.4); }
 </nav>
 
 <section class="hero">
-  <img class="hero-logo" src="https://i.imgur.com/VWBy5Sk.png" alt="TeenyTuning logo"/>
+  <img class="hero-logo" src="https://i.imgur.com/J3TQ64u.png" alt="TeenyTuning logo"/>
   <div class="hero-text">
     <h1>TeenyTuning — <span class="accent">audio that listens back.</span></h1>
     <p>Drag a file. Pull audio out of a video. Trim, fade, draw speed curves, swap cover art. Everything runs in your browser — no uploads, no signup, no limits.</p>
@@ -566,10 +575,10 @@ html[data-theme="light"] footer { background: rgba(255,255,255,0.4); }
       <button class="btn btn-ghost" id="changeFile">change</button>
     </div>
 
+    <div class="wave-hint">Drag the green region to trim · Click outside to seek</div>
     <div class="wave-stage playhead-grab" id="waveStage">
       <div id="waveform"></div>
       <svg class="fade-overlay" id="fadeOverlay" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
-      <div class="wave-overlay hidden" id="waveOverlay">drag to select a region · click anywhere to seek</div>
     </div>
 
     <div class="transport">
@@ -584,14 +593,17 @@ html[data-theme="light"] footer { background: rgba(255,255,255,0.4); }
         <span id="tCur">0:00</span><span class="sep">/</span><span class="total" id="tDur">0:00</span>
       </div>
       <div class="spacer"></div>
-      <div class="vol-control" title="Preview volume (not included in download)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-        <input type="range" id="volSlider" min="0" max="1" step="0.01" value="1" aria-label="Volume">
+      <div class="vol-control">
+        <div class="vol-row" title="Preview volume (not included in download)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+          <input type="range" id="volSlider" min="0" max="1" step="0.01" value="1" aria-label="Volume">
+        </div>
+        <span class="vol-hint">preview only</span>
       </div>
       <div class="pitch-lock">
         <span>PITCH LOCK</span>
-        <div class="switch on" id="pitchLockSwitch" role="switch" aria-checked="true"></div>
-        <span class="mono" id="pitchLockLabel" style="color: var(--mint-3);">on</span>
+        <div class="switch" id="pitchLockSwitch" role="switch" aria-checked="false"></div>
+        <span class="mono" id="pitchLockLabel" style="color: var(--muted);">off</span>
       </div>
     </div>
 
@@ -836,19 +848,14 @@ html[data-theme="light"] footer { background: rgba(255,255,255,0.4); }
 </main>
 
 <footer>
-  <div class="ft-brand">
+  <a class="ft-brand" href="/">
     <div class="ft-icon-wrap">
-      <img src="https://i.imgur.com/VWBy5Sk.png" alt="TeenyTuning"/>
-      <div class="ft-waves"><span></span><span></span><span></span></div>
+      <img src="https://i.imgur.com/J3TQ64u.png" alt="TeenyTuning"/>
+      <span class="ft-note">🎵</span>
     </div>
     <span>TeenyTuning</span>
-  </div>
-  <div class="ft-links">
-    <a href="/projects">Projects</a>
-    <a href="/converter">PIXL</a>
-    <a href="https://discord.com/invite/WDbJ5wE2cR" target="_blank" rel="noopener">Discord</a>
-  </div>
-  <p class="ft-copy">built client-side · part of Vadrifts</p>
+  </a>
+  <p class="ft-copy">built client-side · part of <a href="https://vadrifts.onrender.com" target="_blank" rel="noopener">Vadrifts</a></p>
 </footer>
 
 <div class="toast" id="toast"></div>
@@ -920,11 +927,11 @@ const state = {
   fileName: '',
   fileMime: '',
   fileBytes: null,
-  pitchLock: true,
+  pitchLock: false,
   region: { start: 0, end: 0 },
   loop: true,
   volume: 1,
-  livePreview: { fadeIn: 0, fadeOut: 0, boostIn: 0, boostOut: 0, pitchPreview: 0, speed: 1, pitchLock: true },
+  livePreview: { fadeIn: 0, fadeOut: 0, boostIn: 0, boostOut: 0, pitchPreview: 0, speed: 1, pitchLock: false },
   cover: { data: null, mime: null },
   ws: null,
   wsRegions: null,
@@ -1056,6 +1063,9 @@ function renderLoadedFile(file, buf) {
 }
 
 async function mountWavesurfer(buf) {
+  const prevTime = state.ws ? state.ws.getCurrentTime() : 0;
+  const wasPlaying = state.ws ? state.ws.isPlaying() : false;
+  
   if (state.ws) { state.ws.destroy(); state.ws = null; state.wsRegions = null; }
 
   const WS = window.WaveSurfer || window.wavesurfer;
@@ -1099,6 +1109,13 @@ async function mountWavesurfer(buf) {
     updateTrimDisplay();
     PreviewEngine.attach(state.ws);
     state.ws.setVolume(state.volume);
+    
+    if (prevTime > 0 && prevTime < buf.duration) {
+      state.ws.setTime(prevTime);
+    }
+    if (wasPlaying) {
+      state.ws.play();
+    }
   });
 
   state.ws.on('seeking', () => $('#tCur').textContent = fmtTime(state.ws.getCurrentTime(), 2));
@@ -1270,7 +1287,6 @@ function activateTab(tab) {
   $$('.tab').forEach(x => x.classList.toggle('active', x.dataset.tab === tab));
   $$('.panel').forEach(p => p.classList.toggle('active', p.dataset.panel === tab));
   if (tab === 'curve') requestAnimationFrame(drawCurve);
-  $('#waveOverlay').classList.toggle('hidden', tab !== 'trim');
   if (tab === 'pitch') applyPitchPreview(); else clearPitchPreview();
   drawFadeOverlay();
 }
@@ -2153,6 +2169,12 @@ async function processExport() {
       exportBuffer = state.pitchLock ? timeStretch(exportBuffer, f, 0) : resampleSpeed(exportBuffer, f);
     }
   }
+  if (activeTab === 'pitch') {
+    const s = parseFloat($('#pitchRange').value);
+    if (Math.abs(s) > 0.05) {
+      exportBuffer = timeStretch(exportBuffer, 1, s);
+    }
+  }
   if (activeTab === 'fade') {
     const fi = parseFloat($('#fadeInRange').value) || 0;
     const fo = parseFloat($('#fadeOutRange').value) || 0;
@@ -2233,18 +2255,18 @@ function drawFadeOverlay() {
   
   if (fi > 0) {
     const X = pct(fi);
-    parts.push(`<polygon class="wedge-fade" points="0,100 ${X.toFixed(3)},100 0,0"/>`);
+    parts.push(`<polygon class="wedge-fade" points="0,0 ${X.toFixed(3)},0 0,100"/>`);
   } else if (bi > 0) {
     const X = pct(bi);
-    parts.push(`<polygon class="wedge-boost" points="0,0 ${X.toFixed(3)},0 0,100"/>`);
+    parts.push(`<polygon class="wedge-boost" points="0,100 ${X.toFixed(3)},100 0,0"/>`);
   }
   
   if (fo > 0) {
     const X = pct(fo);
-    parts.push(`<polygon class="wedge-fade" points="100,100 100,0 ${(100-X).toFixed(3)},100"/>`);
+    parts.push(`<polygon class="wedge-fade" points="100,0 100,100 ${(100-X).toFixed(3)},0"/>`);
   } else if (bo > 0) {
     const X = pct(bo);
-    parts.push(`<polygon class="wedge-boost" points="100,0 100,100 ${(100-X).toFixed(3)},0"/>`);
+    parts.push(`<polygon class="wedge-boost" points="100,100 100,0 ${(100-X).toFixed(3)},100"/>`);
   }
   
   overlay.innerHTML = parts.join('');
